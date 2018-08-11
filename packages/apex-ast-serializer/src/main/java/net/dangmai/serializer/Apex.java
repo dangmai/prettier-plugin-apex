@@ -1,8 +1,9 @@
 package net.dangmai.serializer;
 
-import com.gilecode.yagson.YaGson;
 import com.gilecode.yagson.YaGsonBuilder;
-import net.sourceforge.pmd.lang.apex.*;
+import com.gilecode.yagson.types.TypeInfoPolicy;
+import net.sourceforge.pmd.lang.apex.ApexParser;
+import net.sourceforge.pmd.lang.apex.ApexParserOptions;
 import net.sourceforge.pmd.lang.ast.Node;
 import org.apache.commons.cli.*;
 
@@ -31,7 +32,7 @@ public class Apex {
             ApexParser parser = new ApexParser(new ApexParserOptions());
             Node topRootNode = parser.parse("", apexReader);
 
-            YaGsonBuilder builder = new YaGsonBuilder();
+            YaGsonBuilder builder = new YaGsonBuilder().setTypeInfoPolicy(TypeInfoPolicy.DISABLED);
             if (cmd.hasOption("p")) {
                 builder.setPrettyPrinting();
             }
