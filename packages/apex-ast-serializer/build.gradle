@@ -1,0 +1,32 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group 'net.dangmai'
+version '1.0-SNAPSHOT'
+
+mainClassName = 'net.dangmai.serializer.Apex'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+run {
+    standardInput = System.in
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd-apex
+    implementation group: 'net.sourceforge.pmd', name: 'pmd-apex', version: '6.6.0'
+
+    // https://mvnrepository.com/artifact/com.gilecode.yagson/yagson
+    implementation group: 'com.gilecode.yagson', name: 'yagson', version: '0.4'
+
+    // https://mvnrepository.com/artifact/commons-cli/commons-cli
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
