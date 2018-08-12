@@ -15,6 +15,7 @@ public class Apex {
         cliOptions.addOption("l", "location", true, "Location of Apex class file. If not specified, the Apex content will be read from stdin.");
         cliOptions.addOption("p", "pretty", false, "Pretty print output JSON.");
         cliOptions.addOption("h", "help", false, "Print help information.");
+        cliOptions.addOption("t", "type", false, "Include details type information.");
 
         CommandLineParser cliParser = new DefaultParser();
         CommandLine cmd = cliParser.parse(cliOptions, args);
@@ -32,7 +33,11 @@ public class Apex {
             ApexParser parser = new ApexParser(new ApexParserOptions());
             Node topRootNode = parser.parse("", apexReader);
 
-            YaGsonBuilder builder = new YaGsonBuilder().setTypeInfoPolicy(TypeInfoPolicy.DISABLED);
+            YaGsonBuilder builder = new YaGsonBuilder();
+
+            if (!cmd.hasOption("t")) {
+                builder.setTypeInfoPolicy(TypeInfoPolicy.DISABLED);
+            }
             if (cmd.hasOption("p")) {
                 builder.setPrettyPrinting();
             }
