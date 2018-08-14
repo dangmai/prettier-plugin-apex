@@ -25,6 +25,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.gilecode.yagson/yagson
     implementation group: 'com.gilecode.yagson', name: 'yagson', version: '0.4'
 
+    // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
