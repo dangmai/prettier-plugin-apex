@@ -18,9 +18,10 @@ public class Apex {
         Options cliOptions = new Options();
         cliOptions.addOption("f", "format", true, "Format of the output. Possible options: json, xml.");
         cliOptions.addOption("l", "location", true, "Location of Apex class file. If not specified, the Apex content will be read from stdin.");
-        cliOptions.addOption("p", "pretty", false, "Pretty print output JSON.");
+        cliOptions.addOption("t", "type", false, "JSON format only: Include details type information.");
+        cliOptions.addOption("p", "pretty", false, "JSON format only: Pretty print output.");
+        cliOptions.addOption("i", "id-ref", false, "XML format only: Use ID reference rather than XPath.");
         cliOptions.addOption("h", "help", false, "Print help information.");
-        cliOptions.addOption("t", "type", false, "Include details type information in JSON format.");
 
         CommandLineParser cliParser = new DefaultParser();
         CommandLine cmd = cliParser.parse(cliOptions, args);
@@ -55,6 +56,12 @@ public class Apex {
                 System.out.print(builder.create().toJson(topRootNode));
             } else {
                 XStream xstream = new XStream();
+
+                if (cmd.hasOption("i")) {
+                    xstream.setMode(XStream.ID_REFERENCES);
+                } else {
+                    xstream.setMode(XStream.XPATH_ABSOLUTE_REFERENCES);
+                }
                 System.out.println(xstream.toXML(topRootNode));
             }
         }
