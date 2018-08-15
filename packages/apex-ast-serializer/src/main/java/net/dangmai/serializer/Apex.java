@@ -3,6 +3,7 @@ package net.dangmai.serializer;
 import com.gilecode.yagson.YaGsonBuilder;
 import com.gilecode.yagson.types.TypeInfoPolicy;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.CompactWriter;
 import net.sourceforge.pmd.lang.apex.ApexParser;
 import net.sourceforge.pmd.lang.apex.ApexParserOptions;
 import net.sourceforge.pmd.lang.ast.Node;
@@ -18,8 +19,8 @@ public class Apex {
         Options cliOptions = new Options();
         cliOptions.addOption("f", "format", true, "Format of the output. Possible options: json, xml.");
         cliOptions.addOption("l", "location", true, "Location of Apex class file. If not specified, the Apex content will be read from stdin.");
+        cliOptions.addOption("p", "pretty", false, "Pretty print output.");
         cliOptions.addOption("t", "type", false, "JSON format only: Include details type information.");
-        cliOptions.addOption("p", "pretty", false, "JSON format only: Pretty print output.");
         cliOptions.addOption("i", "id-ref", false, "XML format only: Use ID reference rather than XPath.");
         cliOptions.addOption("h", "help", false, "Print help information.");
 
@@ -62,7 +63,13 @@ public class Apex {
                 } else {
                     xstream.setMode(XStream.XPATH_ABSOLUTE_REFERENCES);
                 }
-                System.out.println(xstream.toXML(topRootNode));
+                if (cmd.hasOption("p")) {
+                    System.out.println(xstream.toXML(topRootNode));
+                } else {
+                    StringWriter writer = new StringWriter();
+                    xstream.marshal(topRootNode, new CompactWriter(writer));
+                    System.out.print(writer.toString());
+                }
             }
         }
     }
