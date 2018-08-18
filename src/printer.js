@@ -260,8 +260,9 @@ function printVariableExpression(node, children, path, print) {
 }
 
 function printLiteralExpression(node, children, path, print) {
+  // TODO Fix cases where String literal is just white spaces, in which cases node.literal["_"] is undefined
   if (node.literalType === "STRING") {
-    return concat(["'", node.literal["_"], "'"]);
+    return concat(["'", node.literal["_"] ? node.literal["_"]: '', "'"]);
   }
   return concat([node.literal["_"]]);
 }
