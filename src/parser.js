@@ -55,7 +55,7 @@ function parse(text, parsers, opts) {
   const res = executionResult.stdout.toString();
   let ast = {};
   if (res) {
-    console.log(res);
+    // console.log(res);
     const parser = new xml2js.Parser({
       async: false,
       explicitRoot: false,

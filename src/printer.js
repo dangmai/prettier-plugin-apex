@@ -13,6 +13,12 @@ const ANNOTATION_FALSE_VALUE = "apex.jorje.data.ast.AnnotationValue$FalseAnnotat
 const LOCATION_IDENTIFIER = "apex.jorje.data.Identifiers_-LocationIdentifier";
 const CLASS_TYPE_REF = "apex.jorje.data.ast.TypeRefs_-ClassTypeRef";
 const PARAMETER = "apex.jorje.semantic.ast.member.Parameter";
+const BLOCK_STATEMENT = "apex.jorje.semantic.ast.statement.BlockStatement";
+const RETURN_STATEMENT = "apex.jorje.semantic.ast.statement.ReturnStatement";
+const BINARY_EXPRESSION = "apex.jorje.semantic.ast.expression.BinaryExpression";
+const VARIABLE_EXPRESSION = "apex.jorje.semantic.ast.expression.VariableExpression";
+const LITERAL_EXPRESSION = "apex.jorje.semantic.ast.expression.LiteralExpression";
+const BOOLEAN_EXPRESSION = "apex.jorje.semantic.ast.expression.BooleanExpression";
 
 function printSuperReference(node) {
   const docs = [];
@@ -100,6 +106,9 @@ function printAnnotations(node) {
 }
 
 function printChildNodes(children, path, print) {
+  if (!children) {
+    return [];
+  }
   let childDocs = [];
   const childNodeKeys = Object.keys(children).filter(key => key !== "$");
   childNodeKeys.forEach(key => {
@@ -170,16 +179,99 @@ function printMethodDeclaration(node, children, path, print) {
   const childDocs = printChildNodes(children, path, print);
   if(childDocs.length > 0) {
     docs.push(indent(concat([hardline, ...childDocs])));
-    docs.push(dedent(concat([hardline, "}"])));
+    docs.push(concat([hardline, "}"]));
   } else {
     docs.push("}");
   }
   return concat(docs);
 }
 
+function printBlockStatement(node, children, path, print) {
+  const childDocs = printChildNodes(children, path, print);
+  if (childDocs.length > 0) {
+    return concat([...childDocs, ";"]);
+  }
+  return "";
+}
+
+function printReturnStatement(node, children, path, print) {
+  const docs = [];
+  docs.push("return");
+  const childDocs = printChildNodes(children, path, print);
+  if (childDocs.length > 0) {
+    docs.push(" ");
+    docs.push(concat(childDocs));
+  }
+  return concat(docs);
+}
+
+const binaryExpressions = {
+  "ADDITION": "+",
+  "SUBTRACTION": "-",
+  "MULTIPLICATION": "*",
+  "DIVISION": "/",
+  "LEFT_SHIFT": "<<",
+  "RIGHT_SHIFT": ">>",
+  "UNSIGNED_RIGHT_SHIFT": ">>>",
+  "XOR": "^",
+  "AND": "&",
+  "OR": "|",
+};
+function printBinaryExpression(node, children, path, print) {
+  const docs = [];
+  const childDocs = printChildNodes(children, path, print);
+  docs.push(childDocs[0]);
+  docs.push(" ");
+  docs.push(binaryExpressions[node.op]);
+  docs.push(" ");
+  docs.push(childDocs[1]);
+  return concat(docs);
+}
+
+const booleanExpressions = {
+  "DOUBLE_EQUAL": "==",
+  "TRIPLE_EQUAL": "===",
+  "NOT_TRIPLE_EQUAL": "!==",
+  "NOT_EQUAL": "!=",
+  "ALT_NOT_EQUAL": "<>",
+  "LESS_THAN": "<",
+  "GREATER_THAN": ">",
+  "LESS_THAN_EQUAL": "<=",
+  "GREATER_THAN_EQUAL": ">=",
+  "AND": "&&",
+  "OR": "||",
+};
+function printBooleanExpression(node, children, path, print) {
+  const docs = [];
+  const childDocs = printChildNodes(children, path, print);
+  docs.push(childDocs[0]);
+  docs.push(" ");
+  docs.push(booleanExpressions[node.op]);
+  docs.push(" ");
+  docs.push(childDocs[1]);
+  return concat(docs);
+}
+
+function printVariableExpression(node, children, path, print) {
+  return concat([node.name.value]);
+}
+
+function printLiteralExpression(node, children, path, print) {
+  if (node.literalType === "STRING") {
+    return concat(["'", node.literal["_"], "'"]);
+  }
+  return concat([node.literal["_"]]);
+}
+
 const nodeHandler = {};
 nodeHandler[USER_CLASS] = printClassDeclaration;
 nodeHandler[METHOD] = printMethodDeclaration;
+nodeHandler[BLOCK_STATEMENT] = printBlockStatement;
+nodeHandler[RETURN_STATEMENT] = printReturnStatement;
+nodeHandler[BINARY_EXPRESSION] = printBinaryExpression;
+nodeHandler[VARIABLE_EXPRESSION] = printVariableExpression;
+nodeHandler[LITERAL_EXPRESSION] = printLiteralExpression;
+nodeHandler[BOOLEAN_EXPRESSION] = printBooleanExpression;
 
 function genericPrint(path, options, print) {
   const n = path.getValue();

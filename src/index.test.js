@@ -84,11 +84,11 @@ class TestClass   {
 test("one param method", () => {
   expect(format(`
 class TestClass   {
-  public String hello(String subject)
-  { return "Hello"    + subject; }
+  public Boolean hello(Boolean condition)
+  { return true     && condition; }
 }`)).toBe(`class TestClass {
-  public String hello(String subject) {
-    return "Hello" + subject;
+  public Boolean hello(Boolean condition) {
+    return true && condition;
   }
 }
 `);
@@ -97,10 +97,10 @@ test("multiple params method", () => {
   expect(format(`
 class TestClass   {
   public String hello(String action, String subject)
-  { return action    + subject; }
+  { return action    + subject     + ' Test'; }
 }`)).toBe(`class TestClass {
   public String hello(String action, String subject) {
-    return action + subject;
+    return action + subject + ' Test';
   }
 }
 `);
