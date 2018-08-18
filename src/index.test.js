@@ -71,13 +71,22 @@ test("implement 1 interface", () => {
 test("implement multiple interfaces", () => {
   expect(format("class TestClass implements FirstInterface, SecondInterface \n {}")).toBe("class TestClass implements FirstInterface, SecondInterface {}\n");
 });
+test("empty no param method", () => {
+  expect(format(`
+class TestClass   {
+  public String hello()
+  {  }
+}`)).toBe(`class TestClass {
+  public String hello() {}
+}
+`);
+});
 test("one param method", () => {
   expect(format(`
 class TestClass   {
   public String hello(String subject)
   { return "Hello"    + subject; }
-}`)).toBe(`
-class TestClass {
+}`)).toBe(`class TestClass {
   public String hello(String subject) {
     return "Hello" + subject;
   }
@@ -89,8 +98,7 @@ test("multiple params method", () => {
 class TestClass   {
   public String hello(String action, String subject)
   { return action    + subject; }
-}`)).toBe(`
-class TestClass {
+}`)).toBe(`class TestClass {
   public String hello(String action, String subject) {
     return action + subject;
   }

@@ -141,6 +141,9 @@ function printReturnType(node) {
 }
 
 function printMethodParams(node) {
+  if (!node || !node.methodInfo || !node.methodInfo.parameters || !node.methodInfo.parameters.list) {
+    return "";
+  }
   let parameters = node.methodInfo.parameters.list[PARAMETER];
   if (!Array.isArray(parameters)) {
     parameters = [parameters];
