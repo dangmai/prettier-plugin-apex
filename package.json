@@ -1,0 +1,25 @@
+{
+  "name": "prettier-plugin-apex",
+  "version": "0.0.0-development",
+  "description": "Salesforce Apex plugin for Prettier",
+  "main": "src",
+  "scripts": {
+    "test": "jest"
+  },
+  "keywords": [
+    "apex",
+    "prettier"
+  ],
+  "author": "Dang Mai <contact@dangmai.net>",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^23.5.0",
+    "prettier": "prettier/prettier"
+  },
+  "peerDependencies": {
+    "prettier": "^1.14.2"
+  },
+  "dependencies": {
+    "xml2js": "^0.4.19"
+  }
+}
