@@ -105,6 +105,8 @@ function printAnnotations(node) {
   return concat(docs);
 }
 
+// Unlike other methods, this one returns a list of Docs instead of just 1 Doc.
+// This is so that the calling code has flexibility on how to display the children.
 function printChildNodes(children, path, print) {
   if (!children) {
     return [];
