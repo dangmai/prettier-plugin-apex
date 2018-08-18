@@ -23,14 +23,17 @@ function printSuperReference(node) {
     docs.push(" ");
     docs.push(superTypeRef.value.names[LOCATION_IDENTIFIER].value);
   }
-  return docs;
+  if (docs.length > 0) {
+    return concat(docs);
+  }
+  return "";
 }
 
 function printInterfaceReference(node) {
   const docs = [];
   const interfaceTypeRef = node.modifiers.definingType.codeUnit.value.interfaceTypeRefs;
   if (!interfaceTypeRef[CLASS_TYPE_REF]) {
-    return docs;
+    return "";
   }
   let classTypeRefs = interfaceTypeRef[CLASS_TYPE_REF];
   if (!Array.isArray(classTypeRefs)) {
@@ -40,7 +43,10 @@ function printInterfaceReference(node) {
   docs.push("implements");
   docs.push(" ");
   docs.push(classTypeRefs.map(ref => ref.names[LOCATION_IDENTIFIER].value).join(", "));
-  return docs;
+  if (docs.length > 0) {
+    return concat(docs);
+  }
+  return "";
 }
 
 function printModifiers(node) {
@@ -114,8 +120,8 @@ function printClassDeclaration(node, children, path, print) {
   docs.push("class");
   docs.push(" ");
   docs.push(node.name.value);
-  docs.push(...printSuperReference(node));
-  docs.push(...printInterfaceReference(node));
+  docs.push(printSuperReference(node));
+  docs.push(printInterfaceReference(node));
   docs.push(" ");
 
   docs.push("{");
