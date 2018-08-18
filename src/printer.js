@@ -184,9 +184,6 @@ nodeHandler[METHOD] = printMethodDeclaration;
 function genericPrint(path, options, print) {
   const n = path.getValue();
   const name = path.getName();
-  if (name && nodeHandler[name]) {
-    nodeHandler[name](n.node, n.children, path, print);
-  }
   if (!n || !n.node || !n.node["$"] || !n.node["$"].class || !nodeHandler[n.node["$"].class]) {
     return "";
   }
