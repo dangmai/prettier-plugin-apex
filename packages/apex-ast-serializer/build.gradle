@@ -18,6 +18,10 @@ run {
     standardInput = System.in
 }
 
+distZip {
+    archiveName = "${project.name}.zip"
+}
+
 dependencies {
     // https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd-apex
     implementation group: 'net.sourceforge.pmd', name: 'pmd-apex', version: '6.6.0'
