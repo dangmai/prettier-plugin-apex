@@ -241,6 +241,7 @@ const booleanExpressions = {
   "AND": "&&",
   "OR": "||",
 };
+// TODO Fix cases with parentheses
 function printBooleanExpression(node, children, path, print) {
   const docs = [];
   const childDocs = printChildNodes(children, path, print);
