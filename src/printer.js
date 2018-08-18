@@ -136,7 +136,14 @@ function printClassDeclaration(node, children, path, print) {
   docs.push(" ");
 
   docs.push("{");
-  const childDocs = printChildNodes(children, path, print);
+  // Get all the child nodes, then add 2 hardlines at the end of each one, except for the very last one.
+  // That last one will be handled later on as a special case, since it is used to dedent the closing bracket.
+  const childDocs = printChildNodes(children, path, print).map((childDoc, index, allChildDocs) => {
+    if (index !== allChildDocs.length - 1) {
+      return concat([childDoc, hardline, hardline])
+    }
+    return childDoc;
+  });
   if(childDocs.length > 0) {
     docs.push(indent(concat([hardline, ...childDocs])));
     docs.push(dedent(concat([hardline, "}"])));
