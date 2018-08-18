@@ -1,0 +1,3 @@
+private class PrivateEmptyClass
+{}
+

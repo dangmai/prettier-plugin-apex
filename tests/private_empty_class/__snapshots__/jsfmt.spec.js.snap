@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PrivateEmptyClass.cls - apex-verify: PrivateEmptyClass.cls 1`] = `
+private class PrivateEmptyClass
+{}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+private class PrivateEmptyClass {}
+
+`;

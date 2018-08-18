@@ -1,0 +1,27 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ExtendImplementClass.cls - apex-verify: ExtendImplementClass.cls 1`] = `
+class ExtendImplementClass extends FirstExtend implements FirstImplement, SecondImplement {
+  public virtual class VirtualExtendInnerClass extends FirstExtend {
+
+
+  }
+
+  private abstract class AbstractImplementInnerClass implements FirstImplement {
+
+  }
+
+  global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {
+
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class ExtendImplementClass extends FirstExtend implements FirstImplement, SecondImplement {
+  public virtual class VirtualExtendInnerClass extends FirstExtend {}
+
+  private abstract class AbstractImplementInnerClass implements FirstImplement {}
+
+  global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {}
+}
+
+`;

@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`GlobalEmptyClass.cls - apex-verify: GlobalEmptyClass.cls 1`] = `
+global class GlobalEmptyClass
+{}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+global class GlobalEmptyClass {}
+
+`;
