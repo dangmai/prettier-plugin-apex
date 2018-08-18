@@ -3,17 +3,6 @@
 const docBuilders = require("prettier").doc.builders;
 const {concat, join, hardline, line, softline, literalline, group, indent, ifBreak, breakParent} = docBuilders;
 
-// const concat = docBuilders.concat;
-// const join = docBuilders.join;
-// const hardline = docBuilders.hardline;
-// const line = docBuilders.line;
-// const softline = docBuilders.softline;
-// const literalline = docBuilders.literalline;
-// const group = docBuilders.group;
-// const indent = docBuilders.indent;
-// const ifBreak = docBuilders.ifBreak;
-// const breakParent = docBuilders.breakParent;
-
 const USER_CLASS = "apex.jorje.semantic.ast.compilation.UserClass";
 const METHOD = "apex.jorje.semantic.ast.member.Method";
 const MODIFIER  = "apex.jorje.semantic.ast.modifier.Modifier";
