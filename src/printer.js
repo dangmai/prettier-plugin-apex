@@ -63,7 +63,7 @@ function printModifiers(node) {
         docs.push(" ");
       });
   }
-  return docs;
+  return concat(docs);
 }
 
 function printAnnotations(node) {
@@ -90,13 +90,13 @@ function printAnnotations(node) {
     }
     docs.push(hardline);
   }
-  return docs;
+  return concat(docs);
 }
 
 function printClassDeclaration(node, children, path, print) {
   const docs = [];
-  docs.push(...printAnnotations(node));
-  docs.push(...printModifiers(node));
+  docs.push(printAnnotations(node));
+  docs.push(printModifiers(node));
   docs.push("class");
   docs.push(" ");
   docs.push(node.name.value);
@@ -123,7 +123,7 @@ function printClassDeclaration(node, children, path, print) {
 }
 
 function printReturnType(node) {
-  return [node.methodInfo.returnType.apexName, " "];
+  return concat([node.methodInfo.returnType.apexName, " "]);
 }
 
 function printMethodParams(node) {
@@ -132,7 +132,7 @@ function printMethodParams(node) {
     parameters = [parameters];
   }
   const docs = parameters.map(parameter => `${parameter.type.type.apexName} ${parameter.name.value}`).join(", ");
-  return docs;
+  return concat(docs);
 }
 
 function printMethodDeclaration(node, children, path, print) {
@@ -140,12 +140,12 @@ function printMethodDeclaration(node, children, path, print) {
     return '';
   }
   const docs = [];
-  docs.push(...printAnnotations(node));
-  docs.push(...printModifiers(node));
-  docs.push(...printReturnType(node));
+  docs.push(printAnnotations(node));
+  docs.push(printModifiers(node));
+  docs.push(printReturnType(node));
   docs.push(node.methodInfo.canonicalName);
   docs.push("(");
-  docs.push(...printMethodParams(node));
+  docs.push(printMethodParams(node));
   docs.push(")");
   docs.push(" ");
 
