@@ -1,7 +1,7 @@
 "use strict";
 
 const docBuilders = require("prettier").doc.builders;
-const {concat, join, hardline, line, softline, literalline, group, indent, ifBreak, breakParent} = docBuilders;
+const {concat, join, hardline, line, softline, literalline, group, indent, dedent, ifBreak, breakParent} = docBuilders;
 
 const USER_CLASS = "apex.jorje.semantic.ast.compilation.UserClass";
 const METHOD = "apex.jorje.semantic.ast.member.Method";
@@ -93,6 +93,20 @@ function printAnnotations(node) {
   return concat(docs);
 }
 
+function printChildNodes(children, path, print) {
+  let childDocs = [];
+  const childNodeKeys = Object.keys(children).filter(key => key !== "$");
+  childNodeKeys.forEach(key => {
+    if (Array.isArray(children[key])) {
+      childDocs.push(...path.map(print, "children", key));
+    } else {
+      childDocs.push(path.call(print, "children", key));
+    }
+  });
+  childDocs = childDocs.filter(childDoc => childDoc !== "");
+  return childDocs;
+}
+
 function printClassDeclaration(node, children, path, print) {
   const docs = [];
   docs.push(printAnnotations(node));
@@ -105,20 +119,14 @@ function printClassDeclaration(node, children, path, print) {
   docs.push(" ");
 
   docs.push("{");
-  const childNodeKeys = Object.keys(children).filter(key => key !== "$");
-  if(childNodeKeys.length > 0) {
-    docs.push(hardline);
+  const childDocs = printChildNodes(children, path, print);
+  if(childDocs.length > 0) {
+    docs.push(indent(concat([hardline, ...childDocs])));
+    docs.push(dedent(concat([hardline, "}"])));
+  } else {
+    docs.push("}");
   }
-  childNodeKeys.forEach(key => {
-    if (Array.isArray(children[key])) {
-      docs.push(...path.map(print, "children", key));
-    } else {
-      docs.push(path.call(print, "children", key));
-    }
-  });
 
-  docs.push("}");
-  docs.push(hardline);
   return concat(docs);
 }
 
@@ -132,7 +140,7 @@ function printMethodParams(node) {
     parameters = [parameters];
   }
   const docs = parameters.map(parameter => `${parameter.type.type.apexName} ${parameter.name.value}`).join(", ");
-  return concat(docs);
+  return concat([docs]);
 }
 
 function printMethodDeclaration(node, children, path, print) {
@@ -150,16 +158,13 @@ function printMethodDeclaration(node, children, path, print) {
   docs.push(" ");
 
   docs.push("{");
-  const childNodeKeys = Object.keys(children).filter(key => key !== "$");
-  if(childNodeKeys.length > 0) {
-    docs.push(hardline);
+  const childDocs = printChildNodes(children, path, print);
+  if(childDocs.length > 0) {
+    docs.push(indent(concat([hardline, ...childDocs])));
+    docs.push(dedent(concat([hardline, "}"])));
+  } else {
+    docs.push("}");
   }
-  childNodeKeys.forEach(key => {
-    docs.push(path.call(print, "children", key));
-  });
-
-  docs.push("}");
-  docs.push(hardline);
   return concat(docs);
 }
 
@@ -176,7 +181,12 @@ function genericPrint(path, options, print) {
   if (!n || !n.node || !n.node["$"] || !n.node["$"].class || !nodeHandler[n.node["$"].class]) {
     return "";
   }
-  return nodeHandler[n.node["$"].class](n.node, n.children, path, print);
+  const doc = nodeHandler[n.node["$"].class](n.node, n.children, path, print);
+  if (path.stack.length === 1) {
+    // Adding a hardline as the last thing in the document
+    return concat([doc, hardline]);
+  }
+  return doc;
 }
 
 module.exports = genericPrint;
