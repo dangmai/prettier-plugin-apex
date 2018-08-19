@@ -50,9 +50,9 @@ public class Apex {
             SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
             ParserEngine engine;
             if (cmd.hasOption("a")) {
-                engine = ParserEngine.get(ParserEngine.Type.NAMED);
-            } else {
                 engine = ParserEngine.get(ParserEngine.Type.ANONYMOUS);
+            } else {
+                engine = ParserEngine.get(ParserEngine.Type.NAMED);
             }
             ParserOutput output = engine.parse(sourceFile);
 
