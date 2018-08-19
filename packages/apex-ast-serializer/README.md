@@ -1,7 +1,7 @@
 # Apex AST Serializer
 
 This program serializes the Abstract Syntax Tree of an Apex Class/Trigger,
-using [PMD](https://pmd.github.io/) Apex parser.
+using the jorje Apex parser distributed by Salesforce.
 The result is printed out to `stdout` as either a JSON or XML object.
 
 ## Running

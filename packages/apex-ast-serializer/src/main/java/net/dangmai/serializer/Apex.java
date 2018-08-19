@@ -1,13 +1,14 @@
 package net.dangmai.serializer;
 
+import apex.jorje.semantic.compiler.SourceFile;
+import apex.jorje.semantic.compiler.parser.ParserEngine;
+import apex.jorje.semantic.compiler.parser.ParserOutput;
 import com.gilecode.yagson.YaGsonBuilder;
 import com.gilecode.yagson.types.TypeInfoPolicy;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
-import net.sourceforge.pmd.lang.apex.ApexParser;
-import net.sourceforge.pmd.lang.apex.ApexParserOptions;
-import net.sourceforge.pmd.lang.ast.Node;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.Arrays;
@@ -15,8 +16,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Apex {
-    public static void main(String[] args) throws ParseException, FileNotFoundException {
+    public static void main(String[] args) throws ParseException, IOException {
         Options cliOptions = new Options();
+        cliOptions.addOption("a", "anonymous", false, "Parse Anonymous Apex code. If not specify, it will be parsed in Named mode.");
         cliOptions.addOption("f", "format", true, "Format of the output. Possible options: json, xml.");
         cliOptions.addOption("l", "location", true, "Location of Apex class file. If not specified, the Apex content will be read from stdin.");
         cliOptions.addOption("p", "pretty", false, "Pretty print output.");
@@ -42,8 +44,17 @@ public class Apex {
             } else {
                 apexReader = new BufferedReader(new InputStreamReader(System.in));
             }
-            ApexParser parser = new ApexParser(new ApexParserOptions());
-            Node topRootNode = parser.parse("", apexReader);
+
+            String sourceCode = IOUtils.toString(apexReader);
+            apexReader.close();
+            SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
+            ParserEngine engine;
+            if (cmd.hasOption("a")) {
+                engine = ParserEngine.get(ParserEngine.Type.NAMED);
+            } else {
+                engine = ParserEngine.get(ParserEngine.Type.ANONYMOUS);
+            }
+            ParserOutput output = engine.parse(sourceFile);
 
             if (chosenFormat.equals("json")) {
                 YaGsonBuilder builder = new YaGsonBuilder();
@@ -54,7 +65,7 @@ public class Apex {
                 if (cmd.hasOption("p")) {
                     builder.setPrettyPrinting();
                 }
-                System.out.print(builder.create().toJson(topRootNode));
+                System.out.print(builder.create().toJson(output));
             } else {
                 XStream xstream = new XStream();
 
@@ -64,10 +75,10 @@ public class Apex {
                     xstream.setMode(XStream.XPATH_ABSOLUTE_REFERENCES);
                 }
                 if (cmd.hasOption("p")) {
-                    System.out.println(xstream.toXML(topRootNode));
+                    System.out.println(xstream.toXML(output));
                 } else {
                     StringWriter writer = new StringWriter();
-                    xstream.marshal(topRootNode, new CompactWriter(writer));
+                    xstream.marshal(output, new CompactWriter(writer));
                     System.out.print(writer.toString());
                 }
             }
