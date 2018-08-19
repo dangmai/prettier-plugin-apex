@@ -34,11 +34,14 @@ function resolveAstReferences(node, referenceMap) {
   if (node["$"]) {
     const nodeId = node["$"].id;
     const nodeReference = node["$"].reference;
+    const otherAttributes = Object.keys(node["$"]).filter(attr => attr !== "id" && attr !== "reference");
     if (nodeId) {
       referenceMap[nodeId] = node;
     }
     if (nodeReference) {
       // If it has a reference attribute, that means it's a leaf node
+      // Also, copy over the attributes from the current node to the reference node.
+      otherAttributes.forEach(attr => referenceMap[nodeReference]["$"][attr] = node["$"][attr]);
       return referenceMap[nodeReference];
     }
   }

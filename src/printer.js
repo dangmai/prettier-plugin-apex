@@ -19,6 +19,8 @@ const BINARY_EXPRESSION = "apex.jorje.semantic.ast.expression.BinaryExpression";
 const VARIABLE_EXPRESSION = "apex.jorje.semantic.ast.expression.VariableExpression";
 const LITERAL_EXPRESSION = "apex.jorje.semantic.ast.expression.LiteralExpression";
 const BOOLEAN_EXPRESSION = "apex.jorje.semantic.ast.expression.BooleanExpression";
+const METHOD_CALL_EXPRESSION = "apex.jorje.semantic.ast.expression.MethodCallExpression";
+const THIS_VARIABLE_EXPRESSION = "apex.jorje.semantic.ast.expression.ThisVariableExpression";
 
 function printSuperReference(node) {
   const docs = [];
@@ -274,6 +276,35 @@ function printLiteralExpression(node, children, path, print) {
   return concat([node.literal["_"]]);
 }
 
+function printThisExpression(node, children, path, print) {
+  return "this";
+}
+
+function printMethodCallExpression(node, children, path, print) {
+  const docs = [];
+  const dottedExpression = node.reference.dottedExpression;
+  if (dottedExpression) {
+    // 2 branches:
+    // 1st: this expression
+    if (dottedExpression["$"].class === THIS_VARIABLE_EXPRESSION) {
+      docs.push("this");
+    } else {
+      // 2nd: named expression
+      const names = node.reference.names;
+      if (names && names.elements && names.elements[LOCATION_IDENTIFIER]) {
+        docs.push(names.elements[LOCATION_IDENTIFIER].value);
+      }
+    }
+    docs.push(".");
+  }
+  docs.push(node.name.value);
+  const params = [];
+  params.push("(");
+  params.push(join(", ", printChildNodes(children, path, print)));
+  params.push(")");
+  return concat([...docs, group(concat(params))]);
+}
+
 const nodeHandler = {};
 nodeHandler[USER_CLASS] = printClassDeclaration;
 nodeHandler[METHOD] = printMethodDeclaration;
@@ -283,6 +314,8 @@ nodeHandler[BINARY_EXPRESSION] = printBinaryExpression;
 nodeHandler[VARIABLE_EXPRESSION] = printVariableExpression;
 nodeHandler[LITERAL_EXPRESSION] = printLiteralExpression;
 nodeHandler[BOOLEAN_EXPRESSION] = printBooleanExpression;
+nodeHandler[METHOD_CALL_EXPRESSION] = printMethodCallExpression;
+nodeHandler[THIS_VARIABLE_EXPRESSION] = printThisExpression;
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
