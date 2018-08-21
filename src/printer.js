@@ -3,35 +3,17 @@
 const docBuilders = require("prettier").doc.builders;
 const {concat, join, hardline, line, softline, literalline, group, indent, dedent, ifBreak, breakParent} = docBuilders;
 
-const USER_CLASS = "apex.jorje.semantic.ast.compilation.UserClass";
-const METHOD = "apex.jorje.semantic.ast.member.Method";
-const MODIFIER  = "apex.jorje.semantic.ast.modifier.Modifier";
-const ANNOTATION = "apex.jorje.semantic.ast.modifier.Annotation";
-const ANNOTATION_KEY_VALUE = "apex.jorje.data.ast.AnnotationParameter_-AnnotationKeyValue";
-const ANNOTATION_TRUE_VALUE = "apex.jorje.data.ast.AnnotationValue$TrueAnnotationValue";
-const ANNOTATION_FALSE_VALUE = "apex.jorje.data.ast.AnnotationValue$FalseAnnotationValue";
-const LOCATION_IDENTIFIER = "apex.jorje.data.Identifiers_-LocationIdentifier";
-const CLASS_TYPE_REF = "apex.jorje.data.ast.TypeRefs_-ClassTypeRef";
-const PARAMETER = "apex.jorje.semantic.ast.member.Parameter";
-const BLOCK_STATEMENT = "apex.jorje.semantic.ast.statement.BlockStatement";
-const RETURN_STATEMENT = "apex.jorje.semantic.ast.statement.ReturnStatement";
-const BINARY_EXPRESSION = "apex.jorje.semantic.ast.expression.BinaryExpression";
-const VARIABLE_EXPRESSION = "apex.jorje.semantic.ast.expression.VariableExpression";
-const LITERAL_EXPRESSION = "apex.jorje.semantic.ast.expression.LiteralExpression";
-const BOOLEAN_EXPRESSION = "apex.jorje.semantic.ast.expression.BooleanExpression";
-const METHOD_CALL_EXPRESSION = "apex.jorje.semantic.ast.expression.MethodCallExpression";
-const THIS_VARIABLE_EXPRESSION = "apex.jorje.semantic.ast.expression.ThisVariableExpression";
-const VARIABLE_DECLARATION_STATEMENTS = "apex.jorje.semantic.ast.statement.VariableDeclarationStatements";
-const VARIABLE_DECLARATION = "apex.jorje.semantic.ast.statement.VariableDeclaration";
+const expressions = require("./expressions");
+const classes = require("./classes");
 
 function printSuperReference(node) {
   const docs = [];
   const superTypeRef = node.modifiers.definingType.codeUnit.value.superTypeRef;
-  if (superTypeRef.value && superTypeRef.value.names && superTypeRef.value.names[LOCATION_IDENTIFIER]) {
+  if (superTypeRef.value && superTypeRef.value.names && superTypeRef.value.names[classes.LOCATION_IDENTIFIER]) {
     docs.push(" ");
     docs.push("extends");
     docs.push(" ");
-    docs.push(superTypeRef.value.names[LOCATION_IDENTIFIER].value);
+    docs.push(superTypeRef.value.names[classes.LOCATION_IDENTIFIER].value);
   }
   if (docs.length > 0) {
     return concat(docs);
@@ -42,17 +24,17 @@ function printSuperReference(node) {
 function printInterfaceReference(node) {
   const docs = [];
   const interfaceTypeRef = node.modifiers.definingType.codeUnit.value.interfaceTypeRefs;
-  if (!interfaceTypeRef[CLASS_TYPE_REF]) {
+  if (!interfaceTypeRef[classes.CLASS_TYPE_REF]) {
     return "";
   }
-  let classTypeRefs = interfaceTypeRef[CLASS_TYPE_REF];
+  let classTypeRefs = interfaceTypeRef[classes.CLASS_TYPE_REF];
   if (!Array.isArray(classTypeRefs)) {
     classTypeRefs = [classTypeRefs];
   }
   docs.push(" ");
   docs.push("implements");
   docs.push(" ");
-  docs.push(classTypeRefs.map(ref => ref.names[LOCATION_IDENTIFIER].value).join(", "));
+  docs.push(classTypeRefs.map(ref => ref.names[classes.LOCATION_IDENTIFIER].value).join(", "));
   if (docs.length > 0) {
     return concat(docs);
   }
@@ -66,8 +48,8 @@ function printModifiers(node) {
   };
   const docs = [];
   const modifiers = node.modifiers.modifiers.modifiers;
-  if (modifiers[MODIFIER] && Array.isArray(modifiers[MODIFIER])) {
-    modifiers[MODIFIER]
+  if (modifiers[classes.MODIFIER] && Array.isArray(modifiers[classes.MODIFIER])) {
+    modifiers[classes.MODIFIER]
       .filter(modifier => modifier.type[0].apexName !== "explicitStatementExecuted")
       .forEach(modifier => {
         const apexName = modifier.type[0].apexName;
@@ -85,22 +67,22 @@ function printModifiers(node) {
 function printAnnotations(node) {
   const docs = [];
   const annotations = node.modifiers.modifiers.annotations;
-  if (annotations[ANNOTATION]) {
-    docs.push(`@${annotations[ANNOTATION].astAnnotation.name.value}`);
-    if (annotations[ANNOTATION].astAnnotation.parameters[ANNOTATION_KEY_VALUE]) {
+  if (annotations[classes.ANNOTATION]) {
+    docs.push(`@${annotations[classes.ANNOTATION].astAnnotation.name.value}`);
+    if (annotations[classes.ANNOTATION].astAnnotation.parameters[classes.ANNOTATION_KEY_VALUE]) {
       docs.push("(");
-      docs.push(annotations[ANNOTATION].astAnnotation.parameters[ANNOTATION_KEY_VALUE].key.value);
+      docs.push(annotations[classes.ANNOTATION].astAnnotation.parameters[classes.ANNOTATION_KEY_VALUE].key.value);
       docs.push("=");
-      switch (annotations[ANNOTATION].astAnnotation.parameters[ANNOTATION_KEY_VALUE].value["$"].class) {
-        case ANNOTATION_TRUE_VALUE:
+      switch (annotations[classes.ANNOTATION].astAnnotation.parameters[classes.ANNOTATION_KEY_VALUE].value["$"].class) {
+        case classes.ANNOTATION_TRUE_VALUE:
           docs.push("true");
           break;
-        case ANNOTATION_FALSE_VALUE:
+        case classes.ANNOTATION_FALSE_VALUE:
           docs.push("false");
           break;
         default:
           docs.push("'");
-          docs.push(annotations[ANNOTATION].astAnnotation.parameters[ANNOTATION_KEY_VALUE].value.value);
+          docs.push(annotations[classes.ANNOTATION].astAnnotation.parameters[classes.ANNOTATION_KEY_VALUE].value.value);
       }
       docs.push(")");
     }
@@ -166,7 +148,7 @@ function printMethodParams(node) {
   if (!node || !node.methodInfo || !node.methodInfo.parameters || !node.methodInfo.parameters.list) {
     return "";
   }
-  let parameters = node.methodInfo.parameters.list[PARAMETER];
+  let parameters = node.methodInfo.parameters.list[classes.PARAMETER];
   if (!Array.isArray(parameters)) {
     parameters = [parameters];
   }
@@ -218,49 +200,24 @@ function printReturnStatement(node, children, path, print) {
   return concat(docs);
 }
 
-const binaryExpressions = {
-  "ADDITION": "+",
-  "SUBTRACTION": "-",
-  "MULTIPLICATION": "*",
-  "DIVISION": "/",
-  "LEFT_SHIFT": "<<",
-  "RIGHT_SHIFT": ">>",
-  "UNSIGNED_RIGHT_SHIFT": ">>>",
-  "XOR": "^",
-  "AND": "&",
-  "OR": "|",
-};
 function printBinaryExpression(node, children, path, print) {
   const docs = [];
   const childDocs = printChildNodes(children, path, print);
   docs.push(childDocs[0]);
   docs.push(" ");
-  docs.push(binaryExpressions[node.op]);
+  docs.push(expressions.BINARY[node.op]);
   docs.push(" ");
   docs.push(childDocs[1]);
   return concat(docs);
 }
 
-const booleanExpressions = {
-  "DOUBLE_EQUAL": "==",
-  "TRIPLE_EQUAL": "===",
-  "NOT_TRIPLE_EQUAL": "!==",
-  "NOT_EQUAL": "!=",
-  "ALT_NOT_EQUAL": "<>",
-  "LESS_THAN": "<",
-  "GREATER_THAN": ">",
-  "LESS_THAN_EQUAL": "<=",
-  "GREATER_THAN_EQUAL": ">=",
-  "AND": "&&",
-  "OR": "||",
-};
 // TODO Fix cases with parentheses
 function printBooleanExpression(node, children, path, print) {
   const docs = [];
   const childDocs = printChildNodes(children, path, print);
   docs.push(childDocs[0]);
   docs.push(" ");
-  docs.push(booleanExpressions[node.op]);
+  docs.push(expressions.BOOLEAN[node.op]);
   docs.push(" ");
   docs.push(childDocs[1]);
   return concat(docs);
@@ -288,13 +245,13 @@ function printMethodCallExpression(node, children, path, print) {
   if (dottedExpression) {
     // 2 branches:
     // 1st: this expression
-    if (dottedExpression["$"].class === THIS_VARIABLE_EXPRESSION) {
+    if (dottedExpression["$"].class === classes.THIS_VARIABLE_EXPRESSION) {
       docs.push("this");
     } else {
       // 2nd: named expression
       const names = node.reference.names;
-      if (names && names.elements && names.elements[LOCATION_IDENTIFIER]) {
-        docs.push(names.elements[LOCATION_IDENTIFIER].value);
+      if (names && names.elements && names.elements[classes.LOCATION_IDENTIFIER]) {
+        docs.push(names.elements[classes.LOCATION_IDENTIFIER].value);
       }
     }
     docs.push(".");
@@ -319,8 +276,8 @@ function printVariableDeclarationStatements(node, children, path, print) {
 function printVariableDeclaration(node, children, path, print) {
   const docs = [];
   const typeRef = node.declarations.typeRef;
-  if (typeRef && typeRef.names && typeRef.names[LOCATION_IDENTIFIER]) {
-    docs.push(typeRef.names[LOCATION_IDENTIFIER].value);
+  if (typeRef && typeRef.names && typeRef.names[classes.LOCATION_IDENTIFIER]) {
+    docs.push(typeRef.names[classes.LOCATION_IDENTIFIER].value);
     docs.push(" ");
   }
   docs.push(node.localInfo.name.value);
@@ -329,8 +286,8 @@ function printVariableDeclaration(node, children, path, print) {
   docs.push(" ");
   // Now we expand the right side of the declaration by going down the child nodes,
   // except for the variable expression since it has already been handled above.
-  if (VARIABLE_EXPRESSION in children) {
-    delete children[VARIABLE_EXPRESSION];
+  if (classes.VARIABLE_EXPRESSION in children) {
+    delete children[classes.VARIABLE_EXPRESSION];
   }
   const childDocs = printChildNodes(children, path, print);
   docs.push(concat(childDocs));
@@ -338,18 +295,18 @@ function printVariableDeclaration(node, children, path, print) {
 }
 
 const nodeHandler = {};
-nodeHandler[USER_CLASS] = printClassDeclaration;
-nodeHandler[METHOD] = printMethodDeclaration;
-nodeHandler[BLOCK_STATEMENT] = printBlockStatement;
-nodeHandler[RETURN_STATEMENT] = printReturnStatement;
-nodeHandler[BINARY_EXPRESSION] = printBinaryExpression;
-nodeHandler[VARIABLE_EXPRESSION] = printVariableExpression;
-nodeHandler[LITERAL_EXPRESSION] = printLiteralExpression;
-nodeHandler[BOOLEAN_EXPRESSION] = printBooleanExpression;
-nodeHandler[METHOD_CALL_EXPRESSION] = printMethodCallExpression;
-nodeHandler[THIS_VARIABLE_EXPRESSION] = printThisExpression;
-nodeHandler[VARIABLE_DECLARATION_STATEMENTS] = printVariableDeclarationStatements;
-nodeHandler[VARIABLE_DECLARATION] = printVariableDeclaration;
+nodeHandler[classes.USER_CLASS] = printClassDeclaration;
+nodeHandler[classes.METHOD] = printMethodDeclaration;
+nodeHandler[classes.BLOCK_STATEMENT] = printBlockStatement;
+nodeHandler[classes.RETURN_STATEMENT] = printReturnStatement;
+nodeHandler[classes.BINARY_EXPRESSION] = printBinaryExpression;
+nodeHandler[classes.VARIABLE_EXPRESSION] = printVariableExpression;
+nodeHandler[classes.LITERAL_EXPRESSION] = printLiteralExpression;
+nodeHandler[classes.BOOLEAN_EXPRESSION] = printBooleanExpression;
+nodeHandler[classes.METHOD_CALL_EXPRESSION] = printMethodCallExpression;
+nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = printThisExpression;
+nodeHandler[classes.VARIABLE_DECLARATION_STATEMENTS] = printVariableDeclarationStatements;
+nodeHandler[classes.VARIABLE_DECLARATION] = printVariableDeclaration;
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
