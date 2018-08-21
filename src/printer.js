@@ -21,6 +21,8 @@ const LITERAL_EXPRESSION = "apex.jorje.semantic.ast.expression.LiteralExpression
 const BOOLEAN_EXPRESSION = "apex.jorje.semantic.ast.expression.BooleanExpression";
 const METHOD_CALL_EXPRESSION = "apex.jorje.semantic.ast.expression.MethodCallExpression";
 const THIS_VARIABLE_EXPRESSION = "apex.jorje.semantic.ast.expression.ThisVariableExpression";
+const VARIABLE_DECLARATION_STATEMENTS = "apex.jorje.semantic.ast.statement.VariableDeclarationStatements";
+const VARIABLE_DECLARATION = "apex.jorje.semantic.ast.statement.VariableDeclaration";
 
 function printSuperReference(node) {
   const docs = [];
@@ -305,6 +307,36 @@ function printMethodCallExpression(node, children, path, print) {
   return concat([...docs, group(concat(params))]);
 }
 
+function printVariableDeclarationStatements(node, children, path, print) {
+  const docs = [];
+  const childDocs = printChildNodes(children, path, print);
+  docs.push(group(join(concat([",", line]), childDocs)));
+  docs.push(";");
+  docs.push(hardline);
+  return concat(docs);
+}
+
+function printVariableDeclaration(node, children, path, print) {
+  const docs = [];
+  const typeRef = node.declarations.typeRef;
+  if (typeRef && typeRef.names && typeRef.names[LOCATION_IDENTIFIER]) {
+    docs.push(typeRef.names[LOCATION_IDENTIFIER].value);
+    docs.push(" ");
+  }
+  docs.push(node.localInfo.name.value);
+  docs.push(" ");
+  docs.push("=");
+  docs.push(" ");
+  // Now we expand the right side of the declaration by going down the child nodes,
+  // except for the variable expression since it has already been handled above.
+  if (VARIABLE_EXPRESSION in children) {
+    delete children[VARIABLE_EXPRESSION];
+  }
+  const childDocs = printChildNodes(children, path, print);
+  docs.push(concat(childDocs));
+  return concat(docs);
+}
+
 const nodeHandler = {};
 nodeHandler[USER_CLASS] = printClassDeclaration;
 nodeHandler[METHOD] = printMethodDeclaration;
@@ -316,6 +348,8 @@ nodeHandler[LITERAL_EXPRESSION] = printLiteralExpression;
 nodeHandler[BOOLEAN_EXPRESSION] = printBooleanExpression;
 nodeHandler[METHOD_CALL_EXPRESSION] = printMethodCallExpression;
 nodeHandler[THIS_VARIABLE_EXPRESSION] = printThisExpression;
+nodeHandler[VARIABLE_DECLARATION_STATEMENTS] = printVariableDeclarationStatements;
+nodeHandler[VARIABLE_DECLARATION] = printVariableDeclaration;
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
