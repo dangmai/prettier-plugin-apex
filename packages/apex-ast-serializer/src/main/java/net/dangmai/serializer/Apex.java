@@ -3,10 +3,15 @@ package net.dangmai.serializer;
 import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
-import com.gilecode.yagson.YaGsonBuilder;
-import com.gilecode.yagson.types.TypeInfoPolicy;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.core.ClassLoaderReference;
+import com.thoughtworks.xstream.core.util.CompositeClassLoader;
+import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
+import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
+import com.thoughtworks.xstream.io.json.JsonWriter;
 import com.thoughtworks.xstream.io.xml.CompactWriter;
+import com.thoughtworks.xstream.mapper.Mapper;
+import com.thoughtworks.xstream.mapper.MapperWrapper;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
@@ -56,24 +61,43 @@ public class Apex {
             }
             ParserOutput output = engine.parse(sourceFile);
 
-            if (chosenFormat.equals("json")) {
-                YaGsonBuilder builder = new YaGsonBuilder();
-
-                if (!cmd.hasOption("t")) {
-                    builder.setTypeInfoPolicy(TypeInfoPolicy.DISABLED);
-                }
-                if (cmd.hasOption("p")) {
-                    builder.setPrettyPrinting();
-                }
-                System.out.print(builder.create().toJson(output));
+            // Serializing the output
+            int mode;
+            if (cmd.hasOption("i")) {
+                mode = XStream.ID_REFERENCES;
             } else {
-                XStream xstream = new XStream();
+                mode = XStream.XPATH_ABSOLUTE_REFERENCES;
+            }
+            Mapper defaultMapper = (new XStream()).getMapper();
+            XStream xstream;
 
-                if (cmd.hasOption("i")) {
-                    xstream.setMode(XStream.ID_REFERENCES);
-                } else {
-                    xstream.setMode(XStream.XPATH_ABSOLUTE_REFERENCES);
-                }
+            if (chosenFormat.equals("json")) {
+                xstream = new XStream(
+                        null,
+                        new JsonHierarchicalStreamDriver() {
+                            @Override
+                            public HierarchicalStreamWriter createWriter(Writer writer) {
+                                if (cmd.hasOption("p")) {
+                                    // By default JSON is pretty printed
+                                    return super.createWriter(writer);
+                                }
+                                JsonWriter.Format format = new JsonWriter.Format(
+                                        new char[0],
+                                        "".toCharArray(),
+                                        JsonWriter.Format.SPACE_AFTER_LABEL | JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+                                );
+                                return new JsonWriter(writer, format);
+                            }
+                        },
+                        new ClassLoaderReference(new CompositeClassLoader()),
+                        new WithClassMapper(defaultMapper));
+                xstream.setMode(mode);
+
+                System.out.println(xstream.toXML(output));
+            } else {
+                xstream = new XStream();
+                xstream.setMode(mode);
+
                 if (cmd.hasOption("p")) {
                     System.out.println(xstream.toXML(output));
                 } else {
@@ -83,5 +107,28 @@ public class Apex {
                 }
             }
         }
+    }
+
+    // We use this mapper to make sure all classes in the jorje package gets printed out as class attribute
+    static private class WithClassMapper extends MapperWrapper {
+        WithClassMapper(Mapper wrapped) {
+            super(wrapped);
+        }
+
+        @Override
+        public Class defaultImplementationOf(Class type) {
+            if (type.getPackage() != null && type.getPackage().getName().startsWith("apex.jorje")) {
+                return FakeDefaultImplementation.class;
+            }
+            return super.defaultImplementationOf(type);
+        }
+
+        @Override
+        public boolean shouldSerializeMember(Class definedIn, String fieldName) {
+            return true;
+        }
+    }
+
+    private class FakeDefaultImplementation {
     }
 }

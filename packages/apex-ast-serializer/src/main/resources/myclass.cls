@@ -1,31 +1,14 @@
-/*
- * Hello!
- */
-public class MyClass implements FirstSampleInterface, SecondSampleInterface {
-	public String sayHello() {
-		// Comment to say Hello!
-		return this.sayHello('Hello', 'World');  // Finish the line
+class ExtendImplementClass extends FirstExtend implements FirstImplement, SecondImplement {
+	public virtual class VirtualExtendInnerClass extends FirstExtend {
+
+
 	}
 
-	public String sayHello(String subject) {
-		return sayHello('Hello', subject);
+	private abstract class AbstractImplementInnerClass implements FirstImplement {
+
 	}
 
-	public String sayHelloWithDate() {
-		MyClass that = new MyClass();
-		DateTime rightNow = that.getNow(), tomorrow, yesterday = DateTime.now().addDays(-1);
-		return 'Hello at ' + now.format();
-	}
+	global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {
 
-	private sayHello(String action, String subject) {
-		return action + ' ' + subject;
-	}
-
-	void doNothing() {
-		return;
-	}
-
-	private DateTime getNow() {
-		return DateTime.now();
 	}
 }
