@@ -2,7 +2,6 @@
 
 const spawnSync = require("child_process").spawnSync;
 const path = require("path");
-const xml2js = require("xml2js");
 
 function parseText(text) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
@@ -13,7 +12,7 @@ function parseText(text) {
   }
   const executionResult = spawnSync(
     serializerBin,
-    ["-f", "xml", "-i"],
+    ["-f", "json", "-i"],
     {
       input: text
     },
@@ -31,19 +30,15 @@ function parseText(text) {
 // The XML given back contains references (to avoid circular references), which need to be resolved.
 // This method recursively walks through the deserialized object and resolve those references.
 function resolveAstReferences(node, referenceMap) {
-  if (node["$"]) {
-    const nodeId = node["$"].id;
-    const nodeReference = node["$"].reference;
-    const otherAttributes = Object.keys(node["$"]).filter(attr => attr !== "id" && attr !== "reference");
-    if (nodeId) {
-      referenceMap[nodeId] = node;
-    }
-    if (nodeReference) {
-      // If it has a reference attribute, that means it's a leaf node
-      // Also, copy over the attributes from the current node to the reference node.
-      otherAttributes.forEach(attr => referenceMap[nodeReference]["$"][attr] = node["$"][attr]);
-      return referenceMap[nodeReference];
-    }
+  const nodeId = node["@id"];
+  const nodeReference = node["@reference"];
+  if (nodeId) {
+    referenceMap[nodeId] = node;
+  }
+  if (nodeReference) {
+    // If it has a reference attribute, that means it's a leaf node
+    // Also, copy over the attributes from the current node to the reference node.
+    return referenceMap[nodeReference];
   }
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
@@ -52,6 +47,7 @@ function resolveAstReferences(node, referenceMap) {
   });
   return node;
 }
+
 function parse(text, parsers, opts) {
   const executionResult = parseText(text);
 
@@ -59,17 +55,7 @@ function parse(text, parsers, opts) {
   let ast = {};
   if (res) {
     console.log(res);
-    const parser = new xml2js.Parser({
-      async: false,
-      explicitRoot: false,
-      explicitArray: false,
-    });
-    parser.parseString(res, (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-      ast = result;
-    });
+    ast = JSON.parse(res);
     ast = resolveAstReferences(ast, {});
   }
   return ast;

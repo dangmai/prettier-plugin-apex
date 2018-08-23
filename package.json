@@ -19,7 +19,5 @@
   "peerDependencies": {
     "prettier": "^1.14.2"
   },
-  "dependencies": {
-    "xml2js": "^0.4.19"
-  }
+  "dependencies": {}
 }
