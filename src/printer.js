@@ -294,6 +294,61 @@ function printVariableDeclaration(node, children, path, print) {
   return concat(docs);
 }
 
+function handleClassDeclaration(node, path, print) {
+  const parts = [];
+  const modifierDocs = path.map(print, "modifiers");
+  if (modifierDocs.length > 0) {
+    parts.push(concat([join(" ", modifierDocs), " "]));
+  }
+  parts.push("class");
+  parts.push(" ");
+  parts.push(path.call(print, "name", "value"));
+  const superClass = path.call(print, "superClass", "value");
+  if (superClass !== "") {
+    parts.push(" ");
+    parts.push("extends");
+    parts.push(" ");
+    parts.push(superClass);
+  }
+  const interfaces = path.map(print, "interfaces");
+  if (interfaces.length > 0) {
+    parts.push(" ");
+    parts.push("implements");
+    parts.push(" ");
+    parts.push(join(", ", interfaces));
+  }
+  parts.push(" ");
+  parts.push("{");
+  const memberParts = path.map(print, "members").filter(member => member);
+
+  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
+    if (index !== allMemberDocs.length - 1) {
+      return concat([memberDoc, hardline, hardline])
+    }
+    return memberDoc;
+  });
+  if(memberDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...memberDocs])));
+    parts.push(dedent(concat([hardline, "}"])));
+  } else {
+    parts.push("}");
+  }
+  return concat(parts);
+}
+
+function handleClassTypeRef(node, path, print) {
+  const docs = path.map(print, "names");
+  return join(", ", docs);
+}
+
+function handleLocationIdentifier(node, path, print) {
+  return path.call(print, "value");
+}
+
+function handleInnerClassMember(node, path, print) {
+  return path.call(print, "body");
+}
+
 const nodeHandler = {};
 nodeHandler[classes.USER_CLASS] = printClassDeclaration;
 nodeHandler[classes.METHOD] = printMethodDeclaration;
@@ -308,18 +363,46 @@ nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = printThisExpression;
 nodeHandler[classes.VARIABLE_DECLARATION_STATEMENTS] = printVariableDeclarationStatements;
 nodeHandler[classes.VARIABLE_DECLARATION] = printVariableDeclaration;
 
+nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
+nodeHandler[classes.CLASS_TYPE_REF] = handleClassTypeRef;
+nodeHandler[classes.LOCATION_IDENTIFIER] = handleLocationIdentifier;
+nodeHandler[classes.INNER_CLASS_MEMBER] = handleInnerClassMember;
+nodeHandler[classes.PUBLIC_MODIFIER] = () => "public";
+nodeHandler[classes.PRIVATE_MODIFIER] = () => "private";
+nodeHandler[classes.ABSTRACT_MODIFIER] = () => "abstract";
+nodeHandler[classes.FINAL_MODIFIER] = () => "final";
+nodeHandler[classes.HIDDEN_MODIFIER] = () => "hidden";
+nodeHandler[classes.PROTECTED_MODIFIER] = () => "protected";
+nodeHandler[classes.STATIC_MODIFIER] = () => "static";
+nodeHandler[classes.TEST_METHOD_MODIFIER] = () => "testmethod";
+nodeHandler[classes.TRANSIENT_MODIFIER] = () => "transient";
+nodeHandler[classes.WEB_SERVICE_MODIFIER] = () => "webservice";
+nodeHandler[classes.VIRTUAL_MODIFIER] = () => "virtual";
+nodeHandler[classes.GLOBAL_MODIFIER] = () => "global";
+
 function genericPrint(path, options, print) {
   const n = path.getValue();
   const name = path.getName();
-  if (!n || !n.node || !n.node["$"] || !n.node["$"].class || !nodeHandler[n.node["$"].class]) {
+  if (!n) {
     return "";
   }
-  const doc = nodeHandler[n.node["$"].class](n.node, n.children, path, print);
-  if (path.stack.length === 1) {
-    // Adding a hardline as the last thing in the document
-    return concat([doc, hardline]);
+  if (typeof n === "string") {
+    return n;
   }
-  return doc;
+  const docs = [];
+  if (path.stack.length === 1) {
+    // Hard code how to handle the root node here
+    docs.push(path.call(print, classes.PARSER_OUTPUT, "unit", "body"));
+    // Adding a hardline as the last thing in the document
+    docs.push(hardline);
+  } else {
+    if (n["@class"] && n["@class"] in nodeHandler) {
+      docs.push(nodeHandler[n["@class"]](n, path, print));
+    } else {
+      docs.push("");
+    }
+  }
+  return concat(docs);
 }
 
 module.exports = genericPrint;
