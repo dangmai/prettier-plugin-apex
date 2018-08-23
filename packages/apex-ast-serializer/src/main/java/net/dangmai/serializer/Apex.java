@@ -30,8 +30,7 @@ public class Apex {
         cliOptions.addOption("f", "format", true, "Format of the output. Possible options: json, xml.");
         cliOptions.addOption("l", "location", true, "Location of Apex class file. If not specified, the Apex content will be read from stdin.");
         cliOptions.addOption("p", "pretty", false, "Pretty print output.");
-        cliOptions.addOption("t", "type", false, "JSON format only: Include details type information.");
-        cliOptions.addOption("i", "id-ref", false, "XML format only: Use ID reference rather than XPath.");
+        cliOptions.addOption("i", "id-ref", false, "Use ID reference rather than XPath.");
         cliOptions.addOption("h", "help", false, "Print help information.");
 
         CommandLineParser cliParser = new DefaultParser();
