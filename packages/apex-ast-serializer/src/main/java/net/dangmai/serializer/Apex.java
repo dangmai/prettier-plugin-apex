@@ -4,8 +4,11 @@ import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
 import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.converters.MarshallingContext;
+import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.core.ClassLoaderReference;
 import com.thoughtworks.xstream.core.util.CompositeClassLoader;
+import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.json.JsonWriter;
@@ -92,11 +95,13 @@ public class Apex {
                         new ClassLoaderReference(new CompositeClassLoader()),
                         new WithClassMapper(defaultMapper));
                 xstream.setMode(mode);
+                xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
 
                 System.out.println(xstream.toXML(output));
             } else {
                 xstream = new XStream();
                 xstream.setMode(mode);
+                xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
 
                 if (cmd.hasOption("p")) {
                     System.out.println(xstream.toXML(output));
@@ -130,5 +135,27 @@ public class Apex {
     }
 
     private class FakeDefaultImplementation {
+    }
+
+    // Custom Collection Converter to inject the class attribute on the collection elements
+    static class CustomCollectionConverter extends CollectionConverter {
+        public CustomCollectionConverter(Mapper mapper) {
+            super(mapper);
+        }
+
+        protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
+            // Copied from AbstractCollectionConverter
+            if (item == null) {
+                String name = mapper().serializedClass(null);
+                ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, Mapper.Null.class);
+                writer.endNode();
+            } else {
+                String name = mapper().serializedClass(item.getClass());
+                ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, item.getClass());
+                writer.addAttribute("class", name);
+                context.convertAnother(item);
+                writer.endNode();
+            }
+        }
     }
 }
