@@ -33,7 +33,8 @@ public class Apex {
                 new InternalJorjeListConverter(
                         xstream.getMapper(),
                         Arrays.asList(
-                                "com.google.common.collect.SingleAppendList"
+                                "com.google.common.collect.SingleAppendList",
+                                "com.google.common.collect.SingletonImmutableList"
                         )
                 )
         );
