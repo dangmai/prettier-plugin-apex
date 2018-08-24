@@ -26,4 +26,17 @@ module.exports = {
     AND: "&&",
     OR: "||",
   },
+  ASSIGNMENT: {
+    EQUALS: "=",
+    AND_EQUALS: "&=",
+    OR_EQUALS: "|=",
+    XOR_EQUALS: "^=",
+    ADDITION_EQUALS: "+=",
+    SUBTRACTION_EQUALS: "-=",
+    MULTIPLICATION_EQUALS: "*=",
+    DIVISION_EQUALS: "/=",
+    LEFT_SHIFT_EQUALS: "<<=",
+    RIGHT_SHIFT_EQUALS: ">>=",
+    UNSIGNED_RIGHT_SHIFT_EQUALS: ">>>=",
+  }
 };

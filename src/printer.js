@@ -39,8 +39,7 @@ function handleBinaryExpression(_, path, print) {
   return concat(docs);
 }
 
-// TODO Fix cases with parentheses
-function handleBooleanExpression(_, path, print) {
+function handleGenericExpression(_, path, print) {
   const docs = [];
   const leftDoc = path.call(print, "left");
   const operationDoc = path.call(print, "op");
@@ -80,6 +79,10 @@ function handleBinaryOperation(node) {
 
 function handleBooleanOperation(node) {
   return expressions.BOOLEAN[node["$"]];
+}
+
+function handleAssignmentOperation(node) {
+  return expressions.ASSIGNMENT[node["$"]];
 }
 
 function handleClassDeclaration(_, path, print) {
@@ -326,6 +329,64 @@ function handleNewExpression(_, path, print) {
   return concat(parts);
 }
 
+function handleIfElseBlock(_, path, print) {
+  const parts = [];
+  const ifBlockDocs = path.map(print, "ifBlocks");
+  parts.push(join(" else ", ifBlockDocs));
+  const elseBlockDoc = path.call(print, "elseBlock", "value");
+  parts.push(" ");
+  parts.push(elseBlockDoc);
+  return groupConcat(parts);
+}
+
+function handleIfBlock(_, path, print) {
+  const parts = [];
+  parts.push("if");
+  parts.push(" ");
+  // Condition expression
+  parts.push("(");
+  parts.push(path.call(print, "expr"));
+  parts.push(")");
+  parts.push(" ");
+  // Body block
+  parts.push("{");
+  parts.push(path.call(print, "stmnt"));
+  parts.push("}");
+  return groupConcat(parts);
+}
+
+function handleElseBlock(_, path, print) {
+  const parts = [];
+  parts.push("else");
+  parts.push(" ");
+  // Body block
+  parts.push("{");
+  parts.push(path.call(print, "stmnt"));
+  parts.push("}");
+  return groupConcat(parts);
+}
+
+function handleTernaryExpression(_, path, print) {
+  const parts = [];
+  parts.push(path.call(print, "condition"));
+  parts.push(" ");
+  parts.push("?");
+  parts.push(" ");
+  parts.push(path.call(print, "trueExpr"));
+  parts.push(" ");
+  parts.push(":");
+  parts.push(" ");
+  parts.push(path.call(print, "falseExpr"));
+  return groupConcat(parts);
+}
+
+function handleExpressionStatement(_, path, print) {
+  const parts = [];
+  parts.push(path.call(print, "expr"));
+  parts.push(";");
+  return concat(parts);
+}
+
 function _handlePassthroughCall(...names) {
   return function(_, path, print) {
     return path.call(print, ...names);
@@ -333,7 +394,14 @@ function _handlePassthroughCall(...names) {
 }
 
 const nodeHandler = {};
-nodeHandler[classes.BOOLEAN_EXPRESSION] = handleBooleanExpression;
+nodeHandler[classes.IF_ELSE_BLOCK] = handleIfElseBlock;
+nodeHandler[classes.IF_BLOCK] = handleIfBlock;
+nodeHandler[classes.ELSE_BLOCK] = handleElseBlock;
+nodeHandler[classes.TERNARY_EXPRESSION] = handleTernaryExpression;
+nodeHandler[classes.EXPRESSION_STATEMENT] = handleExpressionStatement;
+nodeHandler[classes.BOOLEAN_EXPRESSION] = handleGenericExpression;
+nodeHandler[classes.ASSIGNMENT_EXPRESSION] = handleGenericExpression;
+nodeHandler[classes.ASSIGNMENT_OPERATION] = handleAssignmentOperation;
 nodeHandler[classes.NESTED_EXPRESSION] = handleNestedExpression;
 nodeHandler[classes.VARIABLE_EXPRESSION] = handleVariableExpression;
 nodeHandler[classes.LITERAL_EXPRESSION] = handleLiteralExpression;
@@ -380,11 +448,11 @@ nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = () => "this";
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
-  if (typeof n !== "boolean" && !n) {
-    return "";
-  }
   if (typeof n === "string" || typeof n === "number" || typeof n === "boolean") {
     return n.toString();
+  }
+  if (!n) {
+    return "";
   }
   const docs = [];
   if (path.stack.length === 1) {
