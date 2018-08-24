@@ -82,31 +82,6 @@ function handleBooleanOperation(node) {
   return expressions.BOOLEAN[node["$"]];
 }
 
-function printMethodCallExpression(node, children, path, print) {
-  const docs = [];
-  const dottedExpression = node.reference.dottedExpression;
-  if (dottedExpression) {
-    // 2 branches:
-    // 1st: this expression
-    if (dottedExpression["$"].class === classes.THIS_VARIABLE_EXPRESSION) {
-      docs.push("this");
-    } else {
-      // 2nd: named expression
-      const names = node.reference.names;
-      if (names && names.elements && names.elements[classes.LOCATION_IDENTIFIER]) {
-        docs.push(names.elements[classes.LOCATION_IDENTIFIER].value);
-      }
-    }
-    docs.push(".");
-  }
-  docs.push(node.name.value);
-  const params = [];
-  params.push("(");
-  params.push(join(", ", printChildNodes(children, path, print)));
-  params.push(")");
-  return concat([...docs, group(concat(params))]);
-}
-
 function handleClassDeclaration(_, path, print) {
   const parts = [];
   const modifierDocs = path.map(print, "modifiers");
@@ -190,18 +165,6 @@ function handleArrayTypeRef(_, path, print) {
   return concat(parts);
 }
 
-function handleLocationIdentifier(_, path, print) {
-  return path.call(print, "value");
-}
-
-function handleInnerClassMember(_, path, print) {
-  return path.call(print, "body");
-}
-
-function handleMethodMember(_, path, print) {
-  return path.call(print, "methodDecl");
-}
-
 function handleMethodDeclaration(_, path, print) {
   const parts = [];
   // Modifiers
@@ -254,10 +217,6 @@ function handleBlockStatement(_, path, print) {
   return "";
 }
 
-function handleVariableDeclarationStatement(_, path, print) {
-  return path.call(print, "variableDecls");
-}
-
 function handleVariableDeclarations(_, path, print) {
   const parts = [];
   // Type
@@ -296,8 +255,6 @@ function handleVariableDeclaration(_, path, print) {
 
 function handleNewStandard(_, path, print) {
   const parts = [];
-  parts.push("new");
-  parts.push(" ");
   // Type
   parts.push(path.call(print, "type"));
   // Params
@@ -338,8 +295,6 @@ function handleNestedExpression(_, path, print) {
 function handleNewListInit(_, path, print) {
   // TODO is there a way to preserve the user choice of List<> or []?
   const parts = [];
-  parts.push("new");
-  parts.push(" ");
   // Type
   parts.push(join(".", path.map(print, "types")));
   // Param
@@ -351,8 +306,6 @@ function handleNewListInit(_, path, print) {
 
 function handleNewListLiteral(_, path, print) {
   const parts = [];
-  parts.push("new");
-  parts.push(" ");
   // Type
   parts.push(join(".", path.map(print, "types")));
   // Param
@@ -362,6 +315,14 @@ function handleNewListLiteral(_, path, print) {
   const valueDocs = path.map(print, "values");
   parts.push(join(", ", valueDocs));
   parts.push("}");
+  return concat(parts);
+}
+
+function handleNewExpression(_, path, print) {
+  const parts = [];
+  parts.push("new");
+  parts.push(" ");
+  parts.push(path.call(print, "creator"));
   return concat(parts);
 }
 
@@ -383,16 +344,16 @@ nodeHandler[classes.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[classes.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[classes.ARRAY_TYPE_REF] = handleArrayTypeRef;
-nodeHandler[classes.LOCATION_IDENTIFIER] = handleLocationIdentifier;
-nodeHandler[classes.INNER_CLASS_MEMBER] = handleInnerClassMember;
-nodeHandler[classes.METHOD_MEMBER] = handleMethodMember;
+nodeHandler[classes.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
+nodeHandler[classes.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
+nodeHandler[classes.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[classes.METHOD_DECLARATION] = handleMethodDeclaration;
 nodeHandler[classes.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
 nodeHandler[classes.BLOCK_STATEMENT] = handleBlockStatement;
-nodeHandler[classes.VARIABLE_DECLARATION_STATEMENT] = handleVariableDeclarationStatement;
+nodeHandler[classes.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("variableDecls");
 nodeHandler[classes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[classes.VARIABLE_DECLARATION] = handleVariableDeclaration;
-nodeHandler[classes.NEW_EXPRESSION] = _handlePassthroughCall("creator");
+nodeHandler[classes.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[classes.NEW_LIST_INIT] = handleNewListInit;
 nodeHandler[classes.NEW_LIST_LITERAL] = handleNewListLiteral;
 nodeHandler[classes.NEW_STANDARD] = handleNewStandard;
