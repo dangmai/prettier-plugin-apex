@@ -20,10 +20,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Apex {
     private static void setUpXStream(XStream xstream, int mode) {
@@ -152,8 +149,17 @@ public class Apex {
 
     // Custom Collection Converter to inject the class attribute on the collection elements
     static class CustomCollectionConverter extends CollectionConverter {
+        private static final Class SINGLETON_LIST = Collections.singletonList(Boolean.TRUE).getClass();
+        private static final Class SINGLETON_SET = Collections.singleton(Boolean.TRUE).getClass();
+
         public CustomCollectionConverter(Mapper mapper) {
             super(mapper);
+        }
+
+        @Override
+        public boolean canConvert(Class type) {
+            Boolean isSingleton = (type == SINGLETON_LIST || type == SINGLETON_SET);
+            return isSingleton || super.canConvert(type);
         }
 
         protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
