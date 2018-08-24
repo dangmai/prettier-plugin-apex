@@ -36,6 +36,7 @@ module.exports = {
   NEW_EXPRESSION: "apex.jorje.data.ast.Expr$NewExpr",
   NEW_LIST_INIT: "apex.jorje.data.ast.NewObject$NewListInit",
   NEW_LIST_LITERAL: "apex.jorje.data.ast.NewObject$NewListLiteral",
+  NEW_MAP_INIT: "apex.jorje.data.ast.NewObject$NewMapInit",
   NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
   METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",
   BINARY_EXPRESSION: "apex.jorje.data.ast.Expr$BinaryExpr",

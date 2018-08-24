@@ -307,6 +307,18 @@ function handleNewListInit(_, path, print) {
   return concat(parts);
 }
 
+function handleNewMapInit(_, path, print) {
+  const parts = [];
+  parts.push("Map");
+  // Type
+  parts.push("<");
+  const typeDocs = path.map(print, "types");
+  parts.push(join(", ", typeDocs));
+  parts.push(">");
+  parts.push("()");
+  return concat(parts);
+}
+
 function handleNewListLiteral(_, path, print) {
   const parts = [];
   // Type
@@ -423,6 +435,7 @@ nodeHandler[classes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[classes.VARIABLE_DECLARATION] = handleVariableDeclaration;
 nodeHandler[classes.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[classes.NEW_LIST_INIT] = handleNewListInit;
+nodeHandler[classes.NEW_MAP_INIT] = handleNewMapInit;
 nodeHandler[classes.NEW_LIST_LITERAL] = handleNewListLiteral;
 nodeHandler[classes.NEW_STANDARD] = handleNewStandard;
 nodeHandler[classes.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
