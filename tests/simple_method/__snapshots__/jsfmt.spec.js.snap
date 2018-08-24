@@ -45,7 +45,9 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
 
   public String sayHelloWithDate() {
     SimpleMethod that = new SimpleMethod();
-    DateTime rightNow = that.getNow(), tomorrow, yesterday = DateTime.now().addDays();
+    DateTime rightNow = that.getNow(),
+      tomorrow,
+      yesterday = DateTime.now().addDays();
     return 'Hello at ' + now.format();
   }
 

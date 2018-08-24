@@ -5,6 +5,7 @@ module.exports = {
   LOCATION_IDENTIFIER: "apex.jorje.data.Identifiers$LocationIdentifier",
   PARSER_OUTPUT: "apex.jorje.semantic.compiler.parser.ParserOutput",
   CLASS_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ClassTypeRef",
+  ARRAY_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ArrayTypeRef",
   INNER_CLASS_MEMBER: "apex.jorje.data.ast.BlockMember$InnerClassMember",
   PUBLIC_MODIFIER: "apex.jorje.data.ast.Modifier$PublicModifier",
   PRIVATE_MODIFIER: "apex.jorje.data.ast.Modifier$PrivateModifier",
@@ -33,6 +34,8 @@ module.exports = {
   VARIABLE_DECLARATIONS: "apex.jorje.data.ast.VariableDecls",
   VARIABLE_DECLARATION: "apex.jorje.data.ast.VariableDecl",
   NEW_EXPRESSION: "apex.jorje.data.ast.Expr$NewExpr",
+  NEW_LIST_INIT: "apex.jorje.data.ast.NewObject$NewListInit",
+  NEW_LIST_LITERAL: "apex.jorje.data.ast.NewObject$NewListLiteral",
   NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
   METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",
   BINARY_EXPRESSION: "apex.jorje.data.ast.Expr$BinaryExpr",
@@ -43,9 +46,4 @@ module.exports = {
   BOOLEAN_EXPRESSION: "apex.jorje.data.ast.Expr$BooleanExpr",
   BOOLEAN_OPERATION: "apex.jorje.data.ast.BooleanOp",
   NESTED_EXPRESSION: "apex.jorje.data.ast.Expr$NestedExpr",
-
-  USER_CLASS: "apex.jorje.semantic.ast.compilation.UserClass",
-  METHOD: "apex.jorje.semantic.ast.member.Method",
-  MODIFIER: "apex.jorje.semantic.ast.modifier.Modifier",
-  PARAMETER: "apex.jorje.semantic.ast.member.Parameter",
 };

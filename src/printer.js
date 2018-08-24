@@ -10,6 +10,10 @@ function indentConcat(docs) {
   return indent(concat(docs));
 }
 
+function groupConcat(docs) {
+  return group(concat(docs));
+}
+
 function handleReturnStatement(_, path, print) {
   const docs = [];
   docs.push("return");
@@ -168,8 +172,22 @@ function handleAnnotationKeyValue(_, path, print) {
 }
 
 function handleClassTypeRef(_, path, print) {
-  const docs = path.map(print, "names");
-  return join(", ", docs);
+  const parts = [];
+  parts.push(join(".", path.map(print, "names")));
+  const typeArgumentDocs = path.map(print, "typeArguments");
+  if (typeArgumentDocs.length > 0) {
+    parts.push("<");
+    parts.push(join(", ", typeArgumentDocs));
+    parts.push(">");
+  }
+  return concat(parts);
+}
+
+function handleArrayTypeRef(_, path, print) {
+  const parts = [];
+  parts.push(path.call(print, "heldType"));
+  parts.push("[]");
+  return concat(parts);
 }
 
 function handleLocationIdentifier(_, path, print) {
@@ -245,15 +263,22 @@ function handleVariableDeclarations(_, path, print) {
   // Type
   parts.push(path.call(print, "type"));
   parts.push(" ");
-  // Variable name
+  // Variable declarations
   const declarationDocs = path.map(print, "decls");
   if (declarationDocs.length > 1) {
-    parts.push(join(", ", declarationDocs));
+    parts.push(indentConcat(
+      [
+        join(
+          concat([",", line]),
+          declarationDocs,
+        ),
+      ]
+    ));
     parts.push(";");
   } else if (declarationDocs.length === 1) {
     parts.push(concat([declarationDocs[0], ";"]));
   }
-  return concat(parts);
+  return groupConcat(parts);
 }
 
 function handleVariableDeclaration(_, path, print) {
@@ -310,6 +335,36 @@ function handleNestedExpression(_, path, print) {
   return concat(parts);
 }
 
+function handleNewListInit(_, path, print) {
+  // TODO is there a way to preserve the user choice of List<> or []?
+  const parts = [];
+  parts.push("new");
+  parts.push(" ");
+  // Type
+  parts.push(join(".", path.map(print, "types")));
+  // Param
+  parts.push("[");
+  parts.push(path.call(print, "expr", "value"));
+  parts.push("]");
+  return concat(parts);
+}
+
+function handleNewListLiteral(_, path, print) {
+  const parts = [];
+  parts.push("new");
+  parts.push(" ");
+  // Type
+  parts.push(join(".", path.map(print, "types")));
+  // Param
+  parts.push("[]");
+  // Values
+  parts.push("{");
+  const valueDocs = path.map(print, "values");
+  parts.push(join(", ", valueDocs));
+  parts.push("}");
+  return concat(parts);
+}
+
 function _handlePassthroughCall(...names) {
   return function(_, path, print) {
     return path.call(print, ...names);
@@ -327,6 +382,7 @@ nodeHandler[classes.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[classes.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[classes.CLASS_TYPE_REF] = handleClassTypeRef;
+nodeHandler[classes.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[classes.LOCATION_IDENTIFIER] = handleLocationIdentifier;
 nodeHandler[classes.INNER_CLASS_MEMBER] = handleInnerClassMember;
 nodeHandler[classes.METHOD_MEMBER] = handleMethodMember;
@@ -337,6 +393,8 @@ nodeHandler[classes.VARIABLE_DECLARATION_STATEMENT] = handleVariableDeclarationS
 nodeHandler[classes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[classes.VARIABLE_DECLARATION] = handleVariableDeclaration;
 nodeHandler[classes.NEW_EXPRESSION] = _handlePassthroughCall("creator");
+nodeHandler[classes.NEW_LIST_INIT] = handleNewListInit;
+nodeHandler[classes.NEW_LIST_LITERAL] = handleNewListLiteral;
 nodeHandler[classes.NEW_STANDARD] = handleNewStandard;
 nodeHandler[classes.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[classes.ANNOTATION] = handleAnnotation;
@@ -364,10 +422,7 @@ function genericPrint(path, options, print) {
   if (typeof n !== "boolean" && !n) {
     return "";
   }
-  if (typeof n === "string") {
-    return n;
-  }
-  if (typeof n === "boolean") {
+  if (typeof n === "string" || typeof n === "number" || typeof n === "boolean") {
     return n.toString();
   }
   const docs = [];
