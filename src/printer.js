@@ -478,8 +478,7 @@ function handleMethodCallExpression(_, path, print) {
   const parts = [];
   // Method call chain
   const nameDocs = path.map(print, "names");
-  const allNameDocs = [].concat(...nameDocs);
-  parts.push(join(".", concat(allNameDocs)));
+  parts.push(join(".", nameDocs));
   // Params
   parts.push("(");
   const paramDocs = path.map(print, "inputParameters");
