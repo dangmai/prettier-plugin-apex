@@ -6,6 +6,10 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const expressions = require("./expressions");
 const classes = require("./classes");
 
+function indentConcat(docs) {
+  return indent(concat(docs));
+}
+
 function printSuperReference(node) {
   const docs = [];
   const superTypeRef = node.modifiers.definingType.codeUnit.value.superTypeRef;
@@ -395,6 +399,7 @@ function handleMethodDeclaration(_, path, print) {
   parts.push(" ");
   // Body
   parts.push("{");
+  parts.push(path.call(print, "stmnt", "value"));
   parts.push("}");
   return concat(parts);
 }
@@ -409,18 +414,97 @@ function handleEmptyModifierParameterRef(_, path, print) {
   return concat(parts);
 }
 
+function handleBlockStatement(_, path, print) {
+  const statementDocs = path.map(print, "stmnts");
+  if (statementDocs.length > 0) {
+    return indentConcat(
+      [
+        hardline,
+        join(
+          hardline,
+          statementDocs
+        ),
+      ]
+    );
+  }
+  return "";
+}
+
+function handleVariableDeclarationStatement(_, path, print) {
+  return path.call(print, "variableDecls");
+}
+
+function handleVariableDeclarations(_, path, print) {
+  const parts = [];
+  // Type
+  parts.push(path.call(print, "type"));
+  parts.push(" ");
+  // Variable name
+  const declarationDocs = path.map(print, "decls");
+  if (declarationDocs.length > 1) {
+    parts.push(join(", ", declarationDocs));
+    parts.push(";");
+  } else if (declarationDocs.length === 1) {
+    parts.push(concat([declarationDocs[0], ";"]));
+  }
+  return concat(parts);
+}
+
+function handleVariableDeclaration(_, path, print) {
+  const parts = [];
+  parts.push(path.call(print, "name"));
+  parts.push(" ");
+  parts.push("=");
+  parts.push(" ");
+  parts.push(path.call(print, "assignment", "value"));
+  return concat(parts);
+}
+
+function handleNewStandard(_, path, print) {
+  const parts = [];
+  parts.push("new");
+  parts.push(" ");
+  // Type
+  parts.push(path.call(print, "type"));
+  // Params
+  parts.push("(");
+  const paramDocs = path.call(print, "inputParameters");
+  parts.push(join(", ", paramDocs));
+  parts.push(")");
+  return concat(parts);
+}
+
+function handleMethodCallExpression(_, path, print) {
+  const parts = [];
+  // Method call chain
+  const nameDocs = path.map(print, "names");
+  const allNameDocs = [].concat(...nameDocs);
+  parts.push(join(".", concat(allNameDocs)));
+  // Params
+  parts.push("(");
+  const paramDocs = path.map(print, "inputParameters");
+  parts.push(join(", ", paramDocs));
+  parts.push(")");
+  return concat(parts);
+}
+
+function _handlePassthroughCall(...names) {
+  return function(_, path, print) {
+    return path.call(print, ...names);
+  }
+}
+
 const nodeHandler = {};
 nodeHandler[classes.USER_CLASS] = printClassDeclaration;
 nodeHandler[classes.METHOD] = printMethodDeclaration;
 nodeHandler[classes.BLOCK_STATEMENT] = printBlockStatement;
-nodeHandler[classes.RETURN_STATEMENT] = printReturnStatement;
+// nodeHandler[classes.RETURN_STATEMENT] = printReturnStatement;
 nodeHandler[classes.BINARY_EXPRESSION] = printBinaryExpression;
 nodeHandler[classes.VARIABLE_EXPRESSION] = printVariableExpression;
 nodeHandler[classes.LITERAL_EXPRESSION] = printLiteralExpression;
 nodeHandler[classes.BOOLEAN_EXPRESSION] = printBooleanExpression;
 nodeHandler[classes.METHOD_CALL_EXPRESSION] = printMethodCallExpression;
 nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = printThisExpression;
-nodeHandler[classes.VARIABLE_DECLARATION_STATEMENTS] = printVariableDeclarationStatements;
 nodeHandler[classes.VARIABLE_DECLARATION] = printVariableDeclaration;
 
 nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
@@ -430,6 +514,13 @@ nodeHandler[classes.INNER_CLASS_MEMBER] = handleInnerClassMember;
 nodeHandler[classes.METHOD_MEMBER] = handleMethodMember;
 nodeHandler[classes.METHOD_DECLARATION] = handleMethodDeclaration;
 nodeHandler[classes.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
+nodeHandler[classes.BLOCK_STATEMENT] = handleBlockStatement;
+nodeHandler[classes.VARIABLE_DECLARATION_STATEMENT] = handleVariableDeclarationStatement;
+nodeHandler[classes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
+nodeHandler[classes.VARIABLE_DECLARATION] = handleVariableDeclaration;
+nodeHandler[classes.NEW_EXPRESSION] = _handlePassthroughCall("creator");
+nodeHandler[classes.NEW_STANDARD] = handleNewStandard;
+nodeHandler[classes.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[classes.ANNOTATION] = handleAnnotation;
 nodeHandler[classes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[classes.ANNOTATION_TRUE_VALUE] = () => "true";
@@ -456,6 +547,10 @@ function genericPrint(path, options, print) {
   }
   if (typeof n === "string") {
     return n;
+  }
+  if (Array.isArray(n)) {
+    // simply map the print function over the values
+    return path.map(print);
   }
   const docs = [];
   if (path.stack.length === 1) {
