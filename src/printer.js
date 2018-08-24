@@ -374,11 +374,13 @@ nodeHandler[classes.FINAL_MODIFIER] = () => "final";
 nodeHandler[classes.HIDDEN_MODIFIER] = () => "hidden";
 nodeHandler[classes.PROTECTED_MODIFIER] = () => "protected";
 nodeHandler[classes.STATIC_MODIFIER] = () => "static";
-nodeHandler[classes.TEST_METHOD_MODIFIER] = () => "testmethod";
+nodeHandler[classes.TEST_METHOD_MODIFIER] = () => "testMethod";
 nodeHandler[classes.TRANSIENT_MODIFIER] = () => "transient";
-nodeHandler[classes.WEB_SERVICE_MODIFIER] = () => "webservice";
+nodeHandler[classes.WEB_SERVICE_MODIFIER] = () => "webService";
 nodeHandler[classes.VIRTUAL_MODIFIER] = () => "virtual";
 nodeHandler[classes.GLOBAL_MODIFIER] = () => "global";
+nodeHandler[classes.WITH_SHARING_MODIFIER] = () => "with sharing";
+nodeHandler[classes.WITHOUT_SHARING_MODIFIER] = () => "without sharing";
 
 function genericPrint(path, options, print) {
   const n = path.getValue();

@@ -18,6 +18,8 @@ module.exports = {
   FINAL_MODIFIER: "apex.jorje.data.ast.Modifier$FinalModifier",
   TRANSIENT_MODIFIER: "apex.jorje.data.ast.Modifier$TransientModifier",
   GLOBAL_MODIFIER: "apex.jorje.data.ast.Modifier$GlobalModifier",
+  WITHOUT_SHARING_MODIFIER: "apex.jorje.data.ast.Modifier$WithoutSharingModifier",
+  WITH_SHARING_MODIFIER: "apex.jorje.data.ast.Modifier$WithSharingModifier",
   USER_CLASS: "apex.jorje.semantic.ast.compilation.UserClass",
   METHOD: "apex.jorje.semantic.ast.member.Method",
   MODIFIER: "apex.jorje.semantic.ast.modifier.Modifier",
