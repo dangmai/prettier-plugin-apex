@@ -371,6 +371,44 @@ function handleInnerClassMember(node, path, print) {
   return path.call(print, "body");
 }
 
+function handleMethodMember(_, path, print) {
+  return path.call(print, "methodDecl");
+}
+
+function handleMethodDeclaration(_, path, print) {
+  const parts = [];
+  // Modifiers
+  const modifierDocs = path.map(print, "modifiers");
+  if (modifierDocs.length > 0) {
+    parts.push(concat(modifierDocs));
+  }
+  // Return type
+  parts.push(path.call(print, "type", "value"));
+  parts.push(" ");
+  // Method name
+  parts.push(path.call(print, "name"));
+  // Params
+  parts.push("(");
+  const parameterDocs = path.map(print, "parameters");
+  parts.push(join(", ", parameterDocs));
+  parts.push(")");
+  parts.push(" ");
+  // Body
+  parts.push("{");
+  parts.push("}");
+  return concat(parts);
+}
+
+function handleEmptyModifierParameterRef(_, path, print) {
+  const parts = [];
+  // Type
+  parts.push(path.call(print, "typeRef"));
+  parts.push(" ");
+  // Value
+  parts.push(path.call(print, "name"));
+  return concat(parts);
+}
+
 const nodeHandler = {};
 nodeHandler[classes.USER_CLASS] = printClassDeclaration;
 nodeHandler[classes.METHOD] = printMethodDeclaration;
@@ -389,6 +427,9 @@ nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[classes.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[classes.LOCATION_IDENTIFIER] = handleLocationIdentifier;
 nodeHandler[classes.INNER_CLASS_MEMBER] = handleInnerClassMember;
+nodeHandler[classes.METHOD_MEMBER] = handleMethodMember;
+nodeHandler[classes.METHOD_DECLARATION] = handleMethodDeclaration;
+nodeHandler[classes.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
 nodeHandler[classes.ANNOTATION] = handleAnnotation;
 nodeHandler[classes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[classes.ANNOTATION_TRUE_VALUE] = () => "true";

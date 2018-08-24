@@ -24,6 +24,10 @@ module.exports = {
   ANNOTATION_KEY_VALUE: "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
   ANNOTATION_TRUE_VALUE: "apex.jorje.data.ast.AnnotationValue$TrueAnnotationValue",
   ANNOTATION_FALSE_VALUE: "apex.jorje.data.ast.AnnotationValue$FalseAnnotationValue",
+  METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
+  METHOD_DECLARATION: "apex.jorje.data.ast.MethodDecl",
+  EMPTY_MODIFIER_PARAMETER_REF: "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
+
   USER_CLASS: "apex.jorje.semantic.ast.compilation.UserClass",
   METHOD: "apex.jorje.semantic.ast.member.Method",
   MODIFIER: "apex.jorje.semantic.ast.modifier.Modifier",
