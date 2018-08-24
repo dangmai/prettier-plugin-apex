@@ -294,7 +294,7 @@ function printVariableDeclaration(node, children, path, print) {
   return concat(docs);
 }
 
-function handleClassDeclaration(node, path, print) {
+function handleClassDeclaration(_, path, print) {
   const parts = [];
   const modifierDocs = path.map(print, "modifiers");
   if (modifierDocs.length > 0) {
@@ -358,16 +358,16 @@ function handleAnnotationKeyValue(_, path, print) {
   return concat(parts);
 }
 
-function handleClassTypeRef(node, path, print) {
+function handleClassTypeRef(_, path, print) {
   const docs = path.map(print, "names");
   return join(", ", docs);
 }
 
-function handleLocationIdentifier(node, path, print) {
+function handleLocationIdentifier(_, path, print) {
   return path.call(print, "value");
 }
 
-function handleInnerClassMember(node, path, print) {
+function handleInnerClassMember(_, path, print) {
   return path.call(print, "body");
 }
 
@@ -451,7 +451,6 @@ nodeHandler[classes.WITHOUT_SHARING_MODIFIER] = () => concat(["without sharing",
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
-  const name = path.getName();
   if (!n) {
     return "";
   }
