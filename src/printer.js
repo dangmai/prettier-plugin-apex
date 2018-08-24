@@ -298,7 +298,7 @@ function handleClassDeclaration(node, path, print) {
   const parts = [];
   const modifierDocs = path.map(print, "modifiers");
   if (modifierDocs.length > 0) {
-    parts.push(concat([join(" ", modifierDocs), " "]));
+    parts.push(concat(modifierDocs));
   }
   parts.push("class");
   parts.push(" ");
@@ -336,6 +336,28 @@ function handleClassDeclaration(node, path, print) {
   return concat(parts);
 }
 
+function handleAnnotation(_, path, print) {
+  const parts = [];
+  parts.push("@");
+  parts.push(path.call(print, "name", "value"));
+  const parameterDocs = path.map(print, "parameters");
+  if (parameterDocs.length > 0) {
+    parts.push("(");
+    parts.push(join(", ", parameterDocs));
+    parts.push(")");
+  }
+  parts.push(hardline);
+  return concat(parts);
+}
+
+function handleAnnotationKeyValue(_, path, print) {
+  const parts = [];
+  parts.push(path.call(print, "key", "value"));
+  parts.push("=");
+  parts.push(path.call(print, "value"));
+  return concat(parts);
+}
+
 function handleClassTypeRef(node, path, print) {
   const docs = path.map(print, "names");
   return join(", ", docs);
@@ -367,20 +389,24 @@ nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[classes.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[classes.LOCATION_IDENTIFIER] = handleLocationIdentifier;
 nodeHandler[classes.INNER_CLASS_MEMBER] = handleInnerClassMember;
-nodeHandler[classes.PUBLIC_MODIFIER] = () => "public";
-nodeHandler[classes.PRIVATE_MODIFIER] = () => "private";
-nodeHandler[classes.ABSTRACT_MODIFIER] = () => "abstract";
-nodeHandler[classes.FINAL_MODIFIER] = () => "final";
-nodeHandler[classes.HIDDEN_MODIFIER] = () => "hidden";
-nodeHandler[classes.PROTECTED_MODIFIER] = () => "protected";
-nodeHandler[classes.STATIC_MODIFIER] = () => "static";
-nodeHandler[classes.TEST_METHOD_MODIFIER] = () => "testMethod";
-nodeHandler[classes.TRANSIENT_MODIFIER] = () => "transient";
-nodeHandler[classes.WEB_SERVICE_MODIFIER] = () => "webService";
-nodeHandler[classes.VIRTUAL_MODIFIER] = () => "virtual";
-nodeHandler[classes.GLOBAL_MODIFIER] = () => "global";
-nodeHandler[classes.WITH_SHARING_MODIFIER] = () => "with sharing";
-nodeHandler[classes.WITHOUT_SHARING_MODIFIER] = () => "without sharing";
+nodeHandler[classes.ANNOTATION] = handleAnnotation;
+nodeHandler[classes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
+nodeHandler[classes.ANNOTATION_TRUE_VALUE] = () => "true";
+nodeHandler[classes.ANNOTATION_FALSE_VALUE] = () => "false";
+nodeHandler[classes.PUBLIC_MODIFIER] = () => concat(["public", " "]);
+nodeHandler[classes.PRIVATE_MODIFIER] = () => concat(["private", " "]);
+nodeHandler[classes.ABSTRACT_MODIFIER] = () => concat(["abstract", " "]);
+nodeHandler[classes.FINAL_MODIFIER] = () => concat(["final", " "]);
+nodeHandler[classes.HIDDEN_MODIFIER] = () => concat(["hidden", " "]);
+nodeHandler[classes.PROTECTED_MODIFIER] = () => concat(["protected", " "]);
+nodeHandler[classes.STATIC_MODIFIER] = () => concat(["static", " "]);
+nodeHandler[classes.TEST_METHOD_MODIFIER] = () => concat(["testMethod", " "]);
+nodeHandler[classes.TRANSIENT_MODIFIER] = () => concat(["transient", " "]);
+nodeHandler[classes.WEB_SERVICE_MODIFIER] = () => concat(["webService", " "]);
+nodeHandler[classes.VIRTUAL_MODIFIER] = () => concat(["virtual", " "]);
+nodeHandler[classes.GLOBAL_MODIFIER] = () => concat(["global", " "]);
+nodeHandler[classes.WITH_SHARING_MODIFIER] = () => concat(["with sharing", " "]);
+nodeHandler[classes.WITHOUT_SHARING_MODIFIER] = () => concat(["without sharing", " "]);
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
