@@ -3,6 +3,7 @@ package net.dangmai.serializer;
 import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
+import com.google.common.collect.ImmutableList;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
@@ -20,10 +21,24 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Apex {
+    private static void setUpXStream(XStream xstream, int mode) {
+        xstream.setMode(mode);
+        xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
+        xstream.registerConverter(
+                new InternalJorjeListConverter(
+                        xstream.getMapper(),
+                        Arrays.asList(
+                                "com.google.common.collect.SingleAppendList"
+                        )
+                )
+        );
+    }
+
     public static void main(String[] args) throws ParseException, IOException {
         Options cliOptions = new Options();
         cliOptions.addOption("a", "anonymous", false, "Parse Anonymous Apex code. If not specify, it will be parsed in Named mode.");
@@ -93,14 +108,12 @@ public class Apex {
                         },
                         new ClassLoaderReference(new CompositeClassLoader()),
                         new WithClassMapper(defaultMapper));
-                xstream.setMode(mode);
-                xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
+                setUpXStream(xstream, mode);
 
                 System.out.println(xstream.toXML(output));
             } else {
                 xstream = new XStream();
-                xstream.setMode(mode);
-                xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
+                setUpXStream(xstream, mode);
 
                 if (cmd.hasOption("p")) {
                     System.out.println(xstream.toXML(output));
@@ -155,6 +168,31 @@ public class Apex {
                 context.convertAnother(item);
                 writer.endNode();
             }
+        }
+    }
+
+    // Some internal collections that jorje uses are serialized in a weird way by default,
+    // e.g. SingleAppendList is nested twice for certain input. We streamline
+    // the serialization here by forcing them to behave like ImmutableList
+    static class InternalJorjeListConverter extends CustomCollectionConverter {
+        private Collection<String> listTypes;
+
+        public InternalJorjeListConverter(Mapper mapper, Collection<String> listTypes) {
+            super(mapper);
+            this.listTypes = listTypes;
+        }
+
+        @Override
+        public boolean canConvert(Class type) {
+            // For some reason we can't import some Jorje internal list here
+            // (like SingleAppendList), so we'll have to compare the name string
+            // instead.
+            return this.listTypes.contains(type.getName());
+        }
+        @Override
+        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
+            ImmutableList list = (ImmutableList) source;
+            super.marshal(list.subList(0, list.size()), writer, context);
         }
     }
 }
