@@ -453,10 +453,13 @@ function handleVariableDeclarations(_, path, print) {
 function handleVariableDeclaration(_, path, print) {
   const parts = [];
   parts.push(path.call(print, "name"));
-  parts.push(" ");
-  parts.push("=");
-  parts.push(" ");
-  parts.push(path.call(print, "assignment", "value"));
+  const assignmentDocs = path.call(print, "assignment", "value");
+  if (assignmentDocs) {
+    parts.push(" ");
+    parts.push("=");
+    parts.push(" ");
+    parts.push(assignmentDocs);
+  }
   return concat(parts);
 }
 
