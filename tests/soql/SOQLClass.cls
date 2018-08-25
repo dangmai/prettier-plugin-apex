@@ -112,7 +112,6 @@ class SOQLClass {
     ];
     UserProfileFeed[] withUserIds = [SELECT Id FROM UserProfileFeed WITH UserId='005D0000001AamR' ORDER BY CreatedDate DESC, Id DESC LIMIT 20];
     Question[] withDataCategories = [SELECT Title FROM Question WHERE LastReplyDate > 2005-10-08T01:02:03Z WITH DATA CATEGORY Geography__c AT (usa__c, uk__c)];
-    Contact[] allRows = [SELECT COUNT() FROM Contact WHERE AccountId = :a.Id ALL ROWS];
   }
 }
 
