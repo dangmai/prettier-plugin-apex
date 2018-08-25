@@ -71,6 +71,27 @@ class SOQLClass {
     Account [] forUpdate = [SELECT Id FROM Account LIMIT 2 FOR UPDATE];
     Account[] includeDeleted = [SELECT Id FROM Account ALL ROWS];
     Account[] forViewAllRows = [SELECT Id FROM Account FOR VIEW ALL ROWS];
+    FAQ__kav[] updateTrackings = [
+      SELECT Title FROM FAQ__kav
+      WHERE Keyword='Apex' and
+      Language = 'en_US' and
+      KnowledgeArticleVersion = 'ka230000000PCiy'
+      UPDATE TRACKING];
+    FAQ__kav[] updateViewStats = [
+      SELECT Title FROM FAQ__kav
+      WHERE PublishStatus='online' and
+      Language = 'en_US' and
+      KnowledgeArticleVersion = 'ka230000000PCiy'
+      UPDATE VIEWSTAT
+    ];
+    FAQ__kav[] updateViewStatsAllRows = [
+      SELECT Title FROM FAQ__kav
+      WHERE PublishStatus='online' and
+      Language = 'en_US' and
+      KnowledgeArticleVersion = 'ka230000000PCiy'
+      UPDATE VIEWSTAT
+      ALL ROWS
+    ];
 
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
     Event[] typeOf = [

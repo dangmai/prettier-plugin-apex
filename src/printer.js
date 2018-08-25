@@ -455,6 +455,7 @@ function handleQuery(path, print) {
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "offset", "value"));
   _pushIfExist(parts, path.call(print, "tracking", "value"));
+  _pushIfExist(parts, path.call(print, "updateStats", "value"));
   _pushIfExist(parts, path.call(print, "options", "value"));
   return join(line, parts);
 }
@@ -743,6 +744,31 @@ function handleQueryOption(childClass) {
   return doc;
 }
 
+function handleUpdateStatsClause(path, print) {
+  const optionDocs = path.map(print, "options");
+  const parts = [];
+  parts.push("UPDATE");
+  parts.push(line);
+  parts.push(join(concat([",", line]), optionDocs));
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
+}
+
+function handleUpdateStatsOption(childClass) {
+  let doc;
+  switch (childClass) {
+    case "UpdateTracking":
+      doc = "TRACKING";
+      break;
+    case "UpdateViewStat":
+      doc = "VIEWSTAT";
+      break;
+    default:
+      doc = "";
+  }
+  return doc;
+}
+
 function handleModifier(childClass) {
   return concat([values.MODIFIER[childClass], " "]);
 }
@@ -841,6 +867,8 @@ nodeHandler[apexNames.TRACKING_TYPE] = handleTrackingType;
 nodeHandler[apexNames.QUERY_OPTION] = handleQueryOption;
 nodeHandler[apexNames.QUERY_USING_CLAUSE] = handleQueryUsingClause;
 nodeHandler[apexNames.USING] = handleUsing;
+nodeHandler[apexNames.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
+nodeHandler[apexNames.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WHERE[childClass];
 
 function genericPrint(path, options, print) {

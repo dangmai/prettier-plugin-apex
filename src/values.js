@@ -79,6 +79,8 @@ module.exports = {
     QUERY_OPTION: "apex.jorje.data.soql.QueryOption",
     QUERY_USING_CLAUSE: "apex.jorje.data.soql.QueryUsingClause",
     USING: "apex.jorje.data.soql.UsingExpr$Using",
+    UPDATE_STATS_CLAUSE: "apex.jorje.data.soql.UpdateStatsClause",
+    UPDATE_STATS_OPTION: "apex.jorje.data.soql.UpdateStatsOption",
   },
   BINARY: {
     ADDITION: "+",
