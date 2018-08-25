@@ -523,8 +523,10 @@ function handleFromClause(path, print) {
 function handleFromExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "table"));
-  parts.push(path.call(print, "using"));
-  return groupConcat(parts);
+  parts.push(line);
+  parts.push(path.call(print, "using", "value"));
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
 }
 
 function handleWhereClause(path, print) {
@@ -693,6 +695,24 @@ function handleHavingClause(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleQueryUsingClause(path, print) {
+  const expressionDocs = path.map(print, "exprs");
+  const parts = [];
+  parts.push("USING");
+  parts.push(line);
+  parts.push(join(concat([",", line]), expressionDocs));
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
+}
+
+function handleUsing(path, print) {
+  return concat([
+    path.call(print, "name", "value"),
+    " ",
+    path.call(print, "field", "value"),
+  ]);
+}
+
 function handleTrackingType(childClass) {
   let doc;
   switch (childClass) {
@@ -819,6 +839,8 @@ nodeHandler[apexNames.SOQL_ORDER] = handleOrderOperation;
 nodeHandler[apexNames.SOQL_ORDER_NULL] = handleNullOrderOperation;
 nodeHandler[apexNames.TRACKING_TYPE] = handleTrackingType;
 nodeHandler[apexNames.QUERY_OPTION] = handleQueryOption;
+nodeHandler[apexNames.QUERY_USING_CLAUSE] = handleQueryUsingClause;
+nodeHandler[apexNames.USING] = handleUsing;
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WHERE[childClass];
 
 function genericPrint(path, options, print) {

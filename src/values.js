@@ -77,6 +77,8 @@ module.exports = {
     SOQL_ORDER_NULL: "apex.jorje.data.soql.OrderNull",
     TRACKING_TYPE: "apex.jorje.data.soql.TrackingType",
     QUERY_OPTION: "apex.jorje.data.soql.QueryOption",
+    QUERY_USING_CLAUSE: "apex.jorje.data.soql.QueryUsingClause",
+    USING: "apex.jorje.data.soql.UsingExpr$Using",
   },
   BINARY: {
     ADDITION: "+",
