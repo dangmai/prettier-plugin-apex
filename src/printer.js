@@ -14,6 +14,10 @@ function groupConcat(docs) {
   return group(concat(docs));
 }
 
+function groupIndentConcat(docs) {
+  return group(indent(concat(docs)));
+}
+
 function handleReturnStatement(path, print) {
   const docs = [];
   docs.push("return");
@@ -403,22 +407,55 @@ function handleExpressionStatement(path, print) {
   return concat(parts);
 }
 
+function handleSoqlExpression(path, print) {
+  const parts = [];
+  parts.push("[");
+  parts.push(softline);
+  parts.push(path.call(print, "query"));
+  parts.push(dedent(softline));
+  parts.push("]");
+  return groupIndentConcat(parts);
+}
+
+function handleSelectInnerQuery(path, print) {
+  const parts = [];
+  parts.push("(");
+  parts.push(softline);
+  parts.push(path.call(print, "query"));
+  parts.push(dedent(softline));
+  parts.push(")");
+  const aliasDoc = path.call(print, "alias", "value");
+  _pushIfExist(parts, aliasDoc, null, [" "]);
+
+  return groupIndentConcat(parts);
+}
+
+function handleWhereInnerExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push("(");
+  parts.push(softline);
+  parts.push(path.call(print, "inner"));
+  parts.push(dedent(softline));
+  parts.push(")");
+  return groupIndentConcat(parts);
+}
+
 function handleQuery(path, print) {
   const parts = [];
-  parts.push(softline);
-  const childParts = [];
-  childParts.push(path.call(print, "select"));
-  childParts.push(path.call(print, "from"));
-  _pushIfExist(childParts, path.call(print, "where", "value"));
-  _pushIfExist(childParts, path.call(print, "with"));
-  _pushIfExist(childParts, path.call(print, "groupBy"));
-  _pushIfExist(childParts, path.call(print, "orderBy", "value"));
-  _pushIfExist(childParts, path.call(print, "limit", "value"));
-  _pushIfExist(childParts, path.call(print, "offset", "value"));
-  _pushIfExist(childParts, path.call(print, "tracking"));
-  parts.push(join(line, childParts));
-  parts.push(dedent(softline));
-  return groupConcat(["[", indentConcat(parts), "]"]);
+  parts.push(path.call(print, "select"));
+  parts.push(path.call(print, "from"));
+  _pushIfExist(parts, path.call(print, "where", "value"));
+  _pushIfExist(parts, path.call(print, "with"));
+  _pushIfExist(parts, path.call(print, "groupBy"));
+  _pushIfExist(parts, path.call(print, "orderBy", "value"));
+  _pushIfExist(parts, path.call(print, "limit", "value"));
+  _pushIfExist(parts, path.call(print, "offset", "value"));
+  _pushIfExist(parts, path.call(print, "tracking"));
+  return join(line, parts);
 }
 
 function handleColumnClause(path, print) {
@@ -624,11 +661,14 @@ function _handlePassthroughCall(...names) {
   }
 }
 
-function _pushIfExist(parts, doc, otherDocs) {
+function _pushIfExist(parts, doc, postDocs, preDocs) {
   if (doc) {
+    if (preDocs) {
+      preDocs.forEach(preDoc => parts.push(preDoc));
+    }
     parts.push(doc);
-    if (otherDocs) {
-      otherDocs.forEach(otherDoc => parts.push(otherDoc));
+    if (postDocs) {
+      postDocs.forEach(postDoc => parts.push(postDoc));
     }
   }
   return parts;
@@ -674,16 +714,18 @@ nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALU
 nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 
-nodeHandler[apexNames.SOQL_EXPRESSION] = _handlePassthroughCall("query");
+nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;
 nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
 nodeHandler[apexNames.SELECT_COUNT_CLAUSE] = () => concat(["SELECT", " ", "COUNT()"]);
 nodeHandler[apexNames.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
+nodeHandler[apexNames.SELECT_INNER_QUERY] = handleSelectInnerQuery;
 nodeHandler[apexNames.FIELD] = handleField;
 nodeHandler[apexNames.FIELD_IDENTIFIER] = handleFieldIdentifier;
 nodeHandler[apexNames.FROM_CLAUSE] = handleFromClause;
 nodeHandler[apexNames.FROM_EXPRESSION] = handleFromExpression;
 nodeHandler[apexNames.WHERE_CLAUSE] = handleWhereClause;
+nodeHandler[apexNames.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
 nodeHandler[apexNames.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
 nodeHandler[apexNames.WHERE_OPERATION_EXPRESSIONS] = handleWhereOperationExpressions;
 nodeHandler[apexNames.WHERE_COMPOUND_EXPRESSION] = handleWhereCompoundExpression;

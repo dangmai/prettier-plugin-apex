@@ -45,6 +45,7 @@ module.exports = {
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
     QUERY: "apex.jorje.data.soql.Query",
+    SELECT_INNER_QUERY: "apex.jorje.data.soql.SelectExpr$SelectInnerQuery",
     SELECT_COLUMN_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectColumnClause",
     SELECT_COUNT_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectCountClause",
     SELECT_COLUMN_EXPRESSION: "apex.jorje.data.soql.SelectExpr$SelectColumnExpr",
@@ -53,6 +54,7 @@ module.exports = {
     FROM_CLAUSE: "apex.jorje.data.soql.FromClause",
     FROM_EXPRESSION: "apex.jorje.data.soql.FromExpr",
     WHERE_CLAUSE: "apex.jorje.data.soql.WhereClause",
+    WHERE_INNER_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereInnerExpr",
     WHERE_OPERATION_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereOpExpr",
     WHERE_OPERATION_EXPRESSIONS: "apex.jorje.data.soql.WhereExpr$WhereOpExprs",
     APEX_EXPRESSION: "apex.jorje.data.soql.QueryExpr$ApexExpr",
