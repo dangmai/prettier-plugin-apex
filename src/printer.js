@@ -498,6 +498,72 @@ function handleWhereOperationExpression(path, print) {
   return groupConcat(parts);
 }
 
+function handleWhereOperationExpressions(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push("(");
+  parts.push(
+    indentConcat([
+      softline,
+      join(
+        concat([",", line]), path.map(print, "expr")
+      ),
+      dedent(softline),
+    ])
+  );
+  parts.push(")");
+  return groupConcat(parts);
+}
+
+function handleWhereQueryLiteral(childClass, path, print) {
+  let doc;
+  switch (childClass) {
+    case "QueryString":
+      doc = concat(["'", path.call(print, "literal"), "'"]);
+      break;
+    case "QueryNull":
+      doc = "null";
+      break;
+    case "QueryTrue":
+      doc = "true";
+      break;
+    case "QueryFalse":
+      doc = "false";
+      break;
+    case "QueryNumber":
+      doc = path.call(print, "literal", "$");
+      break;
+    default:
+      doc = path.call(print, "literal");
+  }
+  if (doc) {
+    return doc;
+  }
+  return "";
+}
+
+function handleWhereCompoundExpression(path, print) {
+  const parts = [];
+  parts.push("(");
+  const operatorDoc = path.call(print, "op");
+  const expressionDocs = path.map(print, "expr");
+  parts.push(join(concat([line, operatorDoc, " "]), expressionDocs));
+  parts.push(")");
+  return concat(parts);
+}
+
+function handleWhereUnaryExpression(path, print) {
+  const parts = [];
+  parts.push("(");
+  parts.push(path.call(print, "op"));
+  parts.push(path.call(print, "expr"));
+  parts.push(")");
+  return concat(parts);
+}
+
 function handleColonExpression(path, print) {
   const parts = [];
   parts.push(":");
@@ -632,12 +698,19 @@ nodeHandler[classes.FROM_CLAUSE] = handleFromClause;
 nodeHandler[classes.FROM_EXPRESSION] = handleFromExpression;
 nodeHandler[classes.WHERE_CLAUSE] = handleWhereClause;
 nodeHandler[classes.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
+nodeHandler[classes.WHERE_OPERATION_EXPRESSIONS] = handleWhereOperationExpressions;
+nodeHandler[classes.WHERE_COMPOUND_EXPRESSION] = handleWhereCompoundExpression;
+nodeHandler[classes.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
+nodeHandler[classes.WHERE_UNARY_OPERATOR] = () => "NOT";
+nodeHandler[classes.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall("literal");
+nodeHandler[classes.QUERY_LITERAL] = handleWhereQueryLiteral;
 nodeHandler[classes.APEX_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[classes.COLON_EXPRESSION] = handleColonExpression;
 nodeHandler[classes.ORDER_BY_CLAUSE] = handleOrderByClause;
 nodeHandler[classes.ORDER_BY_VALUE] = handleOrderByValue;
 nodeHandler[classes.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
 nodeHandler[classes.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
+Object.keys(expressions.QUERY_WHERE).forEach(op => nodeHandler[op] = () => expressions.QUERY_WHERE[op]);
 Object.keys(expressions.QUERY).forEach(op => nodeHandler[op] = () => expressions.QUERY[op]);
 Object.keys(expressions.ORDER).forEach(op => nodeHandler[op] = handleOrderOperation(op));
 Object.keys(expressions.ORDER_NULL).forEach(op => nodeHandler[op] = handleNullOrderOperation(op));
@@ -650,6 +723,7 @@ function genericPrint(path, options, print) {
   if (!n) {
     return "";
   }
+  const apexClass = n["@class"];
   if (path.stack.length === 1) {
     // Hard code how to handle the root node here
     const docs = [];
@@ -657,9 +731,22 @@ function genericPrint(path, options, print) {
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
     return concat(docs);
-  } else if (n["@class"] && n["@class"] in nodeHandler) {
-    return nodeHandler[n["@class"]](path, print, options);
   }
+  if (!apexClass) {
+    return "";
+  }
+  if (apexClass in nodeHandler) {
+    return nodeHandler[apexClass](path, print, options);
+  }
+  const separatorIndex = apexClass.indexOf("$");
+  if (separatorIndex != -1) {
+    const parentClass = apexClass.substring(0, separatorIndex);
+    const childClass = apexClass.substring(separatorIndex + 1);
+    if (parentClass in nodeHandler) {
+      return nodeHandler[parentClass](childClass, path, print, options);
+    }
+  }
+
   return "";
 }
 

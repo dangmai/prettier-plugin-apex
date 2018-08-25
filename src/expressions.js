@@ -75,4 +75,8 @@ module.exports = {
     "apex.jorje.data.soql.OrderNull$OrderNullFirst": "NULLS FIRST",
     "apex.jorje.data.soql.OrderNull$OrderNullLast": "NULLS LAST",
   },
+  QUERY_WHERE: {
+    "apex.jorje.data.soql.WhereCompoundOp$QueryAnd": "AND",
+    "apex.jorje.data.soql.WhereCompoundOp$QueryOr": "OR",
+  }
 };
