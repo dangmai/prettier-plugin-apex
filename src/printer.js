@@ -542,6 +542,44 @@ function handleWhereClause(path, print) {
   return groupConcat(parts);
 }
 
+function handleWhereDistanceExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "distance"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return groupConcat(parts);
+}
+
+function handleDistanceFunctionExpression(path, print) {
+  const parts = [];
+  const distanceDocs = [];
+  parts.push("DISTANCE");
+  parts.push("(");
+  parts.push(softline);
+  distanceDocs.push(path.call(print, "field"));
+  distanceDocs.push(path.call(print, "location"));
+  distanceDocs.push("'" + path.call(print, "unit") + "'");
+  parts.push(join(concat([",", line]), distanceDocs));
+  parts.push(dedent(softline));
+  parts.push(")");
+  return groupIndentConcat(parts);
+}
+
+function handleGeolocationLiteral(path, print) {
+  const parts = [];
+  const childParts = [];
+  parts.push("GEOLOCATION");
+  parts.push("(");
+  childParts.push(path.call(print, "latitude", "number", "$"));
+  childParts.push(path.call(print, "longitude", "number", "$"));
+  parts.push(join(concat([",", line]), childParts));
+  parts.push(dedent(softline));
+  parts.push(")");
+  return groupIndentConcat(parts);
+}
+
 function handleWhereOperationExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "field"));
@@ -643,9 +681,20 @@ function handleOrderByClause(path, print) {
   return groupConcat(parts);
 }
 
-function handleOrderByValue(path, print) {
+function handleOrderByExpression(childClass, path, print) {
   const parts = [];
-  parts.push(path.call(print, "field"));
+  let expressionField;
+  switch (childClass) {
+    case "OrderByDistance":
+      expressionField = "distance";
+      break;
+    case "OrderByValue":
+      expressionField = "field";
+      break;
+    default:
+      expressionField = "";
+  }
+  parts.push(path.call(print, expressionField));
 
   const orderDoc = path.call(print, "order");
   if (orderDoc) {
@@ -852,12 +901,15 @@ nodeHandler[apexNames.WHERE_OPERATION_EXPRESSIONS] = handleWhereOperationExpress
 nodeHandler[apexNames.WHERE_COMPOUND_EXPRESSION] = handleWhereCompoundExpression;
 nodeHandler[apexNames.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
 nodeHandler[apexNames.WHERE_UNARY_OPERATOR] = () => "NOT";
+nodeHandler[apexNames.WHERE_DISTANCE_EXPRESSION] = handleWhereDistanceExpression;
+nodeHandler[apexNames.DISTANCE_FUNCTION_EXPRESSION] = handleDistanceFunctionExpression;
+nodeHandler[apexNames.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
 nodeHandler[apexNames.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall("literal");
 nodeHandler[apexNames.QUERY_LITERAL] = handleWhereQueryLiteral;
 nodeHandler[apexNames.APEX_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.COLON_EXPRESSION] = handleColonExpression;
 nodeHandler[apexNames.ORDER_BY_CLAUSE] = handleOrderByClause;
-nodeHandler[apexNames.ORDER_BY_VALUE] = handleOrderByValue;
+nodeHandler[apexNames.ORDER_BY_EXPRESSION] = handleOrderByExpression;
 nodeHandler[apexNames.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
 nodeHandler[apexNames.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
 nodeHandler[apexNames.QUERY_OPERATOR] = (childClass) => values.QUERY[childClass];
