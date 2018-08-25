@@ -78,5 +78,21 @@ module.exports = {
   QUERY_WHERE: {
     "apex.jorje.data.soql.WhereCompoundOp$QueryAnd": "AND",
     "apex.jorje.data.soql.WhereCompoundOp$QueryOr": "OR",
-  }
+  },
+  MODIFIER: {
+    PublicModifier: "public",
+    PrivateModifier: "private",
+    VirtualModifier: "virtual",
+    HiddenModifier: "hidden",
+    ProtectedModifier: "protected",
+    AbstractModifier: "abstract",
+    StaticModifier: "static",
+    TestMethodModifier: "testMethod",
+    WebServiceModifier: "webService",
+    FinalModifier: "final",
+    TransientModifier: "transient",
+    GlobalModifier: "global",
+    WithoutSharingModifier: "without sharing",
+    WithSharingModifier: "with sharing",
+  },
 };

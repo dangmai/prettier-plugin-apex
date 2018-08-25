@@ -67,7 +67,6 @@ function handleVariableExpression(path, print) {
 
 function handleLiteralExpression(path, print) {
   const node = path.getValue();
-  console.log(path.getValue);
   const literalDoc = path.call(print, "literal", "$");
   if (node.type["$"] === "STRING") {
     return concat(["'", literalDoc, "'"]);
@@ -618,6 +617,10 @@ function handleNullOrderOperation(op) {
   }
 }
 
+function handleModifier(childClass) {
+  return concat([expressions.MODIFIER[childClass], " "]);
+}
+
 function _handlePassthroughCall(...names) {
   return function(path, print) {
     return path.call(print, ...names);
@@ -672,20 +675,7 @@ nodeHandler[classes.ANNOTATION] = handleAnnotation;
 nodeHandler[classes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[classes.ANNOTATION_TRUE_VALUE] = () => "true";
 nodeHandler[classes.ANNOTATION_FALSE_VALUE] = () => "false";
-nodeHandler[classes.PUBLIC_MODIFIER] = () => concat(["public", " "]);
-nodeHandler[classes.PRIVATE_MODIFIER] = () => concat(["private", " "]);
-nodeHandler[classes.ABSTRACT_MODIFIER] = () => concat(["abstract", " "]);
-nodeHandler[classes.FINAL_MODIFIER] = () => concat(["final", " "]);
-nodeHandler[classes.HIDDEN_MODIFIER] = () => concat(["hidden", " "]);
-nodeHandler[classes.PROTECTED_MODIFIER] = () => concat(["protected", " "]);
-nodeHandler[classes.STATIC_MODIFIER] = () => concat(["static", " "]);
-nodeHandler[classes.TEST_METHOD_MODIFIER] = () => concat(["testMethod", " "]);
-nodeHandler[classes.TRANSIENT_MODIFIER] = () => concat(["transient", " "]);
-nodeHandler[classes.WEB_SERVICE_MODIFIER] = () => concat(["webService", " "]);
-nodeHandler[classes.VIRTUAL_MODIFIER] = () => concat(["virtual", " "]);
-nodeHandler[classes.GLOBAL_MODIFIER] = () => concat(["global", " "]);
-nodeHandler[classes.WITH_SHARING_MODIFIER] = () => concat(["with sharing", " "]);
-nodeHandler[classes.WITHOUT_SHARING_MODIFIER] = () => concat(["without sharing", " "]);
+nodeHandler[classes.MODIFIER] = handleModifier;
 nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = () => "this";
 
 nodeHandler[classes.SOQL_EXPRESSION] = _handlePassthroughCall("query");
@@ -739,7 +729,7 @@ function genericPrint(path, options, print) {
     return nodeHandler[apexClass](path, print, options);
   }
   const separatorIndex = apexClass.indexOf("$");
-  if (separatorIndex != -1) {
+  if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
     const childClass = apexClass.substring(separatorIndex + 1);
     if (parentClass in nodeHandler) {
