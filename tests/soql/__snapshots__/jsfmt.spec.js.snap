@@ -1,0 +1,134 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SOQLClass.cls - apex-verify: SOQLClass.cls 1`] = `
+class SOQLClass {
+  public void simpleSOQL() {
+    Id[] contactIds = new Id[]{};
+    Contact[] contacts = [SELECT Id, Account.Id, Account.CreatedById FROM Contact WHERE Id IN :contactIds];
+    Contact[] logicalOperators = [
+      SELECT Id
+      From Contact
+      WHERE (Name = 'Hi' OR Name = 'Hello')
+      AND NAME != 'World'
+      AND (NOT(Name = 'Oops' OR Name = 'Another'))
+    ];
+    Account[] comparisonOperators = [
+      SELECT
+        Id
+      FROM Account
+      WHERE (Name = 'Hi'
+      OR Name != 'Hello'
+      OR Name LIKE '%Hi%'
+      OR Name IN ('Test', 'World')
+      OR NAME NOT IN ('Tada', 'No')
+      OR MultiPicklist__c INCLUDES ('AAA;BBB', 'CCC')
+      OR MultiPicklist__c EXCLUDES ('DDD', 'EEE;FFF'))
+      AND (Employees < 100
+      OR Employees > 101
+      OR Employees >= 200
+      OR Employees <= 120)
+    ];
+    Contact[] reservedKeywords = [SELECT Id FROM Contact WHERE Name = '\\'Test Name\\'' OR Name = '\\\\Hi' OR Name = 'Hello\\nWorld'];
+
+    Integer i = [SELECT Count() FROM Contact];
+    Contact[] subquery = [SELECT Id, (SELECT Id FROM Contacts LIMIT 5 OFFSET 5) FROM Account ORDER BY Name DESC LIMIT 1];
+    Contact[] nestedFrom = [SELECT Id FROM Contact WHERE Id IN (SELECT Id FROM Contact) AND Account.Id <> NULL];
+
+  }
+
+  void dateSoql() {
+    AggregateResult[] literals = [SELECT Id FROM Contact WHERE CreatedDate > 2018-01-01T00:00:00Z GROUP BY CALENDAR_YEAR(CreatedDate)];
+    Contact[] contacts = [SELECT Id FROM Contact WHERE CreatedDate < 2018-01-01 OR CreatedDate > TOMORROW OR CreatedDate = LAST_N_DAYS:365];
+  }
+
+  void groupSoql() {
+    AggregateResult[] currencies = [SELECT Name, MAX(Amount) FROM Opportunity GROUP BY Name HAVING MAX(Amount) > USD10000];
+    AggregateResult[] groupedResults = [select avg(amount) aver from opportunity];
+    AggregateResult[] anotherGroupedResults = [
+      SELECT CampaignId, AVG(Amount)
+      FROM Opportunity
+      GROUP BY CampaignId];
+  }
+
+  void nicheSoql() {
+    Contact[] forView = [SELECT Name, ID FROM Contact  LIMIT 1 FOR VIEW];
+    Contact[] forReference = [SELECT Name, ID FROM Contact  LIMIT 1 FOR REFERENCE];
+    Account [] forUpdate = [SELECT Id FROM Account LIMIT 2 FOR UPDATE];
+
+    Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
+    Event[] typeOf = [
+      SELECT
+        TYPEOF What
+          WHEN Account THEN Phone, NumberOfEmployees
+          WHEN Opportunity THEN Amount, CloseDate
+          ELSE Name, Email
+        END
+      FROM Event];
+    Offer__DataCategorySelection dataCategory = [SELECT Id,ParentId FROM Offer__DataCategorySelection];
+    FAQ__kav[] updateTrackings = [
+      SELECT Title FROM FAQ__kav
+      WHERE Keyword='Apex' and
+      Language = 'en_US' and
+      KnowledgeArticleVersion = 'ka230000000PCiy'
+      UPDATE TRACKING];
+    FAQ__kav[] updateViewStats = [
+      SELECT Title FROM FAQ__kav
+      WHERE PublishStatus='online' and
+      Language = 'en_US' and
+      KnowledgeArticleVersion = 'ka230000000PCiy'
+      UPDATE VIEWSTAT
+    ];
+    Warehouse__c[] geoLocations = [
+      SELECT Name, StreetAddress__c
+      FROM Warehouse__c
+      WHERE DISTANCE(Location__c, GEOLOCATION(37.775,-122.418), 'mi') < 20
+      ORDER BY DISTANCE(Location__c, GEOLOCATION(37.775,-122.418), 'mi')
+      LIMIT 10
+    ];
+    UserProfileFeed[] withUserIds = [SELECT Id FROM UserProfileFeed WITH UserId='005D0000001AamR' ORDER BY CreatedDate DESC, Id DESC LIMIT 20];
+    Question[] withDataCategories = [SELECT Title FROM Question WHERE LastReplyDate > 2005-10-08T01:02:03Z WITH DATA CATEGORY Geography__c AT (usa__c, uk__c)];
+    Contact[] allRows = [SELECT COUNT() FROM Contact WHERE AccountId = :a.Id ALL ROWS];
+  }
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class SOQLClass {
+  public void simpleSOQL() {
+    Id[] contactIds = new Id[]{};
+    Contact[] contacts = ;
+    Contact[] logicalOperators = ;
+    Account[] comparisonOperators = ;
+    Contact[] reservedKeywords = ;
+    Integer i = ;
+    Contact[] subquery = ;
+    Contact[] nestedFrom = ;
+  }
+
+  void dateSoql() {
+    AggregateResult[] literals = ;
+    Contact[] contacts = ;
+  }
+
+  void groupSoql() {
+    AggregateResult[] currencies = ;
+    AggregateResult[] groupedResults = ;
+    AggregateResult[] anotherGroupedResults = ;
+  }
+
+  void nicheSoql() {
+    Contact[] forView = ;
+    Contact[] forReference = ;
+    Account[] forUpdate = ;
+    Contact[] usingScope = ;
+    Event[] typeOf = ;
+    Offer__DataCategorySelection dataCategory = ;
+    FAQ__kav[] updateTrackings = ;
+    FAQ__kav[] updateViewStats = ;
+    Warehouse__c[] geoLocations = ;
+    UserProfileFeed[] withUserIds = ;
+    Question[] withDataCategories = ;
+    Contact[] allRows = ;
+  }
+}
+
+`;

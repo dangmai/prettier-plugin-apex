@@ -54,4 +54,22 @@ module.exports = {
   TERNARY_EXPRESSION: "apex.jorje.data.ast.Expr$TernaryExpr",
   EXPRESSION_STATEMENT: "apex.jorje.data.ast.Stmnt$ExpressionStmnt",
   ASSIGNMENT_EXPRESSION: "apex.jorje.data.ast.Expr$AssignmentExpr",
+
+  // SOQL
+  SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
+  QUERY: "apex.jorje.data.soql.Query",
+  SELECT_COLUMN_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectColumnClause",
+  SELECT_COLUMN_EXPRESSION: "apex.jorje.data.soql.SelectExpr$SelectColumnExpr",
+  FIELD: "apex.jorje.data.soql.Field",
+  FIELD_IDENTIFIER: "apex.jorje.data.soql.FieldIdentifier",
+  FROM_CLAUSE: "apex.jorje.data.soql.FromClause",
+  FROM_EXPRESSION: "apex.jorje.data.soql.FromExpr",
+  WHERE_CLAUSE: "apex.jorje.data.soql.WhereClause",
+  WHERE_OPERATION_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereOpExpr",
+  APEX_EXPRESSION: "apex.jorje.data.soql.QueryExpr$ApexExpr",
+  COLON_EXPRESSION: "apex.jorje.data.soql.ColonExpr",
+  ORDER_BY_CLAUSE: "apex.jorje.data.soql.OrderByClause",
+  ORDER_BY_VALUE: "apex.jorje.data.soql.OrderByExpr$OrderByValue",
+  LIMIT_VALUE: "apex.jorje.data.soql.LimitClause$LimitValue",
+  OFFSET_VALUE: "apex.jorje.data.soql.OffsetClause$OffsetValue",
 };

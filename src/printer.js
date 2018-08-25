@@ -14,7 +14,7 @@ function groupConcat(docs) {
   return group(concat(docs));
 }
 
-function handleReturnStatement(_, path, print) {
+function handleReturnStatement(path, print) {
   const docs = [];
   docs.push("return");
   const childDocs = path.call(print, "expr", "value");
@@ -26,7 +26,7 @@ function handleReturnStatement(_, path, print) {
   return concat(docs);
 }
 
-function handleBinaryExpression(_, path, print) {
+function handleBinaryExpression(path, print) {
   const docs = [];
   const leftDoc = path.call(print, "left");
   const operationDoc = path.call(print, "op");
@@ -39,7 +39,7 @@ function handleBinaryExpression(_, path, print) {
   return concat(docs);
 }
 
-function handleGenericExpression(_, path, print) {
+function handleGenericExpression(path, print) {
   const docs = [];
   const leftDoc = path.call(print, "left");
   const operationDoc = path.call(print, "op");
@@ -52,7 +52,7 @@ function handleGenericExpression(_, path, print) {
   return concat(docs);
 }
 
-function handleVariableExpression(_, path, print) {
+function handleVariableExpression(path, print) {
   const parts = [];
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
   if (dottedExpressionDoc) {
@@ -65,7 +65,9 @@ function handleVariableExpression(_, path, print) {
   return concat(parts);
 }
 
-function handleLiteralExpression(node, path, print) {
+function handleLiteralExpression(path, print) {
+  const node = path.getValue();
+  console.log(path.getValue);
   const literalDoc = path.call(print, "literal", "$");
   if (node.type["$"] === "STRING") {
     return concat(["'", literalDoc, "'"]);
@@ -73,19 +75,22 @@ function handleLiteralExpression(node, path, print) {
   return literalDoc;
 }
 
-function handleBinaryOperation(node) {
+function handleBinaryOperation(path) {
+  const node = path.getValue();
   return expressions.BINARY[node["$"]];
 }
 
-function handleBooleanOperation(node) {
+function handleBooleanOperation(path) {
+  const node = path.getValue();
   return expressions.BOOLEAN[node["$"]];
 }
 
-function handleAssignmentOperation(node) {
+function handleAssignmentOperation(path) {
+  const node = path.getValue();
   return expressions.ASSIGNMENT[node["$"]];
 }
 
-function handleClassDeclaration(_, path, print) {
+function handleClassDeclaration(path, print) {
   const parts = [];
   const modifierDocs = path.map(print, "modifiers");
   if (modifierDocs.length > 0) {
@@ -127,7 +132,7 @@ function handleClassDeclaration(_, path, print) {
   return concat(parts);
 }
 
-function handleAnnotation(_, path, print) {
+function handleAnnotation(path, print) {
   const parts = [];
   parts.push("@");
   parts.push(path.call(print, "name", "value"));
@@ -141,7 +146,7 @@ function handleAnnotation(_, path, print) {
   return concat(parts);
 }
 
-function handleAnnotationKeyValue(_, path, print) {
+function handleAnnotationKeyValue(path, print) {
   const parts = [];
   parts.push(path.call(print, "key", "value"));
   parts.push("=");
@@ -149,7 +154,7 @@ function handleAnnotationKeyValue(_, path, print) {
   return concat(parts);
 }
 
-function handleClassTypeRef(_, path, print) {
+function handleClassTypeRef(path, print) {
   const parts = [];
   parts.push(join(".", path.map(print, "names")));
   const typeArgumentDocs = path.map(print, "typeArguments");
@@ -161,14 +166,14 @@ function handleClassTypeRef(_, path, print) {
   return concat(parts);
 }
 
-function handleArrayTypeRef(_, path, print) {
+function handleArrayTypeRef(path, print) {
   const parts = [];
   parts.push(path.call(print, "heldType"));
   parts.push("[]");
   return concat(parts);
 }
 
-function handleMethodDeclaration(_, path, print) {
+function handleMethodDeclaration(path, print) {
   const parts = [];
   // Modifiers
   const modifierDocs = path.map(print, "modifiers");
@@ -193,7 +198,7 @@ function handleMethodDeclaration(_, path, print) {
   return concat(parts);
 }
 
-function handleEmptyModifierParameterRef(_, path, print) {
+function handleEmptyModifierParameterRef(path, print) {
   const parts = [];
   // Type
   parts.push(path.call(print, "typeRef"));
@@ -203,7 +208,7 @@ function handleEmptyModifierParameterRef(_, path, print) {
   return concat(parts);
 }
 
-function handleBlockStatement(_, path, print) {
+function handleBlockStatement(path, print) {
   const statementDocs = path.map(print, "stmnts");
   if (statementDocs.length > 0) {
     return indentConcat(
@@ -220,7 +225,7 @@ function handleBlockStatement(_, path, print) {
   return "";
 }
 
-function handleVariableDeclarations(_, path, print) {
+function handleVariableDeclarations(path, print) {
   const parts = [];
   // Type
   parts.push(path.call(print, "type"));
@@ -243,7 +248,7 @@ function handleVariableDeclarations(_, path, print) {
   return groupConcat(parts);
 }
 
-function handleVariableDeclaration(_, path, print) {
+function handleVariableDeclaration(path, print) {
   const parts = [];
   parts.push(path.call(print, "name"));
   const assignmentDocs = path.call(print, "assignment", "value");
@@ -256,7 +261,7 @@ function handleVariableDeclaration(_, path, print) {
   return concat(parts);
 }
 
-function handleNewStandard(_, path, print) {
+function handleNewStandard(path, print) {
   const parts = [];
   // Type
   parts.push(path.call(print, "type"));
@@ -268,7 +273,7 @@ function handleNewStandard(_, path, print) {
   return concat(parts);
 }
 
-function handleMethodCallExpression(_, path, print) {
+function handleMethodCallExpression(path, print) {
   const parts = [];
   // Dotted expression
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
@@ -287,7 +292,7 @@ function handleMethodCallExpression(_, path, print) {
   return concat(parts);
 }
 
-function handleNestedExpression(_, path, print) {
+function handleNestedExpression(path, print) {
   const parts = [];
   parts.push("(");
   parts.push(path.call(print, "expr"));
@@ -295,7 +300,7 @@ function handleNestedExpression(_, path, print) {
   return concat(parts);
 }
 
-function handleNewListInit(_, path, print) {
+function handleNewListInit(path, print) {
   // TODO is there a way to preserve the user choice of List<> or []?
   const parts = [];
   // Type
@@ -307,7 +312,7 @@ function handleNewListInit(_, path, print) {
   return concat(parts);
 }
 
-function handleNewMapInit(_, path, print) {
+function handleNewMapInit(path, print) {
   const parts = [];
   parts.push("Map");
   // Type
@@ -319,7 +324,7 @@ function handleNewMapInit(_, path, print) {
   return concat(parts);
 }
 
-function handleNewListLiteral(_, path, print) {
+function handleNewListLiteral(path, print) {
   const parts = [];
   // Type
   parts.push(join(".", path.map(print, "types")));
@@ -333,7 +338,7 @@ function handleNewListLiteral(_, path, print) {
   return concat(parts);
 }
 
-function handleNewExpression(_, path, print) {
+function handleNewExpression(path, print) {
   const parts = [];
   parts.push("new");
   parts.push(" ");
@@ -341,7 +346,7 @@ function handleNewExpression(_, path, print) {
   return concat(parts);
 }
 
-function handleIfElseBlock(_, path, print) {
+function handleIfElseBlock(path, print) {
   const parts = [];
   const ifBlockDocs = path.map(print, "ifBlocks");
   parts.push(join(" else ", ifBlockDocs));
@@ -351,7 +356,7 @@ function handleIfElseBlock(_, path, print) {
   return groupConcat(parts);
 }
 
-function handleIfBlock(_, path, print) {
+function handleIfBlock(path, print) {
   const parts = [];
   parts.push("if");
   parts.push(" ");
@@ -367,7 +372,7 @@ function handleIfBlock(_, path, print) {
   return groupConcat(parts);
 }
 
-function handleElseBlock(_, path, print) {
+function handleElseBlock(path, print) {
   const parts = [];
   parts.push("else");
   parts.push(" ");
@@ -378,7 +383,7 @@ function handleElseBlock(_, path, print) {
   return groupConcat(parts);
 }
 
-function handleTernaryExpression(_, path, print) {
+function handleTernaryExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "condition"));
   parts.push(" ");
@@ -392,17 +397,175 @@ function handleTernaryExpression(_, path, print) {
   return groupConcat(parts);
 }
 
-function handleExpressionStatement(_, path, print) {
+function handleExpressionStatement(path, print) {
   const parts = [];
   parts.push(path.call(print, "expr"));
   parts.push(";");
   return concat(parts);
 }
 
+function handleQuery(path, print) {
+  const parts = [];
+  parts.push(softline);
+  const childParts = [];
+  childParts.push(path.call(print, "select"));
+  childParts.push(path.call(print, "from"));
+  _pushIfExist(childParts, path.call(print, "where", "value"));
+  _pushIfExist(childParts, path.call(print, "with"));
+  _pushIfExist(childParts, path.call(print, "groupBy"));
+  _pushIfExist(childParts, path.call(print, "orderBy", "value"));
+  _pushIfExist(childParts, path.call(print, "limit", "value"));
+  _pushIfExist(childParts, path.call(print, "offset", "value"));
+  _pushIfExist(childParts, path.call(print, "tracking"));
+  parts.push(join(line, childParts));
+  parts.push(dedent(softline));
+  return groupConcat(["[", indentConcat(parts), "]"]);
+}
+
+function handleColumnClause(path, print) {
+  const parts = [];
+  parts.push(
+    indentConcat([
+      "SELECT",
+      line,
+      join(concat([",", line]), path.map(print, "exprs")),
+    ]),
+  );
+  return groupConcat(parts);
+}
+
+function handleColumnExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+  return groupConcat(parts);
+}
+
+function handleFieldIdentifier(path, print) {
+  const parts = [];
+  const entity = path.call(print, "entity", "value");
+  if (entity) {
+    parts.push(entity);
+    parts.push(".");
+  }
+  parts.push(path.call(print, "field"));
+  return concat(parts);
+}
+
+function handleField(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+  return concat(parts);
+}
+
+function handleFromClause(path, print) {
+  const parts = [];
+  parts.push(
+    indentConcat([
+      "FROM",
+      line,
+      ...path.map(print, "exprs"),
+    ]),
+  );
+  return groupConcat(parts);
+}
+
+function handleFromExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "table"));
+  parts.push(path.call(print, "using"));
+  return groupConcat(parts);
+}
+
+function handleWhereClause(path, print) {
+  const parts = [];
+  parts.push(
+    indentConcat([
+      "WHERE",
+      line,
+      path.call(print, "expr"),
+    ])
+  );
+  return groupConcat(parts);
+}
+
+function handleWhereOperationExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return groupConcat(parts);
+}
+
+function handleColonExpression(path, print) {
+  const parts = [];
+  parts.push(":");
+  parts.push(path.call(print, "expr"));
+  return concat(parts);
+}
+
+function handleOrderByClause(path, print) {
+  const parts = [];
+  parts.push("ORDER BY");
+  parts.push(indentConcat([
+    line,
+    join(concat([",", line]), path.map(print, "exprs")),
+  ]));
+  return groupConcat(parts);
+}
+
+function handleOrderByValue(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+
+  const orderDoc = path.call(print, "order");
+  if (orderDoc) {
+    parts.push(" ");
+    parts.push(orderDoc);
+  }
+  const nullOrderDoc = path.call(print, "nullOrder");
+  if (nullOrderDoc) {
+    parts.push(" ");
+    parts.push(nullOrderDoc);
+  }
+  return concat(parts);
+}
+
+function handleOrderOperation(op) {
+  return function(path, print, opts) {
+    const loc = opts.locStart(path.getValue());
+    if (loc.line !== -1 && loc.column !== -1) {
+      return expressions.ORDER[op];
+    }
+    return "";
+  }
+}
+
+function handleNullOrderOperation(op) {
+  return function(path, print, opts) {
+    const loc = opts.locStart(path.getValue());
+    if (loc.line !== -1 && loc.column !== -1) {
+      return expressions.ORDER_NULL[op];
+    }
+    return "";
+  }
+}
+
 function _handlePassthroughCall(...names) {
-  return function(_, path, print) {
+  return function(path, print) {
     return path.call(print, ...names);
   }
+}
+
+function _pushIfExist(parts, doc, otherDocs) {
+  if (doc) {
+    parts.push(doc);
+    if (otherDocs) {
+      otherDocs.forEach(otherDoc => parts.push(otherDoc));
+    }
+  }
+  return parts;
 }
 
 const nodeHandler = {};
@@ -459,6 +622,26 @@ nodeHandler[classes.WITH_SHARING_MODIFIER] = () => concat(["with sharing", " "])
 nodeHandler[classes.WITHOUT_SHARING_MODIFIER] = () => concat(["without sharing", " "]);
 nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = () => "this";
 
+nodeHandler[classes.SOQL_EXPRESSION] = _handlePassthroughCall("query");
+nodeHandler[classes.QUERY] = handleQuery;
+nodeHandler[classes.SELECT_COLUMN_CLAUSE] = handleColumnClause;
+nodeHandler[classes.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
+nodeHandler[classes.FIELD] = handleField;
+nodeHandler[classes.FIELD_IDENTIFIER] = handleFieldIdentifier;
+nodeHandler[classes.FROM_CLAUSE] = handleFromClause;
+nodeHandler[classes.FROM_EXPRESSION] = handleFromExpression;
+nodeHandler[classes.WHERE_CLAUSE] = handleWhereClause;
+nodeHandler[classes.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
+nodeHandler[classes.APEX_EXPRESSION] = _handlePassthroughCall("expr");
+nodeHandler[classes.COLON_EXPRESSION] = handleColonExpression;
+nodeHandler[classes.ORDER_BY_CLAUSE] = handleOrderByClause;
+nodeHandler[classes.ORDER_BY_VALUE] = handleOrderByValue;
+nodeHandler[classes.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
+nodeHandler[classes.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
+Object.keys(expressions.QUERY).forEach(op => nodeHandler[op] = () => expressions.QUERY[op]);
+Object.keys(expressions.ORDER).forEach(op => nodeHandler[op] = handleOrderOperation(op));
+Object.keys(expressions.ORDER_NULL).forEach(op => nodeHandler[op] = handleNullOrderOperation(op));
+
 function genericPrint(path, options, print) {
   const n = path.getValue();
   if (typeof n === "string" || typeof n === "number" || typeof n === "boolean") {
@@ -467,20 +650,17 @@ function genericPrint(path, options, print) {
   if (!n) {
     return "";
   }
-  const docs = [];
   if (path.stack.length === 1) {
     // Hard code how to handle the root node here
+    const docs = [];
     docs.push(path.call(print, classes.PARSER_OUTPUT, "unit", "body"));
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
-  } else {
-    if (n["@class"] && n["@class"] in nodeHandler) {
-      docs.push(nodeHandler[n["@class"]](n, path, print));
-    } else {
-      docs.push("");
-    }
+    return concat(docs);
+  } else if (n["@class"] && n["@class"] in nodeHandler) {
+    return nodeHandler[n["@class"]](path, print, options);
   }
-  return concat(docs);
+  return "";
 }
 
 module.exports = genericPrint;

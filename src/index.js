@@ -14,10 +14,13 @@ const languages = [
 ];
 
 function locStart(node) {
-  return -1;
+  if (node.loc) {
+    return node.loc;
+  }
+  return {line: -1, column: -1};
 }
 
-function locEnd(node) {
+function locEnd() {
   return -1;
 }
 

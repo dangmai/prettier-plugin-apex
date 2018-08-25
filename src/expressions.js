@@ -38,5 +38,41 @@ module.exports = {
     LEFT_SHIFT_EQUALS: "<<=",
     RIGHT_SHIFT_EQUALS: ">>=",
     UNSIGNED_RIGHT_SHIFT_EQUALS: ">>>=",
-  }
+  },
+  POSTFIX: {
+    INC: "++",
+    DEC: "--",
+  },
+  PREFIX: {
+    POSITIVE: "+",
+    NEGATIVE: "-",
+    NOT: "!",
+    BITWISE_COMPLEMENT: "~",
+    INC: "++",
+    DEC: "--",
+  },
+  QUERY: {
+    "apex.jorje.data.soql.QueryOp$QueryIncludes": "INCLUDES",
+    "apex.jorje.data.soql.QueryOp$QueryExcludes": "EXCLUDES",
+    "apex.jorje.data.soql.QueryOp$QueryEqual": "=",
+    "apex.jorje.data.soql.QueryOp$QueryDoubleEqual": "==",
+    "apex.jorje.data.soql.QueryOp$QueryTripleEqual": "===",
+    "apex.jorje.data.soql.QueryOp$QueryNotEqual": "!=",
+    "apex.jorje.data.soql.QueryOp$QueryNotTripleEqual": "!==",
+    "apex.jorje.data.soql.QueryOp$QueryLike": "LIKE",
+    "apex.jorje.data.soql.QueryOp$QueryLessThanEqual": "<=",
+    "apex.jorje.data.soql.QueryOp$QueryGreaterThanEqual": ">=",
+    "apex.jorje.data.soql.QueryOp$QueryLessThan": "<",
+    "apex.jorje.data.soql.QueryOp$QueryGreaterThan": ">",
+    "apex.jorje.data.soql.QueryOp$QueryIn": "IN",
+    "apex.jorje.data.soql.QueryOp$QueryNotIn": "NOT IN",
+  },
+  ORDER: {
+    "apex.jorje.data.soql.Order$OrderDesc": "DESC",
+    "apex.jorje.data.soql.Order$OrderAsc": "ASC",
+  },
+  ORDER_NULL: {
+    "apex.jorje.data.soql.OrderNull$OrderNullFirst": "NULLS FIRST",
+    "apex.jorje.data.soql.OrderNull$OrderNullLast": "NULLS LAST",
+  },
 };
