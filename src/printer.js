@@ -518,6 +518,7 @@ function handleWhereOperationExpressions(path, print) {
 }
 
 function handleWhereQueryLiteral(childClass, path, print) {
+  // TODO Fix escaping special characters
   let doc;
   switch (childClass) {
     case "QueryString":
@@ -597,24 +598,20 @@ function handleOrderByValue(path, print) {
   return concat(parts);
 }
 
-function handleOrderOperation(op) {
-  return function(path, print, opts) {
-    const loc = opts.locStart(path.getValue());
-    if (loc.line !== -1 && loc.column !== -1) {
-      return values.ORDER[op];
-    }
-    return "";
+function handleOrderOperation(childClass, path, print, opts) {
+  const loc = opts.locStart(path.getValue());
+  if (loc.line !== -1 && loc.column !== -1) {
+    return values.ORDER[childClass];
   }
+  return "";
 }
 
-function handleNullOrderOperation(op) {
-  return function(path, print, opts) {
-    const loc = opts.locStart(path.getValue());
-    if (loc.line !== -1 && loc.column !== -1) {
-      return values.ORDER_NULL[op];
-    }
-    return "";
+function handleNullOrderOperation(childClass, path, print, opts) {
+  const loc = opts.locStart(path.getValue());
+  if (loc.line !== -1 && loc.column !== -1) {
+    return values.ORDER_NULL[childClass];
   }
+  return "";
 }
 
 function handleModifier(childClass) {
@@ -700,10 +697,10 @@ nodeHandler[apexNames.ORDER_BY_CLAUSE] = handleOrderByClause;
 nodeHandler[apexNames.ORDER_BY_VALUE] = handleOrderByValue;
 nodeHandler[apexNames.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
 nodeHandler[apexNames.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
-Object.keys(values.QUERY_WHERE).forEach(op => nodeHandler[op] = () => values.QUERY_WHERE[op]);
-Object.keys(values.QUERY).forEach(op => nodeHandler[op] = () => values.QUERY[op]);
-Object.keys(values.ORDER).forEach(op => nodeHandler[op] = handleOrderOperation(op));
-Object.keys(values.ORDER_NULL).forEach(op => nodeHandler[op] = handleNullOrderOperation(op));
+nodeHandler[apexNames.QUERY_OPERATOR] = (childClass) => values.QUERY[childClass];
+nodeHandler[apexNames.SOQL_ORDER] = handleOrderOperation;
+nodeHandler[apexNames.SOQL_ORDER_NULL] = handleNullOrderOperation;
+nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WHERE[childClass];
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
