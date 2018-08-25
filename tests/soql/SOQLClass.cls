@@ -38,7 +38,14 @@ class SOQLClass {
   }
 
   void dateSoql() {
-    AggregateResult[] literals = [SELECT Id FROM Contact WHERE CreatedDate > 2018-01-01T00:00:00Z GROUP BY CALENDAR_YEAR(CreatedDate)];
+    AggregateResult[] literals = [
+      SELECT Id
+      FROM Contact
+      WHERE CreatedDate > 2018-01-01T00:00:00Z
+      OR CreatedDate < 2017-01-01T05:00:00+01:00
+      OR CreatedDate < 2016-01-01T01:00:00-02:00
+      GROUP BY CALENDAR_YEAR(CreatedDate)
+    ];
     Contact[] contacts = [SELECT Id FROM Contact WHERE CreatedDate < 2018-01-01 OR CreatedDate > TOMORROW OR CreatedDate = LAST_N_DAYS:365];
   }
 

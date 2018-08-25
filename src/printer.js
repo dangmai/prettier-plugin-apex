@@ -587,6 +587,10 @@ function handleWhereQueryLiteral(childClass, path, print) {
     case "QueryNumber":
       doc = path.call(print, "literal", "$");
       break;
+    case "QueryDateTime":
+      // TODO find a way to preserve user's input instead of converting to GMT
+      doc = path.call(print, "literal").replace("[GMT]", "");
+      break;
     default:
       doc = path.call(print, "literal");
   }
