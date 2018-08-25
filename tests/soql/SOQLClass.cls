@@ -103,19 +103,6 @@ class SOQLClass {
         END
       FROM Event];
     Offer__DataCategorySelection dataCategory = [SELECT Id,ParentId FROM Offer__DataCategorySelection];
-    FAQ__kav[] updateTrackings = [
-      SELECT Title FROM FAQ__kav
-      WHERE Keyword='Apex' and
-      Language = 'en_US' and
-      KnowledgeArticleVersion = 'ka230000000PCiy'
-      UPDATE TRACKING];
-    FAQ__kav[] updateViewStats = [
-      SELECT Title FROM FAQ__kav
-      WHERE PublishStatus='online' and
-      Language = 'en_US' and
-      KnowledgeArticleVersion = 'ka230000000PCiy'
-      UPDATE VIEWSTAT
-    ];
     Warehouse__c[] geoLocations = [
       SELECT Name, StreetAddress__c
       FROM Warehouse__c
