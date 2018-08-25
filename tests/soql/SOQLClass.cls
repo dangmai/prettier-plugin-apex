@@ -69,6 +69,8 @@ class SOQLClass {
     Contact[] forView = [SELECT Name, ID FROM Contact  LIMIT 1 FOR VIEW];
     Contact[] forReference = [SELECT Name, ID FROM Contact  LIMIT 1 FOR REFERENCE];
     Account [] forUpdate = [SELECT Id FROM Account LIMIT 2 FOR UPDATE];
+    Account[] includeDeleted = [SELECT Id FROM Account ALL ROWS];
+    Account[] forViewAllRows = [SELECT Id FROM Account FOR VIEW ALL ROWS];
 
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
     Event[] typeOf = [

@@ -75,6 +75,8 @@ module.exports = {
     QUERY_OPERATOR: "apex.jorje.data.soql.QueryOp",
     SOQL_ORDER: "apex.jorje.data.soql.Order",
     SOQL_ORDER_NULL: "apex.jorje.data.soql.OrderNull",
+    TRACKING_TYPE: "apex.jorje.data.soql.TrackingType",
+    QUERY_OPTION: "apex.jorje.data.soql.QueryOption",
   },
   BINARY: {
     ADDITION: "+",

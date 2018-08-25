@@ -454,7 +454,8 @@ function handleQuery(path, print) {
   _pushIfExist(parts, path.call(print, "orderBy", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "offset", "value"));
-  _pushIfExist(parts, path.call(print, "tracking"));
+  _pushIfExist(parts, path.call(print, "tracking", "value"));
+  _pushIfExist(parts, path.call(print, "options", "value"));
   return join(line, parts);
 }
 
@@ -692,6 +693,36 @@ function handleHavingClause(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleTrackingType(childClass) {
+  let doc;
+  switch (childClass) {
+    case "ForView":
+      doc = "FOR VIEW";
+      break;
+    case "ForReference":
+      doc = "FOR REFERENCE";
+      break;
+    default:
+      doc = "";
+  }
+  return doc;
+}
+
+function handleQueryOption(childClass) {
+  let doc;
+  switch (childClass) {
+    case "LockRows":
+      doc = "FOR UPDATE";
+      break;
+    case "IncludeDeleted":
+      doc = "ALL ROWS";
+      break;
+    default:
+      doc = "";
+  }
+  return doc;
+}
+
 function handleModifier(childClass) {
   return concat([values.MODIFIER[childClass], " "]);
 }
@@ -786,6 +817,8 @@ nodeHandler[apexNames.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", pa
 nodeHandler[apexNames.QUERY_OPERATOR] = (childClass) => values.QUERY[childClass];
 nodeHandler[apexNames.SOQL_ORDER] = handleOrderOperation;
 nodeHandler[apexNames.SOQL_ORDER_NULL] = handleNullOrderOperation;
+nodeHandler[apexNames.TRACKING_TYPE] = handleTrackingType;
+nodeHandler[apexNames.QUERY_OPTION] = handleQueryOption;
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WHERE[childClass];
 
 function genericPrint(path, options, print) {
