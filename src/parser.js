@@ -3,6 +3,8 @@
 const spawnSync = require("child_process").spawnSync;
 const path = require("path");
 
+const classes = require("./classes");
+
 function parseText(text) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
   if (process.platform === "win32") {
@@ -56,6 +58,10 @@ function parse(text, parsers, opts) {
   if (res) {
     console.log(res);
     ast = JSON.parse(res);
+    if (ast[classes.PARSER_OUTPUT] && ast[classes.PARSER_OUTPUT].parseErrors) {
+      const errors = ast[classes.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);
+      throw new Error(errors.join("\r\n"));
+    }
     ast = resolveAstReferences(ast, {});
   }
   return ast;
