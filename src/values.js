@@ -46,6 +46,7 @@ module.exports = {
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
     QUERY: "apex.jorje.data.soql.Query",
     SELECT_COLUMN_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectColumnClause",
+    SELECT_COUNT_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectCountClause",
     SELECT_COLUMN_EXPRESSION: "apex.jorje.data.soql.SelectExpr$SelectColumnExpr",
     FIELD: "apex.jorje.data.soql.Field",
     FIELD_IDENTIFIER: "apex.jorje.data.soql.FieldIdentifier",

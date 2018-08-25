@@ -677,6 +677,7 @@ nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 nodeHandler[apexNames.SOQL_EXPRESSION] = _handlePassthroughCall("query");
 nodeHandler[apexNames.QUERY] = handleQuery;
 nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
+nodeHandler[apexNames.SELECT_COUNT_CLAUSE] = () => concat(["SELECT", " ", "COUNT()"]);
 nodeHandler[apexNames.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
 nodeHandler[apexNames.FIELD] = handleField;
 nodeHandler[apexNames.FIELD_IDENTIFIER] = handleFieldIdentifier;
