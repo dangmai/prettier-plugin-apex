@@ -450,7 +450,7 @@ function handleQuery(path, print) {
   parts.push(path.call(print, "from"));
   _pushIfExist(parts, path.call(print, "where", "value"));
   _pushIfExist(parts, path.call(print, "with"));
-  _pushIfExist(parts, path.call(print, "groupBy"));
+  _pushIfExist(parts, path.call(print, "groupBy", "value"));
   _pushIfExist(parts, path.call(print, "orderBy", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "offset", "value"));
@@ -473,6 +473,7 @@ function handleColumnClause(path, print) {
 function handleColumnExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "field"));
+  _pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
   return groupConcat(parts);
 }
 
@@ -488,9 +489,22 @@ function handleFieldIdentifier(path, print) {
 }
 
 function handleField(path, print) {
+  const functionOneDoc = path.call(print, "function1", "value");
+  const functionTwoDoc = path.call(print, "function2", "value");
+
   const parts = [];
+  _pushIfExist(parts, functionOneDoc, ["(", softline]);
+  _pushIfExist(parts, functionTwoDoc, ["(", softline]);
   parts.push(path.call(print, "field"));
-  return concat(parts);
+  if (functionOneDoc) {
+    parts.push(dedent(softline));
+    parts.push(")");
+  }
+  if (functionTwoDoc) {
+    parts.push(dedent(softline));
+    parts.push(")");
+  }
+  return groupIndentConcat(parts);
 }
 
 function handleFromClause(path, print) {
@@ -651,6 +665,26 @@ function handleNullOrderOperation(childClass, path, print, opts) {
   return "";
 }
 
+function handleGroupByClause(path, print) {
+  const expressionDocs = path.map(print, "exprs");
+
+  const parts = [];
+  parts.push("GROUP BY");
+  parts.push(line);
+  parts.push(join(concat([",", line]), expressionDocs));
+  _pushIfExist(parts, path.call(print, "having", "value"), null, [line]);
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
+}
+
+function handleHavingClause(path, print) {
+  const parts = [];
+  parts.push("HAVING");
+  parts.push(line);
+  parts.push(path.call(print, "expr"));
+  return groupIndentConcat(parts);
+}
+
 function handleModifier(childClass) {
   return concat([values.MODIFIER[childClass], " "]);
 }
@@ -724,6 +758,9 @@ nodeHandler[apexNames.FIELD] = handleField;
 nodeHandler[apexNames.FIELD_IDENTIFIER] = handleFieldIdentifier;
 nodeHandler[apexNames.FROM_CLAUSE] = handleFromClause;
 nodeHandler[apexNames.FROM_EXPRESSION] = handleFromExpression;
+nodeHandler[apexNames.GROUP_BY_CLAUSE] = handleGroupByClause;
+nodeHandler[apexNames.GROUP_BY_EXPRESSION] = _handlePassthroughCall("field");
+nodeHandler[apexNames.HAVING_CLAUSE] = handleHavingClause;
 nodeHandler[apexNames.WHERE_CLAUSE] = handleWhereClause;
 nodeHandler[apexNames.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
 nodeHandler[apexNames.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
