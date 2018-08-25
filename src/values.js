@@ -11,8 +11,7 @@ module.exports = {
     MODIFIER: "apex.jorje.data.ast.Modifier",
     ANNOTATION: "apex.jorje.data.ast.Modifier$Annotation",
     ANNOTATION_KEY_VALUE: "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
-    ANNOTATION_TRUE_VALUE: "apex.jorje.data.ast.AnnotationValue$TrueAnnotationValue",
-    ANNOTATION_FALSE_VALUE: "apex.jorje.data.ast.AnnotationValue$FalseAnnotationValue",
+    ANNOTATION_VALUE: "apex.jorje.data.ast.AnnotationValue",
     METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
     METHOD_DECLARATION: "apex.jorje.data.ast.MethodDecl",
     EMPTY_MODIFIER_PARAMETER_REF: "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
@@ -148,6 +147,10 @@ module.exports = {
   QUERY_WHERE: {
     QueryAnd: "AND",
     QueryOr: "OR",
+  },
+  ANNOTATION_VALUE: {
+    TrueAnnotationValue: "true",
+    FalseAnnotationValue: "false",
   },
   MODIFIER: {
     PublicModifier: "public",

@@ -670,8 +670,7 @@ nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
 nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
 nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
-nodeHandler[apexNames.ANNOTATION_TRUE_VALUE] = () => "true";
-nodeHandler[apexNames.ANNOTATION_FALSE_VALUE] = () => "false";
+nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALUE[childClass];
 nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 
