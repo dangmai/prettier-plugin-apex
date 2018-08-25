@@ -3,8 +3,8 @@
 const docBuilders = require("prettier").doc.builders;
 const {concat, join, hardline, line, softline, literalline, group, indent, dedent, ifBreak, breakParent} = docBuilders;
 
-const expressions = require("./expressions");
-const classes = require("./classes");
+const values = require("./values");
+const apexNames = values.APEX_NAMES;
 
 function indentConcat(docs) {
   return indent(concat(docs));
@@ -76,17 +76,17 @@ function handleLiteralExpression(path, print) {
 
 function handleBinaryOperation(path) {
   const node = path.getValue();
-  return expressions.BINARY[node["$"]];
+  return values.BINARY[node["$"]];
 }
 
 function handleBooleanOperation(path) {
   const node = path.getValue();
-  return expressions.BOOLEAN[node["$"]];
+  return values.BOOLEAN[node["$"]];
 }
 
 function handleAssignmentOperation(path) {
   const node = path.getValue();
-  return expressions.ASSIGNMENT[node["$"]];
+  return values.ASSIGNMENT[node["$"]];
 }
 
 function handleClassDeclaration(path, print) {
@@ -601,7 +601,7 @@ function handleOrderOperation(op) {
   return function(path, print, opts) {
     const loc = opts.locStart(path.getValue());
     if (loc.line !== -1 && loc.column !== -1) {
-      return expressions.ORDER[op];
+      return values.ORDER[op];
     }
     return "";
   }
@@ -611,14 +611,14 @@ function handleNullOrderOperation(op) {
   return function(path, print, opts) {
     const loc = opts.locStart(path.getValue());
     if (loc.line !== -1 && loc.column !== -1) {
-      return expressions.ORDER_NULL[op];
+      return values.ORDER_NULL[op];
     }
     return "";
   }
 }
 
 function handleModifier(childClass) {
-  return concat([expressions.MODIFIER[childClass], " "]);
+  return concat([values.MODIFIER[childClass], " "]);
 }
 
 function _handlePassthroughCall(...names) {
@@ -638,72 +638,72 @@ function _pushIfExist(parts, doc, otherDocs) {
 }
 
 const nodeHandler = {};
-nodeHandler[classes.IF_ELSE_BLOCK] = handleIfElseBlock;
-nodeHandler[classes.IF_BLOCK] = handleIfBlock;
-nodeHandler[classes.ELSE_BLOCK] = handleElseBlock;
-nodeHandler[classes.TERNARY_EXPRESSION] = handleTernaryExpression;
-nodeHandler[classes.EXPRESSION_STATEMENT] = handleExpressionStatement;
-nodeHandler[classes.BOOLEAN_EXPRESSION] = handleGenericExpression;
-nodeHandler[classes.ASSIGNMENT_EXPRESSION] = handleGenericExpression;
-nodeHandler[classes.ASSIGNMENT_OPERATION] = handleAssignmentOperation;
-nodeHandler[classes.NESTED_EXPRESSION] = handleNestedExpression;
-nodeHandler[classes.VARIABLE_EXPRESSION] = handleVariableExpression;
-nodeHandler[classes.LITERAL_EXPRESSION] = handleLiteralExpression;
-nodeHandler[classes.BINARY_EXPRESSION] = handleBinaryExpression;
-nodeHandler[classes.BINARY_OPERATION] = handleBinaryOperation;
-nodeHandler[classes.BOOLEAN_OPERATION] = handleBooleanOperation;
-nodeHandler[classes.RETURN_STATEMENT] = handleReturnStatement;
-nodeHandler[classes.CLASS_DECLARATION] = handleClassDeclaration;
-nodeHandler[classes.CLASS_TYPE_REF] = handleClassTypeRef;
-nodeHandler[classes.ARRAY_TYPE_REF] = handleArrayTypeRef;
-nodeHandler[classes.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
-nodeHandler[classes.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
-nodeHandler[classes.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
-nodeHandler[classes.METHOD_DECLARATION] = handleMethodDeclaration;
-nodeHandler[classes.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
-nodeHandler[classes.BLOCK_STATEMENT] = handleBlockStatement;
-nodeHandler[classes.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("variableDecls");
-nodeHandler[classes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
-nodeHandler[classes.VARIABLE_DECLARATION] = handleVariableDeclaration;
-nodeHandler[classes.NEW_EXPRESSION] = handleNewExpression;
-nodeHandler[classes.NEW_LIST_INIT] = handleNewListInit;
-nodeHandler[classes.NEW_MAP_INIT] = handleNewMapInit;
-nodeHandler[classes.NEW_LIST_LITERAL] = handleNewListLiteral;
-nodeHandler[classes.NEW_STANDARD] = handleNewStandard;
-nodeHandler[classes.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
-nodeHandler[classes.ANNOTATION] = handleAnnotation;
-nodeHandler[classes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
-nodeHandler[classes.ANNOTATION_TRUE_VALUE] = () => "true";
-nodeHandler[classes.ANNOTATION_FALSE_VALUE] = () => "false";
-nodeHandler[classes.MODIFIER] = handleModifier;
-nodeHandler[classes.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[apexNames.IF_ELSE_BLOCK] = handleIfElseBlock;
+nodeHandler[apexNames.IF_BLOCK] = handleIfBlock;
+nodeHandler[apexNames.ELSE_BLOCK] = handleElseBlock;
+nodeHandler[apexNames.TERNARY_EXPRESSION] = handleTernaryExpression;
+nodeHandler[apexNames.EXPRESSION_STATEMENT] = handleExpressionStatement;
+nodeHandler[apexNames.BOOLEAN_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexNames.ASSIGNMENT_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexNames.ASSIGNMENT_OPERATION] = handleAssignmentOperation;
+nodeHandler[apexNames.NESTED_EXPRESSION] = handleNestedExpression;
+nodeHandler[apexNames.VARIABLE_EXPRESSION] = handleVariableExpression;
+nodeHandler[apexNames.LITERAL_EXPRESSION] = handleLiteralExpression;
+nodeHandler[apexNames.BINARY_EXPRESSION] = handleBinaryExpression;
+nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
+nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
+nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
+nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
+nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
+nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
+nodeHandler[apexNames.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
+nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
+nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
+nodeHandler[apexNames.METHOD_DECLARATION] = handleMethodDeclaration;
+nodeHandler[apexNames.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
+nodeHandler[apexNames.BLOCK_STATEMENT] = handleBlockStatement;
+nodeHandler[apexNames.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("variableDecls");
+nodeHandler[apexNames.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
+nodeHandler[apexNames.VARIABLE_DECLARATION] = handleVariableDeclaration;
+nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
+nodeHandler[apexNames.NEW_LIST_INIT] = handleNewListInit;
+nodeHandler[apexNames.NEW_MAP_INIT] = handleNewMapInit;
+nodeHandler[apexNames.NEW_LIST_LITERAL] = handleNewListLiteral;
+nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
+nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
+nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
+nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
+nodeHandler[apexNames.ANNOTATION_TRUE_VALUE] = () => "true";
+nodeHandler[apexNames.ANNOTATION_FALSE_VALUE] = () => "false";
+nodeHandler[apexNames.MODIFIER] = handleModifier;
+nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 
-nodeHandler[classes.SOQL_EXPRESSION] = _handlePassthroughCall("query");
-nodeHandler[classes.QUERY] = handleQuery;
-nodeHandler[classes.SELECT_COLUMN_CLAUSE] = handleColumnClause;
-nodeHandler[classes.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
-nodeHandler[classes.FIELD] = handleField;
-nodeHandler[classes.FIELD_IDENTIFIER] = handleFieldIdentifier;
-nodeHandler[classes.FROM_CLAUSE] = handleFromClause;
-nodeHandler[classes.FROM_EXPRESSION] = handleFromExpression;
-nodeHandler[classes.WHERE_CLAUSE] = handleWhereClause;
-nodeHandler[classes.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
-nodeHandler[classes.WHERE_OPERATION_EXPRESSIONS] = handleWhereOperationExpressions;
-nodeHandler[classes.WHERE_COMPOUND_EXPRESSION] = handleWhereCompoundExpression;
-nodeHandler[classes.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
-nodeHandler[classes.WHERE_UNARY_OPERATOR] = () => "NOT";
-nodeHandler[classes.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall("literal");
-nodeHandler[classes.QUERY_LITERAL] = handleWhereQueryLiteral;
-nodeHandler[classes.APEX_EXPRESSION] = _handlePassthroughCall("expr");
-nodeHandler[classes.COLON_EXPRESSION] = handleColonExpression;
-nodeHandler[classes.ORDER_BY_CLAUSE] = handleOrderByClause;
-nodeHandler[classes.ORDER_BY_VALUE] = handleOrderByValue;
-nodeHandler[classes.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
-nodeHandler[classes.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
-Object.keys(expressions.QUERY_WHERE).forEach(op => nodeHandler[op] = () => expressions.QUERY_WHERE[op]);
-Object.keys(expressions.QUERY).forEach(op => nodeHandler[op] = () => expressions.QUERY[op]);
-Object.keys(expressions.ORDER).forEach(op => nodeHandler[op] = handleOrderOperation(op));
-Object.keys(expressions.ORDER_NULL).forEach(op => nodeHandler[op] = handleNullOrderOperation(op));
+nodeHandler[apexNames.SOQL_EXPRESSION] = _handlePassthroughCall("query");
+nodeHandler[apexNames.QUERY] = handleQuery;
+nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
+nodeHandler[apexNames.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
+nodeHandler[apexNames.FIELD] = handleField;
+nodeHandler[apexNames.FIELD_IDENTIFIER] = handleFieldIdentifier;
+nodeHandler[apexNames.FROM_CLAUSE] = handleFromClause;
+nodeHandler[apexNames.FROM_EXPRESSION] = handleFromExpression;
+nodeHandler[apexNames.WHERE_CLAUSE] = handleWhereClause;
+nodeHandler[apexNames.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
+nodeHandler[apexNames.WHERE_OPERATION_EXPRESSIONS] = handleWhereOperationExpressions;
+nodeHandler[apexNames.WHERE_COMPOUND_EXPRESSION] = handleWhereCompoundExpression;
+nodeHandler[apexNames.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
+nodeHandler[apexNames.WHERE_UNARY_OPERATOR] = () => "NOT";
+nodeHandler[apexNames.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall("literal");
+nodeHandler[apexNames.QUERY_LITERAL] = handleWhereQueryLiteral;
+nodeHandler[apexNames.APEX_EXPRESSION] = _handlePassthroughCall("expr");
+nodeHandler[apexNames.COLON_EXPRESSION] = handleColonExpression;
+nodeHandler[apexNames.ORDER_BY_CLAUSE] = handleOrderByClause;
+nodeHandler[apexNames.ORDER_BY_VALUE] = handleOrderByValue;
+nodeHandler[apexNames.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
+nodeHandler[apexNames.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
+Object.keys(values.QUERY_WHERE).forEach(op => nodeHandler[op] = () => values.QUERY_WHERE[op]);
+Object.keys(values.QUERY).forEach(op => nodeHandler[op] = () => values.QUERY[op]);
+Object.keys(values.ORDER).forEach(op => nodeHandler[op] = handleOrderOperation(op));
+Object.keys(values.ORDER_NULL).forEach(op => nodeHandler[op] = handleNullOrderOperation(op));
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
@@ -717,7 +717,7 @@ function genericPrint(path, options, print) {
   if (path.stack.length === 1) {
     // Hard code how to handle the root node here
     const docs = [];
-    docs.push(path.call(print, classes.PARSER_OUTPUT, "unit", "body"));
+    docs.push(path.call(print, apexNames.PARSER_OUTPUT, "unit", "body"));
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
     return concat(docs);

@@ -3,7 +3,7 @@
 const spawnSync = require("child_process").spawnSync;
 const path = require("path");
 
-const classes = require("./classes");
+const apexNames = require("./values").APEX_NAMES;
 
 function parseText(text) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
@@ -50,7 +50,7 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-function parse(text, parsers, opts) {
+function parse(text) {
   const executionResult = parseText(text);
 
   const res = executionResult.stdout.toString();
@@ -58,8 +58,8 @@ function parse(text, parsers, opts) {
   if (res) {
     console.log(res);
     ast = JSON.parse(res);
-    if (ast[classes.PARSER_OUTPUT] && ast[classes.PARSER_OUTPUT].parseErrors.length > 0) {
-      const errors = ast[classes.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);
+    if (ast[apexNames.PARSER_OUTPUT] && ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0) {
+      const errors = ast[apexNames.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);
       throw new Error(errors.join("\r\n"));
     }
     ast = resolveAstReferences(ast, {});
