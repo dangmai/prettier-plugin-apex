@@ -58,7 +58,7 @@ function parse(text, parsers, opts) {
   if (res) {
     console.log(res);
     ast = JSON.parse(res);
-    if (ast[classes.PARSER_OUTPUT] && ast[classes.PARSER_OUTPUT].parseErrors) {
+    if (ast[classes.PARSER_OUTPUT] && ast[classes.PARSER_OUTPUT].parseErrors.length > 0) {
       const errors = ast[classes.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);
       throw new Error(errors.join("\r\n"));
     }
