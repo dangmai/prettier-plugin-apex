@@ -591,6 +591,9 @@ function handleWhereQueryLiteral(childClass, path, print) {
       // TODO find a way to preserve user's input instead of converting to GMT
       doc = path.call(print, "literal").replace("[GMT]", "");
       break;
+    case "QueryDateFormula":
+      doc = path.call(print, "dateFormula");
+      break;
     default:
       doc = path.call(print, "literal");
   }
