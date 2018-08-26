@@ -886,6 +886,18 @@ function _pushIfExist(parts, doc, postDocs, preDocs) {
   return parts;
 }
 
+function _escapeString(text) {
+  // Code from https://stackoverflow.com/a/11716317/477761
+  return text.replace(/\\/g, '\\\\')
+    .replace(/\u0008/g, '\\b')
+    .replace(/\t/g, '\\t')
+    .replace(/\n/g, '\\n')
+    .replace(/\f/g, '\\f')
+    .replace(/\r/g, '\\r')
+    .replace(/'/g, '\\\'')
+    .replace(/"/g, '\\"');
+}
+
 const nodeHandler = {};
 nodeHandler[apexNames.IF_ELSE_BLOCK] = handleIfElseBlock;
 nodeHandler[apexNames.IF_BLOCK] = handleIfBlock;
@@ -974,8 +986,11 @@ nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WH
 
 function genericPrint(path, options, print) {
   const n = path.getValue();
-  if (typeof n === "string" || typeof n === "number" || typeof n === "boolean") {
+  if (typeof n === "number" || typeof n === "boolean") {
     return n.toString();
+  }
+  if (typeof n === "string") {
+    return _escapeString(n);
   }
   if (!n) {
     return "";
