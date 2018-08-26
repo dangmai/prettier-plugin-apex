@@ -56,7 +56,7 @@ function parse(text) {
   const res = executionResult.stdout.toString();
   let ast = {};
   if (res) {
-    console.log(res);
+    // console.log(res);
     ast = JSON.parse(res);
     if (ast[apexNames.PARSER_OUTPUT] && ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0) {
       const errors = ast[apexNames.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);
