@@ -69,6 +69,7 @@ module.exports = {
     ORDER_BY_EXPRESSION: "apex.jorje.data.soql.OrderByExpr",
     GROUP_BY_CLAUSE: "apex.jorje.data.soql.GroupByClause",
     GROUP_BY_EXPRESSION: "apex.jorje.data.soql.GroupByExpr",
+    GROUP_BY_TYPE: "apex.jorje.data.soql.GroupByType",
     HAVING_CLAUSE: "apex.jorje.data.soql.HavingClause",
     LIMIT_VALUE: "apex.jorje.data.soql.LimitClause$LimitValue",
     OFFSET_VALUE: "apex.jorje.data.soql.OffsetClause$OffsetValue",

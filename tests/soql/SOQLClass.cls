@@ -81,6 +81,15 @@ class SOQLClass {
       GROUP BY CUBE(Type, BillingCountry)
       ORDER BY GROUPING(Type), GROUPING(BillingCountry)
     ];
+    AggregateResult[] groupByCubeWithHavings = [
+      SELECT Type, BillingCountry,
+        GROUPING(Type) grpType, GROUPING(BillingCountry) grpCty,
+        COUNT(id) accts
+      FROM Account
+      GROUP BY CUBE(Type, BillingCountry, Site, Owner, Name, Description, PersonEmail, PersonDoNotCall, Industry)
+      HAVING MAX(NumberOfEmployees) > 100
+      ORDER BY GROUPING(Type), GROUPING(BillingCountry)
+    ];
   }
 
   void orderSoql() {

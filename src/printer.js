@@ -812,14 +812,46 @@ function handleNullOrderOperation(childClass, path, print, opts) {
 
 function handleGroupByClause(path, print) {
   const expressionDocs = path.map(print, "exprs");
+  const typeDoc = path.call(print, "type", "value");
+  const havingDoc = path.call(print, "having", "value");
 
   const parts = [];
   parts.push("GROUP BY");
-  parts.push(line);
+  if (typeDoc) {
+    parts.push(" ");
+    parts.push(typeDoc);
+    parts.push("(");
+    parts.push(softline);
+  } else {
+    parts.push(line);
+  }
   parts.push(join(concat([",", line]), expressionDocs));
-  _pushIfExist(parts, path.call(print, "having", "value"), null, [line]);
   parts.push(dedent(softline));
+  if (typeDoc) {
+    parts.push(")");
+  }
+  if (havingDoc) {
+    parts.push(concat([
+      line,
+      havingDoc,
+    ]));
+  }
   return groupIndentConcat(parts);
+}
+
+function handleGroupByType(childClass) {
+  let doc;
+  switch (childClass) {
+    case "GroupByRollUp":
+      doc = "ROLLUP";
+      break;
+    case "GroupByCube":
+      doc = "CUBE";
+      break;
+    default:
+      doc = "";
+  }
+  return doc;
 }
 
 function handleHavingClause(path, print) {
@@ -996,6 +1028,7 @@ nodeHandler[apexNames.FROM_CLAUSE] = handleFromClause;
 nodeHandler[apexNames.FROM_EXPRESSION] = handleFromExpression;
 nodeHandler[apexNames.GROUP_BY_CLAUSE] = handleGroupByClause;
 nodeHandler[apexNames.GROUP_BY_EXPRESSION] = _handlePassthroughCall("field");
+nodeHandler[apexNames.GROUP_BY_TYPE] = handleGroupByType;
 nodeHandler[apexNames.HAVING_CLAUSE] = handleHavingClause;
 nodeHandler[apexNames.WHERE_CLAUSE] = handleWhereClause;
 nodeHandler[apexNames.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
