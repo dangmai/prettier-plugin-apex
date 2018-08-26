@@ -460,6 +460,46 @@ function handleQuery(path, print) {
   return join(line, parts);
 }
 
+function handleCaseExpression(path, print) {
+  const parts = [];
+  const whenBranchDocs = path.map(print, "whenBranches");
+  const elseBranchDoc = path.call(print, "elseBranch", "value");
+  parts.push("TYPEOF");
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(line);
+  parts.push(join(line, whenBranchDocs));
+  parts.push(line);
+  parts.push(elseBranchDoc);
+  parts.push(dedent(softline));
+  parts.push("END");
+  return groupIndentConcat(parts);
+}
+
+function handleWhenExpression(path, print) {
+  const parts = [];
+  parts.push("WHEN");
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push("THEN");
+  parts.push(line);
+  const identifierDocs = path.map(print, "identifiers");
+  parts.push(join(concat([",", line]), identifierDocs));
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
+}
+
+function handleElseExpression(path, print) {
+  const parts = [];
+  parts.push("ELSE");
+  parts.push(" ");
+  const identifierDocs = path.map(print, "identifiers");
+  parts.push(join(concat([",", line]), identifierDocs));
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
+}
+
 function handleColumnClause(path, print) {
   const parts = [];
   parts.push(
@@ -944,6 +984,12 @@ nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
 nodeHandler[apexNames.SELECT_COUNT_CLAUSE] = () => concat(["SELECT", " ", "COUNT()"]);
 nodeHandler[apexNames.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
 nodeHandler[apexNames.SELECT_INNER_QUERY] = handleSelectInnerQuery;
+nodeHandler[apexNames.SELECT_CASE_EXPRESSION] = _handlePassthroughCall("expr");
+nodeHandler[apexNames.CASE_EXPRESSION] = handleCaseExpression;
+nodeHandler[apexNames.WHEN_OPERATOR] = _handlePassthroughCall("identifier");
+nodeHandler[apexNames.WHEN_EXPRESSION] = handleWhenExpression;
+nodeHandler[apexNames.CASE_OPERATOR] = _handlePassthroughCall("identifier");
+nodeHandler[apexNames.ELSE_EXPRESSION] = handleElseExpression;
 nodeHandler[apexNames.FIELD] = handleField;
 nodeHandler[apexNames.FIELD_IDENTIFIER] = handleFieldIdentifier;
 nodeHandler[apexNames.FROM_CLAUSE] = handleFromClause;

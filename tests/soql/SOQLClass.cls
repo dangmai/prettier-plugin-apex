@@ -68,6 +68,19 @@ class SOQLClass {
       SELECT CampaignId, AVG(Amount)
       FROM Opportunity
       GROUP BY CampaignId];
+    AggregateResult[] groupByRollups = [
+      SELECT LeadSource, COUNT(Name) cnt
+      FROM Lead
+      GROUP BY ROLLUP(LeadSource)
+    ];
+    AggregateResult[] groupByCubes = [
+      SELECT Type, BillingCountry,
+        GROUPING(Type) grpType, GROUPING(BillingCountry) grpCty,
+        COUNT(id) accts
+      FROM Account
+      GROUP BY CUBE(Type, BillingCountry)
+      ORDER BY GROUPING(Type), GROUPING(BillingCountry)
+    ];
   }
 
   void orderSoql() {
@@ -106,14 +119,6 @@ class SOQLClass {
     ];
 
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
-    Event[] typeOf = [
-      SELECT
-        TYPEOF What
-          WHEN Account THEN Phone, NumberOfEmployees
-          WHEN Opportunity THEN Amount, CloseDate
-          ELSE Name, Email
-        END
-      FROM Event];
     Offer__DataCategorySelection dataCategory = [SELECT Id,ParentId FROM Offer__DataCategorySelection];
     Warehouse__c[] geoLocations = [
       SELECT Name, StreetAddress__c
@@ -130,6 +135,17 @@ class SOQLClass {
       WHERE LastReplyDate > 2005-10-08T01:02:03Z
       WITH DATA CATEGORY Geography__c AT (usa__c, uk__c) AND Product__c ABOVE_OR_BELOW usa__c
     ];
+  }
+
+  void typeOfSoql() {
+    Event[] typeOf = [
+      SELECT
+        TYPEOF What
+          WHEN Account THEN Phone, NumberOfEmployees
+          WHEN Opportunity THEN Amount, CloseDate
+          ELSE Name, Email
+        END
+      FROM Event];
   }
 }
 
