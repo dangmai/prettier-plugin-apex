@@ -84,6 +84,10 @@ module.exports = {
     USING: "apex.jorje.data.soql.UsingExpr$Using",
     UPDATE_STATS_CLAUSE: "apex.jorje.data.soql.UpdateStatsClause",
     UPDATE_STATS_OPTION: "apex.jorje.data.soql.UpdateStatsOption",
+    WITH_VALUE: "apex.jorje.data.soql.WithClause$WithValue",
+    WITH_DATA_CATEGORIES: "apex.jorje.data.soql.WithClause$WithDataCategories",
+    DATA_CATEGORY: "apex.jorje.data.soql.DataCategory",
+    DATA_CATEGORY_OPERATOR: "apex.jorje.data.soql.DataCategoryOperator",
   },
   BINARY: {
     ADDITION: "+",
@@ -182,5 +186,11 @@ module.exports = {
     GlobalModifier: "global",
     WithoutSharingModifier: "without sharing",
     WithSharingModifier: "with sharing",
+  },
+  DATA_CATEGORY: {
+    DataCategoryAt: "AT",
+    DataCategoryAbove: "ABOVE",
+    DataCategoryBelow: "BELOW",
+    DataCategoryAboveOrBelow: "ABOVE_OR_BELOW",
   },
 };

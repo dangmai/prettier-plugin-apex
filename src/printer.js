@@ -449,7 +449,7 @@ function handleQuery(path, print) {
   parts.push(path.call(print, "select"));
   parts.push(path.call(print, "from"));
   _pushIfExist(parts, path.call(print, "where", "value"));
-  _pushIfExist(parts, path.call(print, "with"));
+  _pushIfExist(parts, path.call(print, "with", "value"));
   _pushIfExist(parts, path.call(print, "groupBy", "value"));
   _pushIfExist(parts, path.call(print, "orderBy", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
@@ -578,6 +578,51 @@ function handleGeolocationLiteral(path, print) {
   parts.push(dedent(softline));
   parts.push(")");
   return groupIndentConcat(parts);
+}
+
+function handleWithValue(path, print) {
+  const parts = [];
+  parts.push("WITH");
+  parts.push(" ");
+  parts.push(path.call(print, "name"));
+  parts.push(" ");
+  parts.push("=");
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return concat(parts);
+}
+
+function handleWithDataCategories(path, print) {
+  const parts = [];
+  const categoryDocs = path.map(print, "categories");
+  parts.push("WITH DATA CATEGORY");
+  parts.push(line);
+  parts.push(join(concat([line, "AND", " "]), categoryDocs));
+  parts.push(dedent(softline));
+  return groupIndentConcat(parts);
+}
+
+function handleDataCategory(path, print) {
+  const parts = [];
+  const categoryDocs = path.map(print, "categories").filter(doc => doc);
+  parts.push(path.call(print, "type"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  if (categoryDocs.length > 1) {
+    parts.push("(");
+  }
+  parts.push(softline);
+  parts.push(join(concat([",", line]), categoryDocs));
+  parts.push(dedent(softline));
+  if (categoryDocs.length > 1) {
+    parts.push(")");
+  }
+  return groupIndentConcat(parts);
+}
+
+function handleDataCategoryOperator(childClass) {
+  return values.DATA_CATEGORY[childClass];
 }
 
 function handleWhereOperationExpression(path, print) {
@@ -910,6 +955,10 @@ nodeHandler[apexNames.APEX_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.COLON_EXPRESSION] = handleColonExpression;
 nodeHandler[apexNames.ORDER_BY_CLAUSE] = handleOrderByClause;
 nodeHandler[apexNames.ORDER_BY_EXPRESSION] = handleOrderByExpression;
+nodeHandler[apexNames.WITH_VALUE] = handleWithValue;
+nodeHandler[apexNames.WITH_DATA_CATEGORIES] = handleWithDataCategories;
+nodeHandler[apexNames.DATA_CATEGORY] = handleDataCategory;
+nodeHandler[apexNames.DATA_CATEGORY_OPERATOR] = handleDataCategoryOperator;
 nodeHandler[apexNames.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
 nodeHandler[apexNames.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
 nodeHandler[apexNames.QUERY_OPERATOR] = (childClass) => values.QUERY[childClass];
