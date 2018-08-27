@@ -45,7 +45,7 @@ class DMLClass {
   }
   void upsertWithOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
-    Account account = new Account(Id = accountId, Name = 'Acme');
+    Account account = new Account(Id = accountId, Name = 'Acme', Description='Test Description');
     Account[] account = new Account[]{
       new Account(Name = 'Inner Acme One'),
       new Account(Id = accountId, Name = 'Inner Acme Two')
