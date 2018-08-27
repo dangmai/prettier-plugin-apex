@@ -1,9 +1,15 @@
 class LoopClass {
   void forLoop() {
+    Integer count = 0;
     for (Integer i = 0; i < 10; i++)
       System.debug(i);
 
-    for (Integer j = 10; j > 0; j = j - 1) {
+    for (count = 0; count < 10; count ++) {
+      System.debug(count);
+    }
+    for (;;) {
+    }
+    for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
       System.debug(j);
       System.debug('Hi');
       if (j == 5) {
@@ -11,7 +17,15 @@ class LoopClass {
       }
     }
 
+    for (Integer i = 0; i < 10; i ++) {
+
+    }
+
     for (Contact a: [SELECT Id FROM Contact]) {
+      System.debug(a);
+    }
+
+    for (Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']) {
       System.debug(a);
     }
 
@@ -30,6 +44,12 @@ class LoopClass {
       }
       i++;
     }
+    while (i < 5) {
+
+    }
+    while (true) {
+      break;
+    }
   }
 
   void doWhileLoop() {
@@ -40,6 +60,9 @@ class LoopClass {
         break;
       }
       i ++;
+    } while (count < 10);
+    do {
+
     } while (count < 10);
   }
 }
