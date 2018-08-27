@@ -177,9 +177,12 @@ function handleArrayTypeRef(path, print) {
 }
 
 function handleMethodDeclaration(path, print) {
+  const statementDoc = path.call(print, "stmnt", "value");
+  const modifierDocs = path.map(print, "modifiers");
+  const parameterDocs = path.map(print, "parameters");
+
   const parts = [];
   // Modifiers
-  const modifierDocs = path.map(print, "modifiers");
   if (modifierDocs.length > 0) {
     parts.push(concat(modifierDocs));
   }
@@ -190,15 +193,14 @@ function handleMethodDeclaration(path, print) {
   parts.push(path.call(print, "name"));
   // Params
   parts.push("(");
-  const parameterDocs = path.map(print, "parameters");
   parts.push(join(", ", parameterDocs));
   parts.push(")");
   parts.push(" ");
   // Body
   parts.push("{");
-  parts.push(path.call(print, "stmnt", "value"));
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
   parts.push("}");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleEmptyModifierParameterRef(path, print) {
@@ -214,16 +216,7 @@ function handleEmptyModifierParameterRef(path, print) {
 function handleBlockStatement(path, print) {
   const statementDocs = path.map(print, "stmnts");
   if (statementDocs.length > 0) {
-    return indentConcat(
-      [
-        hardline,
-        join(
-          hardline,
-          statementDocs
-        ),
-        dedent(hardline),
-      ]
-    );
+    return join(hardline, statementDocs);
   }
   return "";
 }
@@ -939,6 +932,83 @@ function handleModifier(childClass) {
   return concat([values.MODIFIER[childClass], " "]);
 }
 
+function handlePostfixExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "expr"));
+  parts.push(path.call(print, "op"));
+  return concat(parts);
+}
+
+function handlePrefixExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "op"));
+  parts.push(path.call(print, "expr"));
+  return concat(parts);
+}
+
+function handlePostfixOperator(path, print) {
+  return values.POSTFIX[path.call(print, "$")];
+}
+
+function handlePrefixOperator(path, print) {
+  return values.PREFIX[path.call(print, "$")];
+}
+
+function handleForLoop(path, print) {
+  const forControlDoc = path.call(print, "forControl");
+  const statementDoc = path.call(print, "stmnt", "value");
+
+  const parts = [];
+  parts.push("for");
+  parts.push(" ");
+  parts.push("(");
+  // For Control
+  parts.push(forControlDoc);
+  parts.push(")");
+  parts.push(" ");
+  // Body
+  parts.push("{");
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleForCStyleControl(path, print) {
+  const initsDoc = path.call(print, "inits", "value");
+  const conditionDoc = path.call(print, "condition", "value");
+  const controlDoc = path.call(print, "control", "value");
+
+  const parts = [];
+  _pushIfExist(parts, initsDoc);
+  parts.push(";");
+  _pushIfExist(parts, conditionDoc, null, [line]);
+  parts.push(";");
+  _pushIfExist(parts, controlDoc, null, [line]);
+  return groupIndentConcat(parts);
+}
+
+function handleForInits(path, print) {
+  const typeDoc = path.call(print, "type", "value");
+  const initDocs = path.map(print, "inits");
+
+  const parts = [];
+  _pushIfExist(parts, typeDoc, [" "]);
+  parts.push(join(concat([",", line]), initDocs));
+  return groupIndentConcat(parts);
+}
+
+function handleForInit(path, print) {
+  const nameDocs = path.map(print, "name");
+
+  const parts = [];
+  parts.push(join(".", nameDocs));
+  parts.push(" ");
+  parts.push("=");
+  parts.push(" ");
+  parts.push(path.call(print, "expr", "value"));
+  return concat(parts);
+}
+
 function _handlePassthroughCall(...names) {
   return function(path, print) {
     return path.call(print, ...names);
@@ -1009,6 +1079,14 @@ nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALUE[childClass];
 nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[apexNames.FOR_LOOP] = handleForLoop;
+nodeHandler[apexNames.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
+nodeHandler[apexNames.FOR_INITS] = handleForInits;
+nodeHandler[apexNames.FOR_INIT] = handleForInit;
+nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
+nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
+nodeHandler[apexNames.POSTFIX_OPERATOR] = handlePostfixOperator;
+nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;

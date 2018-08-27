@@ -41,6 +41,14 @@ module.exports = {
     TERNARY_EXPRESSION: "apex.jorje.data.ast.Expr$TernaryExpr",
     EXPRESSION_STATEMENT: "apex.jorje.data.ast.Stmnt$ExpressionStmnt",
     ASSIGNMENT_EXPRESSION: "apex.jorje.data.ast.Expr$AssignmentExpr",
+    FOR_LOOP: "apex.jorje.data.ast.Stmnt$ForLoop",
+    FOR_C_STYLE_CONTROL: "apex.jorje.data.ast.ForControl$CStyleForControl",
+    FOR_INITS: "apex.jorje.data.ast.ForInits",
+    FOR_INIT: "apex.jorje.data.ast.ForInit",
+    POSTFIX_EXPRESSION: "apex.jorje.data.ast.Expr$PostfixExpr",
+    PREFIX_EXPRESSION: "apex.jorje.data.ast.Expr$PrefixExpr",
+    POSTFIX_OPERATOR: "apex.jorje.data.ast.PostfixOp",
+    PREFIX_OPERATOR: "apex.jorje.data.ast.PrefixOp",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
