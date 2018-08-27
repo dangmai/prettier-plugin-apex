@@ -17,6 +17,10 @@ class LoopClass {
       }
     }
 
+    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {
+
+    }
+
     for (Integer i = 0; i < 10; i ++) {
 
     }
