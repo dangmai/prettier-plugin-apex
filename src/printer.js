@@ -265,10 +265,10 @@ function handleNewStandard(path, print) {
   parts.push(path.call(print, "type"));
   // Params
   parts.push("(");
-  const paramDocs = path.call(print, "inputParameters");
-  parts.push(join(", ", paramDocs));
+  const paramDocs = path.map(print, "inputParameters");
+  parts.push(join(concat([",", line]), paramDocs));
   parts.push(")");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleMethodCallExpression(path, print) {
@@ -1151,6 +1151,7 @@ nodeHandler[apexNames.POSTFIX_OPERATOR] = handlePostfixOperator;
 nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
 nodeHandler[apexNames.BREAK_STATEMENT] = () => "break;";
 nodeHandler[apexNames.CONTINUE_STATEMENT] = () => "continue;";
+nodeHandler[apexNames.THROW_STATEMENT] = (path, print) => concat(["throw", " ", path.call(print, "expr"), ";"]);
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;
