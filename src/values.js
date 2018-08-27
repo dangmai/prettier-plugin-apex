@@ -43,6 +43,7 @@ module.exports = {
     TERNARY_EXPRESSION: "apex.jorje.data.ast.Expr$TernaryExpr",
     EXPRESSION_STATEMENT: "apex.jorje.data.ast.Stmnt$ExpressionStmnt",
     ASSIGNMENT_EXPRESSION: "apex.jorje.data.ast.Expr$AssignmentExpr",
+    RUN_AS_BLOCK: "apex.jorje.data.ast.Stmnt$RunAsBlock",
     WHILE_LOOP: "apex.jorje.data.ast.Stmnt$WhileLoop",
     DO_LOOP: "apex.jorje.data.ast.Stmnt$DoLoop",
     FOR_LOOP: "apex.jorje.data.ast.Stmnt$ForLoop",

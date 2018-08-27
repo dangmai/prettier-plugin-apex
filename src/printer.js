@@ -261,6 +261,22 @@ function handleDmlMergeStatement(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleRunAsBlock(path, print) {
+  const paramDocs = path.map(print, "inputParameters");
+  const statementDoc = path.call(print, "stmnt");
+
+  const parts = [];
+  parts.push("System.runAs");
+  parts.push("(");
+  parts.push(join(concat([",", line]), paramDocs));
+  parts.push(")");
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
 function handleBlockStatement(path, print) {
   const statementDocs = path.map(print, "stmnts");
   if (statementDocs.length > 0) {
@@ -1260,6 +1276,7 @@ nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALUE[childClass];
 nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[apexNames.RUN_AS_BLOCK] = handleRunAsBlock;
 nodeHandler[apexNames.DO_LOOP] = handleDoLoop;
 nodeHandler[apexNames.WHILE_LOOP] = handleWhileLoop;
 nodeHandler[apexNames.FOR_LOOP] = handleForLoop;
