@@ -43,6 +43,7 @@ class LoopClass {
 
   void whileLoop() {
     Integer i = 0;
+    while (i < 10) i++;
     while (i < 10) {
       System.debug(i);
       i++;
