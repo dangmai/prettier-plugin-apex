@@ -972,6 +972,27 @@ function handleWhileLoop(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleDoLoop(path, print) {
+  const statementDoc = path.call(print, "stmnt");
+
+  const parts = [];
+  parts.push("do");
+  parts.push(" ");
+  // Body
+  parts.push("{");
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  parts.push(" ");
+  parts.push("while");
+  parts.push(" ");
+  parts.push("(");
+  // Condition
+  parts.push(path.call(print, "condition"));
+  parts.push(")");
+  parts.push(";");
+  return groupIndentConcat(parts);
+}
+
 function handleForLoop(path, print) {
   const forControlDoc = path.call(print, "forControl");
   const statementDoc = path.call(print, "stmnt", "value");
@@ -1117,6 +1138,7 @@ nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALUE[childClass];
 nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[apexNames.DO_LOOP] = handleDoLoop;
 nodeHandler[apexNames.WHILE_LOOP] = handleWhileLoop;
 nodeHandler[apexNames.FOR_LOOP] = handleForLoop;
 nodeHandler[apexNames.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
