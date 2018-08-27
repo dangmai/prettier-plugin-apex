@@ -24,6 +24,17 @@ class ExceptionClass {
     } finally {
       System.debug('It has been dealt with');
     }
+
+    try {
+      System.debug('try without catch');
+    } finally {
+      System.debug('finally without catch');
+    }
+    try {
+      System.debug('try without finally');
+    } catch (Exception ex) {
+      System.debug('catch without finally');
+    }
   }
 
   class CustomException extends Exception {}
