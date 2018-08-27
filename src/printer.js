@@ -557,9 +557,7 @@ function handleFromClause(path, print) {
 function handleFromExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "table"));
-  parts.push(line);
-  parts.push(path.call(print, "using", "value"));
-  parts.push(dedent(softline));
+  _pushIfExist(parts, path.call(print, "using", "value"), [dedent(softline)], [line]);
   return groupIndentConcat(parts);
 }
 

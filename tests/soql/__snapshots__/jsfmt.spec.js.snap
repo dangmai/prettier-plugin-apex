@@ -210,9 +210,9 @@ class SOQLClass {
         OR Employees >= 200
         OR Employees <= 120))
     ];
-    Integer i = [SELECT COUNT() FROM Contact ];
+    Integer i = [SELECT COUNT() FROM Contact];
     Contact[] subquery = [
-      SELECT Id, (SELECT Id FROM Contacts  LIMIT 5 OFFSET 5) sampleAlias
+      SELECT Id, (SELECT Id FROM Contacts LIMIT 5 OFFSET 5) sampleAlias
       FROM Account
       ORDER BY Name DESC
       LIMIT 1
@@ -220,7 +220,7 @@ class SOQLClass {
     Contact[] nestedFrom = [
       SELECT Id
       FROM Contact
-      WHERE (Id IN (SELECT Id FROM Contact ) AND Account.Id != null)
+      WHERE (Id IN (SELECT Id FROM Contact) AND Account.Id != null)
     ];
   }
 
@@ -337,16 +337,16 @@ class SOQLClass {
   }
 
   void nicheSoql() {
-    Contact[] forView = [SELECT Name, ID FROM Contact  LIMIT 1 FOR VIEW];
+    Contact[] forView = [SELECT Name, ID FROM Contact LIMIT 1 FOR VIEW];
     Contact[] forReference = [
       SELECT Name, ID
       FROM Contact
       LIMIT 1
       FOR REFERENCE
     ];
-    Account[] forUpdate = [SELECT Id FROM Account  LIMIT 2 FOR UPDATE];
-    Account[] includeDeleted = [SELECT Id FROM Account  ALL ROWS];
-    Account[] forViewAllRows = [SELECT Id FROM Account  FOR VIEW ALL ROWS];
+    Account[] forUpdate = [SELECT Id FROM Account LIMIT 2 FOR UPDATE];
+    Account[] includeDeleted = [SELECT Id FROM Account ALL ROWS];
+    Account[] forViewAllRows = [SELECT Id FROM Account FOR VIEW ALL ROWS];
     FAQ__kav[] updateTrackings = [
       SELECT Title
       FROM FAQ__kav
