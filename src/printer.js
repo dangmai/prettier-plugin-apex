@@ -973,6 +973,18 @@ function handleForLoop(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleForEnhancedControl(path, print) {
+  // See the note in handleForInit to see why we have to do this
+  const initDocParts = path.call(print, "init");
+  const initDoc = join(concat([":", " "]), initDocParts);
+
+  const parts = [];
+  parts.push(path.call(print, "type", "value"));
+  parts.push(" ");
+  parts.push(initDoc);
+  return concat(parts);
+}
+
 function handleForCStyleControl(path, print) {
   const initsDoc = path.call(print, "inits", "value");
   const conditionDoc = path.call(print, "condition", "value");
@@ -989,7 +1001,10 @@ function handleForCStyleControl(path, print) {
 
 function handleForInits(path, print) {
   const typeDoc = path.call(print, "type", "value");
-  const initDocs = path.map(print, "inits");
+  const initDocsParts = path.map(print, "inits");
+
+  // See the note in handleForInit to see why we have to do this
+  const initDocs = initDocsParts.map(initDocParts => join(concat([" ", "=", " "]), initDocParts));
 
   const parts = [];
   _pushIfExist(parts, typeDoc, [" "]);
@@ -998,15 +1013,20 @@ function handleForInits(path, print) {
 }
 
 function handleForInit(path, print) {
+  // This is one of the weird cases that does not really match the way that we print things.
+  // ForInit is used by both C style for loop and enhanced for loop, and there's no way to tell
+  // which operator we should use for init in this context, for example:
+  // for (Integer i = [SELECT COUNT() FROM Contact; i++; i < 10)
+  // and
+  // for (Contact a: [SELECT Id FROM Contact])
+  // have very little differentiation from the POV of the ForInit handler.
+  // Therefore, we'll return 2 docs here so the parent can decide what operator to insert between them.
   const nameDocs = path.map(print, "name");
 
   const parts = [];
   parts.push(join(".", nameDocs));
-  parts.push(" ");
-  parts.push("=");
-  parts.push(" ");
   parts.push(path.call(print, "expr", "value"));
-  return concat(parts);
+  return parts;
 }
 
 function _handlePassthroughCall(...names) {
@@ -1081,6 +1101,7 @@ nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 nodeHandler[apexNames.FOR_LOOP] = handleForLoop;
 nodeHandler[apexNames.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
+nodeHandler[apexNames.FOR_ENHANCED_CONTROL] = handleForEnhancedControl;
 nodeHandler[apexNames.FOR_INITS] = handleForInits;
 nodeHandler[apexNames.FOR_INIT] = handleForInit;
 nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;

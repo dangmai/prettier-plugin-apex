@@ -43,6 +43,7 @@ module.exports = {
     ASSIGNMENT_EXPRESSION: "apex.jorje.data.ast.Expr$AssignmentExpr",
     FOR_LOOP: "apex.jorje.data.ast.Stmnt$ForLoop",
     FOR_C_STYLE_CONTROL: "apex.jorje.data.ast.ForControl$CStyleForControl",
+    FOR_ENHANCED_CONTROL: "apex.jorje.data.ast.ForControl$EnhancedForControl",
     FOR_INITS: "apex.jorje.data.ast.ForInits",
     FOR_INIT: "apex.jorje.data.ast.ForInit",
     POSTFIX_EXPRESSION: "apex.jorje.data.ast.Expr$PostfixExpr",
