@@ -6,7 +6,7 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const values = require("./values");
 const apexNames = values.APEX_NAMES;
 
-// TODO: Check the following places: Stmnt.class, Expr.class, NewObject.class
+// TODO: Check the following places: Stmnt.class, Expr.class, NewObject.class, BlockMember.class
 // for possible things that we've forgotten to implement
 
 function indentConcat(docs) {
@@ -258,6 +258,24 @@ function handleDmlMergeStatement(path, print) {
   parts.push(line);
   parts.push(path.call(print, "expr2"));
   parts.push(";");
+  return groupIndentConcat(parts);
+}
+
+function handleEnumDeclaration(path, print) {
+  const modifierDocs = path.map(print, "modifiers");
+  const memberDocs = path.map(print, "members");
+
+  const parts = [];
+  _pushIfExist(parts, join(" ", modifierDocs));
+  parts.push("enum");
+  parts.push(" ");
+  parts.push(path.call(print, "name"));
+  parts.push(" ");
+  parts.push("{");
+  parts.push(softline);
+  parts.push(join(concat([",", line]), memberDocs));
+  parts.push(dedent(softline));
+  parts.push("}");
   return groupIndentConcat(parts);
 }
 
@@ -1296,6 +1314,8 @@ nodeHandler[apexNames.CATCH_BLOCK] = handleCatchBlock;
 nodeHandler[apexNames.FINALLY_BLOCK] = handleFinallyBlock;
 nodeHandler[apexNames.STATEMENT] = handleStatement;
 nodeHandler[apexNames.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
+nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
+nodeHandler[apexNames.ENUM_DECLARATION] = handleEnumDeclaration;
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;

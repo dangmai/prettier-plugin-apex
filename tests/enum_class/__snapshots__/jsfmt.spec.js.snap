@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EnumClass.cls - apex-verify: EnumClass.cls 1`] = `
+public enum MyEnumClass { X, Y }
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+public enum MyEnumClass {X, Y}
+
+`;

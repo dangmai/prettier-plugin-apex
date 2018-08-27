@@ -63,6 +63,8 @@ module.exports = {
     FINALLY_BLOCK: "apex.jorje.data.ast.FinallyBlock",
     STATEMENT: "apex.jorje.data.ast.Stmnt",
     DML_MERGE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlMergeStmnt",
+    INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
+    ENUM_DECLARATION: "apex.jorje.data.ast.EnumDecl",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
