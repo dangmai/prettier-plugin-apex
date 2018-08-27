@@ -26,6 +26,18 @@ class ExceptionClass {
     }
 
     try {
+      Integer i = 0;
+      i++;
+    } catch (CustomException e) {
+      System.debug('first custom exception');
+      throw new AnotherCustomException('Yikes', e);
+    } catch (Exception e) {
+      System.debug('general exception');
+    } finally {
+      System.debug('It has been dealt with');
+    }
+
+    try {
       System.debug('try without catch');
     } finally {
       System.debug('finally without catch');
