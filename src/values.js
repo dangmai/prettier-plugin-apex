@@ -25,6 +25,8 @@ module.exports = {
     NEW_LIST_LITERAL: "apex.jorje.data.ast.NewObject$NewListLiteral",
     NEW_MAP_INIT: "apex.jorje.data.ast.NewObject$NewMapInit",
     NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
+    NEW_KEY_VALUE: "apex.jorje.data.ast.NewObject$NewKeyValue",
+    NAME_VALUE_PARAMETER: "apex.jorje.data.ast.NameValueParameter",
     METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",
     BINARY_EXPRESSION: "apex.jorje.data.ast.Expr$BinaryExpr",
     LITERAL_EXPRESSION: "apex.jorje.data.ast.Expr$LiteralExpr",
@@ -58,6 +60,8 @@ module.exports = {
     TRY_CATCH_FINALLY_BLOCK: "apex.jorje.data.ast.Stmnt$TryCatchFinallyBlock",
     CATCH_BLOCK: "apex.jorje.data.ast.CatchBlock",
     FINALLY_BLOCK: "apex.jorje.data.ast.FinallyBlock",
+    STATEMENT: "apex.jorje.data.ast.Stmnt",
+    DML_MERGE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlMergeStmnt",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",

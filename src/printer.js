@@ -6,7 +6,8 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const values = require("./values");
 const apexNames = values.APEX_NAMES;
 
-// TODO: Check the following places: Stmnt.class, Expr.class for possible things that we've forgotten to implement
+// TODO: Check the following places: Stmnt.class, Expr.class, NewObject.class
+// for possible things that we've forgotten to implement
 
 function indentConcat(docs) {
   return indent(concat(docs));
@@ -215,6 +216,51 @@ function handleEmptyModifierParameterRef(path, print) {
   return concat(parts);
 }
 
+function handleStatement(childClass, path, print) {
+  let doc;
+  switch (childClass) {
+    case "DmlInsertStmnt":
+      doc = "insert";
+      break;
+    case "DmlUpdateStmnt":
+      doc = "update";
+      break;
+    case "DmlUpsertStmnt":
+      doc = "upsert";
+      break;
+    case "DmlDeleteStmnt":
+      doc = "delete";
+      break;
+    case "DmlUndeleteStmnt":
+      doc = "undelete";
+      break;
+    default:
+      doc = "";
+  }
+  const node = path.getValue();
+  const parts = [];
+  parts.push(doc);
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  // upsert statement has an extra param that can be tacked on at the end
+  if (node.id) {
+    _pushIfExist(parts, path.call(print, "id", "value"), null, [line]);
+  }
+  parts.push(";");
+  return groupIndentConcat(parts);
+}
+
+function handleDmlMergeStatement(path, print) {
+  const parts = [];
+  parts.push("merge");
+  parts.push(" ");
+  parts.push(path.call(print, "expr1"));
+  parts.push(line);
+  parts.push(path.call(print, "expr2"));
+  parts.push(";");
+  return groupIndentConcat(parts);
+}
+
 function handleBlockStatement(path, print) {
   const statementDocs = path.map(print, "stmnts");
   if (statementDocs.length > 0) {
@@ -315,6 +361,31 @@ function handleNewStandard(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleNewKeyValue(path, print) {
+  const keyValueDocs = path.map(print, "keyValues");
+
+  const parts = [];
+  parts.push(path.call(print, "type"));
+  parts.push("(");
+  if (keyValueDocs.length > 0) {
+    parts.push(softline);
+    parts.push(join(concat([",", line]), keyValueDocs));
+    parts.push(dedent(softline));
+  }
+  parts.push(")");
+  return groupIndentConcat(parts);
+}
+
+function handleNameValueParameter(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "name"));
+  parts.push(" ");
+  parts.push("=");
+  parts.push(" ");
+  parts.push(path.call(print, "value"));
+  return concat(parts);
+}
+
 function handleMethodCallExpression(path, print) {
   const parts = [];
   // Dotted expression
@@ -367,6 +438,8 @@ function handleNewMapInit(path, print) {
 }
 
 function handleNewListLiteral(path, print) {
+  const valueDocs = path.map(print, "values");
+
   const parts = [];
   // Type
   parts.push(join(".", path.map(print, "types")));
@@ -374,10 +447,13 @@ function handleNewListLiteral(path, print) {
   parts.push("[]");
   // Values
   parts.push("{");
-  const valueDocs = path.map(print, "values");
-  parts.push(join(", ", valueDocs));
+  if (valueDocs.length > 0) {
+    parts.push(softline);
+    parts.push(join(concat([",", line]), valueDocs));
+    parts.push(dedent(softline));
+  }
   parts.push("}");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleNewExpression(path, print) {
@@ -1176,6 +1252,8 @@ nodeHandler[apexNames.NEW_LIST_INIT] = handleNewListInit;
 nodeHandler[apexNames.NEW_MAP_INIT] = handleNewMapInit;
 nodeHandler[apexNames.NEW_LIST_LITERAL] = handleNewListLiteral;
 nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
+nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;
+nodeHandler[apexNames.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
 nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
@@ -1199,6 +1277,8 @@ nodeHandler[apexNames.THROW_STATEMENT] = (path, print) => concat(["throw", " ", 
 nodeHandler[apexNames.TRY_CATCH_FINALLY_BLOCK] = handleTryCatchFinallyBlock;
 nodeHandler[apexNames.CATCH_BLOCK] = handleCatchBlock;
 nodeHandler[apexNames.FINALLY_BLOCK] = handleFinallyBlock;
+nodeHandler[apexNames.STATEMENT] = handleStatement;
+nodeHandler[apexNames.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;
