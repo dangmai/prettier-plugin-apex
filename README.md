@@ -4,6 +4,8 @@
 
 ## Prettier Apex Plugin
 
+[![Build Status](https://travis-ci.org/dangmai/prettier-plugin-apex.svg)](https://travis-ci.org/dangmai/prettier-plugin-apex)
+
 ## WORK IN PROGRESS
 
 This is the Prettier plugin for the Apex Programming Language,
