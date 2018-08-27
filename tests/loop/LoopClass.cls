@@ -14,6 +14,8 @@ class LoopClass {
       System.debug('Hi');
       if (j == 5) {
         break;
+      } else {
+        continue;
       }
     }
 
@@ -43,10 +45,12 @@ class LoopClass {
     Integer i = 0;
     while (i < 10) {
       System.debug(i);
+      i++;
       if (i == 5) {
         break;
+      } else {
+        continue;
       }
-      i++;
     }
     while (i < 5) {
 
@@ -60,10 +64,12 @@ class LoopClass {
     Integer i = 0;
     do {
       System.debug(i);
+      i ++;
       if (i == 5) {
         break;
+      } else {
+        continue;
       }
-      i ++;
     } while (count < 10);
     do {
 
