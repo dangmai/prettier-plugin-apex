@@ -1,0 +1,157 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LoopClass.cls - apex-verify: LoopClass.cls 1`] = `
+class LoopClass {
+  void forLoop() {
+    Integer count = 0;
+    for (Integer i = 0; i < 10; i++)
+      System.debug(i);
+
+    for (count = 0; count < 10; count ++) {
+      System.debug(count);
+    }
+    for (;;) {
+    }
+    for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
+      System.debug(j);
+      System.debug('Hi');
+      if (j == 5) {
+        break;
+      } else {
+        continue;
+      }
+    }
+
+    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {
+
+    }
+
+    for (Integer i = 0; i < 10; i ++) {
+
+    }
+
+    for (Contact a: [SELECT Id FROM Contact]) {
+      System.debug(a);
+    }
+
+    for (Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']) {
+      System.debug(a);
+    }
+
+    Contact[] contacts = new Contact[]{};
+    for (Contact a: contacts) {
+      System.debug(a);
+    }
+  }
+
+  void whileLoop() {
+    Integer i = 0;
+    while (i < 10) i++;
+    while (i < 10) {
+      System.debug(i);
+      i++;
+      if (i == 5) {
+        break;
+      } else {
+        continue;
+      }
+    }
+    while (i < 5) {
+
+    }
+    while (true) {
+      break;
+    }
+  }
+
+  void doWhileLoop() {
+    Integer i = 0;
+    do {
+      System.debug(i);
+      i ++;
+      if (i == 5) {
+        break;
+      } else {
+        continue;
+      }
+    } while (count < 10);
+    do {
+
+    } while (count < 10);
+  }
+}
+
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class LoopClass {
+  void forLoop() {
+    Integer count = 0;
+    for (Integer i = 0; i < 10; i++) {
+      System.debug(i);
+    }
+    for (count = 0; count < 10; count++) {
+      System.debug(count);
+    }
+    for (;;) {}
+    for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
+      System.debug(j);
+      System.debug('Hi');
+      if (j == 5) {
+        break;
+      } else {
+        continue;
+      }
+    }
+    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {}
+    for (Integer i = 0; i < 10; i++) {}
+    for (Contact a: [SELECT Id FROM Contact]) {
+      System.debug(a);
+    }
+    for (Contact a: [
+        SELECT Id, Name, Description, Birthdate
+        FROM Contact
+        WHERE (Id != null AND Name != 'Hello')
+      ]) {
+      System.debug(a);
+    }
+    Contact[] contacts = new Contact[]{};
+    for (Contact a: contacts) {
+      System.debug(a);
+    }
+  }
+
+  void whileLoop() {
+    Integer i = 0;
+    while (i < 10) {
+      i++;
+    }
+    while (i < 10) {
+      System.debug(i);
+      i++;
+      if (i == 5) {
+        break;
+      } else {
+        continue;
+      }
+    }
+    while (i < 5) {}
+    while (true) {
+      break;
+    }
+  }
+
+  void doWhileLoop() {
+    Integer i = 0;
+    do {
+      System.debug(i);
+      i++;
+      if (i == 5) {
+        break;
+      } else {
+        continue;
+      }
+    } while (count < 10);
+    do {} while (count < 10);
+  }
+}
+
+`;
