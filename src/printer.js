@@ -365,9 +365,9 @@ function handleIfBlock(path, print) {
   parts.push(" ");
   // Body block
   parts.push("{");
-  parts.push(path.call(print, "stmnt"));
+  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
   parts.push("}");
-  return groupConcat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleElseBlock(path, print) {
@@ -376,9 +376,9 @@ function handleElseBlock(path, print) {
   parts.push(" ");
   // Body block
   parts.push("{");
-  parts.push(path.call(print, "stmnt"));
+  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
   parts.push("}");
-  return groupConcat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleTernaryExpression(path, print) {

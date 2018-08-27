@@ -37,7 +37,7 @@ class Conditional {
     Integer a = 2;
     Integer b = 1;
     if (2 > 1) {}
-    if (DateTime.now() > DateTime.now.addDays()) {
+    if (DateTime.now() > DateTime.now.addDays(-1)) {
       System.debug('Test Debug');
     }
     Integer c = a > b ? a : b;
