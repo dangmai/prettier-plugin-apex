@@ -223,6 +223,50 @@ function handleBlockStatement(path, print) {
   return "";
 }
 
+function handleTryCatchFinallyBlock(path, print) {
+  const tryStatementDoc = path.call(print, "tryBlock");
+  const catchBlockDocs = path.map(print, "catchBlocks");
+  const finallyBlockDoc = path.call(print, "finallyBlock", "value");
+
+  const parts = [];
+  parts.push("try");
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, tryStatementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  if (catchBlockDocs.length > 0) {
+    // Can't use _pushIfExist here because it doesn't check for Array type
+    parts.push(" ");
+    parts.push(dedent(join(" ", catchBlockDocs)));
+  }
+  _pushIfExist(parts, dedent(finallyBlockDoc), null, [" "]);
+  return groupIndentConcat(parts);
+}
+
+function handleCatchBlock(path, print) {
+  const parts = [];
+  parts.push("catch");
+  parts.push(" ");
+  parts.push("(");
+  parts.push(path.call(print, "parameter"));
+  parts.push(")");
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleFinallyBlock(path, print) {
+  const parts = [];
+  parts.push("finally");
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
 function handleVariableDeclarations(path, print) {
   const parts = [];
   // Type
@@ -1152,6 +1196,9 @@ nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
 nodeHandler[apexNames.BREAK_STATEMENT] = () => "break;";
 nodeHandler[apexNames.CONTINUE_STATEMENT] = () => "continue;";
 nodeHandler[apexNames.THROW_STATEMENT] = (path, print) => concat(["throw", " ", path.call(print, "expr"), ";"]);
+nodeHandler[apexNames.TRY_CATCH_FINALLY_BLOCK] = handleTryCatchFinallyBlock;
+nodeHandler[apexNames.CATCH_BLOCK] = handleCatchBlock;
+nodeHandler[apexNames.FINALLY_BLOCK] = handleFinallyBlock;
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;

@@ -55,6 +55,9 @@ module.exports = {
     BREAK_STATEMENT: "apex.jorje.data.ast.Stmnt$BreakStmnt",
     CONTINUE_STATEMENT: "apex.jorje.data.ast.Stmnt$ContinueStmnt",
     THROW_STATEMENT: "apex.jorje.data.ast.Stmnt$ThrowStmnt",
+    TRY_CATCH_FINALLY_BLOCK: "apex.jorje.data.ast.Stmnt$TryCatchFinallyBlock",
+    CATCH_BLOCK: "apex.jorje.data.ast.CatchBlock",
+    FINALLY_BLOCK: "apex.jorje.data.ast.FinallyBlock",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
