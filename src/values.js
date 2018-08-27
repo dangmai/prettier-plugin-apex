@@ -50,6 +50,8 @@ module.exports = {
     PREFIX_EXPRESSION: "apex.jorje.data.ast.Expr$PrefixExpr",
     POSTFIX_OPERATOR: "apex.jorje.data.ast.PostfixOp",
     PREFIX_OPERATOR: "apex.jorje.data.ast.PrefixOp",
+    BREAK_STATEMENT: "apex.jorje.data.ast.Stmnt$BreakStmnt",
+    CONTINUE_STATEMENT: "apex.jorje.data.ast.Stmnt$ContinueStmnt",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",

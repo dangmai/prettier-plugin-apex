@@ -1108,6 +1108,8 @@ nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.POSTFIX_OPERATOR] = handlePostfixOperator;
 nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
+nodeHandler[apexNames.BREAK_STATEMENT] = () => "break;";
+nodeHandler[apexNames.CONTINUE_STATEMENT] = () => "continue;";
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;
