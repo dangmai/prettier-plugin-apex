@@ -6,8 +6,9 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const values = require("./values");
 const apexNames = values.APEX_NAMES;
 
-// TODO: Check the following places: Stmnt.class, Expr.class, NewObject.class, BlockMember.class
+// TODO: Check the following places: Expr.class, NewObject.class, BlockMember.class
 // for possible things that we've forgotten to implement
+// Already done: Stmnt.class
 
 function indentConcat(docs) {
   return indent(concat(docs));
@@ -74,6 +75,10 @@ function handleVariableExpression(path, print) {
 
 function handleLiteralExpression(path, print) {
   const node = path.getValue();
+  const literalType = path.call(print, "type", "$");
+  if (literalType === "NULL") {
+    return "null";
+  }
   const literalDoc = path.call(print, "literal", "$");
   if (node.type["$"] === "STRING") {
     return concat(["'", literalDoc, "'"]);
@@ -277,6 +282,72 @@ function handleEnumDeclaration(path, print) {
   parts.push(dedent(softline));
   parts.push("}");
   return groupIndentConcat(parts);
+}
+
+function handleSwitchStatement(path, print) {
+  const whenBlocks = path.map(print, "whenBlocks");
+
+  const parts = [];
+  parts.push("switch on");
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  parts.push(" ");
+  parts.push("{");
+  parts.push(hardline);
+  parts.push(join(hardline, whenBlocks));
+  parts.push(dedent(hardline));
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleValueWhen(path, print) {
+  const whenCaseDocs = path.map(print, "whenCases");
+  const statementDoc = path.call(print, "stmnt");
+
+  const parts = [];
+  parts.push("when");
+  parts.push(" ");
+  // TODO right now the values always breaks, because there's a hardline below
+  parts.push(join(concat([",", line]), whenCaseDocs));
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleElseWhen(path, print) {
+  const statementDoc = path.call(print, "stmnt");
+
+  const parts = [];
+  parts.push("when");
+  parts.push(" ");
+  parts.push("else");
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleTypeWhen(path, print) {
+  const statementDoc = path.call(print, "stmnt");
+
+  const parts = [];
+  parts.push("when");
+  parts.push(" ");
+  parts.push(path.call(print, "typeRef"));
+  parts.push(" ");
+  parts.push(path.call(print, "name"));
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleEnumCase(path, print) {
+  return join(",", path.map(print, "identifiers"));
 }
 
 function handleRunAsBlock(path, print) {
@@ -1316,6 +1387,12 @@ nodeHandler[apexNames.STATEMENT] = handleStatement;
 nodeHandler[apexNames.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
 nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
 nodeHandler[apexNames.ENUM_DECLARATION] = handleEnumDeclaration;
+nodeHandler[apexNames.SWITCH_STATEMENT] = handleSwitchStatement;
+nodeHandler[apexNames.VALUE_WHEN] = handleValueWhen;
+nodeHandler[apexNames.ELSE_WHEN] = handleElseWhen;
+nodeHandler[apexNames.TYPE_WHEN] = handleTypeWhen;
+nodeHandler[apexNames.ENUM_CASE] = handleEnumCase;
+nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;

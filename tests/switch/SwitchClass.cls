@@ -37,6 +37,9 @@ class SwitchClass {
       when Contact c {
         System.debug('Contact ' + c);
       }
+      when Opportunity {
+        System.debug('No variable');
+      }
       when null {
         System.debug('Null');
       }

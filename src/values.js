@@ -65,6 +65,12 @@ module.exports = {
     DML_MERGE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlMergeStmnt",
     INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
     ENUM_DECLARATION: "apex.jorje.data.ast.EnumDecl",
+    SWITCH_STATEMENT: "apex.jorje.data.ast.Stmnt$SwitchStmnt",
+    VALUE_WHEN: "apex.jorje.data.ast.WhenBlock$ValueWhen",
+    ELSE_WHEN: "apex.jorje.data.ast.WhenBlock$ElseWhen",
+    TYPE_WHEN: "apex.jorje.data.ast.WhenBlock$TypeWhen",
+    ENUM_CASE: "apex.jorje.data.ast.WhenCase$EnumCase",
+    LITERAL_CASE: "apex.jorje.data.ast.WhenCase$LiteralCase",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
