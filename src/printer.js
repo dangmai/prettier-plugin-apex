@@ -610,7 +610,44 @@ function handleNewMapInit(path, print) {
   const typeDocs = path.map(print, "types");
   parts.push(join(", ", typeDocs));
   parts.push(">");
-  parts.push("()");
+  parts.push("(");
+  parts.push(path.call(print, "expr", "value"));
+  parts.push(")");
+  return concat(parts);
+}
+
+function handleNewMapLiteral(path, print) {
+  const valueDocs = path.map(print, "pairs");
+
+  const parts = [];
+  // Type
+  parts.push("Map");
+  parts.push("<");
+  const typeGroup = groupConcat([
+    softline,
+    join(concat([",", line]), path.map(print, "types")),
+    softline,
+  ]);
+  parts.push(typeGroup);
+  parts.push(">");
+  // Values
+  parts.push("{");
+  if (valueDocs.length > 0) {
+    parts.push(softline);
+    parts.push(join(concat([",", line]), valueDocs));
+    parts.push(dedent(softline));
+  }
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function handleMapLiteralKeyValue(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "key"));
+  parts.push(" ");
+  parts.push("=>");
+  parts.push(" ");
+  parts.push(path.call(print, "value"));
   return concat(parts);
 }
 
@@ -1472,6 +1509,8 @@ nodeHandler[apexNames.NEW_SET_INIT] = handleNewSetInit;
 nodeHandler[apexNames.NEW_SET_LITERAL] = handleNewSetLiteral;
 nodeHandler[apexNames.NEW_LIST_INIT] = handleNewListInit;
 nodeHandler[apexNames.NEW_MAP_INIT] = handleNewMapInit;
+nodeHandler[apexNames.NEW_MAP_LITERAL] = handleNewMapLiteral;
+nodeHandler[apexNames.MAP_LITERAL_KEY_VALUE] = handleMapLiteralKeyValue;
 nodeHandler[apexNames.NEW_LIST_LITERAL] = handleNewListLiteral;
 nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
 nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;

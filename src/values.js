@@ -79,8 +79,10 @@ module.exports = {
     NEW_LIST_INIT: "apex.jorje.data.ast.NewObject$NewListInit",
     NEW_LIST_LITERAL: "apex.jorje.data.ast.NewObject$NewListLiteral",
     NEW_MAP_INIT: "apex.jorje.data.ast.NewObject$NewMapInit",
+    NEW_MAP_LITERAL: "apex.jorje.data.ast.NewObject$NewMapLiteral",
     NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
     NEW_KEY_VALUE: "apex.jorje.data.ast.NewObject$NewKeyValue",
+    MAP_LITERAL_KEY_VALUE: "apex.jorje.data.ast.MapLiteralKeyValue",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
