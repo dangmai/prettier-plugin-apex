@@ -98,9 +98,11 @@ class Conditional extends Object {
   void arrayExpression() {
     Integer[] a = new Integer[]{1, 2, 3, 4};
     Integer b;
+    Integer veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay = 1;
 
     b = a[0];
     b = a[a[0]];
+    b = a[a[veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay]];
   }
 
   void variableExpression() {

@@ -741,6 +741,17 @@ function handleInstanceOfExpression(path, print) {
   return concat(parts);
 }
 
+function handleArrayExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "expr"));
+  parts.push("[");
+  parts.push(softline);
+  parts.push(path.call(print, "index"));
+  parts.push(dedent(softline));
+  parts.push("]");
+  return groupIndentConcat(parts);
+}
+
 function handleCastExpression(path, print) {
   const parts = [];
   parts.push("(");
@@ -1530,6 +1541,7 @@ nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
 nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
 nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () => "Package.Version.Request";  // Not sure what this is
+nodeHandler[apexNames.ARRAY_EXPRESSION] = handleArrayExpression;
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 
 // New Object Init
