@@ -1529,6 +1529,7 @@ nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
 nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
+nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () => "Package.Version.Request";  // Not sure what this is
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 
 // New Object Init
