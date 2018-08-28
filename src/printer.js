@@ -1536,6 +1536,7 @@ nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) => concat(["T
 nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[apexNames.SUPER_VARIABLE_EXPRESSION] = () => "super";
 nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;

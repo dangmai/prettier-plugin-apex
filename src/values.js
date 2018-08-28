@@ -78,6 +78,7 @@ module.exports = {
     INSTANCE_OF_EXPRESSION: "apex.jorje.data.ast.Expr$InstanceOf",
     PACKAGE_VERSION_EXPRESSION: "apex.jorje.data.ast.Expr$PackageVersionExpr",
     ARRAY_EXPRESSION: "apex.jorje.data.ast.Expr$ArrayExpr",
+    SUPER_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$SuperVariableExpr",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
 
     // New Object Init
