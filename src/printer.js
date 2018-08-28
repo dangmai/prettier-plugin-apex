@@ -1383,6 +1383,7 @@ nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[pat
 nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
 nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) => concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
+nodeHandler[apexNames.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;

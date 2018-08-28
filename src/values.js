@@ -4,6 +4,7 @@ module.exports = {
   APEX_NAMES: {
     CLASS_DECLARATION: "apex.jorje.data.ast.ClassDecl",
     CLASS_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$ClassDeclUnit",
+    ENUM_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$EnumDeclUnit",
     TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
     TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
     TRIGGER_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$TriggerVariableExpr",
