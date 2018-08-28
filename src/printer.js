@@ -731,6 +731,16 @@ function handleTernaryExpression(path, print) {
   return groupConcat(parts);
 }
 
+function handleCastExpression(path, print) {
+  const parts = [];
+  parts.push("(");
+  parts.push(path.call(print, "type"));
+  parts.push(")");
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return concat(parts);
+}
+
 function handleExpressionStatement(path, print) {
   const parts = [];
   parts.push(path.call(print, "expr"));
@@ -1439,22 +1449,14 @@ const nodeHandler = {};
 nodeHandler[apexNames.IF_ELSE_BLOCK] = handleIfElseBlock;
 nodeHandler[apexNames.IF_BLOCK] = handleIfBlock;
 nodeHandler[apexNames.ELSE_BLOCK] = handleElseBlock;
-nodeHandler[apexNames.TERNARY_EXPRESSION] = handleTernaryExpression;
 nodeHandler[apexNames.EXPRESSION_STATEMENT] = handleExpressionStatement;
-nodeHandler[apexNames.BOOLEAN_EXPRESSION] = handleGenericExpression;
-nodeHandler[apexNames.ASSIGNMENT_EXPRESSION] = handleGenericExpression;
 nodeHandler[apexNames.ASSIGNMENT_OPERATION] = handleAssignmentOperation;
-nodeHandler[apexNames.NESTED_EXPRESSION] = handleNestedExpression;
-nodeHandler[apexNames.VARIABLE_EXPRESSION] = handleVariableExpression;
-nodeHandler[apexNames.LITERAL_EXPRESSION] = handleLiteralExpression;
-nodeHandler[apexNames.BINARY_EXPRESSION] = handleBinaryExpression;
 nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
 nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
 nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
 nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
-nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) => concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
@@ -1469,14 +1471,11 @@ nodeHandler[apexNames.BLOCK_STATEMENT] = handleBlockStatement;
 nodeHandler[apexNames.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("variableDecls");
 nodeHandler[apexNames.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[apexNames.VARIABLE_DECLARATION] = handleVariableDeclaration;
-nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[apexNames.NAME_VALUE_PARAMETER] = handleNameValueParameter;
-nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
 nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALUE[childClass];
 nodeHandler[apexNames.MODIFIER] = handleModifier;
-nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 nodeHandler[apexNames.RUN_AS_BLOCK] = handleRunAsBlock;
 nodeHandler[apexNames.DO_LOOP] = handleDoLoop;
 nodeHandler[apexNames.WHILE_LOOP] = handleWhileLoop;
@@ -1485,8 +1484,6 @@ nodeHandler[apexNames.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
 nodeHandler[apexNames.FOR_ENHANCED_CONTROL] = handleForEnhancedControl;
 nodeHandler[apexNames.FOR_INITS] = handleForInits;
 nodeHandler[apexNames.FOR_INIT] = handleForInit;
-nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
-nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.POSTFIX_OPERATOR] = handlePostfixOperator;
 nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
 nodeHandler[apexNames.BREAK_STATEMENT] = () => "break;";
@@ -1506,6 +1503,23 @@ nodeHandler[apexNames.TYPE_WHEN] = handleTypeWhen;
 nodeHandler[apexNames.ENUM_CASE] = handleEnumCase;
 nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 
+// Expression
+nodeHandler[apexNames.TERNARY_EXPRESSION] = handleTernaryExpression;
+nodeHandler[apexNames.BOOLEAN_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexNames.ASSIGNMENT_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexNames.NESTED_EXPRESSION] = handleNestedExpression;
+nodeHandler[apexNames.VARIABLE_EXPRESSION] = handleVariableExpression;
+nodeHandler[apexNames.LITERAL_EXPRESSION] = handleLiteralExpression;
+nodeHandler[apexNames.BINARY_EXPRESSION] = handleBinaryExpression;
+nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) => concat(["Trigger", ".", path.call(print, "variable")]);
+nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
+nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
+nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
+nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
+nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
+nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
+
 // New Object Init
 nodeHandler[apexNames.NEW_SET_INIT] = handleNewSetInit;
 nodeHandler[apexNames.NEW_SET_LITERAL] = handleNewSetLiteral;
@@ -1518,7 +1532,6 @@ nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
 nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;
 
 // SOQL
-nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;
 nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
 nodeHandler[apexNames.SELECT_COUNT_CLAUSE] = () => concat(["SELECT", " ", "COUNT()"]);
