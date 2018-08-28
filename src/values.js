@@ -27,11 +27,6 @@ module.exports = {
     VARIABLE_DECLARATIONS: "apex.jorje.data.ast.VariableDecls",
     VARIABLE_DECLARATION: "apex.jorje.data.ast.VariableDecl",
     NEW_EXPRESSION: "apex.jorje.data.ast.Expr$NewExpr",
-    NEW_LIST_INIT: "apex.jorje.data.ast.NewObject$NewListInit",
-    NEW_LIST_LITERAL: "apex.jorje.data.ast.NewObject$NewListLiteral",
-    NEW_MAP_INIT: "apex.jorje.data.ast.NewObject$NewMapInit",
-    NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
-    NEW_KEY_VALUE: "apex.jorje.data.ast.NewObject$NewKeyValue",
     NAME_VALUE_PARAMETER: "apex.jorje.data.ast.NameValueParameter",
     METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",
     BINARY_EXPRESSION: "apex.jorje.data.ast.Expr$BinaryExpr",
@@ -77,6 +72,15 @@ module.exports = {
     TYPE_WHEN: "apex.jorje.data.ast.WhenBlock$TypeWhen",
     ENUM_CASE: "apex.jorje.data.ast.WhenCase$EnumCase",
     LITERAL_CASE: "apex.jorje.data.ast.WhenCase$LiteralCase",
+
+    // New Object Init
+    NEW_SET_INIT: "apex.jorje.data.ast.NewObject$NewSetInit",
+    NEW_SET_LITERAL: "apex.jorje.data.ast.NewObject$NewSetLiteral",
+    NEW_LIST_INIT: "apex.jorje.data.ast.NewObject$NewListInit",
+    NEW_LIST_LITERAL: "apex.jorje.data.ast.NewObject$NewListLiteral",
+    NEW_MAP_INIT: "apex.jorje.data.ast.NewObject$NewMapInit",
+    NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
+    NEW_KEY_VALUE: "apex.jorje.data.ast.NewObject$NewKeyValue",
 
     // SOQL
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",

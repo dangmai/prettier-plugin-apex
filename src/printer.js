@@ -556,6 +556,40 @@ function handleNestedExpression(path, print) {
   return concat(parts);
 }
 
+function handleNewSetInit(path, print) {
+  const parts = [];
+  // Type
+  parts.push("Set");
+  parts.push("<");
+  parts.push(join(concat([",", " "]), path.map(print, "types")));
+  parts.push(">");
+  // Param
+  parts.push("(");
+  parts.push(path.call(print, "expr", "value"));
+  parts.push(")");
+  return concat(parts);
+}
+
+function handleNewSetLiteral(path, print) {
+  const valueDocs = path.map(print, "values");
+
+  const parts = [];
+  // Type
+  parts.push("Set");
+  parts.push("<");
+  parts.push(join(concat([",", " "]), path.map(print, "types")));
+  parts.push(">");
+  // Values
+  parts.push("{");
+  if (valueDocs.length > 0) {
+    parts.push(softline);
+    parts.push(join(concat([",", line]), valueDocs));
+    parts.push(dedent(softline));
+  }
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
 function handleNewListInit(path, print) {
   // TODO is there a way to preserve the user choice of List<> or []?
   const parts = [];
@@ -1397,11 +1431,6 @@ nodeHandler[apexNames.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("
 nodeHandler[apexNames.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[apexNames.VARIABLE_DECLARATION] = handleVariableDeclaration;
 nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
-nodeHandler[apexNames.NEW_LIST_INIT] = handleNewListInit;
-nodeHandler[apexNames.NEW_MAP_INIT] = handleNewMapInit;
-nodeHandler[apexNames.NEW_LIST_LITERAL] = handleNewListLiteral;
-nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
-nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;
 nodeHandler[apexNames.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
@@ -1438,6 +1467,16 @@ nodeHandler[apexNames.TYPE_WHEN] = handleTypeWhen;
 nodeHandler[apexNames.ENUM_CASE] = handleEnumCase;
 nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 
+// New Object Init
+nodeHandler[apexNames.NEW_SET_INIT] = handleNewSetInit;
+nodeHandler[apexNames.NEW_SET_LITERAL] = handleNewSetLiteral;
+nodeHandler[apexNames.NEW_LIST_INIT] = handleNewListInit;
+nodeHandler[apexNames.NEW_MAP_INIT] = handleNewMapInit;
+nodeHandler[apexNames.NEW_LIST_LITERAL] = handleNewListLiteral;
+nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
+nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;
+
+// SOQL
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexNames.QUERY] = handleQuery;
 nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
