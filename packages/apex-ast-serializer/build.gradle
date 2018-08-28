@@ -11,6 +11,9 @@ mainClassName = 'net.dangmai.serializer.Apex'
 sourceCompatibility = 1.8
 
 repositories {
+    flatDir {
+        dirs 'libs'
+    }
     mavenCentral()
 }
 
@@ -23,9 +26,7 @@ distZip {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/net.sourceforge.pmd/pmd-apex
-    implementation group: 'net.sourceforge.pmd', name: 'pmd-apex', version: '6.6.0'
-
+    implementation name: 'apex-jorje-lsp'
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
     implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
 
