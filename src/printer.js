@@ -101,6 +101,44 @@ function handleAssignmentOperation(path) {
   return values.ASSIGNMENT[node["$"]];
 }
 
+function handleTriggerDeclarationUnit(path, print) {
+  const usageDocs = path.map(print, "usages");
+  const targetDocs = path.map(print, "target");
+
+  const parts = [];
+  parts.push("trigger");
+  parts.push(" ");
+  parts.push(path.call(print, "name", "value"));
+  parts.push(" ");
+  parts.push("on");
+  parts.push(" ");
+  parts.push(join(",", targetDocs));
+  parts.push("(");
+  const usagePart = concat([
+    softline,
+    join(concat([",", line]), usageDocs),
+  ]);
+  parts.push(indent(usagePart));
+  parts.push(")");
+  parts.push(" ");
+  parts.push("{");
+  const memberParts = path.map(print, "members").filter(member => member);
+
+  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
+    if (index !== allMemberDocs.length - 1) {
+      return concat([memberDoc, hardline, hardline])
+    }
+    return memberDoc;
+  });
+  if(memberDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...memberDocs])));
+    parts.push(dedent(concat([hardline, "}"])));
+  } else {
+    parts.push("}");
+  }
+  return concat(parts);
+}
+
 function handleClassDeclaration(path, print) {
   const parts = [];
   const modifierDocs = path.map(print, "modifiers");
@@ -1340,6 +1378,11 @@ nodeHandler[apexNames.BINARY_EXPRESSION] = handleBinaryExpression;
 nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
 nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
+nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
+nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
+nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
+nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) => concat(["Trigger", ".", path.call(print, "variable")]);
+nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
@@ -1462,7 +1505,7 @@ function genericPrint(path, options, print) {
   if (path.stack.length === 1) {
     // Hard code how to handle the root node here
     const docs = [];
-    docs.push(path.call(print, apexNames.PARSER_OUTPUT, "unit", "body"));
+    docs.push(path.call(print, apexNames.PARSER_OUTPUT, "unit"));
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
     return concat(docs);

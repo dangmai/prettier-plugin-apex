@@ -3,6 +3,11 @@
 module.exports = {
   APEX_NAMES: {
     CLASS_DECLARATION: "apex.jorje.data.ast.ClassDecl",
+    CLASS_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$ClassDeclUnit",
+    TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
+    TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
+    TRIGGER_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$TriggerVariableExpr",
+    STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
     LOCATION_IDENTIFIER: "apex.jorje.data.Identifiers$LocationIdentifier",
     PARSER_OUTPUT: "apex.jorje.semantic.compiler.parser.ParserOutput",
     CLASS_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ClassTypeRef",
@@ -230,4 +235,14 @@ module.exports = {
     DataCategoryBelow: "BELOW",
     DataCategoryAboveOrBelow: "ABOVE_OR_BELOW",
   },
+  TRIGGER_USAGE: {
+    BEFORE_DELETE: "before delete",
+    BEFORE_INSERT: "before insert",
+    BEFORE_UPDATE: "before update",
+    BEFORE_UNDELETE: "before undelete",
+    AFTER_DELETE: "after delete",
+    AFTER_INSERT: "after insert",
+    AFTER_UPDATE: "after update",
+    AFTER_UNDELETE: "after undelete",
+  }
 };
