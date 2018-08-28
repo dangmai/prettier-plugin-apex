@@ -74,14 +74,17 @@ function handleVariableExpression(path, print) {
 }
 
 function handleLiteralExpression(path, print) {
-  const node = path.getValue();
   const literalType = path.call(print, "type", "$");
   if (literalType === "NULL") {
     return "null";
   }
   const literalDoc = path.call(print, "literal", "$");
-  if (node.type["$"] === "STRING") {
+  if (literalType === "STRING") {
     return concat(["'", literalDoc, "'"]);
+  } else if (literalType === "LONG") {
+    return concat([literalDoc, "L"]);
+  } else if (literalType === "DOUBLE") {
+    return concat([literalDoc, "d"]);
   }
   return literalDoc;
 }
