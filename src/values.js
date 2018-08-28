@@ -75,6 +75,7 @@ module.exports = {
     POSTFIX_EXPRESSION: "apex.jorje.data.ast.Expr$PostfixExpr",
     NEW_EXPRESSION: "apex.jorje.data.ast.Expr$NewExpr",
     CAST_EXPRESSION: "apex.jorje.data.ast.Expr$CastExpr",
+    INSTANCE_OF_EXPRESSION: "apex.jorje.data.ast.Expr$InstanceOf",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
 
     // New Object Init

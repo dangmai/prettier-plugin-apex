@@ -731,6 +731,16 @@ function handleTernaryExpression(path, print) {
   return groupConcat(parts);
 }
 
+function handleInstanceOfExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "expr"));
+  parts.push(" ");
+  parts.push("instanceof");
+  parts.push(" ");
+  parts.push(path.call(print, "type"));
+  return concat(parts);
+}
+
 function handleCastExpression(path, print) {
   const parts = [];
   parts.push("(");
@@ -1518,6 +1528,7 @@ nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
+nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 
 // New Object Init
