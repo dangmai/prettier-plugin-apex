@@ -6,9 +6,9 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const values = require("./values");
 const apexNames = values.APEX_NAMES;
 
-// TODO: Check the following places: Expr.class, NewObject.class, BlockMember.class
+// TODO: Check the following places: Expr.class, BlockMember.class
 // for possible things that we've forgotten to implement
-// Already done: Stmnt.class
+// Already done: Stmnt.class, NewObject.class
 
 function indentConcat(docs) {
   return indent(concat(docs));
