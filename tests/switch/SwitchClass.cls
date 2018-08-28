@@ -1,9 +1,9 @@
 class SwitchClass {
-  enum Season {SPRING, SUMMER, AUTUMN, WINTER}
+  enum Month {JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER}
 
   public void switchTest() {
     Integer i = 1;
-    Season s;
+    Month s;
     sObject randomObject;
 
     switch on i {
@@ -22,11 +22,11 @@ class SwitchClass {
     }
 
     switch on s {
-      when SPRING {
-        System.debug('Spring');
+      when JANUARY {
+        System.debug('January');
       }
-      when WINTER, AUTUMN {
-        System.debug('Winter, Autumn');
+      when FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER {
+        System.debug('Other months');
       }
     }
 

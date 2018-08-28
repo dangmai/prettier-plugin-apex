@@ -2,11 +2,11 @@
 
 exports[`SwitchClass.cls - apex-verify: SwitchClass.cls 1`] = `
 class SwitchClass {
-  enum Season {SPRING, SUMMER, AUTUMN, WINTER}
+  enum Month {JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER}
 
   public void switchTest() {
     Integer i = 1;
-    Season s;
+    Month s;
     sObject randomObject;
 
     switch on i {
@@ -25,11 +25,11 @@ class SwitchClass {
     }
 
     switch on s {
-      when SPRING {
-        System.debug('Spring');
+      when JANUARY {
+        System.debug('January');
       }
-      when WINTER, AUTUMN {
-        System.debug('Winter, Autumn');
+      when FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER {
+        System.debug('Other months');
       }
     }
 
@@ -55,19 +55,30 @@ class SwitchClass {
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class SwitchClass {
-  enum Season {SPRING, SUMMER, AUTUMN, WINTER}
+  enum Month {
+    JANUARY,
+    FEBRUARY,
+    MARCH,
+    APRIL,
+    MAY,
+    JUNE,
+    JULY,
+    AUGUST,
+    SEPTEMBER,
+    OCTOBER,
+    NOVEMBER,
+    DECEMBER
+  }
 
   public void switchTest() {
     Integer i = 1;
-    Season s;
+    Month s;
     sObject randomObject;
     switch on i {
       when 1 {
         System.debug('One');
       }
-      when 2,
-        3,
-        4 {
+      when 2, 3, 4 {
         System.debug('Two three four');
       }
       when null {
@@ -78,12 +89,21 @@ class SwitchClass {
       }
     }
     switch on s {
-      when SPRING {
-        System.debug('Spring');
+      when JANUARY {
+        System.debug('January');
       }
-      when WINTER,
-        AUTUMN {
-        System.debug('Winter, Autumn');
+      when FEBRUARY,
+          MARCH,
+          APRIL,
+          MAY,
+          JUNE,
+          JULY,
+          AUGUST,
+          SEPTEMBER,
+          OCTOBER,
+          NOVEMBER,
+          DECEMBER {
+        System.debug('Other months');
       }
     }
     switch on randomObject {

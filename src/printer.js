@@ -345,8 +345,8 @@ function handleValueWhen(path, print) {
   const parts = [];
   parts.push("when");
   parts.push(" ");
-  // TODO right now the values always breaks, because there's a hardline below
-  parts.push(join(concat([",", line]), whenCaseDocs));
+  const whenCaseGroup = group(indent(join(concat([",", line]), whenCaseDocs)));
+  parts.push(whenCaseGroup);
   parts.push(" ");
   parts.push("{");
   _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
