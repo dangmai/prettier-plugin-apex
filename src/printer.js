@@ -1543,6 +1543,7 @@ nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
 nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
 nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () => "Package.Version.Request";  // Not sure what this is
 nodeHandler[apexNames.ARRAY_EXPRESSION] = handleArrayExpression;
+nodeHandler[apexNames.CLASS_REF_EXPRESSION] = (path, print) => concat([path.call(print, "type"), ".", "class"]);
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 
 // New Object Init

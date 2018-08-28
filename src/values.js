@@ -79,6 +79,7 @@ module.exports = {
     PACKAGE_VERSION_EXPRESSION: "apex.jorje.data.ast.Expr$PackageVersionExpr",
     ARRAY_EXPRESSION: "apex.jorje.data.ast.Expr$ArrayExpr",
     SUPER_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$SuperVariableExpr",
+    CLASS_REF_EXPRESSION: "apex.jorje.data.ast.Expr$ClassRefExpr",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
 
     // New Object Init
