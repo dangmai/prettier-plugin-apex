@@ -3,7 +3,6 @@ package net.dangmai.serializer;
 import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
-import com.google.common.collect.ImmutableList;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
@@ -26,15 +25,6 @@ public class Apex {
     private static void setUpXStream(XStream xstream, int mode) {
         xstream.setMode(mode);
         xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
-        xstream.registerConverter(
-                new InternalJorjeListConverter(
-                        xstream.getMapper(),
-                        Arrays.asList(
-                                "com.google.common.collect.SingleAppendList",
-                                "com.google.common.collect.SingletonImmutableList"
-                        )
-                )
-        );
     }
 
     public static void main(String[] args) throws ParseException, IOException {
@@ -158,8 +148,7 @@ public class Apex {
 
         @Override
         public boolean canConvert(Class type) {
-            Boolean isSingleton = (type == SINGLETON_LIST || type == SINGLETON_SET);
-            return isSingleton || super.canConvert(type);
+            return Collection.class.isAssignableFrom(type) || super.canConvert(type);
         }
 
         protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
@@ -175,31 +164,6 @@ public class Apex {
                 context.convertAnother(item);
                 writer.endNode();
             }
-        }
-    }
-
-    // Some internal collections that jorje uses are serialized in a weird way by default,
-    // e.g. SingleAppendList is nested twice for certain input. We streamline
-    // the serialization here by forcing them to behave like ImmutableList
-    static class InternalJorjeListConverter extends CustomCollectionConverter {
-        private Collection<String> listTypes;
-
-        public InternalJorjeListConverter(Mapper mapper, Collection<String> listTypes) {
-            super(mapper);
-            this.listTypes = listTypes;
-        }
-
-        @Override
-        public boolean canConvert(Class type) {
-            // For some reason we can't import some Jorje internal list here
-            // (like SingleAppendList), so we'll have to compare the name string
-            // instead.
-            return this.listTypes.contains(type.getName());
-        }
-        @Override
-        public void marshal(Object source, HierarchicalStreamWriter writer, MarshallingContext context) {
-            ImmutableList list = (ImmutableList) source;
-            super.marshal(list.subList(0, list.size()), writer, context);
         }
     }
 }
