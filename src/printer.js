@@ -236,8 +236,7 @@ function handleMethodDeclaration(path, print) {
     parts.push(concat(modifierDocs));
   }
   // Return type
-  parts.push(path.call(print, "type", "value"));
-  parts.push(" ");
+  _pushIfExist(parts, path.call(print, "type", "value"), [" "]);
   // Method name
   parts.push(path.call(print, "name"));
   // Params
