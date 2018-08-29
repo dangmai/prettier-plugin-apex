@@ -225,6 +225,43 @@ function handleArrayTypeRef(path, print) {
   return concat(parts);
 }
 
+function handlePropertyDeclaration(path, print) {
+  const modifierDocs = path.map(print, "modifiers");
+
+  const parts = [];
+  parts.push(join("", modifierDocs));
+  parts.push(path.call(print, "type"));
+  parts.push(" ");
+  parts.push(path.call(print, "name"));
+  parts.push(" ");
+  parts.push("{");
+  _pushIfExist(parts, path.call(print, "getter", "value"), [dedent(softline)], [line]);
+  _pushIfExist(parts, path.call(print, "setter", "value"), [dedent(line)], [line]);
+  parts.push("}");
+  return groupIndentConcat(parts);
+}
+
+function _handlePropertyGetterSetter(action) {
+  return function(path, print) {
+    const statementDoc = path.call(print, "stmnt", "value");
+
+    const parts = [];
+    parts.push(path.call(print, "modifier", "value"));
+    parts.push(action);
+    if (statementDoc) {
+      parts.push(" ");
+      parts.push("{");
+      parts.push(hardline);
+      parts.push(statementDoc);
+      parts.push(dedent(hardline));
+      parts.push("}")
+    } else {
+      parts.push(";");
+    }
+    return groupIndentConcat(parts);
+  }
+}
+
 function handleMethodDeclaration(path, print) {
   const statementDoc = path.call(print, "stmnt", "value");
   const modifierDocs = path.map(print, "modifiers");
@@ -1553,8 +1590,12 @@ nodeHandler[apexNames.ELSE_WHEN] = handleElseWhen;
 nodeHandler[apexNames.TYPE_WHEN] = handleTypeWhen;
 nodeHandler[apexNames.ENUM_CASE] = handleEnumCase;
 nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
+nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
+nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
+nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
 
 // Block Member
+nodeHandler[apexNames.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");
 nodeHandler[apexNames.FIELD_MEMBER] = _handlePassthroughCall("variableDecls");
 nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
 nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");

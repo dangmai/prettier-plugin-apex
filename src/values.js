@@ -55,8 +55,12 @@ module.exports = {
     TYPE_WHEN: "apex.jorje.data.ast.WhenBlock$TypeWhen",
     ENUM_CASE: "apex.jorje.data.ast.WhenCase$EnumCase",
     LITERAL_CASE: "apex.jorje.data.ast.WhenCase$LiteralCase",
+    PROPERTY_DECLATION: "apex.jorje.data.ast.PropertyDecl",
+    PROPERTY_GETTER: "apex.jorje.data.ast.PropertyGetter",
+    PROPERTY_SETTER: "apex.jorje.data.ast.PropertySetter",
 
     // Block Member
+    PROPERTY_MEMBER: "apex.jorje.data.ast.BlockMember$PropertyMember",
     FIELD_MEMBER: "apex.jorje.data.ast.BlockMember$FieldMember",
     STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
     METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
