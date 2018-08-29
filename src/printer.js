@@ -6,12 +6,15 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const values = require("./values");
 const apexNames = values.APEX_NAMES;
 
-// TODO: Check the following places: BlockMember.class, CompilationUnit.class
+// TODO: Check the following places: CompilationUnit.class
 // for possible things that we've forgotten to implement
-// Already done: Stmnt.class, NewObject.class, Expr.class
+// Already done: Stmnt.class, NewObject.class, Expr.class, BlockMember.class
 
 // TODO make sure expression inside {} are consistent, right now Enum/List/Map/Set
 // init does not have spaces around them, while everything else does.
+
+// TODO right now there are spaces around field member and property member.
+// Find a way to fix that.
 
 function indentConcat(docs) {
   return indent(concat(docs));
