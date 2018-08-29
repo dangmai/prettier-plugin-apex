@@ -7,17 +7,14 @@ module.exports = {
     ENUM_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$EnumDeclUnit",
     TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
     TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
-    STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
     LOCATION_IDENTIFIER: "apex.jorje.data.Identifiers$LocationIdentifier",
     PARSER_OUTPUT: "apex.jorje.semantic.compiler.parser.ParserOutput",
     CLASS_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ClassTypeRef",
     ARRAY_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ArrayTypeRef",
-    INNER_CLASS_MEMBER: "apex.jorje.data.ast.BlockMember$InnerClassMember",
     MODIFIER: "apex.jorje.data.ast.Modifier",
     ANNOTATION: "apex.jorje.data.ast.Modifier$Annotation",
     ANNOTATION_KEY_VALUE: "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
     ANNOTATION_VALUE: "apex.jorje.data.ast.AnnotationValue",
-    METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
     METHOD_DECLARATION: "apex.jorje.data.ast.MethodDecl",
     EMPTY_MODIFIER_PARAMETER_REF: "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
     BLOCK_STATEMENT: "apex.jorje.data.ast.Stmnt$BlockStmnt",
@@ -51,7 +48,6 @@ module.exports = {
     FINALLY_BLOCK: "apex.jorje.data.ast.FinallyBlock",
     STATEMENT: "apex.jorje.data.ast.Stmnt",
     DML_MERGE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlMergeStmnt",
-    INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
     ENUM_DECLARATION: "apex.jorje.data.ast.EnumDecl",
     SWITCH_STATEMENT: "apex.jorje.data.ast.Stmnt$SwitchStmnt",
     VALUE_WHEN: "apex.jorje.data.ast.WhenBlock$ValueWhen",
@@ -59,6 +55,12 @@ module.exports = {
     TYPE_WHEN: "apex.jorje.data.ast.WhenBlock$TypeWhen",
     ENUM_CASE: "apex.jorje.data.ast.WhenCase$EnumCase",
     LITERAL_CASE: "apex.jorje.data.ast.WhenCase$LiteralCase",
+
+    // Block Member
+    STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
+    METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
+    INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
+    INNER_CLASS_MEMBER: "apex.jorje.data.ast.BlockMember$InnerClassMember",
 
     // Expression
     METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",

@@ -1504,7 +1504,6 @@ nodeHandler[apexNames.ASSIGNMENT_OPERATION] = handleAssignmentOperation;
 nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
 nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
-nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
 nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
 nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
 nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
@@ -1513,8 +1512,6 @@ nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[apexNames.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
-nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
-nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[apexNames.METHOD_DECLARATION] = handleMethodDeclaration;
 nodeHandler[apexNames.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
 nodeHandler[apexNames.BLOCK_STATEMENT] = handleBlockStatement;
@@ -1544,7 +1541,6 @@ nodeHandler[apexNames.CATCH_BLOCK] = handleCatchBlock;
 nodeHandler[apexNames.FINALLY_BLOCK] = handleFinallyBlock;
 nodeHandler[apexNames.STATEMENT] = handleStatement;
 nodeHandler[apexNames.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
-nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
 nodeHandler[apexNames.ENUM_DECLARATION] = handleEnumDeclaration;
 nodeHandler[apexNames.SWITCH_STATEMENT] = handleSwitchStatement;
 nodeHandler[apexNames.VALUE_WHEN] = handleValueWhen;
@@ -1552,6 +1548,12 @@ nodeHandler[apexNames.ELSE_WHEN] = handleElseWhen;
 nodeHandler[apexNames.TYPE_WHEN] = handleTypeWhen;
 nodeHandler[apexNames.ENUM_CASE] = handleEnumCase;
 nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
+
+// Block Member
+nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
+nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
+nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
+nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
 
 // Expression
 nodeHandler[apexNames.TERNARY_EXPRESSION] = handleTernaryExpression;
