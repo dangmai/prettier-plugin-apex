@@ -57,6 +57,7 @@ module.exports = {
     LITERAL_CASE: "apex.jorje.data.ast.WhenCase$LiteralCase",
 
     // Block Member
+    FIELD_MEMBER: "apex.jorje.data.ast.BlockMember$FieldMember",
     STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
     METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
     INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",

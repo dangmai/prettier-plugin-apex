@@ -459,7 +459,12 @@ function handleFinallyBlock(path, print) {
 }
 
 function handleVariableDeclarations(path, print) {
+  const modifierDocs = path.map(print, "modifiers");
+
   const parts = [];
+  // Modifiers
+  parts.push(join("", modifierDocs));
+
   // Type
   parts.push(path.call(print, "type"));
   parts.push(" ");
@@ -1550,6 +1555,7 @@ nodeHandler[apexNames.ENUM_CASE] = handleEnumCase;
 nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 
 // Block Member
+nodeHandler[apexNames.FIELD_MEMBER] = _handlePassthroughCall("variableDecls");
 nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
 nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
