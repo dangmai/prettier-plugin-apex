@@ -2,20 +2,26 @@
 
 exports[`BlockMember.cls - apex-verify: BlockMember.cls 1`] = `
 class BlockMember {
-  String memberOne;
-  String anotherMember = 'Hello';
-  private transient String anotherMemberTwo;
-  static string anotherMemberThree;
-  String memberWithGetSet { get; set; }
-  String memberWithGetPrivateSet {
+  String fieldMemberOne;
+  String anotherFieldMember = 'Hello';
+  private transient String anotherFieldMemberTwo;
+  static string anotherFieldMemberThree;
+
+  String propertyMemberWithGetSet { get; set; }
+  public String propertyMemberWithGetPrivateSet {
     get {
       return 1;
     }
     private set;
   }
-  String memberWithSet {
+  String propertyMemberWithOnlySet {
     set {
       memberThree = value;
+    }
+  }
+  private String privatePropertyMemberWithOnlyGet {
+    get {
+      return 2;
     }
   }
 
@@ -41,23 +47,51 @@ class BlockMember {
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class BlockMember {
-  String memberOne;
+  String fieldMemberOne;
 
-  String anotherMember = 'Hello';
+  String anotherFieldMember = 'Hello';
 
-  String anotherMemberTwo;
+  private transient String anotherFieldMemberTwo;
 
-  string anotherMemberThree;
+  static string anotherFieldMemberThree;
+
+  String propertyMemberWithGetSet { get; set; }
+
+  public String propertyMemberWithGetPrivateSet {
+    get {
+      return 1;
+    }
+
+    private set;
+  }
+
+  String propertyMemberWithOnlySet {
+    set {
+      memberThree = value;
+    }
+  }
+
+  private String privatePropertyMemberWithOnlyGet {
+    get {
+      return 2;
+    }
+  }
 
   void method() {
     System.debug('method');
   }
 
   class StatementBlockMember {
-    System.debug('Statement Block Member');
+    {
+      System.debug('Statement Block Member');
+    }
 }
 
-  class StaticStatementBlockMember {}
+  class StaticStatementBlockMember {
+    static {
+      System.debug('Static Statement Block Member');
+    }
+}
 
   enum TestEnum {ONE, TWO}
 }
