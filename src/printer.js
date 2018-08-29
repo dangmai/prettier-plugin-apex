@@ -1573,9 +1573,6 @@ nodeHandler[apexNames.IF_ELSE_BLOCK] = handleIfElseBlock;
 nodeHandler[apexNames.IF_BLOCK] = handleIfBlock;
 nodeHandler[apexNames.ELSE_BLOCK] = handleElseBlock;
 nodeHandler[apexNames.EXPRESSION_STATEMENT] = handleExpressionStatement;
-nodeHandler[apexNames.ASSIGNMENT_OPERATION] = handleAssignmentOperation;
-nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
-nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
@@ -1598,8 +1595,6 @@ nodeHandler[apexNames.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
 nodeHandler[apexNames.FOR_ENHANCED_CONTROL] = handleForEnhancedControl;
 nodeHandler[apexNames.FOR_INITS] = handleForInits;
 nodeHandler[apexNames.FOR_INIT] = handleForInit;
-nodeHandler[apexNames.POSTFIX_OPERATOR] = handlePostfixOperator;
-nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
 nodeHandler[apexNames.BREAK_STATEMENT] = () => "break;";
 nodeHandler[apexNames.CONTINUE_STATEMENT] = () => "continue;";
 nodeHandler[apexNames.THROW_STATEMENT] = (path, print) => concat(["throw", " ", path.call(print, "expr"), ";"]);
@@ -1617,6 +1612,13 @@ nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
+
+// Operator
+nodeHandler[apexNames.ASSIGNMENT_OPERATOR] = handleAssignmentOperation;
+nodeHandler[apexNames.BINARY_OPERATOR] = handleBinaryOperation;
+nodeHandler[apexNames.BOOLEAN_OPERATOR] = handleBooleanOperation;
+nodeHandler[apexNames.POSTFIX_OPERATOR] = handlePostfixOperator;
+nodeHandler[apexNames.PREFIX_OPERATOR] = handlePrefixOperator;
 
 // Declaration
 nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;

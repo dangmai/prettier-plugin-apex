@@ -17,9 +17,6 @@ module.exports = {
     VARIABLE_DECLARATION_STATEMENT: "apex.jorje.data.ast.Stmnt$VariableDeclStmnt",
     VARIABLE_DECLARATIONS: "apex.jorje.data.ast.VariableDecls",
     NAME_VALUE_PARAMETER: "apex.jorje.data.ast.NameValueParameter",
-    BINARY_OPERATION: "apex.jorje.data.ast.BinaryOp",
-    ASSIGNMENT_OPERATION: "apex.jorje.data.ast.AssignmentOp",
-    BOOLEAN_OPERATION: "apex.jorje.data.ast.BooleanOp",
     IF_ELSE_BLOCK: "apex.jorje.data.ast.Stmnt$IfElseBlock",
     IF_BLOCK: "apex.jorje.data.ast.IfBlock",
     ELSE_BLOCK: "apex.jorje.data.ast.ElseBlock",
@@ -32,8 +29,6 @@ module.exports = {
     FOR_ENHANCED_CONTROL: "apex.jorje.data.ast.ForControl$EnhancedForControl",
     FOR_INITS: "apex.jorje.data.ast.ForInits",
     FOR_INIT: "apex.jorje.data.ast.ForInit",
-    POSTFIX_OPERATOR: "apex.jorje.data.ast.PostfixOp",
-    PREFIX_OPERATOR: "apex.jorje.data.ast.PrefixOp",
     BREAK_STATEMENT: "apex.jorje.data.ast.Stmnt$BreakStmnt",
     CONTINUE_STATEMENT: "apex.jorje.data.ast.Stmnt$ContinueStmnt",
     THROW_STATEMENT: "apex.jorje.data.ast.Stmnt$ThrowStmnt",
@@ -51,6 +46,13 @@ module.exports = {
     PROPERTY_DECLATION: "apex.jorje.data.ast.PropertyDecl",
     PROPERTY_GETTER: "apex.jorje.data.ast.PropertyGetter",
     PROPERTY_SETTER: "apex.jorje.data.ast.PropertySetter",
+
+    // Operators
+    BINARY_OPERATOR: "apex.jorje.data.ast.BinaryOp",
+    ASSIGNMENT_OPERATOR: "apex.jorje.data.ast.AssignmentOp",
+    BOOLEAN_OPERATOR: "apex.jorje.data.ast.BooleanOp",
+    POSTFIX_OPERATOR: "apex.jorje.data.ast.PostfixOp",
+    PREFIX_OPERATOR: "apex.jorje.data.ast.PrefixOp",
 
     // Declaration
     CLASS_DECLARATION: "apex.jorje.data.ast.ClassDecl",
