@@ -534,6 +534,31 @@ function handleNameValueParameter(path, print) {
   return concat(parts);
 }
 
+
+function handleThisMethodCallExpression(path, print) {
+  const parts = [];
+  parts.push("this");
+  parts.push("(");
+  parts.push(softline);
+  const paramDocs = path.map(print, "inputParameters");
+  parts.push(join(concat([",", line]), paramDocs));
+  parts.push(dedent(softline));
+  parts.push(")");
+  return groupIndentConcat(parts);
+}
+
+function handleSuperMethodCallExpression(path, print) {
+  const parts = [];
+  parts.push("super");
+  parts.push("(");
+  parts.push(softline);
+  const paramDocs = path.map(print, "inputParameters");
+  parts.push(join(concat([",", line]), paramDocs));
+  parts.push(dedent(softline));
+  parts.push(")");
+  return groupIndentConcat(parts);
+}
+
 function handleMethodCallExpression(path, print) {
   const parts = [];
   // Dotted expression
@@ -547,10 +572,12 @@ function handleMethodCallExpression(path, print) {
   parts.push(join(".", nameDocs));
   // Params
   parts.push("(");
+  parts.push(softline);
   const paramDocs = path.map(print, "inputParameters");
-  parts.push(join(", ", paramDocs));
+  parts.push(join(concat([",", line]), paramDocs));
+  parts.push(dedent(softline));
   parts.push(")");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleNestedExpression(path, print) {
@@ -1547,6 +1574,8 @@ nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
 nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () => "Package.Version.Request";  // Not sure what this is
 nodeHandler[apexNames.ARRAY_EXPRESSION] = handleArrayExpression;
 nodeHandler[apexNames.CLASS_REF_EXPRESSION] = (path, print) => concat([path.call(print, "type"), ".", "class"]);
+nodeHandler[apexNames.THIS_METHOD_CALL_EXPRESSION] = handleThisMethodCallExpression;
+nodeHandler[apexNames.SUPER_METHOD_CALL_EXPRESSION] = handleSuperMethodCallExpression;
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 
 // New Object Init

@@ -80,6 +80,8 @@ module.exports = {
     ARRAY_EXPRESSION: "apex.jorje.data.ast.Expr$ArrayExpr",
     SUPER_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$SuperVariableExpr",
     CLASS_REF_EXPRESSION: "apex.jorje.data.ast.Expr$ClassRefExpr",
+    THIS_METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$ThisMethodCallExpr",
+    SUPER_METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$SuperMethodCallExpr",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
 
     // New Object Init
