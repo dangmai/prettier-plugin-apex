@@ -1,18 +1,24 @@
 class BlockMember {
-  String memberOne;
-  String anotherMember = 'Hello';
-  private transient String anotherMemberTwo;
-  static string anotherMemberThree;
-  String memberWithGetSet { get; set; }
-  String memberWithGetPrivateSet {
+  String fieldMemberOne;
+  String anotherFieldMember = 'Hello';
+  private transient String anotherFieldMemberTwo;
+  static string anotherFieldMemberThree;
+
+  String propertyMemberWithGetSet { get; set; }
+  public String propertyMemberWithGetPrivateSet {
     get {
       return 1;
     }
     private set;
   }
-  String memberWithSet {
+  String propertyMemberWithOnlySet {
     set {
       memberThree = value;
+    }
+  }
+  private String privatePropertyMemberWithOnlyGet {
+    get {
+      return 2;
     }
   }
 
