@@ -2,7 +2,6 @@
 
 module.exports = {
   APEX_NAMES: {
-    CLASS_DECLARATION: "apex.jorje.data.ast.ClassDecl",
     TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
     LOCATION_IDENTIFIER: "apex.jorje.data.Identifiers$LocationIdentifier",
     PARSER_OUTPUT: "apex.jorje.semantic.compiler.parser.ParserOutput",
@@ -12,13 +11,11 @@ module.exports = {
     ANNOTATION: "apex.jorje.data.ast.Modifier$Annotation",
     ANNOTATION_KEY_VALUE: "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
     ANNOTATION_VALUE: "apex.jorje.data.ast.AnnotationValue",
-    METHOD_DECLARATION: "apex.jorje.data.ast.MethodDecl",
     EMPTY_MODIFIER_PARAMETER_REF: "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
     BLOCK_STATEMENT: "apex.jorje.data.ast.Stmnt$BlockStmnt",
     RETURN_STATEMENT: "apex.jorje.data.ast.Stmnt$ReturnStmnt",
     VARIABLE_DECLARATION_STATEMENT: "apex.jorje.data.ast.Stmnt$VariableDeclStmnt",
     VARIABLE_DECLARATIONS: "apex.jorje.data.ast.VariableDecls",
-    VARIABLE_DECLARATION: "apex.jorje.data.ast.VariableDecl",
     NAME_VALUE_PARAMETER: "apex.jorje.data.ast.NameValueParameter",
     BINARY_OPERATION: "apex.jorje.data.ast.BinaryOp",
     ASSIGNMENT_OPERATION: "apex.jorje.data.ast.AssignmentOp",
@@ -45,7 +42,6 @@ module.exports = {
     FINALLY_BLOCK: "apex.jorje.data.ast.FinallyBlock",
     STATEMENT: "apex.jorje.data.ast.Stmnt",
     DML_MERGE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlMergeStmnt",
-    ENUM_DECLARATION: "apex.jorje.data.ast.EnumDecl",
     SWITCH_STATEMENT: "apex.jorje.data.ast.Stmnt$SwitchStmnt",
     VALUE_WHEN: "apex.jorje.data.ast.WhenBlock$ValueWhen",
     ELSE_WHEN: "apex.jorje.data.ast.WhenBlock$ElseWhen",
@@ -56,10 +52,18 @@ module.exports = {
     PROPERTY_GETTER: "apex.jorje.data.ast.PropertyGetter",
     PROPERTY_SETTER: "apex.jorje.data.ast.PropertySetter",
 
+    // Declaration
+    CLASS_DECLARATION: "apex.jorje.data.ast.ClassDecl",
+    INTERFACE_DECLARATION: "apex.jorje.data.ast.InterfaceDecl",
+    METHOD_DECLARATION: "apex.jorje.data.ast.MethodDecl",
+    VARIABLE_DECLARATION: "apex.jorje.data.ast.VariableDecl",
+    ENUM_DECLARATION: "apex.jorje.data.ast.EnumDecl",
+
     // Compilation Unit
     CLASS_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$ClassDeclUnit",
     ENUM_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$EnumDeclUnit",
     TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
+    INTERFACE_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$InterfaceDeclUnit",
 
     // Block Member
     PROPERTY_MEMBER: "apex.jorje.data.ast.BlockMember$PropertyMember",

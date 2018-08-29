@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`InterfaceClass.cls - apex-verify: InterfaceClass.cls 1`] = `
+public interface OuterInterface extends ExtendedInterface {
+  void methodOne();
+  void methodTwo();
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+public interface OuterInterface extends ExtendedInterface {
+  void methodOne()
+
+  void methodTwo()
+}
+
+`;

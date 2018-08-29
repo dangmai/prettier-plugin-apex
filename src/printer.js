@@ -6,9 +6,8 @@ const {concat, join, hardline, line, softline, literalline, group, indent, deden
 const values = require("./values");
 const apexNames = values.APEX_NAMES;
 
-// TODO: Check the following places: CompilationUnit.class
-// for possible things that we've forgotten to implement
-// Already done: Stmnt.class, NewObject.class, Expr.class, BlockMember.class
+// Places we've looked into to make sure we're not forgetting to implement things:
+// Stmnt.class, NewObject.class, Expr.class, BlockMember.class, CompilationUnit.class
 
 // TODO make sure expression inside {} are consistent, right now Enum/List/Map/Set
 // init does not have spaces around them, while everything else does.
@@ -148,16 +147,61 @@ function handleTriggerDeclarationUnit(path, print) {
   return concat(parts);
 }
 
-function handleClassDeclaration(path, print) {
-  const parts = [];
+function handleInterfaceDeclaration(path, print) {
+  const superInterface = path.call(print, "superInterface", "value");
   const modifierDocs = path.map(print, "modifiers");
+  const memberParts = path.map(print, "members").filter(member => member);
+
+  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
+    if (index !== allMemberDocs.length - 1) {
+      return concat([memberDoc, hardline, hardline])
+    }
+    return memberDoc;
+  });
+
+  const parts = [];
+  if (modifierDocs.length > 0) {
+    parts.push(concat(modifierDocs));
+  }
+  parts.push("interface");
+  parts.push(" ");
+  parts.push(path.call(print, "name", "value"));
+  if (superInterface) {
+    parts.push(" ");
+    parts.push("extends");
+    parts.push(" ");
+    parts.push(superInterface);
+  }
+  parts.push(" ");
+  parts.push("{");
+  if(memberDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...memberDocs])));
+    parts.push(dedent(concat([hardline, "}"])));
+  } else {
+    parts.push("}");
+  }
+  return concat(parts);
+}
+
+function handleClassDeclaration(path, print) {
+  const superClass = path.call(print, "superClass", "value");
+  const modifierDocs = path.map(print, "modifiers");
+  const memberParts = path.map(print, "members").filter(member => member);
+
+  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
+    if (index !== allMemberDocs.length - 1) {
+      return concat([memberDoc, hardline, hardline])
+    }
+    return memberDoc;
+  });
+
+  const parts = [];
   if (modifierDocs.length > 0) {
     parts.push(concat(modifierDocs));
   }
   parts.push("class");
   parts.push(" ");
   parts.push(path.call(print, "name", "value"));
-  const superClass = path.call(print, "superClass", "value");
   if (superClass !== "") {
     parts.push(" ");
     parts.push("extends");
@@ -173,14 +217,6 @@ function handleClassDeclaration(path, print) {
   }
   parts.push(" ");
   parts.push("{");
-  const memberParts = path.map(print, "members").filter(member => member);
-
-  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
-    if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline, hardline])
-    }
-    return memberDoc;
-  });
   if(memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
     parts.push(dedent(concat([hardline, "}"])));
@@ -1542,16 +1578,13 @@ nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
 nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
-nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[apexNames.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
-nodeHandler[apexNames.METHOD_DECLARATION] = handleMethodDeclaration;
 nodeHandler[apexNames.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
 nodeHandler[apexNames.BLOCK_STATEMENT] = handleBlockStatement;
 nodeHandler[apexNames.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("variableDecls");
 nodeHandler[apexNames.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
-nodeHandler[apexNames.VARIABLE_DECLARATION] = handleVariableDeclaration;
 nodeHandler[apexNames.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
 nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
@@ -1575,7 +1608,6 @@ nodeHandler[apexNames.CATCH_BLOCK] = handleCatchBlock;
 nodeHandler[apexNames.FINALLY_BLOCK] = handleFinallyBlock;
 nodeHandler[apexNames.STATEMENT] = handleStatement;
 nodeHandler[apexNames.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
-nodeHandler[apexNames.ENUM_DECLARATION] = handleEnumDeclaration;
 nodeHandler[apexNames.SWITCH_STATEMENT] = handleSwitchStatement;
 nodeHandler[apexNames.VALUE_WHEN] = handleValueWhen;
 nodeHandler[apexNames.ELSE_WHEN] = handleElseWhen;
@@ -1586,10 +1618,18 @@ nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
 
-// Compilation Unit
+// Declaration
+nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
+nodeHandler[apexNames.INTERFACE_DECLARATION] = handleInterfaceDeclaration;
+nodeHandler[apexNames.METHOD_DECLARATION] = handleMethodDeclaration;
+nodeHandler[apexNames.VARIABLE_DECLARATION] = handleVariableDeclaration;
+nodeHandler[apexNames.ENUM_DECLARATION] = handleEnumDeclaration;
+
+// Compilation Unit: we're not handling AnonymousBlockUnit and InvalidDeclUnit
 nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
 nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
+nodeHandler[apexNames.INTERFACE_DECLARATION_UNIT] = _handlePassthroughCall("body");
 
 // Block Member
 nodeHandler[apexNames.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");
