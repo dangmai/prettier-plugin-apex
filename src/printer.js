@@ -1569,9 +1569,6 @@ nodeHandler[apexNames.BINARY_OPERATION] = handleBinaryOperation;
 nodeHandler[apexNames.BOOLEAN_OPERATION] = handleBooleanOperation;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
-nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
-nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
-nodeHandler[apexNames.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.CLASS_DECLARATION] = handleClassDeclaration;
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
@@ -1615,6 +1612,11 @@ nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
+
+// Compilation Unit
+nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
+nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
+nodeHandler[apexNames.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
 
 // Block Member
 nodeHandler[apexNames.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");

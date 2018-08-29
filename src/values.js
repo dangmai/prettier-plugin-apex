@@ -3,9 +3,6 @@
 module.exports = {
   APEX_NAMES: {
     CLASS_DECLARATION: "apex.jorje.data.ast.ClassDecl",
-    CLASS_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$ClassDeclUnit",
-    ENUM_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$EnumDeclUnit",
-    TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
     TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
     LOCATION_IDENTIFIER: "apex.jorje.data.Identifiers$LocationIdentifier",
     PARSER_OUTPUT: "apex.jorje.semantic.compiler.parser.ParserOutput",
@@ -58,6 +55,11 @@ module.exports = {
     PROPERTY_DECLATION: "apex.jorje.data.ast.PropertyDecl",
     PROPERTY_GETTER: "apex.jorje.data.ast.PropertyGetter",
     PROPERTY_SETTER: "apex.jorje.data.ast.PropertySetter",
+
+    // Compilation Unit
+    CLASS_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$ClassDeclUnit",
+    ENUM_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$EnumDeclUnit",
+    TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
 
     // Block Member
     PROPERTY_MEMBER: "apex.jorje.data.ast.BlockMember$PropertyMember",
