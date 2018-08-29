@@ -93,16 +93,16 @@ class SwitchClass {
         System.debug('January');
       }
       when FEBRUARY,
-          MARCH,
-          APRIL,
-          MAY,
-          JUNE,
-          JULY,
-          AUGUST,
-          SEPTEMBER,
-          OCTOBER,
-          NOVEMBER,
-          DECEMBER {
+        MARCH,
+        APRIL,
+        MAY,
+        JUNE,
+        JULY,
+        AUGUST,
+        SEPTEMBER,
+        OCTOBER,
+        NOVEMBER,
+        DECEMBER {
         System.debug('Other months');
       }
     }

@@ -240,10 +240,8 @@ function _handleStatementBlockMember(modifier) {
       parts.push(modifier);
       parts.push(" ");
     }
-    parts.push("{");
-    _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-    parts.push("}");
-    return groupIndentConcat(parts);
+    _pushIfExist(parts, statementDoc);
+    return concat(parts);
   };
 }
 
@@ -272,15 +270,11 @@ function _handlePropertyGetterSetter(action) {
     parts.push(action);
     if (statementDoc) {
       parts.push(" ");
-      parts.push("{");
-      parts.push(hardline);
       parts.push(statementDoc);
-      parts.push(dedent(hardline));
-      parts.push("}")
     } else {
       parts.push(";");
     }
-    return groupIndentConcat(parts);
+    return concat(parts);
   };
 }
 
@@ -304,10 +298,8 @@ function handleMethodDeclaration(path, print) {
   parts.push(")");
   parts.push(" ");
   // Body
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleEmptyModifierParameterRef(path, print) {
@@ -409,10 +401,8 @@ function handleValueWhen(path, print) {
   const whenCaseGroup = group(indent(join(concat([",", line]), whenCaseDocs)));
   parts.push(whenCaseGroup);
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleElseWhen(path, print) {
@@ -423,10 +413,8 @@ function handleElseWhen(path, print) {
   parts.push(" ");
   parts.push("else");
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleTypeWhen(path, print) {
@@ -439,10 +427,8 @@ function handleTypeWhen(path, print) {
   parts.push(" ");
   parts.push(path.call(print, "name"));
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleEnumCase(path, print) {
@@ -459,18 +445,21 @@ function handleRunAsBlock(path, print) {
   parts.push(join(concat([",", line]), paramDocs));
   parts.push(")");
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleBlockStatement(path, print) {
+  const parts = [];
+  parts.push("{");
   const statementDocs = path.map(print, "stmnts");
   if (statementDocs.length > 0) {
-    return join(hardline, statementDocs);
+    parts.push(hardline);
+    parts.push(join(hardline, statementDocs));
+    parts.push(dedent(hardline));
   }
-  return "";
+  parts.push("}");
+  return groupIndentConcat(parts);
 }
 
 function handleTryCatchFinallyBlock(path, print) {
@@ -481,16 +470,14 @@ function handleTryCatchFinallyBlock(path, print) {
   const parts = [];
   parts.push("try");
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, tryStatementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
+  _pushIfExist(parts, tryStatementDoc);
   if (catchBlockDocs.length > 0) {
     // Can't use _pushIfExist here because it doesn't check for Array type
     parts.push(" ");
-    parts.push(dedent(join(" ", catchBlockDocs)));
+    parts.push(join(" ", catchBlockDocs));
   }
-  _pushIfExist(parts, dedent(finallyBlockDoc), null, [" "]);
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, finallyBlockDoc, null, [" "]);
+  return concat(parts);
 }
 
 function handleCatchBlock(path, print) {
@@ -501,20 +488,16 @@ function handleCatchBlock(path, print) {
   parts.push(path.call(print, "parameter"));
   parts.push(")");
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, path.call(print, "stmnt"));
+  return concat(parts);
 }
 
 function handleFinallyBlock(path, print) {
   const parts = [];
   parts.push("finally");
   parts.push(" ");
-  parts.push("{");
-  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, path.call(print, "stmnt"));
+  return concat(parts);
 }
 
 function handleVariableDeclarations(path, print) {
@@ -793,10 +776,8 @@ function handleIfBlock(path, print) {
   parts.push(")");
   parts.push(" ");
   // Body block
-  parts.push("{");
-  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, path.call(print, "stmnt"));
+  return concat(parts);
 }
 
 function handleElseBlock(path, print) {
@@ -804,10 +785,8 @@ function handleElseBlock(path, print) {
   parts.push("else");
   parts.push(" ");
   // Body block
-  parts.push("{");
-  _pushIfExist(parts, path.call(print, "stmnt"), [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, path.call(print, "stmnt"));
+  return concat(parts);
 }
 
 function handleTernaryExpression(path, print) {
@@ -1426,10 +1405,8 @@ function handleWhileLoop(path, print) {
   parts.push(")");
   parts.push(" ");
   // Body
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleDoLoop(path, print) {
@@ -1439,9 +1416,7 @@ function handleDoLoop(path, print) {
   parts.push("do");
   parts.push(" ");
   // Body
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
+  _pushIfExist(parts, statementDoc);
   parts.push(" ");
   parts.push("while");
   parts.push(" ");
@@ -1450,7 +1425,7 @@ function handleDoLoop(path, print) {
   parts.push(path.call(print, "condition"));
   parts.push(")");
   parts.push(";");
-  return groupIndentConcat(parts);
+  return concat(parts);
 }
 
 function handleForLoop(path, print) {
@@ -1466,10 +1441,8 @@ function handleForLoop(path, print) {
   parts.push(")");
   parts.push(" ");
   // Body
-  parts.push("{");
-  _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
-  parts.push("}");
-  return groupIndentConcat(parts);
+  _pushIfExist(parts, statementDoc);
+  return concat(parts);
 }
 
 function handleForEnhancedControl(path, print) {
