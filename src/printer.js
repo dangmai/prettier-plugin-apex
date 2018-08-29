@@ -10,6 +10,9 @@ const apexNames = values.APEX_NAMES;
 // for possible things that we've forgotten to implement
 // Already done: Stmnt.class, NewObject.class, Expr.class
 
+// TODO make sure expression inside {} are consistent, right now Enum/List/Map/Set
+// init does not have spaces around them, while everything else does.
+
 function indentConcat(docs) {
   return indent(concat(docs));
 }
