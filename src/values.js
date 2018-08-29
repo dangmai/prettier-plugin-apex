@@ -63,6 +63,7 @@ module.exports = {
     PROPERTY_MEMBER: "apex.jorje.data.ast.BlockMember$PropertyMember",
     FIELD_MEMBER: "apex.jorje.data.ast.BlockMember$FieldMember",
     STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
+    STATIC_STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StaticStmntBlockMember",
     METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
     INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
     INNER_CLASS_MEMBER: "apex.jorje.data.ast.BlockMember$InnerClassMember",

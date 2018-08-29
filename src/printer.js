@@ -228,6 +228,22 @@ function handleArrayTypeRef(path, print) {
   return concat(parts);
 }
 
+function _handleStatementBlockMember(modifier) {
+  return function(path, print) {
+    const statementDoc = path.call(print, "stmnt");
+
+    const parts = [];
+    if (modifier) {
+      parts.push(modifier);
+      parts.push(" ");
+    }
+    parts.push("{");
+    _pushIfExist(parts, statementDoc, [dedent(hardline)], [hardline]);
+    parts.push("}");
+    return groupIndentConcat(parts);
+  };
+}
+
 function handlePropertyDeclaration(path, print) {
   const modifierDocs = path.map(print, "modifiers");
 
@@ -262,7 +278,7 @@ function _handlePropertyGetterSetter(action) {
       parts.push(";");
     }
     return groupIndentConcat(parts);
-  }
+  };
 }
 
 function handleMethodDeclaration(path, print) {
@@ -1600,7 +1616,8 @@ nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
 // Block Member
 nodeHandler[apexNames.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");
 nodeHandler[apexNames.FIELD_MEMBER] = _handlePassthroughCall("variableDecls");
-nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] =_handlePassthroughCall("stmnt");
+nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMember();
+nodeHandler[apexNames.STATIC_STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMember("static");
 nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
 nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
