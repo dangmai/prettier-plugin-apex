@@ -22,4 +22,6 @@ class SharingClass {
 
   }
   with sharing class WithSharingClass {}
+
+  inherited sharing class InheritedSharingClass {}
 }

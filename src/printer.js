@@ -1410,7 +1410,11 @@ function handleUpdateStatsOption(childClass) {
 }
 
 function handleModifier(childClass) {
-  return concat([values.MODIFIER[childClass], " "]);
+  const modifierValue = values.MODIFIER[childClass] || '';
+  if (!modifierValue) {
+    console.warn(`Modifier ${childClass} is not supported!`);
+  }
+  return concat([modifierValue, " "]);
 }
 
 function handlePostfixExpression(path, print) {

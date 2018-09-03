@@ -25,6 +25,8 @@ class SharingClass {
 
   }
   with sharing class WithSharingClass {}
+
+  inherited sharing class InheritedSharingClass {}
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class SharingClass {
@@ -41,6 +43,8 @@ class SharingClass {
   without sharing class WithoutSharingClass {}
 
   with sharing class WithSharingClass {}
+
+  inherited sharing class InheritedSharingClass {}
 }
 
 `;
