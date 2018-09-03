@@ -14,7 +14,7 @@
   "license": "MIT",
   "devDependencies": {
     "jest": "^23.5.0",
-    "prettier": "prettier/prettier"
+    "prettier": "^1.14.2"
   },
   "peerDependencies": {
     "prettier": "^1.14.2"
