@@ -39,6 +39,11 @@ class SOQLClass {
 
   }
 
+  void limitBinds() {
+    Integer numRows = 5;
+    Contact[] contacts = [SELECT ID FROM Contact LIMIT :numRows OFFSET :numRows];
+  }
+
   void escapeSoql() {
     Contact[] reservedKeywords = [
       SELECT Id
@@ -221,6 +226,16 @@ class SOQLClass {
       SELECT Id
       FROM Contact
       WHERE (Id IN (SELECT Id FROM Contact) AND Account.Id != null)
+    ];
+  }
+
+  void limitBinds() {
+    Integer numRows = 5;
+    Contact[] contacts = [
+      SELECT ID
+      FROM Contact
+      LIMIT :numRows
+      OFFSET :numRows
     ];
   }
 
