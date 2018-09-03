@@ -803,6 +803,9 @@ function handleIfElseBlock(path, print) {
 }
 
 function handleIfBlock(path, print) {
+  const statementType = path.call(print, "stmnt", "@class");
+  const statementDoc = path.call(print, "stmnt");
+
   const parts = [];
   parts.push("if");
   parts.push(" ");
@@ -810,9 +813,13 @@ function handleIfBlock(path, print) {
   parts.push("(");
   parts.push(path.call(print, "expr"));
   parts.push(")");
-  parts.push(" ");
   // Body block
-  _pushIfExist(parts, path.call(print, "stmnt"));
+  if (statementType === apexNames.BLOCK_STATEMENT) {
+    parts.push(" ");
+    _pushIfExist(parts, path.call(print, "stmnt"));
+  } else {
+    _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
+  }
   return concat(parts);
 }
 

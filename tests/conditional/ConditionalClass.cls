@@ -22,6 +22,8 @@ class Conditional {
       c = 0;
     }
 
+    if (a > b) c = a;
+
     if (true && (false || false)) {
       System.debug('false');
     }
