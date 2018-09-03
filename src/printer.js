@@ -642,24 +642,23 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
-  const parts = [];
-  // Dotted expression
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
-  if (dottedExpressionDoc) {
-    parts.push(dottedExpressionDoc);
-    parts.push(".");
-  }
-  // Method call chain
   const nameDocs = path.map(print, "names");
-  parts.push(join(".", nameDocs));
-  // Params
-  parts.push("(");
-  parts.push(softline);
   const paramDocs = path.map(print, "inputParameters");
-  parts.push(join(concat([",", line]), paramDocs));
-  parts.push(dedent(softline));
-  parts.push(")");
-  return groupIndentConcat(parts);
+
+  const chainParts = [];
+  const paramParts = [];
+  // Dotted expression
+  _pushIfExist(chainParts, dottedExpressionDoc, ["."]);
+  // Method call chain
+  chainParts.push(indentConcat([softline, join(concat([".", softline]), nameDocs)]));
+  // Params
+  paramParts.push("(");
+  paramParts.push(softline);
+  paramParts.push(join(concat([",", line]), paramDocs));
+  paramParts.push(dedent(softline));
+  paramParts.push(")");
+  return groupConcat([...chainParts, groupConcat(paramParts)]);
 }
 
 function handleNestedExpression(path, print) {
