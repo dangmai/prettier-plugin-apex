@@ -1658,6 +1658,7 @@ nodeHandler[apexNames.STATIC_STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMemb
 nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
 nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
+nodeHandler[apexNames.INNER_INTERFACE_MEMBER] = _handlePassthroughCall("body");
 
 // Expression
 nodeHandler[apexNames.TERNARY_EXPRESSION] = handleTernaryExpression;

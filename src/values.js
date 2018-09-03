@@ -75,6 +75,7 @@ module.exports = {
     METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
     INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
     INNER_CLASS_MEMBER: "apex.jorje.data.ast.BlockMember$InnerClassMember",
+    INNER_INTERFACE_MEMBER: "apex.jorje.data.ast.BlockMember$InnerInterfaceMember",
 
     // Expression
     METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",

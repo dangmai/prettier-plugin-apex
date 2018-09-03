@@ -93,6 +93,10 @@ class BlockMember {
     }
 }
 
+  interface InnerInterface {
+    void interfaceMethod()
+}
+
   enum TestEnum {ONE, TWO}
 }
 
