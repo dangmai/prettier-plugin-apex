@@ -1781,6 +1781,7 @@ function genericPrint(path, options, print) {
       return nodeHandler[parentClass](childClass, path, print, options);
     }
   }
+  console.warn(`No handler found for ${apexClass}`);
 
   return "";
 }
