@@ -85,7 +85,8 @@ class LoopClass {
 class LoopClass {
   void forLoop() {
     Integer count = 0;
-    for (Integer i = 0; i < 10; i++) System.debug(i);
+    for (Integer i = 0; i < 10; i++)
+      System.debug(i);
     for (count = 0; count < 10; count++) {
       System.debug(count);
     }
@@ -119,7 +120,8 @@ class LoopClass {
 
   void whileLoop() {
     Integer i = 0;
-    while (i < 10) i++;
+    while (i < 10)
+      i++;
     while (i < 10) {
       System.debug(i);
       i++;
