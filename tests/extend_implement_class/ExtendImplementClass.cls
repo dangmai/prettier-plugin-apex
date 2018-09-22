@@ -11,4 +11,8 @@ class ExtendImplementClass extends FirstExtend implements FirstImplement, Second
   global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {
 
   }
+
+  public override Integer compareTo(Object anotherObject) {
+
+  }
 }

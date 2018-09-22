@@ -14,6 +14,10 @@ class ExtendImplementClass extends FirstExtend implements FirstImplement, Second
   global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {
 
   }
+
+  public override Integer compareTo(Object anotherObject) {
+
+  }
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ExtendImplementClass extends FirstExtend implements FirstImplement, SecondImplement {
@@ -22,6 +26,8 @@ class ExtendImplementClass extends FirstExtend implements FirstImplement, Second
   private abstract class AbstractImplementInnerClass implements FirstImplement {}
 
   global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {}
+
+  public override Integer compareTo(Object anotherObject) {}
 }
 
 `;

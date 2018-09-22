@@ -265,6 +265,7 @@ module.exports = {
     WithoutSharingModifier: "without sharing",
     WithSharingModifier: "with sharing",
     InheritedSharingModifier: "inherited sharing",
+    OverrideModifier: "override",
   },
   DATA_CATEGORY: {
     DataCategoryAt: "AT",
