@@ -4,7 +4,8 @@
   "description": "Salesforce Apex plugin for Prettier",
   "main": "src",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "execute": "./tools/run.sh"
   },
   "keywords": [
     "apex",
