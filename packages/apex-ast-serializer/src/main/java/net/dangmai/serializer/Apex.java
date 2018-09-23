@@ -20,6 +20,7 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.util.*;
+import java.util.logging.LogManager;
 
 public class Apex {
     private static void setUpXStream(XStream xstream, int mode) {
@@ -28,6 +29,10 @@ public class Apex {
     }
 
     public static void main(String[] args) throws ParseException, IOException {
+        // Disable logging, otherwise jorje puts logs onto stderr,
+        // which makes the calling code thinks that something is wrong
+        LogManager.getLogManager().reset();
+
         Options cliOptions = new Options();
         cliOptions.addOption("a", "anonymous", false, "Parse Anonymous Apex code. If not specify, it will be parsed in Named mode.");
         cliOptions.addOption("f", "format", true, "Format of the output. Possible options: json, xml.");
