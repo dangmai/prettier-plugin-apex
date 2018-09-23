@@ -47,6 +47,7 @@ function prettyprint(src, filename, options) {
     Object.assign(
       {
         filepath: filename,
+        serverAutoStart: false,
       },
       options
     )

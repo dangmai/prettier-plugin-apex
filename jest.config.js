@@ -10,5 +10,7 @@ module.exports = {
   testPathIgnorePatterns: [],
   collectCoverage: ENABLE_COVERAGE,
   collectCoverageFrom: ["src/**/*.js", "!<rootDir>/node_modules/"],
-  transform: {}
+  transform: {},
+  globalSetup: "<rootDir>/tests_config/set_up.js",
+  globalTeardown: "<rootDir>/tests_config/tear_down.js",
 };
