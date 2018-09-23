@@ -15,6 +15,7 @@ repositories {
         dirs 'libs'
     }
     mavenCentral()
+    maven { url "https://jitpack.io" }
 }
 
 run {
@@ -36,8 +37,8 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
 
-    // https://mvnrepository.com/artifact/com.martiansoftware/nailgun-server
-    implementation group: 'com.martiansoftware', name: 'nailgun-server', version: '0.9.1'
+    // Using master for nailgun since it fixes stdin issue
+    implementation 'com.github.facebook.nailgun:nailgun-server:master'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
