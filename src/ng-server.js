@@ -24,6 +24,7 @@ async function start(address, port) {
     }
   });
 
+  // TODO right now this is littering the stderr from server with EOFException
   await waitOnPromise({
     resources: [
       `tcp:${address}:${port}`,
