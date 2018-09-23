@@ -7,5 +7,6 @@ set -euxo pipefail
 # - Path to directory contains Apex Code
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 PLUGIN_DIR="$(dirname "$CURRENT_DIR")"
-echo $PLUGIN_DIR
-prettier --plugin="${PLUGIN_DIR}" --write "${1}/**/*.{trigger,cls}"
+node "${CURRENT_DIR}/../tests_config/set_up.js" &
+prettier --plugin="${PLUGIN_DIR}" --server-auto-start=false --write "${1}/**/*.{trigger,cls}"
+node "${CURRENT_DIR}/../tests_config/tear_down.js"
