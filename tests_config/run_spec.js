@@ -7,7 +7,7 @@ const prettier = require("prettier");
 function run_spec(dirname, parsers, options) {
   options = Object.assign(
     {
-      plugins: ["."]
+      plugins: ["."],
     },
     options
   );
@@ -46,7 +46,7 @@ function prettyprint(src, filename, options) {
     src,
     Object.assign(
       {
-        filepath: filename
+        filepath: filename,
       },
       options
     )

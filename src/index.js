@@ -39,8 +39,30 @@ const printers = {
   }
 };
 
+const options = {
+  serverAutoStart: {
+    type: "boolean",
+    category: "Global",
+    default: true,
+    description: "Whether the nailgun server should be autostarted",
+  },
+  serverPort: {
+    type: "number",
+    category: "Global",
+    default: 2113,
+    description: "Nailgun server port",
+  },
+  serverHost: {
+    type: "string",
+    category: "Global",
+    default: "localhost",
+    description: "Nailgun server host",
+  },
+};
+
 module.exports = {
   languages,
   printers,
   parsers,
+  options,
 };

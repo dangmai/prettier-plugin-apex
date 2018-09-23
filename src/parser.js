@@ -1,29 +1,27 @@
 "use strict";
 
-const spawnSync = require("child_process").spawnSync;
+const childProcess = require("child_process");
 const path = require("path");
 
 const apexNames = require("./values").APEX_NAMES;
 
-function parseText(text) {
-  let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
-  if (process.platform === "win32") {
-    serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
-  } else {
-    serializerBin = path.join(serializerBin, "apex-ast-serializer");
+function parseText(text, options) {
+  const runClientLocation = path.join(__dirname, "run_client.js");
+  const args = [runClientLocation, "-a", options.serverHost, "-p", options.serverPort];
+  if (options.serverAutoStart) {
+    args.push("-s")
   }
-  const executionResult = spawnSync(
-    serializerBin,
-    ["-f", "json", "-i"],
+  const executionResult = childProcess.spawnSync(
+    process.argv[0],
+    args,
     {
       input: text
     },
   );
 
-  const executionError = executionResult.error;
-
-  if (executionError) {
-    throw executionError;
+  if (executionResult.status) {
+    const executionError = executionResult.stderr.toString();
+    throw new Error(executionError);
   }
 
   return executionResult;
@@ -50,13 +48,11 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-function parse(text) {
-  const executionResult = parseText(text);
-
+function parse(text, _, options) {
+  const executionResult = parseText(text, options);
   const res = executionResult.stdout.toString();
   let ast = {};
   if (res) {
-    // console.log(res);
     ast = JSON.parse(res);
     if (ast[apexNames.PARSER_OUTPUT] && ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0) {
       const errors = ast[apexNames.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);

@@ -5,6 +5,8 @@
   "main": "src",
   "scripts": {
     "test": "jest",
+    "start-server": "./vendor/apex-ast-serializer/bin/apex-ast-serializer",
+    "start-server-win": "./vendor/apex-ast-serializer/bin/apex-ast-serializer.bat",
     "execute": "./tools/run.sh"
   },
   "keywords": [
@@ -20,5 +22,10 @@
   "peerDependencies": {
     "prettier": "^1.14.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "node-nailgun-client": "^0.1.0",
+    "temp": "^0.8.3",
+    "wait-on": "^3.0.1",
+    "yargs": "^12.0.2"
+  }
 }
