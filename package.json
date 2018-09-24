@@ -7,7 +7,7 @@
     "test": "jest",
     "start-server": "node tests_config/set_up.js",
     "stop-server": "node tests_config/tear_down.js",
-    "execute": "./tools/run.sh",
+    "execute": "./tools/execute.sh",
     "execute:windows": "tools\\execute.bat"
   },
   "keywords": [
