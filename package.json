@@ -5,9 +5,10 @@
   "main": "src",
   "scripts": {
     "test": "jest",
-    "start-server": "./vendor/apex-ast-serializer/bin/apex-ast-serializer",
-    "start-server-win": "./vendor/apex-ast-serializer/bin/apex-ast-serializer.bat",
-    "execute": "./tools/run.sh"
+    "start-server": "node tests_config/set_up.js",
+    "stop-server": "node tests_config/tear_down.js",
+    "execute": "./tools/run.sh",
+    "execute:windows": "tools\\execute.bat"
   },
   "keywords": [
     "apex",
