@@ -281,10 +281,10 @@ class Conditional extends Object {
     SomeObject o = new SomeObject();
     String result = o.callMethod().getStringResult();
     String longResult = o.callMethod(
-          'first param',
-          'second param',
-          'thirdParam'
-        ).callAnotherMethod().getStringResult();
+      'first param',
+      'second param',
+      'thirdParam'
+    ).callAnotherMethod().getStringResult();
   }
 
   void javaMethodCallExpression_notNeeded() {}

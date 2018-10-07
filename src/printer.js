@@ -677,18 +677,19 @@ function handleMethodCallExpression(path, print) {
     dottedExpressionParts.push(".");
   }
   parts.push(
-    groupIndentConcat([
+    groupConcat([
       ...dottedExpressionParts,
       groupConcat([
         // Method call chain
-        dottedExpressionDoc ? softline : "",
-        join(concat(".", softline), nameDocs),
+        join(".", nameDocs),
         "(",
-        groupConcat([
-          paramDocs.length > 0 ? softline: "",
-          join(concat([",", line]), paramDocs),
-          dedent(softline),
-        ]),
+        paramDocs.length > 0
+          ? groupIndentConcat([
+            softline,
+            join(concat([",", line]), paramDocs),
+            dedent(softline),
+          ])
+          : "",
         ")",
       ]),
     ]),

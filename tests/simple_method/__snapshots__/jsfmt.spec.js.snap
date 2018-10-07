@@ -41,6 +41,7 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
     controller.addFields(
       new String[]{'Very_Long_SObject_Chain__r.An_Inner_SObject__r.Name', 'Another_Long_SObject_Chain__r.Name'}
     );
+    ((SObject) a).get('Very_Long_Field_Name__c').subString(0, 5).escapeHtml4().escapeEcmaScript().escapeJava().escapeUnicode();
   }
 
   @InvocableMethod(label='Insert Accounts' description='Inserts the accounts specified and returns the IDs of the new accounts.')
@@ -94,6 +95,10 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
         'Another_Long_SObject_Chain__r.Name'
       }
     );
+    ((SObject) a).get('Very_Long_Field_Name__c').subString(
+      0,
+      5
+    ).escapeHtml4().escapeEcmaScript().escapeJava().escapeUnicode();
   }
 
   @InvocableMethod(label='Insert Accounts' description='Inserts the accounts specified and returns the IDs of the new accounts.')
