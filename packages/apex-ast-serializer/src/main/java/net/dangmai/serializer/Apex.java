@@ -1,14 +1,9 @@
 package net.dangmai.serializer;
 
+import apex.jorje.data.Locations;
 import apex.jorje.semantic.ast.compilation.*;
 import apex.jorje.semantic.ast.visitor.AdditionalPassScope;
 import apex.jorje.semantic.ast.visitor.AstVisitor;
-import apex.jorje.semantic.common.EmptySymbolProvider;
-import apex.jorje.semantic.common.TestAccessEvaluator;
-import apex.jorje.semantic.common.TestQueryValidators;
-import apex.jorje.semantic.compiler.ApexCompiler;
-import apex.jorje.semantic.compiler.CodeUnit;
-import apex.jorje.semantic.compiler.CompilationInput;
 import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
@@ -78,22 +73,11 @@ public class Apex {
             } else {
                 engine = ParserEngine.get(ParserEngine.Type.NAMED);
             }
+            Locations.useIndexFactory();  // without this, comments won't be retained correctly
             ParserOutput output = engine.parse(
                     sourceFile,
                     ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS
             );
-            CompilationInput compilationInput = new CompilationInput(
-                    Arrays.asList(sourceFile),
-                    EmptySymbolProvider.get(),
-                    new TestAccessEvaluator(),
-                    new TestQueryValidators.Noop(),
-                    new TopLevelVisitor()
-            );
-            ApexCompiler compiler = ApexCompiler.builder()
-                    .setInput(compilationInput)
-                    .setHiddenTokenBehavior(ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS)
-                    .build();
-            List<CodeUnit> codeUnits = compiler.compile();
 
             // Serializing the output
             int mode;
