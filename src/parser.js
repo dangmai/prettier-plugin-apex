@@ -73,6 +73,9 @@ function getLineIndexes(sourceCode) {
   let lineIndex = 2;
   while (characterIndex < sourceCode.length) {
     const eolIndex = sourceCode.indexOf("\n", characterIndex);
+    if (eolIndex < 0) {
+      break;
+    }
     lineIndexes[lineIndex] = lineIndexes[lineIndex - 1] + sourceCode.substring(characterIndex, eolIndex).length + 1;
     characterIndex = eolIndex + 1;
     lineIndex ++;
