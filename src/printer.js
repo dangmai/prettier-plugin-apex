@@ -248,6 +248,26 @@ function handleAnnotationKeyValue(path, print) {
   return concat(parts);
 }
 
+function handleAnnotationValue(childClass, path, print) {
+  const parts = [];
+  switch (childClass) {
+    case "TrueAnnotationValue":
+      parts.push("true");
+      break;
+    case "FalseAnnotationValue":
+      parts.push("false");
+      break;
+    case "StringAnnotationValue":
+      parts.push("'");
+      parts.push(path.call(print, "value"));
+      parts.push("'");
+      break;
+    default:
+      parts.push("");
+  }
+  return concat(parts);
+}
+
 function handleClassTypeRef(path, print) {
   const parts = [];
   parts.push(join(".", path.map(print, "names")));
@@ -1605,7 +1625,7 @@ nodeHandler[apexNames.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[apexNames.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
 nodeHandler[apexNames.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
-nodeHandler[apexNames.ANNOTATION_VALUE] = (childClass) => values.ANNOTATION_VALUE[childClass];
+nodeHandler[apexNames.ANNOTATION_VALUE] = handleAnnotationValue;
 nodeHandler[apexNames.MODIFIER] = handleModifier;
 nodeHandler[apexNames.RUN_AS_BLOCK] = handleRunAsBlock;
 nodeHandler[apexNames.DO_LOOP] = handleDoLoop;

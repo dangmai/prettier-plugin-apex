@@ -245,10 +245,6 @@ module.exports = {
     QueryAnd: "AND",
     QueryOr: "OR",
   },
-  ANNOTATION_VALUE: {
-    TrueAnnotationValue: "true",
-    FalseAnnotationValue: "false",
-  },
   MODIFIER: {
     PublicModifier: "public",
     PrivateModifier: "private",

@@ -32,6 +32,11 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
     Boolean b = true;
     Boolean a = true || ((true && b) && (true || false));
   }
+
+  @InvocableMethod(label='Insert Accounts' description='Inserts the accounts specified and returns the IDs of the new accounts.')
+  public static List<ID> insertAccounts(List<Account> accounts) {
+    return null;
+  }
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface {
@@ -66,6 +71,11 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
   void simpleBooleanExpressions() {
     Boolean b = true;
     Boolean a = true || ((true && b) && (true || false));
+  }
+
+  @InvocableMethod(label='Insert Accounts', description='Inserts the accounts specified and returns the IDs of the new accounts.')
+  public static List<ID> insertAccounts(List<Account> accounts) {
+    return null;
   }
 }
 
