@@ -32,6 +32,12 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
 
   void longMethodCall() {
     VeryLongOuterClassNameExtension.InnerWrapperClassName innerClass = new VeryLongOuterClassNameExtension.InnerWrapperClassName();
+    controller.addFields(
+      new String[]{'Very_Long_SObject_Chain__r.An_Inner_SObject__r.Name'}
+    );
+    controller.addFields(
+      new String[]{'Very_Long_SObject_Chain__r.An_Inner_SObject__r.Name', 'Another_Long_SObject_Chain__r.Name'}
+    );
   }
 
   @InvocableMethod(label='Insert Accounts' description='Inserts the accounts specified and returns the IDs of the new accounts.')

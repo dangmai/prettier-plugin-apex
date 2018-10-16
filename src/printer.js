@@ -668,19 +668,30 @@ function handleMethodCallExpression(path, print) {
   const nameDocs = path.map(print, "names");
   const paramDocs = path.map(print, "inputParameters");
 
-  const chainParts = [];
-  const paramParts = [];
-  // Dotted expression
-  _pushIfExist(chainParts, dottedExpressionDoc, ["."]);
-  // Method call chain
-  chainParts.push(indentConcat([softline, join(concat([".", softline]), nameDocs)]));
-  // Params
-  paramParts.push("(");
-  paramParts.push(softline);
-  paramParts.push(join(concat([",", line]), paramDocs));
-  paramParts.push(dedent(softline));
-  paramParts.push(")");
-  return groupConcat([...chainParts, groupConcat(paramParts)]);
+  const parts = [];
+  const dottedExpressionParts = [];
+  if (dottedExpressionDoc) {
+    dottedExpressionParts.push(dottedExpressionDoc);
+    dottedExpressionParts.push(".");
+  }
+  parts.push(
+    groupIndentConcat([
+      ...dottedExpressionParts,
+      groupConcat([
+        // Method call chain
+        dottedExpressionDoc ? softline : "",
+        join(concat(".", softline), nameDocs),
+        "(",
+        groupConcat([
+          paramDocs.length > 0 ? softline: "",
+          join(concat([",", line]), paramDocs),
+          dedent(softline),
+        ]),
+        ")",
+      ]),
+    ]),
+  );
+  return groupConcat(parts);
 }
 
 function handleNestedExpression(path, print) {
