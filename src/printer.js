@@ -740,13 +740,24 @@ function handleNewSetLiteral(path, print) {
 
 function handleNewListInit(path, print) {
   // TODO is there a way to preserve the user choice of List<> or []?
+
+  // All of these are correct:
+  // Id[] ids = new Id[]{};
+  // Id[] ids = new Id[1];
+  // Id[] ids = new Id[anotherIds];
+  // But this is not correct:
+  // Id[] ids = new Id[1]{};
+  const expressionDoc = path.call(print, "expr", "value");
   const parts = [];
   // Type
   parts.push(join(".", path.map(print, "types")));
   // Param
   parts.push("[");
-  parts.push(path.call(print, "expr", "value"));
+  parts.push(expressionDoc);
   parts.push("]");
+  if (!expressionDoc) {
+    parts.push("{}");
+  }
   return concat(parts);
 }
 

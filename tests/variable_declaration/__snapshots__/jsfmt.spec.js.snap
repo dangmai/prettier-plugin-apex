@@ -25,7 +25,7 @@ public class VariableDeclaration {
   public void declareVariables() {
     String firstString, secondString;
     String a = 'aaa', b = 'bbb';
-    List<UnknownClass.InnerClass> nestedList = new UnknownClass.InnerClass[];
+    List<UnknownClass.InnerClass> nestedList = new UnknownClass.InnerClass[]{};
     String veryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'tada',
       anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'a';
     String c = 'c';
@@ -36,8 +36,8 @@ public class VariableDeclaration {
     String[] anotherStringArray = new String[]{'a', 'b'};
     List<String> anotherArray = new String[1];
     String[] emptyStrings;
-    String[] otherStrings = new String[];
-    List<List<String>> listOfList = new List<String>[];
+    String[] otherStrings = new String[]{};
+    List<List<String>> listOfList = new List<String>[]{};
   }
 }
 

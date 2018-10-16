@@ -46,7 +46,7 @@ class NewObject {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class NewObject {
   void newListTest() {
-    List<String> a = new String[];
+    List<String> a = new String[]{};
     List<String> aCopy = new String[a];
     List<String> b = new String[]{};
     String[] c = new String[]{};
