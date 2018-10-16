@@ -40,6 +40,13 @@ async function stop(address, port) {
   };
 
   const nail = nailgunClient.exec("ng-stop", [], options);
+  nail.socket.on("error", function (err) {
+    // For some reason on Windows ECONNABORTED gets thrown when we write to
+    // the socket, even though the command runs successfully.
+    if (err.code !== "ECONNABORTED") {
+      throw err;
+    }
+  });
 
   await waitOnPromise({
     resources: [
