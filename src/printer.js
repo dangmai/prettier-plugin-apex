@@ -233,7 +233,7 @@ function handleAnnotation(path, print) {
   const parameterDocs = path.map(print, "parameters");
   if (parameterDocs.length > 0) {
     parts.push("(");
-    parts.push(join(", ", parameterDocs));
+    parts.push(join(" ", parameterDocs));
     parts.push(")");
   }
   parts.push(hardline);
