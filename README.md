@@ -21,7 +21,7 @@ A lot is already supported.
 git clone https://github.com/dangmai/prettier-plugin-apex.git
 cd prettier-plugin-apex
 npm i
-npm run execute -- /path/to/apex/dir
+npm run execute -- prettify /path/to/apex/dir
 ```
 
 ### License
