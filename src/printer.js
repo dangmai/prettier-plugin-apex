@@ -352,9 +352,11 @@ function handleMethodDeclaration(path, print) {
   parts.push("(");
   parts.push(join(", ", parameterDocs));
   parts.push(")");
-  parts.push(" ");
   // Body
-  _pushIfExist(parts, statementDoc);
+  _pushIfExist(parts, statementDoc, null, [" "]);
+  if (!statementDoc) {
+    parts.push(";");
+  }
   return concat(parts);
 }
 
