@@ -6,6 +6,8 @@ class NewObject {
     String[] c = new String[]{};
     String[] d = new String[]{'a', 'b'};
     String[] e = new String[]{'Long string number one', 'Long string number two'};
+    String[] f = new String[1];
+    String[] g = new String[f];
   }
 
   void newSetTest() {
