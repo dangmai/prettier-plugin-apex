@@ -30,6 +30,10 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
     Boolean a = true || ((true && b) && (true || false));
   }
 
+  void longMethodCall() {
+    VeryLongOuterClassNameExtension.InnerWrapperClassName innerClass = new VeryLongOuterClassNameExtension.InnerWrapperClassName();
+  }
+
   @InvocableMethod(label='Insert Accounts' description='Inserts the accounts specified and returns the IDs of the new accounts.')
   public static List<ID> insertAccounts(List<Account> accounts) {
     return null;

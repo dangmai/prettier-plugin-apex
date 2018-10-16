@@ -598,15 +598,17 @@ function handleVariableDeclaration(path, print) {
 }
 
 function handleNewStandard(path, print) {
+  const paramDocs = path.map(print, "inputParameters");
   const parts = [];
   // Type
   parts.push(path.call(print, "type"));
   // Params
   parts.push("(");
-  parts.push(softline);
-  const paramDocs = path.map(print, "inputParameters");
-  parts.push(join(concat([",", line]), paramDocs));
-  parts.push(dedent(softline));
+  if (paramDocs.length > 0) {
+    parts.push(softline);
+    parts.push(join(concat([",", line]), paramDocs));
+    parts.push(dedent(softline));
+  }
   parts.push(")");
   return groupIndentConcat(parts);
 }
