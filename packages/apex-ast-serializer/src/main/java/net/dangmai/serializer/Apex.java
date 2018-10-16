@@ -1,5 +1,14 @@
 package net.dangmai.serializer;
 
+import apex.jorje.semantic.ast.compilation.*;
+import apex.jorje.semantic.ast.visitor.AdditionalPassScope;
+import apex.jorje.semantic.ast.visitor.AstVisitor;
+import apex.jorje.semantic.common.EmptySymbolProvider;
+import apex.jorje.semantic.common.TestAccessEvaluator;
+import apex.jorje.semantic.common.TestQueryValidators;
+import apex.jorje.semantic.compiler.ApexCompiler;
+import apex.jorje.semantic.compiler.CodeUnit;
+import apex.jorje.semantic.compiler.CompilationInput;
 import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
@@ -69,7 +78,22 @@ public class Apex {
             } else {
                 engine = ParserEngine.get(ParserEngine.Type.NAMED);
             }
-            ParserOutput output = engine.parse(sourceFile);
+            ParserOutput output = engine.parse(
+                    sourceFile,
+                    ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS
+            );
+            CompilationInput compilationInput = new CompilationInput(
+                    Arrays.asList(sourceFile),
+                    EmptySymbolProvider.get(),
+                    new TestAccessEvaluator(),
+                    new TestQueryValidators.Noop(),
+                    new TopLevelVisitor()
+            );
+            ApexCompiler compiler = ApexCompiler.builder()
+                    .setInput(compilationInput)
+                    .setHiddenTokenBehavior(ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS)
+                    .build();
+            List<CodeUnit> codeUnits = compiler.compile();
 
             // Serializing the output
             int mode;
@@ -169,6 +193,33 @@ public class Apex {
                 context.convertAnother(item);
                 writer.endNode();
             }
+        }
+    }
+    private static class TopLevelVisitor extends AstVisitor<AdditionalPassScope> {
+        Compilation topLevel;
+
+        public Compilation getTopLevel() {
+            return topLevel;
+        }
+
+        @Override
+        public void visitEnd(UserClass node, AdditionalPassScope scope) {
+            topLevel = node;
+        }
+
+        @Override
+        public void visitEnd(UserEnum node, AdditionalPassScope scope) {
+            topLevel = node;
+        }
+
+        @Override
+        public void visitEnd(UserInterface node, AdditionalPassScope scope) {
+            topLevel = node;
+        }
+
+        @Override
+        public void visitEnd(UserTrigger node, AdditionalPassScope scope) {
+            topLevel = node;
         }
     }
 }
