@@ -48,43 +48,7 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-// For each node, the jorje compiler gives us its line and its index within
-// that line; however we use this method to resolve that line index to a global
-// index of that node within the source code. That allows us to use prettier
-// utility methods.
-function resolveLineIndexes(node, lineIndexes) {
-  const nodeLoc = node["loc"];
-  if (nodeLoc) {
-    nodeLoc["startIndex"] = lineIndexes[nodeLoc["line"]] + nodeLoc["column"];
-  }
-  Object.keys(node).forEach(key => {
-    if (typeof node[key] === "object") {
-      node[key] = resolveLineIndexes(node[key], lineIndexes);
-    }
-  });
-  return node;
-}
-
-// Get a map of line number to the index of its first character
-function getLineIndexes(sourceCode) {
-  // First line always start with index 0
-  const lineIndexes = {1: 0};
-  let characterIndex = 0;
-  let lineIndex = 2;
-  while (characterIndex < sourceCode.length) {
-    const eolIndex = sourceCode.indexOf("\n", characterIndex);
-    if (eolIndex < 0) {
-      break;
-    }
-    lineIndexes[lineIndex] = lineIndexes[lineIndex - 1] + sourceCode.substring(characterIndex, eolIndex).length + 1;
-    characterIndex = eolIndex + 1;
-    lineIndex ++;
-  }
-  return lineIndexes;
-}
-
 function parse(sourceCode, _, options) {
-  const lineIndexes = getLineIndexes(sourceCode);
   const executionResult = parseText(sourceCode, options);
   const serializedAst = executionResult.stdout.toString();
   let ast = {};
@@ -95,7 +59,6 @@ function parse(sourceCode, _, options) {
       throw new Error(errors.join("\r\n"));
     }
     ast = resolveAstReferences(ast, {});
-    ast = resolveLineIndexes(ast, lineIndexes);
   }
   return ast;
 }
