@@ -65,7 +65,7 @@ trigger myAccountTrigger on Account(
         }
       } else {
         if (Trigger.isInsert) {
-          List<Contact> contacts = new Contact[]{};
+          List<Contact> contacts = new List<Contact>();
           for (Account a: Trigger.new) {
             if (a.Name == 'makeContact') {
               System.debug('Make Contact');

@@ -112,7 +112,7 @@ class LoopClass {
     ]) {
       System.debug(a);
     }
-    Contact[] contacts = new Contact[]{};
+    Contact[] contacts = new List<Contact>{};
     for (Contact a: contacts) {
       System.debug(a);
     }

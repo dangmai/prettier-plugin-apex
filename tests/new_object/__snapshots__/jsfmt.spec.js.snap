@@ -48,17 +48,17 @@ class NewObject {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class NewObject {
   void newListTest() {
-    List<String> a = new String[]{};
-    List<String> aCopy = new String[a];
-    List<String> b = new String[]{};
-    String[] c = new String[]{};
-    String[] d = new String[]{'a', 'b'};
-    String[] e = new String[]{
+    List<String> a = new List<String>();
+    List<String> aCopy = new List<String>a;
+    List<String> b = new List<String>{};
+    String[] c = new List<String>{};
+    String[] d = new List<String>{'a', 'b'};
+    String[] e = new List<String>{
       'Long string number one',
       'Long string number two'
     };
-    String[] f = new String[1];
-    String[] g = new String[f];
+    String[] f = new List<String>1;
+    String[] g = new List<String>f;
   }
 
   void newSetTest() {
@@ -82,8 +82,8 @@ class NewObject {
       'Long string key two' => 'Long string value two'
     };
     Map<String, String[]> d = new Map<String, String[]>{
-      'a' => new String[]{'a', 'b'},
-      'b' => new String[]{'c', 'd'}
+      'a' => new List<String>{'a', 'b'},
+      'b' => new List<String>{'c', 'd'}
     };
   }
 

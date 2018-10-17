@@ -740,8 +740,16 @@ function handleNewSetLiteral(path, print) {
 }
 
 function handleNewListInit(path, print) {
-  // TODO is there a way to preserve the user choice of List<> or []?
+  // Technically there are 2 ways to declare new list:
+  // - new String[]{};
+  // - new List<String>{};
+  // We use the 2nd format because it can handle any type of new list, e.g.
+  // This is correct:
+  // List<List<String>> data = new List<List<String>>{};
+  // But this is not:
+  // List<List<String>> data = new List<String>[]{};
 
+  // Other quirks:
   // All of these are correct:
   // Id[] ids = new Id[]{};
   // Id[] ids = new Id[1];
@@ -751,13 +759,13 @@ function handleNewListInit(path, print) {
   const expressionDoc = path.call(print, "expr", "value");
   const parts = [];
   // Type
+  parts.push("List<");
   parts.push(join(".", path.map(print, "types")));
+  parts.push(">");
   // Param
-  parts.push("[");
   parts.push(expressionDoc);
-  parts.push("]");
   if (!expressionDoc) {
-    parts.push("{}");
+    parts.push("()");
   }
   return concat(parts);
 }
@@ -816,9 +824,9 @@ function handleNewListLiteral(path, print) {
 
   const parts = [];
   // Type
+  parts.push("List<");
   parts.push(join(".", path.map(print, "types")));
-  // Param
-  parts.push("[]");
+  parts.push(">");
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
