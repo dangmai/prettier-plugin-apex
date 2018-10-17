@@ -7,6 +7,7 @@ import apex.jorje.semantic.compiler.parser.ParserOutput;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
+import com.thoughtworks.xstream.converters.collections.TreeMapConverter;
 import com.thoughtworks.xstream.core.ClassLoaderReference;
 import com.thoughtworks.xstream.core.util.CompositeClassLoader;
 import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
@@ -27,6 +28,7 @@ public class Apex {
     private static void setUpXStream(XStream xstream, int mode) {
         xstream.setMode(mode);
         xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
+        xstream.registerConverter(new CustomTreeMapConverter(xstream.getMapper()));
     }
 
     public static void main(String[] args) throws ParseException, IOException {
@@ -149,11 +151,11 @@ public class Apex {
 
     // Custom Collection Converter to inject the class attribute on the collection elements
     static class CustomCollectionConverter extends CollectionConverter {
-        private static final Class SINGLETON_LIST = Collections.singletonList(Boolean.TRUE).getClass();
-        private static final Class SINGLETON_SET = Collections.singleton(Boolean.TRUE).getClass();
+        CustomItemWriter itemWriter;
 
         public CustomCollectionConverter(Mapper mapper) {
             super(mapper);
+            this.itemWriter = new CustomItemWriter(mapper());
         }
 
         @Override
@@ -162,13 +164,36 @@ public class Apex {
         }
 
         protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
+            this.itemWriter.writeItem(item, context, writer);
+        }
+    }
+    // Custom Collection Converter to inject the class attribute on the collection elements
+    static class CustomTreeMapConverter extends TreeMapConverter {
+        CustomItemWriter itemWriter;
+
+        public CustomTreeMapConverter(Mapper mapper) {
+            super(mapper);
+            this.itemWriter = new CustomItemWriter(mapper());
+        }
+
+        protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
+            this.itemWriter.writeItem(item, context, writer);
+        }
+    }
+
+    static class CustomItemWriter {
+        private Mapper mapper;
+        public CustomItemWriter(Mapper mapper) {
+            this.mapper = mapper;
+        }
+        public void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
             // Copied from AbstractCollectionConverter
             if (item == null) {
-                String name = mapper().serializedClass(null);
+                String name = mapper.serializedClass(null);
                 ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, Mapper.Null.class);
                 writer.endNode();
             } else {
-                String name = mapper().serializedClass(item.getClass());
+                String name = mapper.serializedClass(item.getClass());
                 ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, item.getClass());
                 writer.addAttribute("class", name);
                 context.convertAnother(item);
