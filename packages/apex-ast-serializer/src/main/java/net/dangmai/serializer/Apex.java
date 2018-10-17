@@ -1,9 +1,6 @@
 package net.dangmai.serializer;
 
 import apex.jorje.data.Locations;
-import apex.jorje.semantic.ast.compilation.*;
-import apex.jorje.semantic.ast.visitor.AdditionalPassScope;
-import apex.jorje.semantic.ast.visitor.AstVisitor;
 import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserEngine;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
@@ -177,33 +174,6 @@ public class Apex {
                 context.convertAnother(item);
                 writer.endNode();
             }
-        }
-    }
-    private static class TopLevelVisitor extends AstVisitor<AdditionalPassScope> {
-        Compilation topLevel;
-
-        public Compilation getTopLevel() {
-            return topLevel;
-        }
-
-        @Override
-        public void visitEnd(UserClass node, AdditionalPassScope scope) {
-            topLevel = node;
-        }
-
-        @Override
-        public void visitEnd(UserEnum node, AdditionalPassScope scope) {
-            topLevel = node;
-        }
-
-        @Override
-        public void visitEnd(UserInterface node, AdditionalPassScope scope) {
-            topLevel = node;
-        }
-
-        @Override
-        public void visitEnd(UserTrigger node, AdditionalPassScope scope) {
-            topLevel = node;
         }
     }
 }
