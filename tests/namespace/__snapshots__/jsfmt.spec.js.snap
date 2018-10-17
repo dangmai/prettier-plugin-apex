@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Namespace.cls - apex-verify: Namespace.cls 1`] = `
+class Namespace {
+  void simpleNamespaceTests() {
+    System.System.debug('Hello');
+
+    SampleNamespace__TestObject__c a = new SampleNamespace__TestObject__c();
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class Namespace {
+  void simpleNamespaceTests() {
+    System.System.debug('Hello');
+    SampleNamespace__TestObject__c a = new SampleNamespace__TestObject__c();
+  }
+}
+
+`;
