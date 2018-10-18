@@ -48,10 +48,24 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
+function resolveLocations(node, locationMap) {
+  const nodeLoc = node["location"] || node["loc"];
+  if (nodeLoc) {
+    locationMap.set(nodeLoc, node);
+  }
+  Object.keys(node).forEach(key => {
+    if (typeof node[key] === "object") {
+      resolveLocations(node[key], locationMap);
+    }
+  });
+}
+
 function parse(sourceCode, _, options) {
   const executionResult = parseText(sourceCode, options);
   const serializedAst = executionResult.stdout.toString();
   let ast = {};
+  const locationMap = new Map();
+  let locations;
   if (serializedAst) {
     ast = JSON.parse(serializedAst);
     if (ast[apexNames.PARSER_OUTPUT] && ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0) {
@@ -59,6 +73,15 @@ function parse(sourceCode, _, options) {
       throw new Error(errors.join("\r\n"));
     }
     ast = resolveAstReferences(ast, {});
+    resolveLocations(ast, locationMap);
+    locations = Array.from(locationMap.keys());
+    locations.sort((first, second) => {
+      const startIndexDiff = first.startIndex - second.startIndex;
+      if (startIndexDiff !== 0) {
+        return startIndexDiff;
+      }
+      return first.endIndex - second.endIndex;
+    });
   }
   return ast;
 }
