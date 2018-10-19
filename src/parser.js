@@ -37,7 +37,6 @@ function resolveAstReferences(node, referenceMap) {
   }
   if (nodeReference) {
     // If it has a reference attribute, that means it's a leaf node
-    // Also, copy over the attributes from the current node to the reference node.
     return referenceMap[nodeReference];
   }
   Object.keys(node).forEach(key => {
@@ -46,6 +45,65 @@ function resolveAstReferences(node, referenceMap) {
     }
   });
   return node;
+}
+
+// Here we generate metadata about whitespaces for statement nodes
+function generateExtraMetadata(node, emptyLineLocations) {
+  const apexClass = node["@class"];
+  if (apexClass && node.loc) {
+    const separatorIndex = apexClass.indexOf("$");
+    if (separatorIndex !== -1) {
+      const parentClass = apexClass.substring(0, separatorIndex);
+      const nextEmptyLine = emptyLineLocations.indexOf(node.loc.endLine + 1);
+      if (parentClass === apexNames.STATEMENT && nextEmptyLine !== -1) {
+        node.trailingEmptyLine = true;
+        // There's a chance that multiple statements exist on 1 line,
+        // so we only want to tag one of them as having a trailing empty line.
+        // We do that by removing the empty line location from the list.
+        emptyLineLocations.splice(nextEmptyLine, 1);
+      }
+    }
+  }
+  Object.keys(node).forEach(key => {
+    if (typeof node[key] === "object") {
+      generateExtraMetadata(node[key], emptyLineLocations);
+    }
+  });
+}
+
+
+// For each node, the jorje compiler gives us its line and its index within
+// that line; however we use this method to resolve that line index to a global
+// index of that node within the source code. That allows us to use prettier
+// utility methods.
+function resolveLineIndexes(node, lineIndexes) {
+  const nodeLoc = node.loc;
+  if (nodeLoc) {
+    nodeLoc.endLine = lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;
+  }
+  Object.keys(node).forEach(key => {
+    if (typeof node[key] === "object") {
+      node[key] = resolveLineIndexes(node[key], lineIndexes);
+    }
+  });
+  return node;
+}
+// Get a map of line number to the index of its first character
+function getLineIndexes(sourceCode) {
+  // First line always start with index 0
+  const lineIndexes = [0, 0];
+  let characterIndex = 0;
+  let lineIndex = 2;
+  while (characterIndex < sourceCode.length) {
+    const eolIndex = sourceCode.indexOf("\n", characterIndex);
+    if (eolIndex < 0) {
+      break;
+    }
+    lineIndexes[lineIndex] = lineIndexes[lineIndex - 1] + sourceCode.substring(characterIndex, eolIndex).length + 1;
+    characterIndex = eolIndex + 1;
+    lineIndex ++;
+  }
+  return lineIndexes;
 }
 
 function resolveLocations(node, locationMap) {
@@ -61,46 +119,21 @@ function resolveLocations(node, locationMap) {
 }
 
 
-// Get a map of line number to the index of its first character
-function getLineIndexes(sourceCode) {
-  // First line always start with index 0
-  const lineIndexes = {1: 0};
-  let characterIndex = 0;
-  let lineIndex = 2;
-  while (characterIndex < sourceCode.length) {
-    const eolIndex = sourceCode.indexOf("\n", characterIndex);
-    if (eolIndex < 0) {
-      break;
-    }
-    lineIndexes[lineIndex] = lineIndexes[lineIndex - 1] + sourceCode.substring(characterIndex, eolIndex).length + 1;
-    characterIndex = eolIndex + 1;
-    lineIndex ++;
-  }
-  return lineIndexes;
-}
-
 function getEmptyLineLocations(sourceCode) {
   const whiteSpaceRegEx = /^\s*$/;
   const lines = sourceCode.split('\n');
-  const lineIndexes = getLineIndexes(sourceCode);
   return lines
     .map(line => whiteSpaceRegEx.test(line))
     .reduce((accumulator, currentValue, currentIndex) => {
-      const lineNumber = currentIndex + 1;
       if (currentValue) {
-        accumulator.push({
-          column: 0,
-          line: lineNumber,
-          startIndex: lineIndexes[lineNumber],
-          endIndex: lineIndexes[lineNumber] + lines[currentIndex].length + 1,
-        });
+        accumulator.push(currentIndex + 1);
       }
       return accumulator;
     }, []);
 }
 
 function parse(sourceCode, _, options) {
-  const emptyLineIndexes = getEmptyLineLocations(sourceCode);
+  const lineIndexes = getLineIndexes(sourceCode);
   const executionResult = parseText(sourceCode, options);
   const serializedAst = executionResult.stdout.toString();
   let ast = {};
@@ -113,6 +146,8 @@ function parse(sourceCode, _, options) {
       throw new Error(errors.join("\r\n"));
     }
     ast = resolveAstReferences(ast, {});
+    ast = resolveLineIndexes(ast, lineIndexes);
+    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode));
     resolveLocations(ast, locationMap);
     locations = Array.from(locationMap.keys());
     locations.sort((first, second) => {

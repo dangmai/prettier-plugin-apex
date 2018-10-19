@@ -154,7 +154,7 @@ function handleInterfaceDeclaration(path, print) {
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline, hardline])
+      return concat([memberDoc, hardline])
     }
     return memberDoc;
   });
@@ -190,7 +190,7 @@ function handleClassDeclaration(path, print) {
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline, hardline])
+      return concat([memberDoc, hardline])
     }
     return memberDoc;
   });
@@ -1832,14 +1832,30 @@ function genericPrint(path, options, print) {
     return "";
   }
   if (apexClass in nodeHandler) {
-    return nodeHandler[apexClass](path, print, options);
+    let doc = nodeHandler[apexClass](path, print, options);
+    if (n.trailingEmptyLine) {
+      doc = concat([doc, hardline]);
+    }
+    return doc;
   }
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
     const childClass = apexClass.substring(separatorIndex + 1);
     if (parentClass in nodeHandler) {
-      return nodeHandler[parentClass](childClass, path, print, options);
+      let doc = nodeHandler[parentClass](childClass, path, print, options);
+      // TODO for some reason VariableDeclStmnt does not have a location
+      // associated with them. We'll have to deal with them separately.
+
+      // TODO some statement types liek While statement only holds the location
+      // of the keyword (e.g. "while"), which screws up our calculation.
+
+      // TODO when 2 statements are on 1 line, we're adding 2 trailing lines
+      // at the moment.
+      if (parentClass === apexNames.STATEMENT && n.trailingEmptyLine) {
+        doc = concat([doc, hardline]);
+      }
+      return doc;
     }
   }
   console.warn(`No handler found for ${apexClass}`);
