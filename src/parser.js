@@ -60,7 +60,47 @@ function resolveLocations(node, locationMap) {
   });
 }
 
+
+// Get a map of line number to the index of its first character
+function getLineIndexes(sourceCode) {
+  // First line always start with index 0
+  const lineIndexes = {1: 0};
+  let characterIndex = 0;
+  let lineIndex = 2;
+  while (characterIndex < sourceCode.length) {
+    const eolIndex = sourceCode.indexOf("\n", characterIndex);
+    if (eolIndex < 0) {
+      break;
+    }
+    lineIndexes[lineIndex] = lineIndexes[lineIndex - 1] + sourceCode.substring(characterIndex, eolIndex).length + 1;
+    characterIndex = eolIndex + 1;
+    lineIndex ++;
+  }
+  return lineIndexes;
+}
+
+function getEmptyLineLocations(sourceCode) {
+  const whiteSpaceRegEx = /^\s*$/;
+  const lines = sourceCode.split('\n');
+  const lineIndexes = getLineIndexes(sourceCode);
+  return lines
+    .map(line => whiteSpaceRegEx.test(line))
+    .reduce((accumulator, currentValue, currentIndex) => {
+      const lineNumber = currentIndex + 1;
+      if (currentValue) {
+        accumulator.push({
+          column: 0,
+          line: lineNumber,
+          startIndex: lineIndexes[lineNumber],
+          endIndex: lineIndexes[lineNumber] + lines[currentIndex].length + 1,
+        });
+      }
+      return accumulator;
+    }, []);
+}
+
 function parse(sourceCode, _, options) {
+  const emptyLineIndexes = getEmptyLineLocations(sourceCode);
   const executionResult = parseText(sourceCode, options);
   const serializedAst = executionResult.stdout.toString();
   let ast = {};
