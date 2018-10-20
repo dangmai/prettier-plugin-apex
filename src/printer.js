@@ -1808,6 +1808,13 @@ nodeHandler[apexNames.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
 nodeHandler[apexNames.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WHERE[childClass];
 
+function handleTrailingEmptyLines(doc, node) {
+  if (node.trailingEmptyLine && !node.isLastNode) {
+    doc = concat([doc, hardline]);
+  }
+  return doc;
+}
+
 function genericPrint(path, options, print) {
   const n = path.getValue();
   if (typeof n === "number" || typeof n === "boolean") {
@@ -1833,10 +1840,7 @@ function genericPrint(path, options, print) {
   }
   if (apexClass in nodeHandler) {
     let doc = nodeHandler[apexClass](path, print, options);
-    if (n.trailingEmptyLine) {
-      doc = concat([doc, hardline]);
-    }
-    return doc;
+    return handleTrailingEmptyLines(doc, n);
   }
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
@@ -1844,18 +1848,7 @@ function genericPrint(path, options, print) {
     const childClass = apexClass.substring(separatorIndex + 1);
     if (parentClass in nodeHandler) {
       let doc = nodeHandler[parentClass](childClass, path, print, options);
-      // TODO for some reason VariableDeclStmnt does not have a location
-      // associated with them. We'll have to deal with them separately.
-
-      // TODO some statement types liek While statement only holds the location
-      // of the keyword (e.g. "while"), which screws up our calculation.
-
-      // TODO when 2 statements are on 1 line, we're adding 2 trailing lines
-      // at the moment.
-      if (parentClass === apexNames.STATEMENT && n.trailingEmptyLine) {
-        doc = concat([doc, hardline]);
-      }
-      return doc;
+      return handleTrailingEmptyLines(doc, n)
     }
   }
   console.warn(`No handler found for ${apexClass}`);

@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = {
+const values = {
   APEX_NAMES: {
     TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
     LOCATION_IDENTIFIER: "apex.jorje.data.Identifiers$LocationIdentifier",
@@ -36,6 +36,11 @@ module.exports = {
     CATCH_BLOCK: "apex.jorje.data.ast.CatchBlock",
     FINALLY_BLOCK: "apex.jorje.data.ast.FinallyBlock",
     STATEMENT: "apex.jorje.data.ast.Stmnt",
+    DML_INSERT_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlInsertStmnt",
+    DML_UPDATE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlUpdateStmnt",
+    DML_UPSERT_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlUpsertStmnt",
+    DML_DELETE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlDeleteStmnt",
+    DML_UNDELETE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlUndeleteStmnt",
     DML_MERGE_STATEMENT: "apex.jorje.data.ast.Stmnt$DmlMergeStmnt",
     SWITCH_STATEMENT: "apex.jorje.data.ast.Stmnt$SwitchStmnt",
     VALUE_WHEN: "apex.jorje.data.ast.WhenBlock$ValueWhen",
@@ -280,3 +285,21 @@ module.exports = {
     AFTER_UNDELETE: "after undelete",
   }
 };
+
+values["ALLOW_TRAILING_WHITESPACE"] = [
+  values.APEX_NAMES.BLOCK_STATEMENT,
+  values.APEX_NAMES.EXPRESSION_STATEMENT,
+  values.APEX_NAMES.DML_INSERT_STATEMENT,
+  values.APEX_NAMES.DML_UPDATE_STATEMENT,
+  values.APEX_NAMES.DML_UPSERT_STATEMENT,
+  values.APEX_NAMES.DML_DELETE_STATEMENT,
+  values.APEX_NAMES.DML_UNDELETE_STATEMENT,
+  values.APEX_NAMES.DML_MERGE_STATEMENT,
+  values.APEX_NAMES.VARIABLE_DECLARATION_STATEMENT,
+  values.APEX_NAMES.RETURN_STATEMENT,
+  values.APEX_NAMES.THROW_STATEMENT,
+  values.APEX_NAMES.BREAK_STATEMENT,
+  values.APEX_NAMES.CONTINUE_STATEMENT,
+];
+
+module.exports = values;

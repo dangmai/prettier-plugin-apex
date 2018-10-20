@@ -3,7 +3,8 @@
 const childProcess = require("child_process");
 const path = require("path");
 
-const apexNames = require("./values").APEX_NAMES;
+const values = require("./values");
+const apexNames = values.APEX_NAMES;
 
 function parseText(text, options) {
   const runClientLocation = path.join(__dirname, "run_client.js");
@@ -47,28 +48,52 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-// Here we generate metadata about whitespaces for statement nodes
-function generateExtraMetadata(node, emptyLineLocations) {
+// Here we generate metadata about empty lines for statement nodes
+function generateExtraMetadata(node, emptyLineLocations, emptyLineNodeMap) {
   const apexClass = node["@class"];
+  let lastNodeLoc;
+  Object.keys(node).forEach(key => {
+    if (typeof node[key] === "object") {
+      if (Array.isArray(node) && key == node.length - 1) {
+        node[key].isLastNode = true;  // So that we don't apply trailing empty line after this node
+      }
+      const nodeLoc = generateExtraMetadata(node[key], emptyLineLocations, emptyLineNodeMap);
+      if (nodeLoc && (!lastNodeLoc || nodeLoc.endIndex > lastNodeLoc.endIndex)) {
+        lastNodeLoc = nodeLoc;  // We keep track of the last node location for VariableDeclStmnt
+      }
+    }
+  });
+
+  if (apexClass === apexNames.VARIABLE_DECLARATION_STATEMENT && lastNodeLoc) {
+    // Pretend that the last node location is the location of the Variable
+    // Declaration Statement, since jorje doesn't give that information to us
+    node.loc = lastNodeLoc;
+  }
   if (apexClass && node.loc) {
-    const separatorIndex = apexClass.indexOf("$");
-    if (separatorIndex !== -1) {
-      const parentClass = apexClass.substring(0, separatorIndex);
-      const nextEmptyLine = emptyLineLocations.indexOf(node.loc.endLine + 1);
-      if (parentClass === apexNames.STATEMENT && nextEmptyLine !== -1) {
-        node.trailingEmptyLine = true;
-        // There's a chance that multiple statements exist on 1 line,
-        // so we only want to tag one of them as having a trailing empty line.
-        // We do that by removing the empty line location from the list.
-        emptyLineLocations.splice(nextEmptyLine, 1);
+    const nextEmptyLine = emptyLineLocations.indexOf(node.loc.endLine + 1);
+    if (values.ALLOW_TRAILING_WHITESPACE.includes(apexClass) && nextEmptyLine !== -1) {
+      node.trailingEmptyLine = true;
+      // There's a chance that multiple statements exist on 1 line,
+      // so we only want to tag one of them as having a trailing empty line.
+      // We do that by applying the trailing empty line only after the last node.
+      // e.g. `if (a === 1) {} else {}\n\n`,the empty line should be applied
+      // after the `else`, not the `if`. We keep track of which
+      // nodes have trailingEmptyLine turned on for a certain line, then turn
+      // it off for all but the last one.
+      if (emptyLineNodeMap[node.loc.endLine] && emptyLineNodeMap[node.loc.endLine].loc.endIndex > node.loc.endIndex) {
+        node.trailingEmptyLine = false;
+      } else {
+        if (emptyLineNodeMap[node.loc.endLine]) {
+          emptyLineNodeMap[node.loc.endLine].trailingEmptyLine = false;
+        }
+        emptyLineNodeMap[node.loc.endLine] = node;
       }
     }
   }
-  Object.keys(node).forEach(key => {
-    if (typeof node[key] === "object") {
-      generateExtraMetadata(node[key], emptyLineLocations);
-    }
-  });
+  if (lastNodeLoc) {
+    return lastNodeLoc;
+  }
+  return node.loc;
 }
 
 
@@ -147,7 +172,7 @@ function parse(sourceCode, _, options) {
     }
     ast = resolveAstReferences(ast, {});
     ast = resolveLineIndexes(ast, lineIndexes);
-    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode));
+    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), {});
     resolveLocations(ast, locationMap);
     locations = Array.from(locationMap.keys());
     locations.sort((first, second) => {

@@ -12,7 +12,7 @@ It is actively being worked on, and definitely not ready to be run on production
 
 * Priority right now is to support all AST elements from compiler.
 A lot is already supported.
-* Currently not working: SOSL, comments, white spaces.
+* Currently not working: SOSL, comments.
 * Formatting needs a lot of work.
 
 ## How to run
