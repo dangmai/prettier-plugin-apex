@@ -159,10 +159,43 @@ class EmptyLine {
     }
   }
 
-  void multipleStatementsOneLine() {
+  void complicatedStatements() {
     Integer a = 1;
     if (a == 1) {} else if (a == 2) {} else {}
 
+
+    if (a == 1) {
+
+    } else if (a == 2) {
+
+    } else {
+
+    }
+
+    try {
+
+    } catch (Exception e) {
+
+    } finally {
+
+    }
+
+    for (String a: listA) {
+
+    }
+    while (i < 5) {
+
+    }
+    do {
+
+    } while (i < 5);
+
+
+    do {
+
+    }
+
+    while (i < 5);
 
     System.debug();
   }
