@@ -131,7 +131,6 @@ class DMLClass {
         new Account(Name = 'Inner Acme Four')
       };
   }
-
   void updateTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
     Account account = new Account(Id = accountId, Name = 'Acme');
@@ -147,7 +146,6 @@ class DMLClass {
         new Account(Id = accountId, Name = 'Inner Acme Four')
       };
   }
-
   void upsertWithoutOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
     Account account = new Account(Id = accountId, Name = 'Acme');
@@ -163,7 +161,6 @@ class DMLClass {
         new Account(Id = accountId, Name = 'Inner Acme Four')
       };
   }
-
   void upsertWithOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
     Account account = new Account(
@@ -185,7 +182,6 @@ class DMLClass {
       }
       Account.Fields.External_Id__c;
   }
-
   void deleteTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
     Account account = new Account(Id = accountId, Name = 'Acme');
@@ -201,7 +197,6 @@ class DMLClass {
         new Account(Id = accountId, Name = 'Inner Acme Four')
       };
   }
-
   void undeleteTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1 ALL ROWS].Id;
     Id[] accountIds = new List<Id>{accountId};
@@ -220,7 +215,6 @@ class DMLClass {
         new Account(Id = accountId, Name = 'Inner Acme Four')
       };
   }
-
   void mergeTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
     Id[] accountIds = new List<Id>{accountId};
@@ -234,6 +228,7 @@ class DMLClass {
     merge account accounts;
     merge account accountId;
     merge account accountIds;
+
     merge new Account(Id = accountId, Name = 'Acme One')
       new Account(Id = accountId, Name = 'Acme Two');
     merge new Account(Id = accountId, Name = 'Acme One')
