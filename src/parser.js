@@ -60,6 +60,7 @@ function resolveAstReferences(node, referenceMap) {
  */
 function generateEndIndexForNode(node, sourceCode, lineIndexes) {
   switch (node["@class"]) {
+    case apexNames.PROPERTY_MEMBER:
     case apexNames.SWITCH_STATEMENT:
       node.lastNodeLoc.endIndex = sourceCode.indexOf("}", node.lastNodeLoc.endIndex);
       node.lastNodeLoc.endLine = lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;

@@ -1,4 +1,15 @@
 class EmptyLine {
+  String a;
+
+  String b;
+
+  String a {
+    get {
+
+    }
+  }
+  String a { get {} }
+
   enum NUMBER {ONE, TWO}
 
   enum NUMBER {
