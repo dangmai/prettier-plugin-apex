@@ -5,6 +5,9 @@ class BlockMember {
   static string anotherFieldMemberThree;
 
   String propertyMemberWithGetSet { get; set; }
+  String propertyMemberWithGet { get {} }
+  String propertyMemberWithSet { set {} }
+
   public String propertyMemberWithGetPrivateSet {
     get {
       return 1;

@@ -297,8 +297,8 @@ class EmptyLine {
 
   String b;
 
-  String a { get {}}
-  String a { get {}}
+  String a { get {} }
+  String a { get {} }
 
   enum NUMBER {ONE, TWO}
 

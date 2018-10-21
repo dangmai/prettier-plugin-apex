@@ -303,6 +303,8 @@ function _handleStatementBlockMember(modifier) {
 
 function handlePropertyDeclaration(path, print) {
   const modifierDocs = path.map(print, "modifiers");
+  const getterDoc = path.call(print, "getter", "value");
+  const setterDoc = path.call(print, "setter", "value");
 
   const parts = [];
   parts.push(join("", modifierDocs));
@@ -311,8 +313,18 @@ function handlePropertyDeclaration(path, print) {
   parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("{");
-  _pushIfExist(parts, path.call(print, "getter", "value"), [dedent(softline)], [line]);
-  _pushIfExist(parts, path.call(print, "setter", "value"), [dedent(line)], [line]);
+  if (getterDoc || setterDoc) {
+    parts.push(line);
+  }
+  if (getterDoc) {
+    parts.push(getterDoc);
+    if (setterDoc) {
+      parts.push(line);
+    } else {
+      parts.push(dedent(line));
+    }
+  }
+  _pushIfExist(parts, setterDoc, [dedent(line)]);
   parts.push("}");
   return groupIndentConcat(parts);
 }
