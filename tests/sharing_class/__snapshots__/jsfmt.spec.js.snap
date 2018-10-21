@@ -39,12 +39,11 @@ class SharingClass {
   virtual with sharing class VirtualWithSharingClass {}
 
   abstract with sharing class AbstractWithSharingClass {}
-
   without sharing class WithoutSharingClass {}
-
   with sharing class WithSharingClass {}
 
   inherited sharing class InheritedSharingClass {}
 }
+
 
 `;

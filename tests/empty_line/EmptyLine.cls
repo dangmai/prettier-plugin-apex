@@ -249,6 +249,10 @@ class EmptyLine {
 
   }
 
+  class ClassDeclaration {}
+
+  interface InterfaceDeclaration {}
+
   void switchStatement() {
     switch on i {
       when 1 {
