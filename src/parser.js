@@ -64,6 +64,10 @@ function generateEndIndexForNode(node, sourceCode, lineIndexes) {
       node.lastNodeLoc.endIndex = sourceCode.indexOf("}", node.lastNodeLoc.endIndex);
       node.lastNodeLoc.endLine = lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
       break;
+    case apexNames.VARIABLE_DECLARATION_STATEMENT:
+      node.lastNodeLoc.endIndex = sourceCode.indexOf(";", node.lastNodeLoc.endIndex);
+      node.lastNodeLoc.endLine = lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
+      break;
   }
   return node;
 }

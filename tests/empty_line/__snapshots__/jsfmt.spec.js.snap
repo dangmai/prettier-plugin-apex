@@ -285,6 +285,7 @@ class EmptyLine {
     Integer a = 1;
 
     Integer b = 1 + 1, c = 2 + 2;
+
     Integer d = 1, e = 2;
 
     Integer f = 1;
