@@ -50,10 +50,31 @@ function resolveAstReferences(node, referenceMap) {
 }
 
 /**
+ * Certain node types do not get their endIndex reported from the jorje compiler,
+ * or the number they report is not the end of the entire block,
+ * so we'll have to figure it out by hand here.
+ * This method mutates the node that was passed in, and assumes that `lastNodeLoc`
+ * is set on it.
+ * @param node the node to look at
+ * @param sourceCode the entire source code
+ */
+function generateEndIndexForNode(node, sourceCode, lineIndexes) {
+  switch (node["@class"]) {
+    case apexNames.SWITCH_STATEMENT:
+      node.lastNodeLoc.endIndex = sourceCode.indexOf("}", node.lastNodeLoc.endIndex);
+      node.lastNodeLoc.endLine = lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
+      break;
+  }
+  return node;
+}
+
+/**
  * Generate metadata about empty lines for statement nodes.
  * This method is called recursively while visiting each node in the tree.
  *
  * @param node the node being visited
+ * @param sourceCode the entire source code
+ * @param lineIndexes the indexes of the lines in the source code
  * @param emptyLineLocations a list of lines that are empty in the source code
  * @param emptyLineNodeMap a map of empty line to the node that is attached to
  * that line. Usually it is the statement right before it; however for certain
@@ -65,7 +86,7 @@ function resolveAstReferences(node, referenceMap) {
  * inside an IfElseBlock
  *
  */
-function generateExtraMetadata(node, emptyLineLocations, emptyLineNodeMap, allowTrailingEmptyLine) {
+function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations, emptyLineNodeMap, allowTrailingEmptyLine) {
   const apexClass = node["@class"];
   let allowTrailingEmptyLineWithin;
   if (values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass)) {
@@ -81,12 +102,21 @@ function generateExtraMetadata(node, emptyLineLocations, emptyLineNodeMap, allow
       if (Array.isArray(node) && key == node.length - 1) {
         node[key].isLastNodeInArray = true;  // So that we don't apply trailing empty line after this node
       }
-      const nodeLoc = generateExtraMetadata(node[key], emptyLineLocations, emptyLineNodeMap, allowTrailingEmptyLineWithin);
+      const nodeLoc = generateExtraMetadata(
+        node[key],
+        sourceCode,
+        lineIndexes,
+        emptyLineLocations,
+        emptyLineNodeMap,
+        allowTrailingEmptyLineWithin
+      );
       if (nodeLoc && (!lastNodeLoc || nodeLoc.endIndex > lastNodeLoc.endIndex)) {
         // This might not be the same node that `isLastNodeInArray` refers to,
         // since this searches for node in child objects instead of just child
         // arrays
         lastNodeLoc = nodeLoc;
+      } else if (!nodeLoc) {
+        lastNodeLoc = node.loc;
       }
     }
   });
@@ -96,6 +126,7 @@ function generateExtraMetadata(node, emptyLineLocations, emptyLineNodeMap, allow
     // Store the last node information for some special node types, so that
     // we can add trailing empty lines after them.
     node.lastNodeLoc = lastNodeLoc;
+    generateEndIndexForNode(node, sourceCode, lineIndexes);
   }
   if (apexClass && (node.loc || node.lastNodeLoc) && allowTrailingEmptyLine) {
     // There's a chance that multiple statements exist on 1 line,
@@ -213,7 +244,14 @@ function parse(sourceCode, _, options) {
     }
     ast = resolveAstReferences(ast, {});
     ast = resolveLineIndexes(ast, lineIndexes);
-    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), {}, true);
+    generateExtraMetadata(
+      ast,
+      sourceCode,
+      lineIndexes,
+      getEmptyLineLocations(sourceCode),
+      {},
+      true
+    );
     resolveLocations(ast, locationMap);
     locations = Array.from(locationMap.keys());
     locations.sort((first, second) => {

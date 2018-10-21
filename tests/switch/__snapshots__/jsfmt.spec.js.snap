@@ -88,6 +88,7 @@ class SwitchClass {
         System.debug('Else');
       }
     }
+
     switch on s {
       when JANUARY {
         System.debug('January');
@@ -106,6 +107,7 @@ class SwitchClass {
         System.debug('Other months');
       }
     }
+
     switch on randomObject {
       when Account a {
         System.debug('Account ' + a);

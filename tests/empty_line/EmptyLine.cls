@@ -248,4 +248,26 @@ class EmptyLine {
 
 
   }
+
+  void switchStatement() {
+    switch on i {
+      when 1 {
+        System.debug('One');
+      }
+    }
+
+    switch on i {
+      when 1 {
+
+      }
+    }
+
+    switch on i {
+      when 1 {
+
+      }
+    }
+
+
+  }
 }
