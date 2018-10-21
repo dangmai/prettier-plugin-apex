@@ -288,6 +288,8 @@ function handleArrayTypeRef(path, print) {
 }
 
 function _handleStatementBlockMember(modifier) {
+  // TODO right now statement block member does not indent correctly,
+  // see block_member test
   return function(path, print) {
     const statementDoc = path.call(print, "stmnt");
 
