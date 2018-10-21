@@ -28,8 +28,9 @@ function parseText(text, options) {
   return executionResult;
 }
 
-// The XML given back contains references (to avoid circular references), which need to be resolved.
-// This method recursively walks through the deserialized object and resolve those references.
+// The serialized string given back contains references (to avoid circular references),
+// which need to be resolved. This method recursively walks through the
+// deserialized object and resolve those references.
 function resolveAstReferences(node, referenceMap) {
   const nodeId = node["@id"];
   const nodeReference = node["@reference"];
@@ -48,45 +49,85 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-// Here we generate metadata about empty lines for statement nodes
-function generateExtraMetadata(node, emptyLineLocations, emptyLineNodeMap) {
+/**
+ * Generate metadata about empty lines for statement nodes.
+ * This method is called recursively while visiting each node in the tree.
+ *
+ * @param node the node being visited
+ * @param emptyLineLocations a list of lines that are empty in the source code
+ * @param emptyLineNodeMap a map of empty line to the node that is attached to
+ * that line. Usually it is the statement right before it; however for certain
+ * node type (e.g. IfElseBlock) that contains BlockStatement, it'll be the
+ * outermost node (e.g. IfElseBlock instead of BlockStatement)
+ * @param allowTrailingTrailingEmptyLine whether trailing empty line is allowed
+ * for this node. This helps when dealing with statements that contain other
+ * statements. For example, we turn this to `false` for the block statements
+ * inside an IfElseBlock
+ *
+ */
+function generateExtraMetadata(node, emptyLineLocations, emptyLineNodeMap, allowTrailingEmptyLine) {
   const apexClass = node["@class"];
+  let allowTrailingEmptyLineWithin;
+  if (values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass)) {
+    allowTrailingEmptyLineWithin = false;
+  } else if (apexClass === apexNames.BLOCK_STATEMENT) {
+    allowTrailingEmptyLineWithin = true;
+  } else {
+    allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
+  }
   let lastNodeLoc;
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
       if (Array.isArray(node) && key == node.length - 1) {
-        node[key].isLastNode = true;  // So that we don't apply trailing empty line after this node
+        node[key].isLastNodeInArray = true;  // So that we don't apply trailing empty line after this node
       }
-      const nodeLoc = generateExtraMetadata(node[key], emptyLineLocations, emptyLineNodeMap);
+      const nodeLoc = generateExtraMetadata(node[key], emptyLineLocations, emptyLineNodeMap, allowTrailingEmptyLineWithin);
       if (nodeLoc && (!lastNodeLoc || nodeLoc.endIndex > lastNodeLoc.endIndex)) {
-        lastNodeLoc = nodeLoc;  // We keep track of the last node location for VariableDeclStmnt
+        // This might not be the same node that `isLastNodeInArray` refers to,
+        // since this searches for node in child objects instead of just child
+        // arrays
+        lastNodeLoc = nodeLoc;
       }
     }
   });
 
-  if (apexClass === apexNames.VARIABLE_DECLARATION_STATEMENT && lastNodeLoc) {
-    // Pretend that the last node location is the location of the Variable
-    // Declaration Statement, since jorje doesn't give that information to us
-    node.loc = lastNodeLoc;
+  const isSpecialClass = values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+  if (isSpecialClass && lastNodeLoc) {
+    // Store the last node information for some special node types, so that
+    // we can add trailing empty lines after them.
+    node.lastNodeLoc = lastNodeLoc;
   }
-  if (apexClass && node.loc) {
-    const nextEmptyLine = emptyLineLocations.indexOf(node.loc.endLine + 1);
-    if (values.ALLOW_TRAILING_WHITESPACE.includes(apexClass) && nextEmptyLine !== -1) {
+  if (apexClass && (node.loc || node.lastNodeLoc) && allowTrailingEmptyLine) {
+    // There's a chance that multiple statements exist on 1 line,
+    // so we only want to tag one of them as having a trailing empty line.
+    // We do that by applying the trailing empty line only after the last node.
+    // e.g. `if (a === 1) {} else {}\n\n`,the empty line should be applied
+    // after the `else`, not the `if`. We keep track of which
+    // nodes have trailingEmptyLine turned on for a certain line, then turn
+    // it off for all but the last one.
+    const nextLine = isSpecialClass
+      ? node.lastNodeLoc.endLine + 1
+      : node.loc.endLine + 1;
+    const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
+    if (values.ALLOW_TRAILING_EMPTY_LINE.includes(apexClass) && nextEmptyLine !== -1) {
       node.trailingEmptyLine = true;
-      // There's a chance that multiple statements exist on 1 line,
-      // so we only want to tag one of them as having a trailing empty line.
-      // We do that by applying the trailing empty line only after the last node.
-      // e.g. `if (a === 1) {} else {}\n\n`,the empty line should be applied
-      // after the `else`, not the `if`. We keep track of which
-      // nodes have trailingEmptyLine turned on for a certain line, then turn
-      // it off for all but the last one.
-      if (emptyLineNodeMap[node.loc.endLine] && emptyLineNodeMap[node.loc.endLine].loc.endIndex > node.loc.endIndex) {
-        node.trailingEmptyLine = false;
-      } else {
-        if (emptyLineNodeMap[node.loc.endLine]) {
-          emptyLineNodeMap[node.loc.endLine].trailingEmptyLine = false;
+
+      if (emptyLineNodeMap[nextLine]) {
+        const nodeMapEndIndex = emptyLineNodeMap[nextLine].lastNodeLoc
+          ? emptyLineNodeMap[nextLine].lastNodeLoc.endIndex
+          : emptyLineNodeMap[nextLine].loc.endIndex;
+        const thisEndIndex = node.lastNodeLoc
+          ? node.lastNodeLoc.endIndex
+          : node.loc.endIndex;
+
+        if (nodeMapEndIndex > thisEndIndex) {
+          node.trailingEmptyLine = false;
+        } else {
+          emptyLineNodeMap[nextLine].trailingEmptyLine = false;
+          emptyLineNodeMap[nextLine] = node;
         }
-        emptyLineNodeMap[node.loc.endLine] = node;
+      } else {
+        emptyLineNodeMap[nextLine] = node;
       }
     }
   }
@@ -172,7 +213,7 @@ function parse(sourceCode, _, options) {
     }
     ast = resolveAstReferences(ast, {});
     ast = resolveLineIndexes(ast, lineIndexes);
-    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), {});
+    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), {}, true);
     resolveLocations(ast, locationMap);
     locations = Array.from(locationMap.keys());
     locations.sort((first, second) => {

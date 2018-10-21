@@ -159,7 +159,7 @@ class EmptyLine {
     }
   }
 
-  void complicatedStatements() {
+  void ifElseBlock() {
     Integer a = 1;
     if (a == 1) {} else if (a == 2) {} else {}
 
@@ -172,6 +172,25 @@ class EmptyLine {
 
     }
 
+    if (a == 1) {
+    } else if (a == 2) {
+    } else {
+    }
+
+    if (a == 1) a = 2;
+
+    else if (a == 2) a = 3;
+
+    else a = 4;
+
+    if (a == 1) {
+
+    }
+
+
+  }
+
+  void tryCatchBlock() {
     try {
 
     } catch (Exception e) {
@@ -180,12 +199,35 @@ class EmptyLine {
 
     }
 
+    try {} catch (Exception e) {} finally {}
+
+    try {} catch (Exception e) {} finally {}
+  }
+
+  void forLoop() {
     for (String a: listA) {
 
     }
+
+    for (String a: listA) {}
+
+    for (String a: listA) {}
+
+  }
+
+  void whileLoop() {
     while (i < 5) {
 
     }
+
+    while (i < 5) {}
+
+    while (i < 5) {}
+
+
+  }
+
+  void doLoop() {
     do {
 
     } while (i < 5);
@@ -197,6 +239,8 @@ class EmptyLine {
 
     while (i < 5);
 
-    System.debug();
+    do {} while (i < 5);
+
+
   }
 }
