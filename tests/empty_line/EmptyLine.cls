@@ -1,4 +1,9 @@
 class EmptyLine {
+  enum NUMBER {ONE, TWO}
+
+  enum NUMBER {
+
+  }
   void blockStatement() {
 
   }

@@ -2,6 +2,11 @@
 
 exports[`EmptyLine.cls - apex-verify: EmptyLine.cls 1`] = `
 class EmptyLine {
+  enum NUMBER {ONE, TWO}
+
+  enum NUMBER {
+
+  }
   void blockStatement() {
 
   }
@@ -249,6 +254,9 @@ class EmptyLine {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class EmptyLine {
+  enum NUMBER {ONE, TWO}
+
+  enum NUMBER {}
   void blockStatement() {}
 
   void variableDeclarations() {
