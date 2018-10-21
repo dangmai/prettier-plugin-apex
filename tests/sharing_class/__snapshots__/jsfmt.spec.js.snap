@@ -45,5 +45,4 @@ class SharingClass {
   inherited sharing class InheritedSharingClass {}
 }
 
-
 `;

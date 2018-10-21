@@ -44,10 +44,12 @@ class Conditional {
     }
     Integer c = a > b ? a : b;
     a < b ? System.debug('Hi') : System.debug('Hello');
+
     Map<String, String> stringMap = new Map<String, String>();
     if (stringMap.contains('a')) {
       System.debug('Hello');
     }
+
     if (a > b) {
       c = a;
     } else if (a < b) {
@@ -55,8 +57,10 @@ class Conditional {
     } else {
       c = 0;
     }
+
     if (a > b)
       c = a;
+
     if (true && (false || false)) {
       System.debug('false');
     }

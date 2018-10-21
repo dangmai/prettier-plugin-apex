@@ -215,6 +215,7 @@ class SOQLClass {
         OR Employees >= 200
         OR Employees <= 120))
     ];
+
     Integer i = [SELECT COUNT() FROM Contact];
     Contact[] subquery = [
       SELECT Id, (SELECT Id FROM Contacts LIMIT 5 OFFSET 5) sampleAlias
@@ -390,6 +391,7 @@ class SOQLClass {
       UPDATE VIEWSTAT
       ALL ROWS
     ];
+
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
     Offer__DataCategorySelection dataCategory = [
       SELECT Id, ParentId

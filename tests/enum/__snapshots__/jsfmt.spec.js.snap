@@ -15,7 +15,6 @@ class EnumTest {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class EnumTest {
   public enum Season {WINTER, SPRING, SUMMER, FALL}
-
   enum Month {
     JANUARY,
     FEBRUARY,

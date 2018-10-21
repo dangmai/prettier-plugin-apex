@@ -111,4 +111,3 @@ class DMLClass {
     merge new Account(Id = accountId, Name = 'Acme One') new Id[]{'0010B00001kL7i0QAC'};
   }
 }
-

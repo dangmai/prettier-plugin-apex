@@ -87,6 +87,7 @@ class LoopClass {
     Integer count = 0;
     for (Integer i = 0; i < 10; i++)
       System.debug(i);
+
     for (count = 0; count < 10; count++) {
       System.debug(count);
     }
@@ -100,11 +101,15 @@ class LoopClass {
         continue;
       }
     }
+
     for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {}
+
     for (Integer i = 0; i < 10; i++) {}
+
     for (Contact a: [SELECT Id FROM Contact]) {
       System.debug(a);
     }
+
     for (Contact a: [
       SELECT Id, Name, Description, Birthdate
       FROM Contact
@@ -112,6 +117,7 @@ class LoopClass {
     ]) {
       System.debug(a);
     }
+
     Contact[] contacts = new List<Contact>{};
     for (Contact a: contacts) {
       System.debug(a);

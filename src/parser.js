@@ -234,6 +234,7 @@ function getEmptyLineLocations(sourceCode) {
 }
 
 function parse(sourceCode, _, options) {
+  sourceCode = sourceCode.trim();
   const lineIndexes = getLineIndexes(sourceCode);
   const executionResult = parseText(sourceCode, options);
   const serializedAst = executionResult.stdout.toString();

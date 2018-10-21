@@ -8,7 +8,6 @@ public interface OuterInterface extends ExtendedInterface {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public interface OuterInterface extends ExtendedInterface {
   void methodOne();
-
   void methodTwo();
 }
 

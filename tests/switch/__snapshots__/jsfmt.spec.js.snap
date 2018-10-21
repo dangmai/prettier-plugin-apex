@@ -74,6 +74,7 @@ class SwitchClass {
     Integer i = 1;
     Month s;
     sObject randomObject;
+
     switch on i {
       when 1 {
         System.debug('One');

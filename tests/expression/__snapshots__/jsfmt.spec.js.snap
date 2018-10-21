@@ -337,5 +337,4 @@ class Conditional extends Object {
 }
 }
 
-
 `;

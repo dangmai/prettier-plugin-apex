@@ -85,6 +85,7 @@ class Comments {
     Integer i = 1;
     Integer j = 2;
     Integer a;
+
     a = i + j;
     a = i - j;
     a = i * j;
@@ -97,5 +98,6 @@ class Comments {
     a = i | j;
   }
 }
+
 
 `;

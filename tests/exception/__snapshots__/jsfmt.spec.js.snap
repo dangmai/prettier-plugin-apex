@@ -60,12 +60,14 @@ class ExceptionClass {
 class ExceptionClass {
   void throwTestTest() {
     throw new CustomException('Custom Exception');
+
     Exception e = new Exception();
     throw new CustomException('Custom Inner Exception', e);
   }
 
   void tryCatchTest() {
     try {} catch (Exception e) {} finally {}
+
     try {
       Integer i = 0;
       i++;
@@ -75,6 +77,7 @@ class ExceptionClass {
     } finally {
       System.debug('It has been dealt with');
     }
+
     try {
       Integer i = 0;
       i++;
@@ -86,6 +89,7 @@ class ExceptionClass {
     } finally {
       System.debug('It has been dealt with');
     }
+
     try {
       System.debug('try without catch');
     } finally {
@@ -99,7 +103,6 @@ class ExceptionClass {
   }
 
   class CustomException extends Exception {}
-
   class AnotherCustomException extends Exception {}
 }
 
