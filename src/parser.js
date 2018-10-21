@@ -119,7 +119,7 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
         // since this searches for node in child objects instead of just child
         // arrays
         lastNodeLoc = nodeLoc;
-      } else if (!nodeLoc) {
+      } else if (!nodeLoc && !lastNodeLoc) {
         lastNodeLoc = node.loc;
       }
     }

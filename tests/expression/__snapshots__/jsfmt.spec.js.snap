@@ -194,6 +194,7 @@ class Conditional extends Object {
     Integer i = 1;
     Integer j = 2;
     Integer a;
+
     a = i + j;
     a = i - j;
     a = i * j;
@@ -208,6 +209,7 @@ class Conditional extends Object {
 
   void castExpression() {
     String a;
+
     Id b = (Id) a;
     Schema.SObjectType sobjectType = ((Id) a).getSObjectType();
   }
@@ -221,6 +223,7 @@ class Conditional extends Object {
     Boolean a = true;
     Boolean b = false;
     Boolean c;
+
     c = a == b;
     c = a === b;
     c = a !== b;
@@ -243,6 +246,7 @@ class Conditional extends Object {
   void prefixExpression() {
     Integer a = 1;
     Integer b;
+
     b = +a;
     b = -a;
     b = !a;
@@ -254,6 +258,7 @@ class Conditional extends Object {
   void postfixExpression() {
     Integer a = 1;
     Integer b;
+
     b = a++;
     b = a--;
   }
@@ -262,6 +267,7 @@ class Conditional extends Object {
     Integer[] a = new List<Integer>{1, 2, 3, 4};
     Integer b;
     Integer veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay = 1;
+
     b = a[0];
     b = a[a[0]];
     b = a[
@@ -330,5 +336,6 @@ class Conditional extends Object {
     }
 }
 }
+
 
 `;

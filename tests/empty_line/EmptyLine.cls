@@ -20,6 +20,8 @@ class EmptyLine {
     Integer d = 1,
       e = 2;
 
+    Integer a;
+
 
     Integer f = 1;
 
