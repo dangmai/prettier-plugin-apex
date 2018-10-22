@@ -176,7 +176,7 @@ function handleInterfaceDeclaration(path, print) {
   parts.push("{");
   if(memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
-    parts.push(dedent(concat([hardline, "}"])));
+    parts.push(concat([hardline, "}"]));
   } else {
     parts.push("}");
   }
@@ -219,7 +219,7 @@ function handleClassDeclaration(path, print) {
   parts.push("{");
   if(memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
-    parts.push(dedent(concat([hardline, "}"])));
+    parts.push(concat([hardline, "}"]));
   } else {
     parts.push("}");
   }
@@ -288,8 +288,6 @@ function handleArrayTypeRef(path, print) {
 }
 
 function _handleStatementBlockMember(modifier) {
-  // TODO right now statement block member does not indent correctly,
-  // see block_member test
   return function(path, print) {
     const statementDoc = path.call(print, "stmnt");
 

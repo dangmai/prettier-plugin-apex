@@ -334,7 +334,7 @@ class Conditional extends Object {
     InnerClass(Integer i) {
       super(i);
     }
-}
+  }
 }
 
 `;
