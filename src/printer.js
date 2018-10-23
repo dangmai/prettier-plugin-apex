@@ -176,7 +176,7 @@ function handleTriggerDeclarationUnit(path, print) {
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline, hardline]);
+      return concat([memberDoc, hardline]);
     }
     return memberDoc;
   });

@@ -45,7 +45,6 @@ trigger myAccountTrigger on Account(
   after undelete,
   before undelete) {
   System.debug('Inside trigger');
-
   if (Trigger.isBefore) {
     if (Trigger.isDelete) {
       for (Account a: Trigger.old) {
