@@ -809,10 +809,9 @@ function handleNewListInit(path, print) {
   parts.push(join(".", path.map(print, "types")));
   parts.push(">");
   // Param
-  parts.push(expressionDoc);
-  if (!expressionDoc) {
-    parts.push("()");
-  }
+  parts.push("(");
+  _pushIfExist(parts, expressionDoc);
+  parts.push(")");
   return concat(parts);
 }
 
