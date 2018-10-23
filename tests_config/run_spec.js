@@ -39,7 +39,14 @@ function stripLocation(ast) {
       ) {
         return;
       }
-      newObj[key] = stripLocation(ast[key]);
+      if (key === "scope" && typeof ast[key] === "string") {
+        // Apex is case insensitivity, but in sone case we're forcing the strings
+        // to be uppercase for consistency so the ASTs may be different between
+        // the original and parsed strings.
+        newObj[key] = ast[key].toUpperCase();
+      } else {
+        newObj[key] = stripLocation(ast[key]);
+      }
     });
     return newObj;
   }
