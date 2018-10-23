@@ -1,5 +1,3 @@
-"use strict";
-
 const defaultConfig = require("./jest.config.standalone");
 
 // This config starts up nailgun by default

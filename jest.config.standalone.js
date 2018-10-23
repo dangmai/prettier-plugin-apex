@@ -1,5 +1,3 @@
-"use strict";
-
 const ENABLE_COVERAGE = false; // !!process.env.CI;
 
 // This config does not start up nailgun by default
