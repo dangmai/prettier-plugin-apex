@@ -124,13 +124,23 @@ function handleLiteralExpression(path, print) {
   if (literalType === "NULL") {
     return "null";
   }
-  const literalDoc = path.call(print, "literal", "$");
+  let literalDoc = path.call(print, "literal", "$");
   let doc;
   if (literalType === "STRING") {
     doc = concat(["'", literalDoc, "'"]);
   } else if (literalType === "LONG") {
     doc = concat([literalDoc, "L"]);
+  } else if (literalType === "DECIMAL" && literalDoc.indexOf(".") === -1) {
+    // The serializer does not preserve trailing 0s for doubles,
+    // however they are needed when printing,
+    literalDoc += ".0";
   } else if (literalType === "DOUBLE") {
+    if (literalDoc.indexOf(".") === -1) {
+      // The serializer does not preserve trailing 0s for doubles,
+      // however they are needed when printing,
+      // e.g. 1.0D is valid while 1D is invalid
+      literalDoc += ".0";
+    }
     doc = concat([literalDoc, "d"]);
   }
   if (doc) {
