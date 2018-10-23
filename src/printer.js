@@ -1849,7 +1849,7 @@ nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = childClass =>
   values.QUERY_WHERE[childClass];
 
 function handleTrailingEmptyLines(doc, node) {
-  if (node.trailingEmptyLine && !node.isLastNodeInArray) {
+  if (node.trailingEmptyLine) {
     doc = concat([doc, hardline]); // eslint-disable-line no-param-reassign
   }
   return doc;

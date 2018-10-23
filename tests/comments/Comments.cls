@@ -63,7 +63,6 @@ class Comments {
       ;
   }
 }
-
 // Trailing Inline Comment
 
 /* Trailing Block Comment */

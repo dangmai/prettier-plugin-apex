@@ -158,7 +158,12 @@ function generateExtraMetadata(
     node.lastNodeLoc = lastNodeLoc;
     generateEndIndexForNode(node, sourceCode, lineIndexes);
   }
-  if (apexClass && (node.loc || node.lastNodeLoc) && allowTrailingEmptyLine) {
+  if (
+    apexClass &&
+    (node.loc || node.lastNodeLoc) &&
+    allowTrailingEmptyLine &&
+    !node.isLastNodeInArray
+  ) {
     // There's a chance that multiple statements exist on 1 line,
     // so we only want to tag one of them as having a trailing empty line.
     // We do that by applying the trailing empty line only after the last node.
