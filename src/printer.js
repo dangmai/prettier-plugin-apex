@@ -995,6 +995,45 @@ function handleExpressionStatement(path, print) {
   return concat(parts);
 }
 
+// SOSL
+function handleSoslExpression(path, print) {
+  const parts = [];
+  parts.push("[");
+  parts.push(softline);
+  parts.push(path.call(print, "search"));
+  parts.push(dedent(softline));
+  parts.push("]");
+  return groupIndentConcat(parts);
+}
+
+function handleFindClause(path, print) {
+  const parts = [];
+  parts.push(indentConcat(["FIND", line, path.call(print, "search")]));
+  return groupConcat(parts);
+}
+
+function handleFindValue(childClass, path, print) {
+  let doc;
+  switch (childClass) {
+    case "FindString":
+      doc = concat(["'", path.call(print, "value"), "'"]);
+      break;
+    case "FindExpr":
+      doc = path.call(print, "expr");
+      break;
+    default:
+      throw new Error(`FindValue ${childClass} is not supported`);
+  }
+  return doc;
+}
+
+function handleSearch(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "find"));
+  return join(line, parts);
+}
+
+// SOQL
 function handleSoqlExpression(path, print) {
   const parts = [];
   parts.push("[");
@@ -1773,6 +1812,12 @@ nodeHandler[
   apexNames.SUPER_METHOD_CALL_EXPRESSION
 ] = handleSuperMethodCallExpression;
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
+
+// SOSL
+nodeHandler[apexNames.SOSL_EXPRESSION] = handleSoslExpression;
+nodeHandler[apexNames.SEARCH] = handleSearch;
+nodeHandler[apexNames.FIND_CLAUSE] = handleFindClause;
+nodeHandler[apexNames.FIND_VALUE] = handleFindValue;
 
 // New Object Init
 nodeHandler[apexNames.NEW_SET_INIT] = handleNewSetInit;

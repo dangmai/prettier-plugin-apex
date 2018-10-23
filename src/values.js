@@ -111,6 +111,7 @@ const values = {
     SUPER_METHOD_CALL_EXPRESSION:
       "apex.jorje.data.ast.Expr$SuperMethodCallExpr",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
+    SOSL_EXPRESSION: "apex.jorje.data.ast.Expr$SoslExpr",
 
     // New Object Init
     NEW_SET_INIT: "apex.jorje.data.ast.NewObject$NewSetInit",
@@ -122,6 +123,11 @@ const values = {
     NEW_STANDARD: "apex.jorje.data.ast.NewObject$NewStandard",
     NEW_KEY_VALUE: "apex.jorje.data.ast.NewObject$NewKeyValue",
     MAP_LITERAL_KEY_VALUE: "apex.jorje.data.ast.MapLiteralKeyValue",
+
+    // SOSL
+    SEARCH: "apex.jorje.data.sosl.Search",
+    FIND_CLAUSE: "apex.jorje.data.sosl.FindClause",
+    FIND_VALUE: "apex.jorje.data.sosl.FindValue",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",

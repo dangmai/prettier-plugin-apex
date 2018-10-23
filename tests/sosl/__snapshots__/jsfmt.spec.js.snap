@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SOSL.cls - apex-verify: SOSL.cls 1`] = `
+class SOSLClass {
+  void simpleSOSL() {
+    String a = 'Hello';
+    List<List<SObject>> searchResult = [FIND 'FirstLastName'];
+    searchResult = [FIND :a];
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class SOSLClass {
+  void simpleSOSL() {
+    String a = 'Hello';
+    List<List<SObject>> searchResult = [FIND 'FirstLastName'];
+    searchResult = [FIND :a];
+  }
+}
+
+`;
