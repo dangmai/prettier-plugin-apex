@@ -26,4 +26,11 @@ class SOSLClass {
     searchResult = [FIND 'Hello' WITH DATA CATEGORY Geography__c ABOVE France__c AND Product__c AT mobile_phones__c];
     searchResult = [FIND 'Hello' WITH DATA CATEGORY Geography__c below Europe__c];
   }
+  void withSnippet() {
+    List<List<SObject>> searchResult;
+    String a = 'Local';
+    searchResult = [FIND 'Hello' WITH SNIPPET];
+    searchResult = [FIND 'Hello' WITH SNIPPET (target_length=120)];
+    searchResult = [FIND 'Hello' WITH SNIPPET (TARGET_LENGTH=120)];
+  }
 }

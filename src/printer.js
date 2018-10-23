@@ -1059,12 +1059,22 @@ function handleDivisionValue(childClass, path, print) {
   return doc;
 }
 
+function handleWithSnippetClause(path, print) {
+  const maxLengthDoc = path.call(print, "maxLength", "value");
+
+  const parts = [];
+  parts.push("WITH SNIPPET");
+  _pushIfExist(parts, maxLengthDoc, [")"], ["(target_length = "]);
+  return concat(parts);
+}
+
 function handleSearch(path, print) {
   const parts = [];
   parts.push(path.call(print, "find"));
   _pushIfExist(parts, path.call(print, "in", "value"));
   _pushIfExist(parts, path.call(print, "division", "value"));
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
+  _pushIfExist(parts, path.call(print, "snippet", "value"));
   return join(line, parts);
 }
 
@@ -1782,6 +1792,7 @@ nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
+nodeHandler.int = (path, print) => path.call(print, "$");
 
 // Operator
 nodeHandler[apexNames.ASSIGNMENT_OPERATOR] = handleAssignmentOperation;
@@ -1868,6 +1879,7 @@ nodeHandler[apexNames.IN_CLAUSE] = handleInClause;
 nodeHandler[apexNames.WITH_DIVISION_CLAUSE] = handleDivisionClause;
 nodeHandler[apexNames.DIVISION_VALUE] = handleDivisionValue;
 nodeHandler[apexNames.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
+nodeHandler[apexNames.WITH_SNIPPET_CLAUSE] = handleWithSnippetClause;
 
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;
