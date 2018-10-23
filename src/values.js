@@ -131,6 +131,7 @@ const values = {
     IN_CLAUSE: "apex.jorje.data.sosl.InClause",
     WITH_DIVISION_CLAUSE: "apex.jorje.data.sosl.WithDivisionClause",
     DIVISION_VALUE: "apex.jorje.data.sosl.DivisionValue",
+    WITH_DATA_CATEGORY_CLAUSE: "apex.jorje.data.sosl.WithDataCategoryClause",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",

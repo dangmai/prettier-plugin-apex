@@ -1064,6 +1064,7 @@ function handleSearch(path, print) {
   parts.push(path.call(print, "find"));
   _pushIfExist(parts, path.call(print, "in", "value"));
   _pushIfExist(parts, path.call(print, "division", "value"));
+  _pushIfExist(parts, path.call(print, "dataCategory", "value"));
   return join(line, parts);
 }
 
@@ -1866,6 +1867,7 @@ nodeHandler[apexNames.FIND_VALUE] = handleFindValue;
 nodeHandler[apexNames.IN_CLAUSE] = handleInClause;
 nodeHandler[apexNames.WITH_DIVISION_CLAUSE] = handleDivisionClause;
 nodeHandler[apexNames.DIVISION_VALUE] = handleDivisionValue;
+nodeHandler[apexNames.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
 
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;
