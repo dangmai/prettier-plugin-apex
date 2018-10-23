@@ -129,6 +129,8 @@ const values = {
     FIND_CLAUSE: "apex.jorje.data.sosl.FindClause",
     FIND_VALUE: "apex.jorje.data.sosl.FindValue",
     IN_CLAUSE: "apex.jorje.data.sosl.InClause",
+    WITH_DIVISION_CLAUSE: "apex.jorje.data.sosl.WithDivisionClause",
+    DIVISION_VALUE: "apex.jorje.data.sosl.DivisionValue",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",

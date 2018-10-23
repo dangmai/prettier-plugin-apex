@@ -1037,10 +1037,33 @@ function handleInClause(path, print) {
   return concat(parts);
 }
 
+function handleDivisionClause(path, print) {
+  const parts = [];
+  parts.push("WITH DIVISION = ");
+  parts.push(path.call(print, "value"));
+  return concat(parts);
+}
+
+function handleDivisionValue(childClass, path, print) {
+  let doc;
+  switch (childClass) {
+    case "DivisionLiteral":
+      doc = concat(["'", path.call(print, "literal"), "'"]);
+      break;
+    case "DivisionExpr":
+      doc = path.call(print, "expr");
+      break;
+    default:
+      throw new Error(`DivisionValue ${childClass} is not supported`);
+  }
+  return doc;
+}
+
 function handleSearch(path, print) {
   const parts = [];
   parts.push(path.call(print, "find"));
   _pushIfExist(parts, path.call(print, "in", "value"));
+  _pushIfExist(parts, path.call(print, "division", "value"));
   return join(line, parts);
 }
 
@@ -1823,13 +1846,7 @@ nodeHandler[
   apexNames.SUPER_METHOD_CALL_EXPRESSION
 ] = handleSuperMethodCallExpression;
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
-
-// SOSL
 nodeHandler[apexNames.SOSL_EXPRESSION] = handleSoslExpression;
-nodeHandler[apexNames.SEARCH] = handleSearch;
-nodeHandler[apexNames.FIND_CLAUSE] = handleFindClause;
-nodeHandler[apexNames.FIND_VALUE] = handleFindValue;
-nodeHandler[apexNames.IN_CLAUSE] = handleInClause;
 
 // New Object Init
 nodeHandler[apexNames.NEW_SET_INIT] = handleNewSetInit;
@@ -1841,6 +1858,14 @@ nodeHandler[apexNames.MAP_LITERAL_KEY_VALUE] = handleMapLiteralKeyValue;
 nodeHandler[apexNames.NEW_LIST_LITERAL] = handleNewListLiteral;
 nodeHandler[apexNames.NEW_STANDARD] = handleNewStandard;
 nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;
+
+// SOSL
+nodeHandler[apexNames.SEARCH] = handleSearch;
+nodeHandler[apexNames.FIND_CLAUSE] = handleFindClause;
+nodeHandler[apexNames.FIND_VALUE] = handleFindValue;
+nodeHandler[apexNames.IN_CLAUSE] = handleInClause;
+nodeHandler[apexNames.WITH_DIVISION_CLAUSE] = handleDivisionClause;
+nodeHandler[apexNames.DIVISION_VALUE] = handleDivisionValue;
 
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;

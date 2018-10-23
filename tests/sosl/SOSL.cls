@@ -13,4 +13,10 @@ class SOSLClass {
     searchResult = [FIND 'Hello' IN PHONE FIELDS];
     searchResult = [FIND 'Hello' IN SIDEBAR FIELDS];
   }
+  void withDivisionClause() {
+    List<List<SObject>> searchResult;
+    String a = 'Local';
+    searchResult = [FIND 'Hello' WITH Division = 'Global'];
+    searchResult = [FIND 'Hello' WITH Division = :a];
+  }
 }
