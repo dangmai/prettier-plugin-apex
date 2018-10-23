@@ -1,24 +1,27 @@
-"use strict";
+/* eslint no-param-reassign:0 */
 
 const childProcess = require("child_process");
 const path = require("path");
 
 const values = require("./values");
+
 const apexNames = values.APEX_NAMES;
 
 function parseText(text, options) {
   const runClientLocation = path.join(__dirname, "run_client.js");
-  const args = [runClientLocation, "-a", options.serverHost, "-p", options.serverPort];
+  const args = [
+    runClientLocation,
+    "-a",
+    options.serverHost,
+    "-p",
+    options.serverPort,
+  ];
   if (options.serverAutoStart) {
-    args.push("-s")
+    args.push("-s");
   }
-  const executionResult = childProcess.spawnSync(
-    process.argv[0],
-    args,
-    {
-      input: text
-    },
-  );
+  const executionResult = childProcess.spawnSync(process.argv[0], args, {
+    input: text,
+  });
 
   if (executionResult.status) {
     const executionError = executionResult.stderr.toString();
@@ -57,18 +60,28 @@ function resolveAstReferences(node, referenceMap) {
  * is set on it.
  * @param node the node to look at
  * @param sourceCode the entire source code
+ * @param lineIndexes the indexes of the lines
  */
 function generateEndIndexForNode(node, sourceCode, lineIndexes) {
   switch (node["@class"]) {
     case apexNames.PROPERTY_MEMBER:
     case apexNames.SWITCH_STATEMENT:
-      node.lastNodeLoc.endIndex = sourceCode.indexOf("}", node.lastNodeLoc.endIndex);
-      node.lastNodeLoc.endLine = lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
+      node.lastNodeLoc.endIndex = sourceCode.indexOf(
+        "}",
+        node.lastNodeLoc.endIndex,
+      );
+      node.lastNodeLoc.endLine =
+        lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
       break;
     case apexNames.VARIABLE_DECLARATION_STATEMENT:
-      node.lastNodeLoc.endIndex = sourceCode.indexOf(";", node.lastNodeLoc.endIndex);
-      node.lastNodeLoc.endLine = lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
+      node.lastNodeLoc.endIndex = sourceCode.indexOf(
+        ";",
+        node.lastNodeLoc.endIndex,
+      );
+      node.lastNodeLoc.endLine =
+        lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
       break;
+    default:
   }
   return node;
 }
@@ -85,13 +98,20 @@ function generateEndIndexForNode(node, sourceCode, lineIndexes) {
  * that line. Usually it is the statement right before it; however for certain
  * node type (e.g. IfElseBlock) that contains BlockStatement, it'll be the
  * outermost node (e.g. IfElseBlock instead of BlockStatement)
- * @param allowTrailingTrailingEmptyLine whether trailing empty line is allowed
+ * @param allowTrailingEmptyLine whether trailing empty line is allowed
  * for this node. This helps when dealing with statements that contain other
  * statements. For example, we turn this to `false` for the block statements
  * inside an IfElseBlock
  *
  */
-function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations, emptyLineNodeMap, allowTrailingEmptyLine) {
+function generateExtraMetadata(
+  node,
+  sourceCode,
+  lineIndexes,
+  emptyLineLocations,
+  emptyLineNodeMap,
+  allowTrailingEmptyLine,
+) {
   const apexClass = node["@class"];
   let allowTrailingEmptyLineWithin;
   if (values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass)) {
@@ -104,8 +124,8 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
   let lastNodeLoc;
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
-      if (Array.isArray(node) && key == node.length - 1) {
-        node[key].isLastNodeInArray = true;  // So that we don't apply trailing empty line after this node
+      if (Array.isArray(node) && parseInt(key, 10) === node.length - 1) {
+        node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
       }
       const nodeLoc = generateExtraMetadata(
         node[key],
@@ -113,9 +133,12 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
         lineIndexes,
         emptyLineLocations,
         emptyLineNodeMap,
-        allowTrailingEmptyLineWithin
+        allowTrailingEmptyLineWithin,
       );
-      if (nodeLoc && (!lastNodeLoc || nodeLoc.endIndex > lastNodeLoc.endIndex)) {
+      if (
+        nodeLoc &&
+        (!lastNodeLoc || nodeLoc.endIndex > lastNodeLoc.endIndex)
+      ) {
         // This might not be the same node that `isLastNodeInArray` refers to,
         // since this searches for node in child objects instead of just child
         // arrays
@@ -126,7 +149,9 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
     }
   });
 
-  const isSpecialClass = values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+  const isSpecialClass = values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(
+    apexClass,
+  );
   if (isSpecialClass && lastNodeLoc) {
     // Store the last node information for some special node types, so that
     // we can add trailing empty lines after them.
@@ -145,7 +170,10 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
       ? node.lastNodeLoc.endLine + 1
       : node.loc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-    if (values.ALLOW_TRAILING_EMPTY_LINE.includes(apexClass) && nextEmptyLine !== -1) {
+    if (
+      values.ALLOW_TRAILING_EMPTY_LINE.includes(apexClass) &&
+      nextEmptyLine !== -1
+    ) {
       node.trailingEmptyLine = true;
 
       if (emptyLineNodeMap[nextLine]) {
@@ -173,7 +201,6 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
   return node.loc;
 }
 
-
 // For each node, the jorje compiler gives us its line and its index within
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
@@ -181,7 +208,8 @@ function generateExtraMetadata(node, sourceCode, lineIndexes, emptyLineLocations
 function resolveLineIndexes(node, lineIndexes) {
   const nodeLoc = node.loc;
   if (nodeLoc) {
-    nodeLoc.endLine = lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;
+    nodeLoc.endLine =
+      lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;
   }
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
@@ -201,15 +229,18 @@ function getLineIndexes(sourceCode) {
     if (eolIndex < 0) {
       break;
     }
-    lineIndexes[lineIndex] = lineIndexes[lineIndex - 1] + sourceCode.substring(characterIndex, eolIndex).length + 1;
+    lineIndexes[lineIndex] =
+      lineIndexes[lineIndex - 1] +
+      sourceCode.substring(characterIndex, eolIndex).length +
+      1;
     characterIndex = eolIndex + 1;
-    lineIndex ++;
+    lineIndex += 1;
   }
   return lineIndexes;
 }
 
 function resolveLocations(node, locationMap) {
-  const nodeLoc = node["location"] || node["loc"];
+  const nodeLoc = node.location || node.loc;
   if (nodeLoc) {
     locationMap.set(nodeLoc, node);
   }
@@ -220,10 +251,9 @@ function resolveLocations(node, locationMap) {
   });
 }
 
-
 function getEmptyLineLocations(sourceCode) {
   const whiteSpaceRegEx = /^\s*$/;
-  const lines = sourceCode.split('\n');
+  const lines = sourceCode.split("\n");
   return lines
     .map(line => whiteSpaceRegEx.test(line))
     .reduce((accumulator, currentValue, currentIndex) => {
@@ -244,8 +274,13 @@ function parse(sourceCode, _, options) {
   let locations;
   if (serializedAst) {
     ast = JSON.parse(serializedAst);
-    if (ast[apexNames.PARSER_OUTPUT] && ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0) {
-      const errors = ast[apexNames.PARSER_OUTPUT].parseErrors.map(err => `${err.message}. ${err.detailMessage}`);
+    if (
+      ast[apexNames.PARSER_OUTPUT] &&
+      ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0
+    ) {
+      const errors = ast[apexNames.PARSER_OUTPUT].parseErrors.map(
+        err => `${err.message}. ${err.detailMessage}`,
+      );
       throw new Error(errors.join("\r\n"));
     }
     ast = resolveAstReferences(ast, {});
@@ -256,7 +291,7 @@ function parse(sourceCode, _, options) {
       lineIndexes,
       getEmptyLineLocations(sourceCode),
       {},
-      true
+      true,
     );
     resolveLocations(ast, locationMap);
     locations = Array.from(locationMap.keys());

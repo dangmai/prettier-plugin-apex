@@ -1,13 +1,10 @@
-"use strict";
-
-const argv = require("yargs").argv;
+const { argv } = require("yargs");
 const nailgunClient = require("node-nailgun-client");
 
 const nailgunServer = require("./ng-server");
 
 async function main() {
   // Start the server if needed
-  let childCommand;
   const options = {
     address: argv.a || "localhost",
     port: argv.p || 2113,
@@ -16,7 +13,7 @@ async function main() {
   if (argv.s) {
     // TODO this does not stop the program if it fails, since the Gradle
     // App returns status code 0
-    childCommand = await nailgunServer.start(options.address, options.port);
+    await nailgunServer.start(options.address, options.port);
   }
 
   const args = ["-f", "json", "-i"];
@@ -27,7 +24,7 @@ async function main() {
   nail.stderr.pipe(process.stderr);
   process.stdin.pipe(nail.stdin);
 
-  const stopNailgunServer = async function (code) {
+  const stopNailgunServer = async code => {
     if (argv.s) {
       await nailgunServer.stop(options.address, options.port);
 

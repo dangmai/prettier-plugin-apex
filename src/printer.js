@@ -1,9 +1,20 @@
-"use strict";
+/* eslint no-underscore-dangle: 0 */
 
 const docBuilders = require("prettier").doc.builders;
-const {concat, join, hardline, line, softline, literalline, group, indent, dedent, ifBreak, breakParent} = docBuilders;
+
+const {
+  concat,
+  join,
+  hardline,
+  line,
+  softline,
+  group,
+  indent,
+  dedent,
+} = docBuilders;
 
 const values = require("./values");
+
 const apexNames = values.APEX_NAMES;
 
 // Places we've looked into to make sure we're not forgetting to implement things:
@@ -25,6 +36,36 @@ function groupConcat(docs) {
 
 function groupIndentConcat(docs) {
   return group(indent(concat(docs)));
+}
+
+function _handlePassthroughCall(...names) {
+  return (path, print) => path.call(print, ...names);
+}
+
+function _pushIfExist(parts, doc, postDocs, preDocs) {
+  if (doc) {
+    if (preDocs) {
+      preDocs.forEach(preDoc => parts.push(preDoc));
+    }
+    parts.push(doc);
+    if (postDocs) {
+      postDocs.forEach(postDoc => parts.push(postDoc));
+    }
+  }
+  return parts;
+}
+
+function _escapeString(text) {
+  // Code from https://stackoverflow.com/a/11716317/477761
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/\u0008/g, "\\b") // eslint-disable-line no-control-regex
+    .replace(/\t/g, "\\t")
+    .replace(/\n/g, "\\n")
+    .replace(/\f/g, "\\f")
+    .replace(/\r/g, "\\r")
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '\\"');
 }
 
 function handleReturnStatement(path, print) {
@@ -84,29 +125,33 @@ function handleLiteralExpression(path, print) {
     return "null";
   }
   const literalDoc = path.call(print, "literal", "$");
+  let doc;
   if (literalType === "STRING") {
-    return concat(["'", literalDoc, "'"]);
+    doc = concat(["'", literalDoc, "'"]);
   } else if (literalType === "LONG") {
-    return concat([literalDoc, "L"]);
+    doc = concat([literalDoc, "L"]);
   } else if (literalType === "DOUBLE") {
-    return concat([literalDoc, "d"]);
+    doc = concat([literalDoc, "d"]);
+  }
+  if (doc) {
+    return doc;
   }
   return literalDoc;
 }
 
 function handleBinaryOperation(path) {
   const node = path.getValue();
-  return values.BINARY[node["$"]];
+  return values.BINARY[node.$];
 }
 
 function handleBooleanOperation(path) {
   const node = path.getValue();
-  return values.BOOLEAN[node["$"]];
+  return values.BOOLEAN[node.$];
 }
 
 function handleAssignmentOperation(path) {
   const node = path.getValue();
-  return values.ASSIGNMENT[node["$"]];
+  return values.ASSIGNMENT[node.$];
 }
 
 function handleTriggerDeclarationUnit(path, print) {
@@ -122,10 +167,7 @@ function handleTriggerDeclarationUnit(path, print) {
   parts.push(" ");
   parts.push(join(",", targetDocs));
   parts.push("(");
-  const usagePart = concat([
-    softline,
-    join(concat([",", line]), usageDocs),
-  ]);
+  const usagePart = concat([softline, join(concat([",", line]), usageDocs)]);
   parts.push(indent(usagePart));
   parts.push(")");
   parts.push(" ");
@@ -134,11 +176,11 @@ function handleTriggerDeclarationUnit(path, print) {
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline, hardline])
+      return concat([memberDoc, hardline, hardline]);
     }
     return memberDoc;
   });
-  if(memberDocs.length > 0) {
+  if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
     parts.push(dedent(concat([hardline, "}"])));
   } else {
@@ -154,7 +196,7 @@ function handleInterfaceDeclaration(path, print) {
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline])
+      return concat([memberDoc, hardline]);
     }
     return memberDoc;
   });
@@ -174,7 +216,7 @@ function handleInterfaceDeclaration(path, print) {
   }
   parts.push(" ");
   parts.push("{");
-  if(memberDocs.length > 0) {
+  if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
     parts.push(concat([hardline, "}"]));
   } else {
@@ -190,7 +232,7 @@ function handleClassDeclaration(path, print) {
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline])
+      return concat([memberDoc, hardline]);
     }
     return memberDoc;
   });
@@ -217,7 +259,7 @@ function handleClassDeclaration(path, print) {
   }
   parts.push(" ");
   parts.push("{");
-  if(memberDocs.length > 0) {
+  if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
     parts.push(concat([hardline, "}"]));
   } else {
@@ -288,7 +330,7 @@ function handleArrayTypeRef(path, print) {
 }
 
 function _handleStatementBlockMember(modifier) {
-  return function(path, print) {
+  return (path, print) => {
     const statementDoc = path.call(print, "stmnt");
 
     const parts = [];
@@ -330,7 +372,7 @@ function handlePropertyDeclaration(path, print) {
 }
 
 function _handlePropertyGetterSetter(action) {
-  return function(path, print) {
+  return (path, print) => {
     const statementDoc = path.call(print, "stmnt", "value");
 
     const parts = [];
@@ -583,14 +625,7 @@ function handleVariableDeclarations(path, print) {
   // Variable declarations
   const declarationDocs = path.map(print, "decls");
   if (declarationDocs.length > 1) {
-    parts.push(indentConcat(
-      [
-        join(
-          concat([",", line]),
-          declarationDocs,
-        ),
-      ]
-    ));
+    parts.push(indentConcat([join(concat([",", line]), declarationDocs)]));
     parts.push(";");
   } else if (declarationDocs.length === 1) {
     parts.push(concat([declarationDocs[0], ";"]));
@@ -652,7 +687,6 @@ function handleNameValueParameter(path, print) {
   return concat(parts);
 }
 
-
 function handleThisMethodCallExpression(path, print) {
   const parts = [];
   parts.push("this");
@@ -697,10 +731,10 @@ function handleMethodCallExpression(path, print) {
         "(",
         paramDocs.length > 0
           ? groupIndentConcat([
-            softline,
-            join(concat([",", line]), paramDocs),
-            dedent(softline),
-          ])
+              softline,
+              join(concat([",", line]), paramDocs),
+              dedent(softline),
+            ])
           : "",
         ")",
       ]),
@@ -1096,32 +1130,25 @@ function handleField(path, print) {
 
 function handleFromClause(path, print) {
   const parts = [];
-  parts.push(
-    indentConcat([
-      "FROM",
-      line,
-      ...path.map(print, "exprs"),
-    ]),
-  );
+  parts.push(indentConcat(["FROM", line, ...path.map(print, "exprs")]));
   return groupConcat(parts);
 }
 
 function handleFromExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "table"));
-  _pushIfExist(parts, path.call(print, "using", "value"), [dedent(softline)], [line]);
+  _pushIfExist(
+    parts,
+    path.call(print, "using", "value"),
+    [dedent(softline)],
+    [line],
+  );
   return groupIndentConcat(parts);
 }
 
 function handleWhereClause(path, print) {
   const parts = [];
-  parts.push(
-    indentConcat([
-      "WHERE",
-      line,
-      path.call(print, "expr"),
-    ])
-  );
+  parts.push(indentConcat(["WHERE", line, path.call(print, "expr")]));
   return groupConcat(parts);
 }
 
@@ -1143,7 +1170,7 @@ function handleDistanceFunctionExpression(path, print) {
   parts.push(softline);
   distanceDocs.push(path.call(print, "field"));
   distanceDocs.push(path.call(print, "location"));
-  distanceDocs.push("'" + path.call(print, "unit") + "'");
+  distanceDocs.push(`'${path.call(print, "unit")}'`);
   parts.push(join(concat([",", line]), distanceDocs));
   parts.push(dedent(softline));
   parts.push(")");
@@ -1228,11 +1255,9 @@ function handleWhereOperationExpressions(path, print) {
   parts.push(
     indentConcat([
       softline,
-      join(
-        concat([",", line]), path.map(print, "expr")
-      ),
+      join(concat([",", line]), path.map(print, "expr")),
       dedent(softline),
-    ])
+    ]),
   );
   parts.push(")");
   return groupConcat(parts);
@@ -1302,10 +1327,9 @@ function handleColonExpression(path, print) {
 function handleOrderByClause(path, print) {
   const parts = [];
   parts.push("ORDER BY");
-  parts.push(indentConcat([
-    line,
-    join(concat([",", line]), path.map(print, "exprs")),
-  ]));
+  parts.push(
+    indentConcat([line, join(concat([",", line]), path.map(print, "exprs"))]),
+  );
   return groupConcat(parts);
 }
 
@@ -1374,10 +1398,7 @@ function handleGroupByClause(path, print) {
     parts.push(")");
   }
   if (havingDoc) {
-    parts.push(concat([
-      line,
-      havingDoc,
-    ]));
+    parts.push(concat([line, havingDoc]));
   }
   return groupIndentConcat(parts);
 }
@@ -1479,9 +1500,9 @@ function handleUpdateStatsOption(childClass) {
 }
 
 function handleModifier(childClass) {
-  const modifierValue = values.MODIFIER[childClass] || '';
+  const modifierValue = values.MODIFIER[childClass] || "";
   if (!modifierValue) {
-    console.warn(`Modifier ${childClass} is not supported!`);
+    console.warn(`Modifier ${childClass} is not supported!`); // eslint-disable-line no-console
   }
   return concat([modifierValue, " "]);
 }
@@ -1601,7 +1622,9 @@ function handleForInits(path, print) {
   const initDocsParts = path.map(print, "inits");
 
   // See the note in handleForInit to see why we have to do this
-  const initDocs = initDocsParts.map(initDocParts => join(concat([" ", "=", " "]), initDocParts));
+  const initDocs = initDocsParts.map(initDocParts =>
+    join(concat([" ", "=", " "]), initDocParts),
+  );
 
   const parts = [];
   _pushIfExist(parts, typeDoc, [" "]);
@@ -1626,50 +1649,24 @@ function handleForInit(path, print) {
   return parts;
 }
 
-function _handlePassthroughCall(...names) {
-  return function(path, print) {
-    return path.call(print, ...names);
-  }
-}
-
-function _pushIfExist(parts, doc, postDocs, preDocs) {
-  if (doc) {
-    if (preDocs) {
-      preDocs.forEach(preDoc => parts.push(preDoc));
-    }
-    parts.push(doc);
-    if (postDocs) {
-      postDocs.forEach(postDoc => parts.push(postDoc));
-    }
-  }
-  return parts;
-}
-
-function _escapeString(text) {
-  // Code from https://stackoverflow.com/a/11716317/477761
-  return text.replace(/\\/g, '\\\\')
-    .replace(/\u0008/g, '\\b')
-    .replace(/\t/g, '\\t')
-    .replace(/\n/g, '\\n')
-    .replace(/\f/g, '\\f')
-    .replace(/\r/g, '\\r')
-    .replace(/'/g, '\\\'')
-    .replace(/"/g, '\\"');
-}
-
 const nodeHandler = {};
 nodeHandler[apexNames.IF_ELSE_BLOCK] = handleIfElseBlock;
 nodeHandler[apexNames.IF_BLOCK] = handleIfBlock;
 nodeHandler[apexNames.ELSE_BLOCK] = handleElseBlock;
 nodeHandler[apexNames.EXPRESSION_STATEMENT] = handleExpressionStatement;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
-nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) => values.TRIGGER_USAGE[path.call(print, "$")];
+nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) =>
+  values.TRIGGER_USAGE[path.call(print, "$")];
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[apexNames.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
-nodeHandler[apexNames.EMPTY_MODIFIER_PARAMETER_REF] = handleEmptyModifierParameterRef;
+nodeHandler[
+  apexNames.EMPTY_MODIFIER_PARAMETER_REF
+] = handleEmptyModifierParameterRef;
 nodeHandler[apexNames.BLOCK_STATEMENT] = handleBlockStatement;
-nodeHandler[apexNames.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall("variableDecls");
+nodeHandler[apexNames.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall(
+  "variableDecls",
+);
 nodeHandler[apexNames.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[apexNames.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexNames.ANNOTATION] = handleAnnotation;
@@ -1686,7 +1683,8 @@ nodeHandler[apexNames.FOR_INITS] = handleForInits;
 nodeHandler[apexNames.FOR_INIT] = handleForInit;
 nodeHandler[apexNames.BREAK_STATEMENT] = () => "break;";
 nodeHandler[apexNames.CONTINUE_STATEMENT] = () => "continue;";
-nodeHandler[apexNames.THROW_STATEMENT] = (path, print) => concat(["throw", " ", path.call(print, "expr"), ";"]);
+nodeHandler[apexNames.THROW_STATEMENT] = (path, print) =>
+  concat(["throw", " ", path.call(print, "expr"), ";"]);
 nodeHandler[apexNames.TRY_CATCH_FINALLY_BLOCK] = handleTryCatchFinallyBlock;
 nodeHandler[apexNames.CATCH_BLOCK] = handleCatchBlock;
 nodeHandler[apexNames.FINALLY_BLOCK] = handleFinallyBlock;
@@ -1720,13 +1718,17 @@ nodeHandler[apexNames.ENUM_DECLARATION] = handleEnumDeclaration;
 nodeHandler[apexNames.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
 nodeHandler[apexNames.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexNames.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
-nodeHandler[apexNames.INTERFACE_DECLARATION_UNIT] = _handlePassthroughCall("body");
+nodeHandler[apexNames.INTERFACE_DECLARATION_UNIT] = _handlePassthroughCall(
+  "body",
+);
 
 // Block Member
 nodeHandler[apexNames.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");
 nodeHandler[apexNames.FIELD_MEMBER] = _handlePassthroughCall("variableDecls");
 nodeHandler[apexNames.STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMember();
-nodeHandler[apexNames.STATIC_STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMember("static");
+nodeHandler[
+  apexNames.STATIC_STATEMENT_BLOCK_MEMBER
+] = _handleStatementBlockMember("static");
 nodeHandler[apexNames.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[apexNames.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
 nodeHandler[apexNames.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
@@ -1740,7 +1742,8 @@ nodeHandler[apexNames.NESTED_EXPRESSION] = handleNestedExpression;
 nodeHandler[apexNames.VARIABLE_EXPRESSION] = handleVariableExpression;
 nodeHandler[apexNames.LITERAL_EXPRESSION] = handleLiteralExpression;
 nodeHandler[apexNames.BINARY_EXPRESSION] = handleBinaryExpression;
-nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) => concat(["Trigger", ".", path.call(print, "variable")]);
+nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) =>
+  concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
@@ -1749,11 +1752,17 @@ nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
 nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
-nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () => "Package.Version.Request";  // Not sure what this is
+nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () =>
+  "Package.Version.Request"; // Not sure what this is
 nodeHandler[apexNames.ARRAY_EXPRESSION] = handleArrayExpression;
-nodeHandler[apexNames.CLASS_REF_EXPRESSION] = (path, print) => concat([path.call(print, "type"), ".", "class"]);
-nodeHandler[apexNames.THIS_METHOD_CALL_EXPRESSION] = handleThisMethodCallExpression;
-nodeHandler[apexNames.SUPER_METHOD_CALL_EXPRESSION] = handleSuperMethodCallExpression;
+nodeHandler[apexNames.CLASS_REF_EXPRESSION] = (path, print) =>
+  concat([path.call(print, "type"), ".", "class"]);
+nodeHandler[
+  apexNames.THIS_METHOD_CALL_EXPRESSION
+] = handleThisMethodCallExpression;
+nodeHandler[
+  apexNames.SUPER_METHOD_CALL_EXPRESSION
+] = handleSuperMethodCallExpression;
 nodeHandler[apexNames.SOQL_EXPRESSION] = handleSoqlExpression;
 
 // New Object Init
@@ -1770,7 +1779,8 @@ nodeHandler[apexNames.NEW_KEY_VALUE] = handleNewKeyValue;
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;
 nodeHandler[apexNames.SELECT_COLUMN_CLAUSE] = handleColumnClause;
-nodeHandler[apexNames.SELECT_COUNT_CLAUSE] = () => concat(["SELECT", " ", "COUNT()"]);
+nodeHandler[apexNames.SELECT_COUNT_CLAUSE] = () =>
+  concat(["SELECT", " ", "COUNT()"]);
 nodeHandler[apexNames.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
 nodeHandler[apexNames.SELECT_INNER_QUERY] = handleSelectInnerQuery;
 nodeHandler[apexNames.SELECT_CASE_EXPRESSION] = _handlePassthroughCall("expr");
@@ -1789,15 +1799,27 @@ nodeHandler[apexNames.GROUP_BY_TYPE] = handleGroupByType;
 nodeHandler[apexNames.HAVING_CLAUSE] = handleHavingClause;
 nodeHandler[apexNames.WHERE_CLAUSE] = handleWhereClause;
 nodeHandler[apexNames.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
-nodeHandler[apexNames.WHERE_OPERATION_EXPRESSION] = handleWhereOperationExpression;
-nodeHandler[apexNames.WHERE_OPERATION_EXPRESSIONS] = handleWhereOperationExpressions;
-nodeHandler[apexNames.WHERE_COMPOUND_EXPRESSION] = handleWhereCompoundExpression;
+nodeHandler[
+  apexNames.WHERE_OPERATION_EXPRESSION
+] = handleWhereOperationExpression;
+nodeHandler[
+  apexNames.WHERE_OPERATION_EXPRESSIONS
+] = handleWhereOperationExpressions;
+nodeHandler[
+  apexNames.WHERE_COMPOUND_EXPRESSION
+] = handleWhereCompoundExpression;
 nodeHandler[apexNames.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
 nodeHandler[apexNames.WHERE_UNARY_OPERATOR] = () => "NOT";
-nodeHandler[apexNames.WHERE_DISTANCE_EXPRESSION] = handleWhereDistanceExpression;
-nodeHandler[apexNames.DISTANCE_FUNCTION_EXPRESSION] = handleDistanceFunctionExpression;
+nodeHandler[
+  apexNames.WHERE_DISTANCE_EXPRESSION
+] = handleWhereDistanceExpression;
+nodeHandler[
+  apexNames.DISTANCE_FUNCTION_EXPRESSION
+] = handleDistanceFunctionExpression;
 nodeHandler[apexNames.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
-nodeHandler[apexNames.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall("literal");
+nodeHandler[apexNames.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall(
+  "literal",
+);
 nodeHandler[apexNames.QUERY_LITERAL] = handleWhereQueryLiteral;
 nodeHandler[apexNames.APEX_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.COLON_EXPRESSION] = handleColonExpression;
@@ -1807,11 +1829,15 @@ nodeHandler[apexNames.WITH_VALUE] = handleWithValue;
 nodeHandler[apexNames.WITH_DATA_CATEGORIES] = handleWithDataCategories;
 nodeHandler[apexNames.DATA_CATEGORY] = handleDataCategory;
 nodeHandler[apexNames.DATA_CATEGORY_OPERATOR] = handleDataCategoryOperator;
-nodeHandler[apexNames.LIMIT_VALUE] = (path, print) => concat(["LIMIT", " ", path.call(print, "i")]);
-nodeHandler[apexNames.LIMIT_EXPRESSION] = (path, print) => concat(["LIMIT", " ", path.call(print, "expr")]);
-nodeHandler[apexNames.OFFSET_VALUE] = (path, print) => concat(["OFFSET", " ", path.call(print, "i")]);
-nodeHandler[apexNames.OFFSET_EXPRESSION] = (path, print) => concat(["OFFSET", " ", path.call(print, "expr")]);
-nodeHandler[apexNames.QUERY_OPERATOR] = (childClass) => values.QUERY[childClass];
+nodeHandler[apexNames.LIMIT_VALUE] = (path, print) =>
+  concat(["LIMIT", " ", path.call(print, "i")]);
+nodeHandler[apexNames.LIMIT_EXPRESSION] = (path, print) =>
+  concat(["LIMIT", " ", path.call(print, "expr")]);
+nodeHandler[apexNames.OFFSET_VALUE] = (path, print) =>
+  concat(["OFFSET", " ", path.call(print, "i")]);
+nodeHandler[apexNames.OFFSET_EXPRESSION] = (path, print) =>
+  concat(["OFFSET", " ", path.call(print, "expr")]);
+nodeHandler[apexNames.QUERY_OPERATOR] = childClass => values.QUERY[childClass];
 nodeHandler[apexNames.SOQL_ORDER] = handleOrderOperation;
 nodeHandler[apexNames.SOQL_ORDER_NULL] = handleNullOrderOperation;
 nodeHandler[apexNames.TRACKING_TYPE] = handleTrackingType;
@@ -1820,11 +1846,12 @@ nodeHandler[apexNames.QUERY_USING_CLAUSE] = handleQueryUsingClause;
 nodeHandler[apexNames.USING] = handleUsing;
 nodeHandler[apexNames.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
 nodeHandler[apexNames.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
-nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = (childClass) => values.QUERY_WHERE[childClass];
+nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = childClass =>
+  values.QUERY_WHERE[childClass];
 
 function handleTrailingEmptyLines(doc, node) {
   if (node.trailingEmptyLine && !node.isLastNodeInArray) {
-    doc = concat([doc, hardline]);
+    doc = concat([doc, hardline]); // eslint-disable-line no-param-reassign
   }
   return doc;
 }
@@ -1853,7 +1880,7 @@ function genericPrint(path, options, print) {
     return "";
   }
   if (apexClass in nodeHandler) {
-    let doc = nodeHandler[apexClass](path, print, options);
+    const doc = nodeHandler[apexClass](path, print, options);
     return handleTrailingEmptyLines(doc, n);
   }
   const separatorIndex = apexClass.indexOf("$");
@@ -1861,11 +1888,11 @@ function genericPrint(path, options, print) {
     const parentClass = apexClass.substring(0, separatorIndex);
     const childClass = apexClass.substring(separatorIndex + 1);
     if (parentClass in nodeHandler) {
-      let doc = nodeHandler[parentClass](childClass, path, print, options);
-      return handleTrailingEmptyLines(doc, n)
+      const doc = nodeHandler[parentClass](childClass, path, print, options);
+      return handleTrailingEmptyLines(doc, n);
     }
   }
-  console.warn(`No handler found for ${apexClass}`);
+  console.warn(`No handler found for ${apexClass}`); // eslint-disable-line no-console
 
   return "";
 }

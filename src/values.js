@@ -1,5 +1,3 @@
-"use strict";
-
 const values = {
   APEX_NAMES: {
     TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage",
@@ -9,12 +7,15 @@ const values = {
     ARRAY_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ArrayTypeRef",
     MODIFIER: "apex.jorje.data.ast.Modifier",
     ANNOTATION: "apex.jorje.data.ast.Modifier$Annotation",
-    ANNOTATION_KEY_VALUE: "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
+    ANNOTATION_KEY_VALUE:
+      "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
     ANNOTATION_VALUE: "apex.jorje.data.ast.AnnotationValue",
-    EMPTY_MODIFIER_PARAMETER_REF: "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
+    EMPTY_MODIFIER_PARAMETER_REF:
+      "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
     BLOCK_STATEMENT: "apex.jorje.data.ast.Stmnt$BlockStmnt",
     RETURN_STATEMENT: "apex.jorje.data.ast.Stmnt$ReturnStmnt",
-    VARIABLE_DECLARATION_STATEMENT: "apex.jorje.data.ast.Stmnt$VariableDeclStmnt",
+    VARIABLE_DECLARATION_STATEMENT:
+      "apex.jorje.data.ast.Stmnt$VariableDeclStmnt",
     VARIABLE_DECLARATIONS: "apex.jorje.data.ast.VariableDecls",
     NAME_VALUE_PARAMETER: "apex.jorje.data.ast.NameValueParameter",
     IF_ELSE_BLOCK: "apex.jorje.data.ast.Stmnt$IfElseBlock",
@@ -69,18 +70,22 @@ const values = {
     // Compilation Unit
     CLASS_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$ClassDeclUnit",
     ENUM_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$EnumDeclUnit",
-    TRIGGER_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
-    INTERFACE_DECLARATION_UNIT: "apex.jorje.data.ast.CompilationUnit$InterfaceDeclUnit",
+    TRIGGER_DECLARATION_UNIT:
+      "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
+    INTERFACE_DECLARATION_UNIT:
+      "apex.jorje.data.ast.CompilationUnit$InterfaceDeclUnit",
 
     // Block Member
     PROPERTY_MEMBER: "apex.jorje.data.ast.BlockMember$PropertyMember",
     FIELD_MEMBER: "apex.jorje.data.ast.BlockMember$FieldMember",
     STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StmntBlockMember",
-    STATIC_STATEMENT_BLOCK_MEMBER: "apex.jorje.data.ast.BlockMember$StaticStmntBlockMember",
+    STATIC_STATEMENT_BLOCK_MEMBER:
+      "apex.jorje.data.ast.BlockMember$StaticStmntBlockMember",
     METHOD_MEMBER: "apex.jorje.data.ast.BlockMember$MethodMember",
     INNER_ENUM_MEMBER: "apex.jorje.data.ast.BlockMember$InnerEnumMember",
     INNER_CLASS_MEMBER: "apex.jorje.data.ast.BlockMember$InnerClassMember",
-    INNER_INTERFACE_MEMBER: "apex.jorje.data.ast.BlockMember$InnerInterfaceMember",
+    INNER_INTERFACE_MEMBER:
+      "apex.jorje.data.ast.BlockMember$InnerInterfaceMember",
 
     // Expression
     METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$MethodCallExpr",
@@ -103,7 +108,8 @@ const values = {
     SUPER_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$SuperVariableExpr",
     CLASS_REF_EXPRESSION: "apex.jorje.data.ast.Expr$ClassRefExpr",
     THIS_METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$ThisMethodCallExpr",
-    SUPER_METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$SuperMethodCallExpr",
+    SUPER_METHOD_CALL_EXPRESSION:
+      "apex.jorje.data.ast.Expr$SuperMethodCallExpr",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
 
     // New Object Init
@@ -120,9 +126,11 @@ const values = {
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",
     SELECT_INNER_QUERY: "apex.jorje.data.soql.SelectExpr$SelectInnerQuery",
-    SELECT_COLUMN_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectColumnClause",
+    SELECT_COLUMN_CLAUSE:
+      "apex.jorje.data.soql.SelectClause$SelectColumnClause",
     SELECT_COUNT_CLAUSE: "apex.jorje.data.soql.SelectClause$SelectCountClause",
-    SELECT_COLUMN_EXPRESSION: "apex.jorje.data.soql.SelectExpr$SelectColumnExpr",
+    SELECT_COLUMN_EXPRESSION:
+      "apex.jorje.data.soql.SelectExpr$SelectColumnExpr",
     SELECT_CASE_EXPRESSION: "apex.jorje.data.soql.SelectExpr$SelectCaseExpr",
     CASE_EXPRESSION: "apex.jorje.data.soql.CaseExpr",
     CASE_OPERATOR: "apex.jorje.data.soql.CaseOp",
@@ -149,11 +157,13 @@ const values = {
     LIMIT_EXPRESSION: "apex.jorje.data.soql.LimitClause$LimitExpr",
     OFFSET_VALUE: "apex.jorje.data.soql.OffsetClause$OffsetValue",
     OFFSET_EXPRESSION: "apex.jorje.data.soql.OffsetClause$OffsetExpr",
-    WHERE_COMPOUND_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereCompoundExpr",
+    WHERE_COMPOUND_EXPRESSION:
+      "apex.jorje.data.soql.WhereExpr$WhereCompoundExpr",
     WHERE_COMPOUND_OPERATOR: "apex.jorje.data.soql.WhereCompoundOp",
     WHERE_UNARY_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereUnaryExpr",
     WHERE_UNARY_OPERATOR: "apex.jorje.data.soql.WhereUnaryOp",
-    WHERE_DISTANCE_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereDistanceExpr",
+    WHERE_DISTANCE_EXPRESSION:
+      "apex.jorje.data.soql.WhereExpr$WhereDistanceExpr",
     DISTANCE_FUNCTION_EXPRESSION: "apex.jorje.data.soql.DistanceFunctionExpr",
     GEOLOCATION_LITERAL: "apex.jorje.data.soql.Geolocation$GeolocationLiteral",
     QUERY_LITERAL_EXPRESSION: "apex.jorje.data.soql.QueryExpr$LiteralExpr",
@@ -283,7 +293,7 @@ const values = {
     AFTER_INSERT: "after insert",
     AFTER_UPDATE: "after update",
     AFTER_UNDELETE: "after undelete",
-  }
+  },
 };
 
 values.ALLOW_TRAILING_EMPTY_LINE = [

@@ -1,11 +1,10 @@
-"use strict";
-
-const spawn = require("child_process").spawn;
+const { spawn } = require("child_process");
 const path = require("path");
 const util = require("util");
 
 const nailgunClient = require("node-nailgun-client");
 const waitOn = require("wait-on");
+
 const waitOnPromise = util.promisify(waitOn);
 
 async function start(address, port) {
@@ -18,16 +17,14 @@ async function start(address, port) {
   const command = spawn(serializerBin);
   command.stderr.pipe(process.stderr);
 
-  command.on("close", function (code) {
+  command.on("close", code => {
     if (code) {
       throw new Error(`Nailgun server closed with error code ${code}`);
     }
   });
 
   await waitOnPromise({
-    resources: [
-      `tcp:${address}:${port}`,
-    ]
+    resources: [`tcp:${address}:${port}`],
   });
 
   return command;
@@ -40,7 +37,7 @@ async function stop(address, port) {
   };
 
   const nail = nailgunClient.exec("ng-stop", [], options);
-  nail.socket.on("error", function (err) {
+  nail.socket.on("error", err => {
     // For some reason on Windows ECONNABORTED gets thrown when we write to
     // the socket, even though the command runs successfully.
     if (err.code !== "ECONNABORTED") {
@@ -49,9 +46,7 @@ async function stop(address, port) {
   });
 
   await waitOnPromise({
-    resources: [
-      `tcp:${address}:${port}`,
-    ],
+    resources: [`tcp:${address}:${port}`],
     reverse: true,
   });
 }

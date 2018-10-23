@@ -1,5 +1,3 @@
-"use strict";
-
 const parse = require("./parser");
 const print = require("./printer");
 
@@ -10,14 +8,14 @@ const languages = [
     extensions: [".cls", ".trigger"],
     linguistLanguageId: 17,
     vscodeLanguageIds: ["apex"],
-  }
+  },
 ];
 
 function locStart(node) {
   if (node.loc) {
     return node.loc;
   }
-  return {line: -1, column: -1};
+  return { line: -1, column: -1 };
 }
 
 function locEnd() {
@@ -25,7 +23,7 @@ function locEnd() {
 }
 
 const parsers = {
-  "apex": {
+  apex: {
     astFormat: "apex",
     parse,
     locStart,
@@ -35,8 +33,8 @@ const parsers = {
 
 const printers = {
   apex: {
-    print
-  }
+    print,
+  },
 };
 
 const options = {
