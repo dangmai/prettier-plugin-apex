@@ -262,7 +262,40 @@ class EmptyLine {
 
   }
 
-  class ClassDeclaration {}
+  class ClassDeclaration {
+    class InnerClassMember {}
+
+    class InnerClassMemberTwo {}
+
+  }
+
+  class InnerClassTwo {
+    interface InnerInterfaceMember {}
+
+    interface InnerInterfaceMemberTwo {}
+
+  }
+
+  class InnerClassThree {
+    enum InnerEnumMember {}
+
+    enum InnerEnumMemberTwo {}
+
+  }
+
+  class InnerClassFour {
+    String propertyMember { get; set; }
+
+    String propertyMemberTwo { get; set; }
+
+  }
+
+  class InnerClassFive {
+    String fieldMember;
+
+    String fieldMemberTwo;
+
+  }
 
   interface InterfaceDeclaration {}
 

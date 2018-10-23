@@ -114,9 +114,15 @@ function generateExtraMetadata(
 ) {
   const apexClass = node["@class"];
   let allowTrailingEmptyLineWithin;
-  if (values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass)) {
+  const isSpecialClass = values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(
+    apexClass,
+  );
+  const trailingEmptyLineAllowed = values.ALLOW_TRAILING_EMPTY_LINE.includes(
+    apexClass,
+  );
+  if (isSpecialClass) {
     allowTrailingEmptyLineWithin = false;
-  } else if (apexClass === apexNames.BLOCK_STATEMENT) {
+  } else if (trailingEmptyLineAllowed) {
     allowTrailingEmptyLineWithin = true;
   } else {
     allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
@@ -149,9 +155,6 @@ function generateExtraMetadata(
     }
   });
 
-  const isSpecialClass = values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(
-    apexClass,
-  );
   if (isSpecialClass && lastNodeLoc) {
     // Store the last node information for some special node types, so that
     // we can add trailing empty lines after them.
@@ -175,10 +178,7 @@ function generateExtraMetadata(
       ? node.lastNodeLoc.endLine + 1
       : node.loc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-    if (
-      values.ALLOW_TRAILING_EMPTY_LINE.includes(apexClass) &&
-      nextEmptyLine !== -1
-    ) {
+    if (trailingEmptyLineAllowed && nextEmptyLine !== -1) {
       node.trailingEmptyLine = true;
 
       if (emptyLineNodeMap[nextLine]) {
