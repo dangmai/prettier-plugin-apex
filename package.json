@@ -4,12 +4,13 @@
   "description": "Salesforce Apex plugin for Prettier",
   "main": "src",
   "scripts": {
+    "pretest": "npm run lint",
     "test": "jest",
     "start-server": "node tests_config/set_up.js",
     "stop-server": "node tests_config/tear_down.js",
     "execute": "node src/execute.js",
-    "lint": "eslint \"src/**/*.js\"",
-    "prettier": "prettier --write \"src/**/*.js\""
+    "lint": "eslint \"{src,tests_config}/**/*.js\"",
+    "prettier": "prettier --write \"{src,tests_config}/**/*.js\""
   },
   "keywords": [
     "apex",
