@@ -1027,9 +1027,20 @@ function handleFindValue(childClass, path, print) {
   return doc;
 }
 
+function handleInClause(path, print) {
+  const parts = [];
+  parts.push("IN");
+  parts.push(" ");
+  parts.push(path.call(print, "scope").toUpperCase());
+  parts.push(" ");
+  parts.push("FIELDS");
+  return concat(parts);
+}
+
 function handleSearch(path, print) {
   const parts = [];
   parts.push(path.call(print, "find"));
+  _pushIfExist(parts, path.call(print, "in", "value"));
   return join(line, parts);
 }
 
@@ -1818,6 +1829,7 @@ nodeHandler[apexNames.SOSL_EXPRESSION] = handleSoslExpression;
 nodeHandler[apexNames.SEARCH] = handleSearch;
 nodeHandler[apexNames.FIND_CLAUSE] = handleFindClause;
 nodeHandler[apexNames.FIND_VALUE] = handleFindValue;
+nodeHandler[apexNames.IN_CLAUSE] = handleInClause;
 
 // New Object Init
 nodeHandler[apexNames.NEW_SET_INIT] = handleNewSetInit;

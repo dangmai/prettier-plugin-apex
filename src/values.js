@@ -128,6 +128,7 @@ const values = {
     SEARCH: "apex.jorje.data.sosl.Search",
     FIND_CLAUSE: "apex.jorje.data.sosl.FindClause",
     FIND_VALUE: "apex.jorje.data.sosl.FindValue",
+    IN_CLAUSE: "apex.jorje.data.sosl.InClause",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",
