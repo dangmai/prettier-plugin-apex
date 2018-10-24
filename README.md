@@ -1,4 +1,4 @@
-# Prettier Apex  [![Build Status](https://travis-ci.org/dangmai/prettier-plugin-apex.svg)](https://travis-ci.org/dangmai/prettier-plugin-apex)
+# Prettier Apex  [![Build Status](https://travis-ci.org/dangmai/prettier-apex.svg)](https://travis-ci.org/dangmai/prettier-apex)
 
 ![Prettier Banner](https://raw.githubusercontent.com/prettier/prettier-logo/master/images/prettier-banner-light.png)
 
