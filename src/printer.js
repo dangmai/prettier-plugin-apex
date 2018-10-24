@@ -1101,9 +1101,10 @@ function handleSearchWithClause(path, print) {
 
 function handleSearchWithClauseValue(childClass, path, print) {
   const parts = [];
+  let valueDocs;
   switch (childClass) {
     case "SearchWithStringValue":
-      const valueDocs = path.map(print, "values");
+      valueDocs = path.map(print, "values");
       if (valueDocs.length === 1) {
         parts.push(" = ");
         parts.push(valueDocs[0]);
