@@ -134,6 +134,8 @@ const values = {
     WITH_DATA_CATEGORY_CLAUSE: "apex.jorje.data.sosl.WithDataCategoryClause",
     WITH_SNIPPET_CLAUSE: "apex.jorje.data.sosl.WithSnippetClause",
     WITH_NETWORK_CLAUSE: "apex.jorje.data.sosl.WithNetworkClause",
+    SEARCH_WITH_CLAUSE: "apex.jorje.data.sosl.SearchWithClause",
+    SEARCH_WITH_CLAUSE_VALUE: "apex.jorje.data.sosl.SearchWithClauseValue",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",

@@ -1090,7 +1090,49 @@ function handleWithNetworkClause(path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleSearchWithClause(path, print) {
+  const parts = [];
+  parts.push("WITH");
+  parts.push(" ");
+  parts.push(path.call(print, "name"));
+  parts.push(path.call(print, "value", "value"));
+  return concat(parts);
+}
+
+function handleSearchWithClauseValue(childClass, path, print) {
+  const parts = [];
+  switch (childClass) {
+    case "SearchWithStringValue":
+      const valueDocs = path.map(print, "values");
+      if (valueDocs.length === 1) {
+        parts.push(" = ");
+        parts.push(valueDocs[0]);
+      } else {
+        parts.push(" IN ");
+        parts.push("(");
+        parts.push(softline);
+        parts.push(join(concat([",", line]), valueDocs));
+        parts.push(dedent(softline));
+        parts.push(")");
+      }
+      break;
+    case "SearchWithTrueValue":
+      parts.push(" = ");
+      parts.push("true");
+      break;
+    case "SearchWithFalseValue":
+      parts.push(" = ");
+      parts.push("false");
+      break;
+    default:
+      throw new Error(`SearchWithClauseValue ${childClass} is not supported`);
+  }
+  return groupIndentConcat(parts);
+}
+
 function handleSearch(path, print) {
+  const withDocs = path.map(print, "withs");
+
   const parts = [];
   parts.push(path.call(print, "find"));
   _pushIfExist(parts, path.call(print, "in", "value"));
@@ -1098,6 +1140,10 @@ function handleSearch(path, print) {
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
   _pushIfExist(parts, path.call(print, "snippet", "value"));
   _pushIfExist(parts, path.call(print, "network", "value"));
+  if (withDocs.length > 0) {
+    parts.push(join(line, withDocs));
+  }
+
   return join(line, parts);
 }
 
@@ -1816,6 +1862,7 @@ nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
 nodeHandler.int = (path, print) => path.call(print, "$");
+nodeHandler.string = (path, print) => concat(["'", path.call(print, "$"), "'"]);
 
 // Operator
 nodeHandler[apexNames.ASSIGNMENT_OPERATOR] = handleAssignmentOperation;
@@ -1904,6 +1951,8 @@ nodeHandler[apexNames.DIVISION_VALUE] = handleDivisionValue;
 nodeHandler[apexNames.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
 nodeHandler[apexNames.WITH_SNIPPET_CLAUSE] = handleWithSnippetClause;
 nodeHandler[apexNames.WITH_NETWORK_CLAUSE] = handleWithNetworkClause;
+nodeHandler[apexNames.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
+nodeHandler[apexNames.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
 
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;

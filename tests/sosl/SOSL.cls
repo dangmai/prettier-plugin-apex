@@ -35,10 +35,31 @@ class SOSLClass {
   }
   void withNetwork() {
     List<List<SObject>> searchResult;
-    String a = 'NetworkId';
     searchResult = [FIND 'Hello' WITH Network = 'NetworkId'];
     searchResult = [FIND 'Hello' WITH Network IN ('NetworkId1', 'NetworkId2', 'NetworkId3')];
     searchResult = [FIND 'Hello' WITH Network = '00000000000000'];
     searchResult = [FIND 'Hello' WITH Network IN ('NetworkId1', 'NetworkId2', 'NetworkId3', 'NetworkId4', 'NetworkId5', 'NetworkId6')];
+  }
+  void withPricebookId() {
+    List<List<SObject>> searchResult;
+    searchResult = [FIND 'Hello' WITH PriceBookId = '01sxx0000002MffAAE'];
+    // Technically the following line is not correct Apex, since PriceBookId
+    // cannot be used with IN, but it's the only semi-accurate example I can
+    // find for SearchWithClauseValue with multiple string values
+    searchResult = [FIND 'Hello' WITH PriceBookId IN ('01sxx0000002MffAAE', '1234')];
+    searchResult = [FIND 'Hello' WITH PriceBookId = '01sxx0000002MffAAE' WITH PriceBookId = '01sxx0000002MffAAE' WITH PriceBookId = '01sxx0000002MffAAE'];
+  }
+  void withMetadata() {
+    List<List<SObject>> searchResult;
+    searchResult = [FIND 'Hello' WITH METADATA = 'LABELS'];
+  }
+  void withHighlight() {
+    List<List<SObject>> searchResult;
+    searchResult = [FIND 'Hello' WITH HIGHLIGHT];
+  }
+  void withSpellCorrection() {
+    List<List<SObject>> searchResult;
+    searchResult = [FIND 'Hello' WITH SPELL_CORRECTION = true];
+    searchResult = [FIND 'Hello' WITH SPELL_CORRECTION = false];
   }
 }
