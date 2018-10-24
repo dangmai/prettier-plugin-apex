@@ -133,6 +133,7 @@ const values = {
     DIVISION_VALUE: "apex.jorje.data.sosl.DivisionValue",
     WITH_DATA_CATEGORY_CLAUSE: "apex.jorje.data.sosl.WithDataCategoryClause",
     WITH_SNIPPET_CLAUSE: "apex.jorje.data.sosl.WithSnippetClause",
+    WITH_NETWORK_CLAUSE: "apex.jorje.data.sosl.WithNetworkClause",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",

@@ -1068,6 +1068,28 @@ function handleWithSnippetClause(path, print) {
   return concat(parts);
 }
 
+function handleWithNetworkClause(path, print) {
+  const networkDocs = path.map(print, "networks");
+
+  const parts = [];
+  parts.push("WITH NETWORK ");
+
+  if (networkDocs.length === 1) {
+    parts.push("=");
+    parts.push(" ");
+    parts.push(networkDocs[0]);
+  } else {
+    parts.push("IN");
+    parts.push(" ");
+    parts.push("(");
+    parts.push(softline);
+    parts.push(join(concat([",", line]), networkDocs));
+    parts.push(dedent(softline));
+    parts.push(")");
+  }
+  return groupIndentConcat(parts);
+}
+
 function handleSearch(path, print) {
   const parts = [];
   parts.push(path.call(print, "find"));
@@ -1075,6 +1097,7 @@ function handleSearch(path, print) {
   _pushIfExist(parts, path.call(print, "division", "value"));
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
   _pushIfExist(parts, path.call(print, "snippet", "value"));
+  _pushIfExist(parts, path.call(print, "network", "value"));
   return join(line, parts);
 }
 
@@ -1880,6 +1903,7 @@ nodeHandler[apexNames.WITH_DIVISION_CLAUSE] = handleDivisionClause;
 nodeHandler[apexNames.DIVISION_VALUE] = handleDivisionValue;
 nodeHandler[apexNames.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
 nodeHandler[apexNames.WITH_SNIPPET_CLAUSE] = handleWithSnippetClause;
+nodeHandler[apexNames.WITH_NETWORK_CLAUSE] = handleWithNetworkClause;
 
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;
