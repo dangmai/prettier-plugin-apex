@@ -1,4 +1,4 @@
-# Prettier Apex  [![Build Status](https://travis-ci.org/dangmai/prettier-apex.svg)](https://travis-ci.org/dangmai/prettier-apex)
+# Prettier Apex  [![Build Status](https://travis-ci.org/dangmai/prettier-plugin-apex.svg)](https://travis-ci.org/dangmai/prettier-plugin-apex)
 
 ![Prettier Banner](https://raw.githubusercontent.com/prettier/prettier-logo/master/images/prettier-banner-light.png)
 
@@ -10,7 +10,7 @@ and the jorje compiler from Salesforce for parsing.
 
 ## Status
 
-`prettier-apex` is actively being worked on,
+This project is actively being worked on,
 and definitely not ready to be run on production code.
 
 * Priority right now is to support all AST elements from compiler.
@@ -23,8 +23,8 @@ continuation indent, etc.
 ## How to run
 
 ```bash
-git clone https://github.com/dangmai/prettier-apex.git
-cd prettier-apex
+git clone https://github.com/dangmai/prettier-plugin-apex.git
+cd prettier-plugin-apex
 npm i
 npm run execute -- prettify /path/to/apex/dir
 ```
