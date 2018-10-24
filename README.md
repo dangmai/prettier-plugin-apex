@@ -23,8 +23,8 @@ continuation indent, etc.
 ## How to run
 
 ```bash
-git clone https://github.com/dangmai/prettier-plugin-apex.git
-cd prettier-plugin-apex
+git clone https://github.com/dangmai/prettier-apex.git
+cd prettier-apex
 npm i
 npm run execute -- prettify /path/to/apex/dir
 ```
