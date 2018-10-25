@@ -1131,6 +1131,46 @@ function handleSearchWithClauseValue(childClass, path, print) {
   return groupIndentConcat(parts);
 }
 
+function handleReturningClause(path, print) {
+  const parts = [];
+  parts.push(
+    indentConcat([
+      "RETURNING",
+      line,
+      join(concat([",", line]), path.map(print, "exprs")),
+    ]),
+  );
+  return groupConcat(parts);
+}
+
+function handleReturningExpression(path, print) {
+  const selectDoc = path.call(print, "select", "value");
+
+  const parts = [];
+  parts.push(path.call(print, "name"));
+  if (selectDoc) {
+    parts.push("(");
+    parts.push(path.call(print, "select", "value"));
+    parts.push(")");
+  }
+  return groupConcat(parts);
+}
+
+function handleReturningSelectExpression(path, print) {
+  const fieldDocs = path.map(print, "fields");
+
+  const parts = [];
+  parts.push(join(concat([",", line]), fieldDocs));
+
+  _pushIfExist(parts, path.call(print, "where", "value"));
+  _pushIfExist(parts, path.call(print, "using", "value"));
+  _pushIfExist(parts, path.call(print, "orderBy", "value"));
+  _pushIfExist(parts, path.call(print, "limit", "value"));
+  _pushIfExist(parts, path.call(print, "offset", "value"));
+  // TODO bind (apex.jorje.data.soql.BindClause/BindExpr) - not sure how this is used ASKSF
+  return groupIndentConcat([softline, join(line, parts)]);
+}
+
 function handleSearch(path, print) {
   const withDocs = path.map(print, "withs");
 
@@ -1141,6 +1181,10 @@ function handleSearch(path, print) {
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
   _pushIfExist(parts, path.call(print, "snippet", "value"));
   _pushIfExist(parts, path.call(print, "network", "value"));
+  _pushIfExist(parts, path.call(print, "returning", "value"));
+  _pushIfExist(parts, path.call(print, "limit", "value"));
+  _pushIfExist(parts, path.call(print, "updateStats", "value"));
+  // TODO using - not sure how this is used ASKSF
   if (withDocs.length > 0) {
     parts.push(join(line, withDocs));
   }
@@ -1599,12 +1643,30 @@ function handleQueryUsingClause(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleUsing(path, print) {
-  return concat([
-    path.call(print, "name", "value"),
-    " ",
-    path.call(print, "field", "value"),
-  ]);
+function handleUsingExpression(childClass, path, print) {
+  let doc;
+  switch (childClass) {
+    case "Using":
+      doc = concat([
+        path.call(print, "name", "value"),
+        " ",
+        path.call(print, "field", "value"),
+      ]);
+      break;
+    case "UsingEquals":
+      doc = concat([
+        path.call(print, "name", "value"),
+        " = ",
+        path.call(print, "field", "value"),
+      ]);
+      break;
+    case "UsingId":
+      // TODO apex.jorje.data.soql.UsingExpr.UsingId not sure how this is used - ASKSF
+      throw new Error(`UsingExpr ${childClass} is not supported!`);
+    default:
+      throw new Error(`UsingExpr ${childClass} is not supported!`);
+  }
+  return doc;
 }
 
 function handleTrackingType(childClass) {
@@ -1954,6 +2016,11 @@ nodeHandler[apexNames.WITH_SNIPPET_CLAUSE] = handleWithSnippetClause;
 nodeHandler[apexNames.WITH_NETWORK_CLAUSE] = handleWithNetworkClause;
 nodeHandler[apexNames.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
 nodeHandler[apexNames.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
+nodeHandler[apexNames.RETURNING_CLAUSE] = handleReturningClause;
+nodeHandler[apexNames.RETURNING_EXPRESSION] = handleReturningExpression;
+nodeHandler[
+  apexNames.RETURNING_SELECT_EXPRESSION
+] = handleReturningSelectExpression;
 
 // SOQL
 nodeHandler[apexNames.QUERY] = handleQuery;
@@ -2022,7 +2089,7 @@ nodeHandler[apexNames.SOQL_ORDER_NULL] = handleNullOrderOperation;
 nodeHandler[apexNames.TRACKING_TYPE] = handleTrackingType;
 nodeHandler[apexNames.QUERY_OPTION] = handleQueryOption;
 nodeHandler[apexNames.QUERY_USING_CLAUSE] = handleQueryUsingClause;
-nodeHandler[apexNames.USING] = handleUsing;
+nodeHandler[apexNames.USING_EXPRESSION] = handleUsingExpression;
 nodeHandler[apexNames.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
 nodeHandler[apexNames.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = childClass =>

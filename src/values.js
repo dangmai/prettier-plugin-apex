@@ -136,6 +136,9 @@ const values = {
     WITH_NETWORK_CLAUSE: "apex.jorje.data.sosl.WithNetworkClause",
     SEARCH_WITH_CLAUSE: "apex.jorje.data.sosl.SearchWithClause",
     SEARCH_WITH_CLAUSE_VALUE: "apex.jorje.data.sosl.SearchWithClauseValue",
+    RETURNING_CLAUSE: "apex.jorje.data.sosl.ReturningClause",
+    RETURNING_EXPRESSION: "apex.jorje.data.sosl.ReturningExpr",
+    RETURNING_SELECT_EXPRESSION: "apex.jorje.data.sosl.ReturningSelectExpr",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",
@@ -188,7 +191,7 @@ const values = {
     TRACKING_TYPE: "apex.jorje.data.soql.TrackingType",
     QUERY_OPTION: "apex.jorje.data.soql.QueryOption",
     QUERY_USING_CLAUSE: "apex.jorje.data.soql.QueryUsingClause",
-    USING: "apex.jorje.data.soql.UsingExpr$Using",
+    USING_EXPRESSION: "apex.jorje.data.soql.UsingExpr",
     UPDATE_STATS_CLAUSE: "apex.jorje.data.soql.UpdateStatsClause",
     UPDATE_STATS_OPTION: "apex.jorje.data.soql.UpdateStatsOption",
     WITH_VALUE: "apex.jorje.data.soql.WithClause$WithValue",
