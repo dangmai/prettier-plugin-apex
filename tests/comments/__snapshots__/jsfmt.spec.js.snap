@@ -71,31 +71,31 @@ class Comments {
 /* Trailing Block Comment */
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class Comments {
-  void assignmentComments() {
-    Integer a = 1;
-    Integer b = 1;
-  }
+    void assignmentComments() {
+        Integer a = 1;
+        Integer b = 1;
+    }
 
-  void beforeComma() {
-    Integer a = 1, b = 2;
-  }
+    void beforeComma() {
+        Integer a = 1, b = 2;
+    }
 
-  void binaryExpression() {
-    Integer i = 1;
-    Integer j = 2;
-    Integer a;
+    void binaryExpression() {
+        Integer i = 1;
+        Integer j = 2;
+        Integer a;
 
-    a = i + j;
-    a = i - j;
-    a = i * j;
-    a = i / j;
-    a = i << j;
-    a = i >> j;
-    a = i >>> j;
-    a = i ^ j;
-    a = i & j;
-    a = i | j;
-  }
+        a = i + j;
+        a = i - j;
+        a = i * j;
+        a = i / j;
+        a = i << j;
+        a = i >> j;
+        a = i >>> j;
+        a = i ^ j;
+        a = i & j;
+        a = i | j;
+    }
 }
 
 `;

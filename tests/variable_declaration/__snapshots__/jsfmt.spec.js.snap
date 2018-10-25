@@ -22,23 +22,23 @@ public class VariableDeclaration {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public class VariableDeclaration {
-  public void declareVariables() {
-    String firstString, secondString;
-    String a = 'aaa', b = 'bbb';
-    List<UnknownClass.InnerClass> nestedList = new List<UnknownClass.InnerClass>();
-    String veryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'tada',
-      anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'a';
-    String c = 'c';
-    String d = 'd';
-    String e = c, d = a;
-    HttpRequest request = new HttpRequest();
-    String[] stringArray = new List<String>{};
-    String[] anotherStringArray = new List<String>{'a', 'b'};
-    List<String> anotherArray = new List<String>(1);
-    String[] emptyStrings;
-    String[] otherStrings = new List<String>();
-    List<List<String>> listOfList = new List<List<String>>();
-  }
+    public void declareVariables() {
+        String firstString, secondString;
+        String a = 'aaa', b = 'bbb';
+        List<UnknownClass.InnerClass> nestedList = new List<UnknownClass.InnerClass>();
+        String veryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'tada',
+            anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'a';
+        String c = 'c';
+        String d = 'd';
+        String e = c, d = a;
+        HttpRequest request = new HttpRequest();
+        String[] stringArray = new List<String>{};
+        String[] anotherStringArray = new List<String>{'a', 'b'};
+        List<String> anotherArray = new List<String>(1);
+        String[] emptyStrings;
+        String[] otherStrings = new List<String>();
+        List<List<String>> listOfList = new List<List<String>>();
+    }
 }
 
 `;

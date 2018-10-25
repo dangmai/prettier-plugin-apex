@@ -58,9 +58,15 @@ const options = {
   },
 };
 
+const defaultOptions = {
+  tabWidth: 4,
+  printWidth: 100,
+};
+
 module.exports = {
   languages,
   printers,
   parsers,
   options,
+  defaultOptions,
 };
