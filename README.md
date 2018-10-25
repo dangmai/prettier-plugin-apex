@@ -15,7 +15,7 @@ and definitely not ready to be run on production code.
 
 * Priority right now is to support all AST elements from compiler.
 A lot is already supported.
-* Currently not working: SOSL, comments.
+* Currently not working: comments.
 * Formatting needs a lot of work.
 * Some defaults will be changed in the future, e.g. default number of spaces,
 continuation indent, etc.
