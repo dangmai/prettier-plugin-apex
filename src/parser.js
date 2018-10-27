@@ -3,6 +3,7 @@
 const childProcess = require("child_process");
 const path = require("path");
 
+const attachComments = require("./comments").attach;
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
@@ -298,15 +299,10 @@ function parse(sourceCode, _, options) {
       {},
       true,
     );
-    resolveLocations(ast, locationMap);
+    resolveLocations(ast[apexNames.PARSER_OUTPUT].unit, locationMap);
     locations = Array.from(locationMap.keys());
-    locations.sort((first, second) => {
-      const startIndexDiff = first.startIndex - second.startIndex;
-      if (startIndexDiff !== 0) {
-        return startIndexDiff;
-      }
-      return first.endIndex - second.endIndex;
-    });
+    locations.sort((first, second) => first.endIndex - second.startIndex);
+    attachComments(ast, locations, locationMap);
   }
   return ast;
 }

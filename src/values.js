@@ -52,6 +52,8 @@ const values = {
     PROPERTY_DECLATION: "apex.jorje.data.ast.PropertyDecl",
     PROPERTY_GETTER: "apex.jorje.data.ast.PropertyGetter",
     PROPERTY_SETTER: "apex.jorje.data.ast.PropertySetter",
+    BLOCK_COMMENT: "apex.jorje.parser.impl.HiddenTokens$BlockComment",
+    INLINE_COMMENT: "apex.jorje.parser.impl.HiddenTokens$InlineComment",
 
     // Operators
     BINARY_OPERATOR: "apex.jorje.data.ast.BinaryOp",
