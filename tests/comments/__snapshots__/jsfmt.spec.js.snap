@@ -70,14 +70,29 @@ class Comments {
 
 /* Trailing Block Comment */
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// Leading Inline Comment
+
+/* Leading Block Comment */ /* Another Leading Block Comment */
+
+/**
+ * ApexDoc for class
+ */
 class Comments {
+    // Dangling class inline comment
+
+    /* Dangling class block comment */
+
+    /**
+   * ApexDoc for method
+   */
     void assignmentComments() {
-        Integer a = 1;
-        Integer b = 1;
+        Integer a /* comment */ = 1;
+        Integer // comment
+        b = 1;
     }
 
     void beforeComma() {
-        Integer a = 1, b = 2;
+        Integer a = 1 /* comment */, b = 2;
     }
 
     void binaryExpression() {
@@ -85,17 +100,30 @@ class Comments {
         Integer j = 2;
         Integer a;
 
-        a = i + j;
-        a = i - j;
-        a = i * j;
-        a = i / j;
-        a = i << j;
-        a = i >> j;
-        a = i >>> j;
-        a = i ^ j;
-        a = i & j;
-        a = i | j;
+        a = // Comment
+        i + j;
+        a = i - // Comment
+        j;
+        a = i
+        /* Comment */ * j;
+        a = i / /* Comment */
+        j;
+        a = // Comment
+        i << /* Comment */
+        j;
+        a = i /* Comment */ >> /* Comment 2 */ j;
+        a = /* Comments */ i >>> j /* Comments 2 */;
+        a = /* Comments */ i ^ /* Comments 2 */ j;
+        a = // Comments
+        i & // Comments
+        j;
+        a = /* Comments */
+        i | j
+        /* Comments */;
     }
 }
+// Trailing Inline Comment
+
+/* Trailing Block Comment */
 
 `;

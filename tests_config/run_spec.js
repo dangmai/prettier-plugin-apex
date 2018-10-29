@@ -35,7 +35,7 @@ function stripLocation(ast) {
         key === "text" ||
         key === "rawQuery" ||
         key === "@id" ||
-        key === "hiddenTokenMap" // TODO remove this when we finish implement comments
+        key === "hiddenTokenMap"
       ) {
         return;
       }

@@ -239,18 +239,6 @@ function getLineIndexes(sourceCode) {
   return lineIndexes;
 }
 
-function resolveLocations(node, locationMap) {
-  const nodeLoc = node.location || node.loc;
-  if (nodeLoc) {
-    locationMap.set(nodeLoc, node);
-  }
-  Object.keys(node).forEach(key => {
-    if (typeof node[key] === "object") {
-      resolveLocations(node[key], locationMap);
-    }
-  });
-}
-
 function getEmptyLineLocations(sourceCode) {
   const whiteSpaceRegEx = /^\s*$/;
   const lines = sourceCode.split("\n");
@@ -270,8 +258,6 @@ function parse(sourceCode, _, options) {
   const executionResult = parseText(sourceCode, options);
   const serializedAst = executionResult.stdout.toString();
   let ast = {};
-  const locationMap = new Map();
-  let locations;
   if (serializedAst) {
     ast = JSON.parse(serializedAst);
     if (
@@ -293,8 +279,7 @@ function parse(sourceCode, _, options) {
       {},
       true,
     );
-    resolveLocations(ast[apexNames.PARSER_OUTPUT].unit, locationMap);
-    attachComments(ast, sourceCode, locationMap);
+    attachComments(ast, sourceCode);
   }
   return ast;
 }

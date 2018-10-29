@@ -1,36 +1,71 @@
-/* eslint no-param-reassign: 0 */
+/* eslint no-param-reassign: 0, no-plusplus: 0, no-else-return: 0, consistent-return: 0 */
 
 // We use the same algorithm to attach comments as recast
 const assert = require("assert");
 const prettier = require("prettier");
 
-const { concat, softline } = prettier.doc.builders;
-const { skipSpaces } = prettier.util;
+const { concat, hardline } = prettier.doc.builders;
+const { skipWhitespace } = prettier.util;
+const childNodesCacheKey = require("private").makeUniqueKey();
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
 
-function decorateComment(comment, locations, locationMap) {
+function getSortedChildNodes(node, resultArray) {
+  if (resultArray && node.loc) {
+    let i;
+    for (i = resultArray.length - 1; i >= 0; --i) {
+      if (resultArray[i].loc.endIndex - node.loc.startIndex <= 0) {
+        break;
+      }
+    }
+    resultArray.splice(i + 1, 0, node);
+    return;
+  } else if (node[childNodesCacheKey]) {
+    return node[childNodesCacheKey];
+  }
+
+  if (!Array.isArray(node) && typeof node !== "object") {
+    return;
+  }
+
+  const names = Object.keys(node).filter(key => key !== "apexComments");
+  if (!resultArray) {
+    Object.defineProperty(node, childNodesCacheKey, {
+      value: (resultArray = []),
+      enumerable: false,
+    });
+  }
+
+  let i;
+  for (i = 0; i < names.length; ++i) {
+    getSortedChildNodes(node[names[i]], resultArray);
+  }
+  return resultArray;
+}
+
+function decorateComment(node, comment) {
+  const childNodes = getSortedChildNodes(node);
+
   let left = 0;
-  let right = locations.length;
+  let right = childNodes.length;
   let precedingNode;
   let followingNode;
   while (left < right) {
     const middle = (left + right) >> 1; // eslint-disable-line no-bitwise
-    const location = locations[middle];
-    const child = locationMap.get(location);
+    const child = childNodes[middle];
 
     if (
-      location.startIndex <= comment.location.startIndex &&
-      location.endIndex >= comment.location.endIndex
+      child.loc.startIndex <= comment.location.startIndex &&
+      child.loc.endIndex >= comment.location.endIndex
     ) {
       // The comment is completely contained by this child node
       comment.enclosingNode = child;
-      right = middle;
-      continue; // eslint-disable-line no-continue
+      decorateComment(child, comment);
+      return; // Abandon the binary search at this level
     }
 
-    if (comment.location.startIndex >= location.endIndex) {
+    if (comment.location.startIndex >= child.loc.endIndex) {
       // This child node falls completely after the comment.
       // Because we will never consider this node or any nodes before it again,
       // this node must be the closest preceding node we have encountered so far
@@ -39,7 +74,7 @@ function decorateComment(comment, locations, locationMap) {
       continue; // eslint-disable-line no-continue
     }
 
-    if (comment.location.endIndex <= location.startIndex) {
+    if (comment.location.endIndex <= child.loc.startIndex) {
       // This child node falls completely after the comment.
       // Because we will never consider this node or any nodes after
       // it again, this node must be the closest following node we
@@ -141,25 +176,7 @@ function breakTies(tiesToBreak, sourceCode) {
   tiesToBreak.length = 0;
 }
 
-function attach(ast, sourceCode, locationMap) {
-  const locations = Array.from(locationMap.keys());
-  locations.sort((first, second) => {
-    let returnValue;
-    if (
-      first.startIndex <= second.startIndex &&
-      first.endIndex >= second.endIndex
-    ) {
-      returnValue = -1;
-    } else if (
-      first.startIndex >= second.startIndex &&
-      first.endIndex <= second.endIndex
-    ) {
-      returnValue = 1;
-    } else {
-      returnValue = first.endIndex - second.startIndex;
-    }
-    return returnValue;
-  });
+function attach(ast, sourceCode) {
   const comments = ast[apexNames.PARSER_OUTPUT].hiddenTokenMap
     .map(item => item[1])
     .filter(
@@ -170,7 +187,7 @@ function attach(ast, sourceCode, locationMap) {
   const tiesToBreak = [];
 
   comments.forEach(comment => {
-    decorateComment(comment, locations, locationMap);
+    decorateComment(ast[apexNames.PARSER_OUTPUT].unit, comment);
 
     const pn = comment.precedingNode;
     const en = comment.enclosingNode;
@@ -181,11 +198,10 @@ function attach(ast, sourceCode, locationMap) {
       if (tieCount > 0) {
         const lastTie = tiesToBreak[tieCount - 1];
 
-        // TODO bring this back
-        // assert.strictEqual(
-        //   lastTie.precedingNode === comment.precedingNode,
-        //   lastTie.followingNode === comment.followingNode,
-        // );
+        assert.strictEqual(
+          lastTie.precedingNode === comment.precedingNode,
+          lastTie.followingNode === comment.followingNode,
+        );
 
         if (lastTie.followingNode !== comment.followingNode) {
           breakTies(tiesToBreak, sourceCode);
@@ -211,6 +227,15 @@ function attach(ast, sourceCode, locationMap) {
     }
   });
   breakTies(tiesToBreak, sourceCode);
+
+  comments.forEach(comment => {
+    // These node references were useful for breaking ties, but we
+    // don't need them anymore, and they create cycles in the AST that
+    // may lead to infinite recursion if we don't delete them here.
+    delete comment.precedingNode;
+    delete comment.enclosingNode;
+    delete comment.followingNode;
+  });
 }
 
 function printLeadingComment(commentPath, options, print) {
@@ -220,12 +245,24 @@ function printLeadingComment(commentPath, options, print) {
   if (comment.trailing) {
     // When we print trailing comments as leading comments, we don't
     // want to bring any trailing spaces along.
-    // parts.push("\n");
+    parts.push(hardline);
   } else {
-    // const trailingSpace = skipSpaces();
-  }
-  parts.push(softline);
+    const trailingWhitespace = options.originalText.slice(
+      comment.location.endIndex,
+      skipWhitespace(options.originalText, comment.location.endIndex),
+    );
+    const numberOfNewLines = (trailingWhitespace.match(/\n/g) || []).length;
 
+    if (trailingWhitespace.length > 0 && numberOfNewLines === 0) {
+      // If trailing space exists, we will add at most one space to replace it.
+      parts.push(" ");
+    } else if (numberOfNewLines > 0) {
+      // If the trailing space contains newlines, then replace it
+      // with at most 2 new lines
+      const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
+      parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
+    }
+  }
   return concat(parts);
 }
 
@@ -235,22 +272,43 @@ function printTrailingComment(commentPath, options, print) {
   const loc = comment.location;
   const parts = [];
 
-  const fromPos = skipSpaces(sourceCode, loc.startIndex, { backwards: true });
+  const fromPos =
+    skipWhitespace(sourceCode, loc.startIndex - 1, {
+      backwards: true,
+    }) + 1;
   const leadingSpace = sourceCode.slice(fromPos, loc.startIndex);
+  const numberOfNewLines = (leadingSpace.match(/\n/g) || []).length;
 
-  if (leadingSpace.length === 1) {
-    // If the leading space contains no newlines, then we want to
-    // preserve it exactly as we found it.
-    parts.push(leadingSpace);
-  } else {
-    // If the leading space contains newlines, then replace it
-    // with just that many newlines, sans all other spaces.
-    parts.push(new Array(leadingSpace.length).join(softline));
+  if (leadingSpace.length > 0 && numberOfNewLines === 0) {
+    // If the leading space contains no newlines, then we add at most 1 space
+    parts.push(" ");
+  } else if (numberOfNewLines > 0) {
+    // If the leading space contains newlines, then add at most 2 new lines
+    const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
+    parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
-
   parts.push(print(commentPath));
 
   return concat(parts);
+}
+
+function allowTrailingComments(apexClass) {
+  let trailingCommentsAllowed = false;
+  const separatorIndex = apexClass.indexOf("$");
+  if (separatorIndex !== -1) {
+    const parentClass = apexClass.substring(0, separatorIndex);
+    trailingCommentsAllowed = parentClass === apexNames.STATEMENT;
+  } else {
+    const allowedTypes = [
+      apexNames.CLASS_DECLARATION,
+      apexNames.INTERFACE_DECLARATION,
+      apexNames.METHOD_DECLARATION,
+      apexNames.ENUM_DECLARATION,
+      apexNames.VARIABLE_DECLARATION,
+    ];
+    trailingCommentsAllowed = allowedTypes.includes(apexClass);
+  }
+  return trailingCommentsAllowed;
 }
 
 function printComments(path, options, print) {
@@ -273,8 +331,8 @@ function printComments(path, options, print) {
       leading ||
       (trailing &&
         !(
-          comment["@class"] === apexNames.BLOCK_COMMENT ||
-          comment.type === "CommentBlock"
+          allowTrailingComments(value["@class"]) ||
+          comment["@class"] === apexNames.BLOCK_COMMENT
         ))
     ) {
       leadingParts.push(printLeadingComment(commentPath, options, print));

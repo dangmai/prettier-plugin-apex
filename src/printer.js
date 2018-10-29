@@ -1875,6 +1875,17 @@ function handleForInit(path, print) {
   return parts;
 }
 
+function handleComment(path) {
+  // This handles both Inline and Block Comments.
+  // We don't just pass through the value because unlike other string literals,
+  // this should not be escaped
+  // TODO ApexDoc is not formatted correctly
+  // TODO indentation after line ending is not correct
+  // TODO AST is not preserved
+  const node = path.getValue();
+  return node.value;
+}
+
 const nodeHandler = {};
 nodeHandler[apexNames.IF_ELSE_BLOCK] = handleIfElseBlock;
 nodeHandler[apexNames.IF_BLOCK] = handleIfBlock;
@@ -1925,8 +1936,8 @@ nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
-nodeHandler[apexNames.BLOCK_COMMENT] = _handlePassthroughCall("value");
-nodeHandler[apexNames.INLINE_COMMENT] = _handlePassthroughCall("value");
+nodeHandler[apexNames.BLOCK_COMMENT] = handleComment;
+nodeHandler[apexNames.INLINE_COMMENT] = handleComment;
 nodeHandler.int = (path, print) => path.call(print, "$");
 nodeHandler.string = (path, print) => concat(["'", path.call(print, "$"), "'"]);
 
