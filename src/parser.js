@@ -10,13 +10,7 @@ const apexNames = values.APEX_NAMES;
 
 function parseText(text, options) {
   const runClientLocation = path.join(__dirname, "run_client.js");
-  const args = [
-    runClientLocation,
-    "-a",
-    options.serverHost,
-    "-p",
-    options.serverPort,
-  ];
+  const args = [runClientLocation, "-a", "localhost", "-p", options.serverPort];
   if (options.serverAutoStart) {
     args.push("-s");
   }
@@ -302,7 +296,7 @@ function parse(sourceCode, _, options) {
     resolveLocations(ast[apexNames.PARSER_OUTPUT].unit, locationMap);
     locations = Array.from(locationMap.keys());
     locations.sort((first, second) => first.endIndex - second.startIndex);
-    attachComments(ast, locations, locationMap);
+    attachComments(ast, sourceCode, locations, locationMap);
   }
   return ast;
 }

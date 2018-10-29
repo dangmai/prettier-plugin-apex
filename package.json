@@ -25,10 +25,10 @@
     "eslint-plugin-import": "^2.14.0",
     "eslint-plugin-prettier": "^3.0.0",
     "jest": "^23.5.0",
-    "prettier": "^1.14.2"
+    "prettier": "prettier/prettier#023a8b78df18a3afd8f82f9c2fc51bae02273d24"
   },
   "peerDependencies": {
-    "prettier": "^1.14.2"
+    "prettier": "^1.15.0"
   },
   "dependencies": {
     "node-nailgun-client": "github:dangmai/node-nailgun-client#send_input",

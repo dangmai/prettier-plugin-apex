@@ -13,6 +13,7 @@ const {
   dedent,
 } = docBuilders;
 
+const { printComments } = require("./comments");
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
@@ -1924,6 +1925,8 @@ nodeHandler[apexNames.LITERAL_CASE] = _handlePassthroughCall("expr");
 nodeHandler[apexNames.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
+nodeHandler[apexNames.BLOCK_COMMENT] = _handlePassthroughCall("value");
+nodeHandler[apexNames.INLINE_COMMENT] = _handlePassthroughCall("value");
 nodeHandler.int = (path, print) => path.call(print, "$");
 nodeHandler.string = (path, print) => concat(["'", path.call(print, "$"), "'"]);
 
@@ -2143,4 +2146,12 @@ function genericPrint(path, options, print) {
   return "";
 }
 
-module.exports = genericPrint;
+let options;
+module.exports = function printGenerically(path, opts) {
+  if (typeof opts === "object") {
+    options = opts;
+  }
+  return printComments(path, options, innerPath =>
+    genericPrint(innerPath, options, printGenerically),
+  );
+};

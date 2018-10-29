@@ -37,6 +37,8 @@ const printers = {
   },
 };
 
+// TODO we have to take out serverHost here, since prettier does not like string
+// option - look at optionInfoToSchema in options-normalizer.js
 const options = {
   serverAutoStart: {
     type: "boolean",
@@ -45,16 +47,10 @@ const options = {
     description: "Whether the nailgun server should be autostarted",
   },
   serverPort: {
-    type: "number",
+    type: "int",
     category: "Global",
     default: 2113,
     description: "Nailgun server port",
-  },
-  serverHost: {
-    type: "string",
-    category: "Global",
-    default: "localhost",
-    description: "Nailgun server host",
   },
 };
 
