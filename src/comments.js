@@ -141,7 +141,25 @@ function breakTies(tiesToBreak, sourceCode) {
   tiesToBreak.length = 0;
 }
 
-function attach(ast, sourceCode, locations, locationMap) {
+function attach(ast, sourceCode, locationMap) {
+  const locations = Array.from(locationMap.keys());
+  locations.sort((first, second) => {
+    let returnValue;
+    if (
+      first.startIndex <= second.startIndex &&
+      first.endIndex >= second.endIndex
+    ) {
+      returnValue = -1;
+    } else if (
+      first.startIndex >= second.startIndex &&
+      first.endIndex <= second.endIndex
+    ) {
+      returnValue = 1;
+    } else {
+      returnValue = first.endIndex - second.startIndex;
+    }
+    return returnValue;
+  });
   const comments = ast[apexNames.PARSER_OUTPUT].hiddenTokenMap
     .map(item => item[1])
     .filter(
@@ -163,10 +181,11 @@ function attach(ast, sourceCode, locations, locationMap) {
       if (tieCount > 0) {
         const lastTie = tiesToBreak[tieCount - 1];
 
-        assert.strictEqual(
-          lastTie.precedingNode === comment.precedingNode,
-          lastTie.followingNode === comment.followingNode,
-        );
+        // TODO bring this back
+        // assert.strictEqual(
+        //   lastTie.precedingNode === comment.precedingNode,
+        //   lastTie.followingNode === comment.followingNode,
+        // );
 
         if (lastTie.followingNode !== comment.followingNode) {
           breakTies(tiesToBreak, sourceCode);
@@ -192,12 +211,6 @@ function attach(ast, sourceCode, locations, locationMap) {
     }
   });
   breakTies(tiesToBreak, sourceCode);
-
-  comments.forEach(comment => {
-    delete comment.precedingNode;
-    delete comment.enclosingNode;
-    delete comment.followingNode;
-  });
 }
 
 function printLeadingComment(commentPath, options, print) {

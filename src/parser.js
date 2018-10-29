@@ -294,9 +294,7 @@ function parse(sourceCode, _, options) {
       true,
     );
     resolveLocations(ast[apexNames.PARSER_OUTPUT].unit, locationMap);
-    locations = Array.from(locationMap.keys());
-    locations.sort((first, second) => first.endIndex - second.startIndex);
-    attachComments(ast, sourceCode, locations, locationMap);
+    attachComments(ast, sourceCode, locationMap);
   }
   return ast;
 }
