@@ -4,6 +4,11 @@ const prettier = require("prettier");
 
 const { AST_COMPARE } = process.env;
 
+const values = require("../src/values");
+const { isApexDocComment } = require("../src/comments");
+
+const apexNames = values.APEX_NAMES;
+
 function read(filename) {
   return fs.readFileSync(filename, "utf8");
 }
@@ -26,7 +31,23 @@ function stripLocation(ast) {
     return ast.map(e => stripLocation(e));
   }
   if (typeof ast === "object") {
-    const newObj = {};
+    let newObj = {};
+    // ApexDoc needs to be massaged a bit before they can be compared
+    if (
+      ast["@class"] &&
+      ast["@class"] === apexNames.BLOCK_COMMENT &&
+      isApexDocComment(ast)
+    ) {
+      newObj = Object.assign({}, ast, {
+        value: ast.value.replace(/\s/g, ""),
+      });
+
+      delete newObj.$;
+      delete newObj.leading;
+      delete newObj.trailing;
+      delete newObj.location;
+      return newObj;
+    }
     Object.keys(ast).forEach(key => {
       if (
         key === "loc" ||

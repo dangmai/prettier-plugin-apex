@@ -13,7 +13,7 @@ const {
   dedent,
 } = docBuilders;
 
-const { printComments } = require("./comments");
+const { isApexDocComment, printComments } = require("./comments");
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
@@ -1875,14 +1875,35 @@ function handleForInit(path, print) {
   return parts;
 }
 
+/**
+ * Print ApexDoc comment. This is straight from prettier handling of JSDoc
+ * @param comment the comment to print.
+ */
+function handleApexDocComment(comment) {
+  const lines = comment.value.split("\n");
+  return concat([
+    join(
+      hardline,
+      lines.map(
+        (commentLine, index) =>
+          (index > 0 ? " " : "") +
+          (index < lines.length - 1
+            ? commentLine.trim()
+            : commentLine.trimLeft()),
+      ),
+    ),
+  ]);
+}
+
 function handleComment(path) {
   // This handles both Inline and Block Comments.
   // We don't just pass through the value because unlike other string literals,
   // this should not be escaped
-  // TODO ApexDoc is not formatted correctly
   // TODO indentation after line ending is not correct
-  // TODO AST is not preserved
   const node = path.getValue();
+  if (isApexDocComment(node)) {
+    return handleApexDocComment(node);
+  }
   return node.value;
 }
 

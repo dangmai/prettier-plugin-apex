@@ -83,8 +83,8 @@ class Comments {
     /* Dangling class block comment */
 
     /**
-   * ApexDoc for method
-   */
+     * ApexDoc for method
+     */
     void assignmentComments() {
         Integer a /* comment */ = 1;
         Integer // comment

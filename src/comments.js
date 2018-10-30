@@ -346,7 +346,23 @@ function printComments(path, options, print) {
   return concat(leadingParts);
 }
 
+/**
+ * Check if this comment is an ApexDoc-style comment.
+ * This code is straight from prettier JSDoc detection.
+ * @param comment the comment to check.
+ */
+function isApexDocComment(comment) {
+  const lines = comment.value.split("\n");
+  return (
+    lines.length > 1 &&
+    lines
+      .slice(1, lines.length - 1)
+      .every(commentLine => commentLine.trim()[0] === "*")
+  );
+}
+
 module.exports = {
   attach,
+  isApexDocComment,
   printComments,
 };
