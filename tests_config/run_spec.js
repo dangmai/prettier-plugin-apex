@@ -35,7 +35,14 @@ function stripLocation(ast) {
         key === "text" ||
         key === "rawQuery" ||
         key === "@id" ||
-        key === "hiddenTokenMap"
+        // It is impossible to preserve the comment AST. Neither recase nor
+        // prettier tries to do it so we are not going to bother either.
+        // We are still striving to not lose comments however, hence why we
+        // don't blacklist hiddenToken
+        key === "apexComments" ||
+        key === "$" ||
+        key === "leading" ||
+        key === "trailing"
       ) {
         return;
       }
