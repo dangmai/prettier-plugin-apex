@@ -10,9 +10,9 @@ const waitOnPromise = util.promisify(waitOn);
 async function start(address, port) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
   if (process.platform === "win32") {
-    serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
+    serializerBin = path.join(serializerBin, "apex-ast-serializer-ng.bat");
   } else {
-    serializerBin = path.join(serializerBin, "apex-ast-serializer");
+    serializerBin = path.join(serializerBin, "apex-ast-serializer-ng");
   }
   const command = spawn(serializerBin);
   command.stderr.pipe(process.stderr);

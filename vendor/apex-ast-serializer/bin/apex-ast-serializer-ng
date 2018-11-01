@@ -2,7 +2,7 @@
 
 ##############################################################################
 ##
-##  apex-ast-serializer start up script for UN*X
+##  apex-ast-serializer-ng start up script for UN*X
 ##
 ##############################################################################
 
@@ -24,10 +24,10 @@ cd "`dirname \"$PRG\"`/.." >/dev/null
 APP_HOME="`pwd -P`"
 cd "$SAVED" >/dev/null
 
-APP_NAME="apex-ast-serializer"
+APP_NAME="apex-ast-serializer-ng"
 APP_BASE_NAME=`basename "$0"`
 
-# Add default JVM options here. You can also use JAVA_OPTS and APEX_AST_SERIALIZER_OPTS to pass JVM options to this script.
+# Add default JVM options here. You can also use JAVA_OPTS and APEX_AST_SERIALIZER_NG_OPTS to pass JVM options to this script.
 DEFAULT_JVM_OPTS=""
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
@@ -162,7 +162,7 @@ save () {
 APP_ARGS=$(save "$@")
 
 # Collect all arguments for the java command, following the shell quoting and substitution rules
-eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $APEX_AST_SERIALIZER_OPTS -classpath "\"$CLASSPATH\"" net.dangmai.serializer.Apex "$APP_ARGS"
+eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $APEX_AST_SERIALIZER_NG_OPTS -classpath "\"$CLASSPATH\"" com.martiansoftware.nailgun.NGServer "$APP_ARGS"
 
 # by default we should be in the correct project dir, but when run from Finder on Mac, the cwd is wrong
 if [ "$(uname)" = "Darwin" ] && [ "$HOME" = "$PWD" ]; then

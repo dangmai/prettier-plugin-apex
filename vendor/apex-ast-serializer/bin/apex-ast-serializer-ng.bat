@@ -1,7 +1,7 @@
 @if "%DEBUG%" == "" @echo off
 @rem ##########################################################################
 @rem
-@rem  apex-ast-serializer startup script for Windows
+@rem  apex-ast-serializer-ng startup script for Windows
 @rem
 @rem ##########################################################################
 
@@ -13,7 +13,7 @@ if "%DIRNAME%" == "" set DIRNAME=.
 set APP_BASE_NAME=%~n0
 set APP_HOME=%DIRNAME%..
 
-@rem Add default JVM options here. You can also use JAVA_OPTS and APEX_AST_SERIALIZER_OPTS to pass JVM options to this script.
+@rem Add default JVM options here. You can also use JAVA_OPTS and APEX_AST_SERIALIZER_NG_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS=
 
 @rem Find java.exe
@@ -65,17 +65,17 @@ set CMD_LINE_ARGS=%*
 
 set CLASSPATH=%APP_HOME%\lib\apex-ast-serializer-1.0-SNAPSHOT.jar;%APP_HOME%\lib\apex-jorje-lsp.jar;%APP_HOME%\lib\xstream-1.4.10.jar;%APP_HOME%\lib\commons-cli-1.4.jar;%APP_HOME%\lib\commons-io-2.6.jar;%APP_HOME%\lib\nailgun-server-master.jar;%APP_HOME%\lib\xmlpull-1.1.3.1.jar;%APP_HOME%\lib\xpp3_min-1.1.4c.jar;%APP_HOME%\lib\jna-platform-4.5.2.jar;%APP_HOME%\lib\jna-4.5.2.jar
 
-@rem Execute apex-ast-serializer
-"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %APEX_AST_SERIALIZER_OPTS%  -classpath "%CLASSPATH%" net.dangmai.serializer.Apex %CMD_LINE_ARGS%
+@rem Execute apex-ast-serializer-ng
+"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %APEX_AST_SERIALIZER_NG_OPTS%  -classpath "%CLASSPATH%" com.martiansoftware.nailgun.NGServer %CMD_LINE_ARGS%
 
 :end
 @rem End local scope for the variables with windows NT shell
 if "%ERRORLEVEL%"=="0" goto mainEnd
 
 :fail
-rem Set variable APEX_AST_SERIALIZER_EXIT_CONSOLE if you need the _script_ return code instead of
+rem Set variable APEX_AST_SERIALIZER_NG_EXIT_CONSOLE if you need the _script_ return code instead of
 rem the _cmd.exe /c_ return code!
-if  not "" == "%APEX_AST_SERIALIZER_EXIT_CONSOLE%" exit 1
+if  not "" == "%APEX_AST_SERIALIZER_NG_EXIT_CONSOLE%" exit 1
 exit /b 1
 
 :mainEnd
