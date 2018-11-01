@@ -10,14 +10,10 @@ and the jorje compiler from Salesforce for parsing.
 
 ## Status
 
-This project is actively being worked on,
-and definitely not ready to be run on production code.
+This project is actively being worked on, and has been tested on production code.
 
-* Priority right now is to support all AST elements from compiler.
-A lot is already supported.
-* Currently not working: comments.
-* Formatting needs a lot of work.
-* Some defaults will be changed in the future, e.g. default number of spaces,
+* Formatting still needs work.
+* Some defaults might be changed in the future, e.g. default number of spaces,
 continuation indent, etc.
 
 ## How to run
