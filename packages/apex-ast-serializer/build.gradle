@@ -6,7 +6,19 @@ plugins {
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
 
-mainClassName = 'com.martiansoftware.nailgun.NGServer'
+task ngStartScripts(type: CreateStartScripts) {
+    mainClassName = 'com.martiansoftware.nailgun.NGServer'
+    applicationName = 'apex-ast-serializer-ng'
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+}
+
+applicationDistribution.into("bin") {
+    from(ngStartScripts)
+    fileMode = 0755
+}
+
+mainClassName = 'net.dangmai.serializer.Apex'
 
 sourceCompatibility = 1.8
 
