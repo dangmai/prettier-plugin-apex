@@ -1470,7 +1470,6 @@ function handleWhereOperationExpressions(path, print) {
 }
 
 function handleWhereQueryLiteral(childClass, path, print, options) {
-  // TODO Fix escaping special characters
   const node = path.getValue();
   let doc;
   switch (childClass) {

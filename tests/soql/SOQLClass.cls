@@ -42,6 +42,7 @@ class SOQLClass {
   }
 
   void escapeSoql() {
+    // The Jest snapshots will have extra backslashes, but that is okay
     Contact[] reservedKeywords = [
       SELECT Id
       FROM Contact
