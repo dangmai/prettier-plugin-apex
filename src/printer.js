@@ -1471,8 +1471,9 @@ function handleWhereOperationExpressions(path, print) {
   return groupConcat(parts);
 }
 
-function handleWhereQueryLiteral(childClass, path, print) {
+function handleWhereQueryLiteral(childClass, path, print, options) {
   // TODO Fix escaping special characters
+  const node = path.getValue();
   let doc;
   switch (childClass) {
     case "QueryString":
@@ -1491,8 +1492,7 @@ function handleWhereQueryLiteral(childClass, path, print) {
       doc = path.call(print, "literal", "$");
       break;
     case "QueryDateTime":
-      // TODO find a way to preserve user's input instead of converting to GMT
-      doc = path.call(print, "literal").replace("[GMT]", "");
+      doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
       break;
     case "QueryDateFormula":
       doc = path.call(print, "dateFormula");
