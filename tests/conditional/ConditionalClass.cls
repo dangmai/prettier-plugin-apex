@@ -24,6 +24,8 @@ class Conditional {
 
     if (a > b) c = a;
 
+    if (a == 1) a = 2; else if (a == 2) a = 3; else a = 4;
+
     if (true && (false || false)) {
       System.debug('false');
     }

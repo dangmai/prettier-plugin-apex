@@ -913,8 +913,6 @@ function handleIfElseBlock(path, print) {
 }
 
 function handleIfBlock(path, print) {
-  // TODO right now ExpressionStmnt are not formatted correctly in if else blocks
-  // i.e. if (a == 1) a = 2; else if (a == 2) a = 3; else a = 4;
   const statementType = path.call(print, "stmnt", "@class");
   const statementDoc = path.call(print, "stmnt");
 
