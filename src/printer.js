@@ -903,12 +903,41 @@ function handleNewExpression(path, print) {
 }
 
 function handleIfElseBlock(path, print) {
+  const node = path.getValue();
   const parts = [];
   const ifBlockDocs = path.map(print, "ifBlocks");
-  parts.push(join(" else ", ifBlockDocs));
   const elseBlockDoc = path.call(print, "elseBlock", "value");
-  parts.push(" ");
-  parts.push(elseBlockDoc);
+  // There are differences when we handle block vs expression statements in
+  // if bodies and else body. For expression statement, we need to add a
+  // hardline after a statement vs a space for block statement. For example:
+  // if (a)
+  //   b = 1;
+  // else if (c) {
+  //   b = 2;
+  // }
+  const ifBlockContainsBlockStatement = node.ifBlocks.map(
+    ifBlock => ifBlock.stmnt["@class"] === apexNames.BLOCK_STATEMENT,
+  );
+
+  ifBlockDocs.forEach((ifBlockDoc, index) => {
+    if (index > 0) {
+      parts.push(
+        concat([
+          ifBlockContainsBlockStatement[index - 1] ? " " : hardline,
+          "else ",
+        ]),
+      );
+    }
+    parts.push(ifBlockDoc);
+    // We also need to handle the last if block, since it might need to add
+    // either a space or a hardline before the else block
+    if (index === ifBlockDocs.length - 1 && elseBlockDoc) {
+      parts.push(ifBlockContainsBlockStatement[index] ? " " : hardline);
+    }
+  });
+  if (elseBlockDoc) {
+    parts.push(elseBlockDoc);
+  }
   return groupConcat(parts);
 }
 
@@ -926,7 +955,7 @@ function handleIfBlock(path, print) {
   // Body block
   if (statementType === apexNames.BLOCK_STATEMENT) {
     parts.push(" ");
-    _pushIfExist(parts, path.call(print, "stmnt"));
+    _pushIfExist(parts, statementDoc);
   } else {
     _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
   }
@@ -934,11 +963,18 @@ function handleIfBlock(path, print) {
 }
 
 function handleElseBlock(path, print) {
+  const statementType = path.call(print, "stmnt", "@class");
+  const statementDoc = path.call(print, "stmnt");
+
   const parts = [];
   parts.push("else");
-  parts.push(" ");
   // Body block
-  _pushIfExist(parts, path.call(print, "stmnt"));
+  if (statementType === apexNames.BLOCK_STATEMENT) {
+    parts.push(" ");
+    _pushIfExist(parts, statementDoc);
+  } else {
+    _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
+  }
   return concat(parts);
 }
 

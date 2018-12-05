@@ -459,8 +459,11 @@ class EmptyLine {
         if (a == 1) {} else if (a == 2) {} else {}
 
         if (a == 1)
-            a = 2; else if (a == 2)
-            a = 3; else a = 4;
+            a = 2;
+        else if (a == 2)
+            a = 3;
+        else
+            a = 4;
 
         if (a == 1) {}
     }
