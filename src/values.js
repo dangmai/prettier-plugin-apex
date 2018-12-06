@@ -146,6 +146,8 @@ const values = {
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",
+    BIND_CLAUSE: "apex.jorje.data.soql.BindClause",
+    BIND_EXPRESSION: "apex.jorje.data.soql.BindExpr",
     SELECT_INNER_QUERY: "apex.jorje.data.soql.SelectExpr$SelectInnerQuery",
     SELECT_COLUMN_CLAUSE:
       "apex.jorje.data.soql.SelectClause$SelectColumnClause",

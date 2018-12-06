@@ -1202,7 +1202,7 @@ function handleReturningSelectExpression(path, print) {
   _pushIfExist(parts, path.call(print, "orderBy", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "offset", "value"));
-  // TODO bind (apex.jorje.data.soql.BindClause/BindExpr) - not sure how this is used ASKSF
+  _pushIfExist(parts, path.call(print, "bind", "value"));
   return groupIndentConcat([softline, join(line, parts)]);
 }
 
@@ -1275,10 +1275,30 @@ function handleQuery(path, print) {
   _pushIfExist(parts, path.call(print, "orderBy", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "offset", "value"));
+  _pushIfExist(parts, path.call(print, "bind", "value"));
   _pushIfExist(parts, path.call(print, "tracking", "value"));
   _pushIfExist(parts, path.call(print, "updateStats", "value"));
   _pushIfExist(parts, path.call(print, "options", "value"));
   return join(line, parts);
+}
+
+function handleBindClause(path, print) {
+  const expressionDocs = path.map(print, "exprs");
+  const parts = [];
+  parts.push("BIND");
+  parts.push(" ");
+  parts.push(join(", ", expressionDocs));
+  return concat(parts);
+}
+
+function handleBindExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field"));
+  parts.push(" ");
+  parts.push("=");
+  parts.push(" ");
+  parts.push(path.call(print, "value"));
+  return concat(parts);
 }
 
 function handleCaseExpression(path, print) {
@@ -2180,6 +2200,8 @@ nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = childClass =>
 nodeHandler[apexNames.SEARCH_USING_CLAUSE] = (path, print) =>
   concat(["USING", " ", path.call(print, "type")]);
 nodeHandler[apexNames.USING_TYPE] = handleUsingType;
+nodeHandler[apexNames.BIND_CLAUSE] = handleBindClause;
+nodeHandler[apexNames.BIND_EXPRESSION] = handleBindExpression;
 
 function handleTrailingEmptyLines(doc, node) {
   if (node.trailingEmptyLine) {

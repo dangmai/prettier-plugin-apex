@@ -89,6 +89,10 @@ class SOSLClass {
       RETURNING My_Custom_Object__c (Id
       WHERE DISTANCE(My_Location_Field__c,GEOLOCATION(37,122),'mi') < 100)];
   }
+  void bindKeyword() {
+    List<List<SObject>> searchResult;
+    searchResult = [FIND 'Hello' RETURNING Contact(FirstName, LastName USING LOOKUP l BIND i='bar', j='baz')];
+  }
   void updateStat() {
     List<List<String>> searchResult;
     searchResult = [FIND 'Title'
@@ -234,6 +238,13 @@ class SOSLClass {
                 My_Custom_Object__c(
                     Id
                     WHERE DISTANCE(My_Location_Field__c, GEOLOCATION(37, 122), 'mi') < 100)
+        ];
+    }
+    void bindKeyword() {
+        List<List<SObject>> searchResult;
+        searchResult = [
+            FIND 'Hello'
+            RETURNING Contact(FirstName, LastName USING LOOKUP l BIND i = 'bar', j = 'baz')
         ];
     }
     void updateStat() {

@@ -41,6 +41,11 @@ class SOQLClass {
     Contact[] contacts = [SELECT ID FROM Contact LIMIT :numRows OFFSET :numRows];
   }
 
+  void bindKeyword() {
+    Contact[] contacts = [SELECT ID FROM Contact USING lookup l BIND i='bar'];
+    Contact[] contacts = [SELECT ID FROM Contact USING lookup l BIND i='bar', j='baz'];
+  }
+
   void escapeSoql() {
     // The Jest snapshots will have extra backslashes, but that is okay
     Contact[] reservedKeywords = [
