@@ -78,6 +78,7 @@ class SOSLClass {
     searchResult = [FIND 'Hello' RETURNING Contact(FirstName, LastName ORDER BY LastName DESC LIMIT 20), Account(Name, Industry LIMIT 10), Opportunity LIMIT 50];
     searchResult = [FIND 'Hello' RETURNING Contact(FirstName, LastName OFFSET 10)];
     searchResult = [FIND 'Hello' IN ALL FIELDS RETURNING Account(Id, Name USING ListView=ListViewName)];
+    searchResult = [FIND 'Hello' IN ALL FIELDS RETURNING Account(Id, Name USING ListView(id=listViewId))];
     searchResult = [FIND 'test' RETURNING Account (id WHERE createddate = THIS_FISCAL_QUARTER)];
     searchResult = [FIND 'test' RETURNING Account (id, Name WHERE Name = :a)];
     searchResult = [FIND 'test' RETURNING Account (id WHERE NAME IN :multiple)];

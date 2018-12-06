@@ -1695,8 +1695,15 @@ function handleUsingExpression(childClass, path, print) {
       ]);
       break;
     case "UsingId":
-      // TODO apex.jorje.data.soql.UsingExpr.UsingId not sure how this is used - ASKSF
-      throw new Error(`UsingExpr ${childClass} is not supported!`);
+      doc = concat([
+        path.call(print, "name"),
+        "(",
+        path.call(print, "id"),
+        " = ",
+        path.call(print, "field"),
+        ")",
+      ]);
+      break;
     default:
       throw new Error(`UsingExpr ${childClass} is not supported!`);
   }

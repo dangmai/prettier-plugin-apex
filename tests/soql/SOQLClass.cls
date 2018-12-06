@@ -134,6 +134,7 @@ class SOQLClass {
     ];
 
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
+    Contact[] usingListView = [SELECT Id FROM Contact USING listView(id=listViewId)];
     Offer__DataCategorySelection dataCategory = [SELECT Id,ParentId FROM Offer__DataCategorySelection];
     Warehouse__c[] geoLocations = [
       SELECT Name, StreetAddress__c
