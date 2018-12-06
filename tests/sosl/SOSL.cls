@@ -3,6 +3,8 @@ class SOSLClass {
     String a = 'Hello';
     List<List<SObject>> searchResult = [FIND 'FirstLastName'];
     searchResult = [FIND :a];
+    searchResult = [FIND :a USING PHRASE SEARCH];
+    searchResult = [FIND :a USING ADVANCED SEARCH];
   }
   void inClause() {
     List<List<SObject>> searchResult;

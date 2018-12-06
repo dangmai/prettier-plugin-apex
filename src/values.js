@@ -141,6 +141,8 @@ const values = {
     RETURNING_CLAUSE: "apex.jorje.data.sosl.ReturningClause",
     RETURNING_EXPRESSION: "apex.jorje.data.sosl.ReturningExpr",
     RETURNING_SELECT_EXPRESSION: "apex.jorje.data.sosl.ReturningSelectExpr",
+    SEARCH_USING_CLAUSE: "apex.jorje.data.sosl.SearchUsingClause",
+    USING_TYPE: "apex.jorje.data.sosl.UsingType",
 
     // SOQL
     QUERY: "apex.jorje.data.soql.Query",

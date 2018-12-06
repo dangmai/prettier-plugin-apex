@@ -1219,7 +1219,7 @@ function handleSearch(path, print) {
   _pushIfExist(parts, path.call(print, "returning", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "updateStats", "value"));
-  // TODO using - not sure how this is used ASKSF
+  _pushIfExist(parts, path.call(print, "using", "value"));
   if (withDocs.length > 0) {
     parts.push(join(line, withDocs));
   }
@@ -1758,6 +1758,14 @@ function handleUpdateStatsOption(childClass) {
   return doc;
 }
 
+function handleUsingType(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "filter"));
+  parts.push(" ");
+  parts.push(path.call(print, "value"));
+  return concat(parts);
+}
+
 function handleModifier(childClass) {
   const modifierValue = values.MODIFIER[childClass] || "";
   if (!modifierValue) {
@@ -2162,6 +2170,9 @@ nodeHandler[apexNames.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
 nodeHandler[apexNames.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = childClass =>
   values.QUERY_WHERE[childClass];
+nodeHandler[apexNames.SEARCH_USING_CLAUSE] = (path, print) =>
+  concat(["USING", " ", path.call(print, "type")]);
+nodeHandler[apexNames.USING_TYPE] = handleUsingType;
 
 function handleTrailingEmptyLines(doc, node) {
   if (node.trailingEmptyLine) {
