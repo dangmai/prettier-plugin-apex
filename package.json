@@ -2,7 +2,11 @@
   "name": "prettier-plugin-apex",
   "version": "0.0.0-development",
   "description": "Salesforce Apex plugin for Prettier",
-  "main": "src",
+  "main": "src/index.js",
+  "files": [
+    "/src",
+    "/vendor"
+  ],
   "scripts": {
     "pretest": "npm run lint",
     "test": "jest",
