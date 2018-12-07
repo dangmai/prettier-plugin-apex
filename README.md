@@ -16,13 +16,45 @@ This project is actively being worked on, and has been tested on production code
 * Some defaults might be changed in the future, e.g. default number of spaces,
 continuation indent, etc.
 
-## How to run
+### Usage
+
+### Requirements
+
+- Node >= 8
+- Java Runtime Engine >= 1.8.0
+
+### How to use
+
+First, install the library:
 
 ```bash
-git clone https://github.com/dangmai/prettier-plugin-apex.git
-cd prettier-plugin-apex
-npm i
-npm run execute -- prettify /path/to/apex/dir
+# Install locally
+npm install --save-dev prettier prettier-plugin-apex
+
+# Or install globally
+npm install --global prettier prettier-plugin-apex
+```
+
+If you install globally, run:
+
+```bash
+prettier --write "/path/to/project/**/*.{trigger,cls}"
+```
+
+If you install locally, you can add prettier as a script in `package.json`:
+
+```json
+{
+  "scripts": {
+    "prettier": "prettier"
+  }
+}
+```
+
+Then in order to run it:
+
+```bash
+npm run prettier -- --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
 ### License
