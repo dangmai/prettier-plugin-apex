@@ -10,11 +10,11 @@ class Namespace {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class Namespace {
-    void simpleNamespaceTests() {
-        System.System.debug('Hello');
+  void simpleNamespaceTests() {
+    System.System.debug('Hello');
 
-        SampleNamespace__TestObject__c a = new SampleNamespace__TestObject__c();
-    }
+    SampleNamespace__TestObject__c a = new SampleNamespace__TestObject__c();
+  }
 }
 
 `;

@@ -42,43 +42,43 @@ class Literal {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class Literal {
-    void nullExpression() {
-        return null;
-        return null;
-        return null;
-    }
-    void stringLiteral() {
-        return 'a';
-    }
-    void integerLiteral() {
-        return 1;
-    }
-    void longLiteral() {
-        return 2147483648L;
-        return 2147483640L;
-    }
-    void decimalLiteral() {
-        return 1.01d;
-        return 1.0d;
-        return 1.0d;
-        return 1.3d;
-    }
-    void doubleLiteral() {
-        return 1.1;
-        return 1.0;
-        return 1.0;
-        return 1.3;
-    }
-    void trueLiteral() {
-        return true;
-        return true;
-        return true;
-    }
-    void falseLiteral() {
-        return false;
-        return false;
-        return false;
-    }
+  void nullExpression() {
+    return null;
+    return null;
+    return null;
+  }
+  void stringLiteral() {
+    return 'a';
+  }
+  void integerLiteral() {
+    return 1;
+  }
+  void longLiteral() {
+    return 2147483648L;
+    return 2147483640L;
+  }
+  void decimalLiteral() {
+    return 1.01d;
+    return 1.0d;
+    return 1.0d;
+    return 1.3d;
+  }
+  void doubleLiteral() {
+    return 1.1;
+    return 1.0;
+    return 1.0;
+    return 1.3;
+  }
+  void trueLiteral() {
+    return true;
+    return true;
+    return true;
+  }
+  void falseLiteral() {
+    return false;
+    return false;
+    return false;
+  }
 }
 
 `;
