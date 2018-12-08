@@ -16,7 +16,7 @@ This project is actively being worked on, and has been tested on production code
 * Some defaults might be changed in the future, e.g. default number of spaces,
 continuation indent, etc.
 
-### Usage
+## Usage
 
 ### Requirements
 
@@ -57,6 +57,32 @@ Then in order to run it:
 npm run prettier -- --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
-### License
+## Performance Tips/3rd party integration
+
+By default,
+this library invokes a CLI application to get the AST of the Apex code.
+However, since this CLI application is written in Java,
+there is a heavy start up cost associated with it.
+In order to alleviate this issue,
+we also have an optional [Nailgun](https://github.com/facebook/nailgun) server
+that makes sure the start up is invoked exactly once.
+This is especially useful if this library is integrated in a 3rd party application.
+
+In order to use this server,
+you have to evoke it out of band before running Prettier,
+as well as specifying a special flag when running Prettier:
+
+```bash
+# Start the server
+node /path/to/libary/tests_config/set_up.js
+
+# In a separate console
+prettier --use-standalone-server --write "/path/to/project/**/*.{trigger,cls}"
+
+# After you are done, stop the server
+node /path/to/libary/tests_config/tear_down.js
+```
+
+## License
 
 MIT

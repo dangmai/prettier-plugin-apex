@@ -37,20 +37,20 @@ const printers = {
   },
 };
 
-// TODO we have to take out serverHost here, since prettier does not like string
-// option - look at optionInfoToSchema in options-normalizer.js
 const options = {
-  serverAutoStart: {
+  useStandaloneServer: {
     type: "boolean",
     category: "Global",
-    default: true,
-    description: "Whether the nailgun server should be autostarted",
+    default: false,
+    description:
+      "Use a standalone server to speed up the parsing process. This server needs to be started and stopped separately from the Prettier process",
   },
   serverPort: {
     type: "int",
     category: "Global",
     default: 2113,
-    description: "Nailgun server port",
+    description:
+      "The standalone server port to connect to. Only applicable if useStandaloneServer is true",
   },
 };
 

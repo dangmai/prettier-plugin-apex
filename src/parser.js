@@ -3,17 +3,35 @@
 const childProcess = require("child_process");
 const path = require("path");
 
+const { spawnSync } = childProcess;
 const attachComments = require("./comments").attach;
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
 
-function parseText(text, options) {
-  const runClientLocation = path.join(__dirname, "run_client.js");
-  const args = [runClientLocation, "-a", "localhost", "-p", options.serverPort];
-  if (options.serverAutoStart) {
-    args.push("-s");
+function parseTextWithSpawn(text) {
+  let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
+  if (process.platform === "win32") {
+    serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
+  } else {
+    serializerBin = path.join(serializerBin, "apex-ast-serializer");
   }
+  const executionResult = spawnSync(serializerBin, ["-f", "json", "-i"], {
+    input: text,
+  });
+
+  const executionError = executionResult.error;
+
+  if (executionError) {
+    throw executionError;
+  }
+
+  return executionResult.stdout.toString();
+}
+
+function parseTextWithNailgun(text, serverPort) {
+  const ngClientLocation = path.join(__dirname, "ng-client.js");
+  const args = [ngClientLocation, "-a", "localhost", "-p", serverPort];
   const executionResult = childProcess.spawnSync(process.argv[0], args, {
     input: text,
   });
@@ -23,7 +41,7 @@ function parseText(text, options) {
     throw new Error(executionError);
   }
 
-  return executionResult;
+  return executionResult.stdout.toString();
 }
 
 // The serialized string given back contains references (to avoid circular references),
@@ -255,8 +273,12 @@ function getEmptyLineLocations(sourceCode) {
 function parse(sourceCode, _, options) {
   sourceCode = sourceCode.trim();
   const lineIndexes = getLineIndexes(sourceCode);
-  const executionResult = parseText(sourceCode, options);
-  const serializedAst = executionResult.stdout.toString();
+  let serializedAst;
+  if (options.useStandaloneServer) {
+    serializedAst = parseTextWithNailgun(sourceCode, options.serverPort);
+  } else {
+    serializedAst = parseTextWithSpawn(sourceCode);
+  }
   let ast = {};
   if (serializedAst) {
     ast = JSON.parse(serializedAst);

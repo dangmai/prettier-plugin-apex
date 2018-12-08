@@ -19,7 +19,7 @@ function prettyprint(src, filename, options) {
     Object.assign(
       {
         filepath: filename,
-        serverAutoStart: false,
+        useStandaloneServer: true,
       },
       options,
     ),
@@ -88,7 +88,7 @@ function parse(string, opts) {
       string,
       Object.assign(
         {
-          serverAutoStart: false,
+          useStandaloneServer: true,
         },
         opts,
       ),
