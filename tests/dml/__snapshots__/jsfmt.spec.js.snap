@@ -126,9 +126,9 @@ class DMLClass {
     insert accounts;
     insert new Account(Name = 'Acme One');
     insert new List<Account>{
-        new Account(Name = 'Inner Acme Three'),
-        new Account(Name = 'Inner Acme Four')
-      };
+      new Account(Name = 'Inner Acme Three'),
+      new Account(Name = 'Inner Acme Four')
+    };
   }
   void updateTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -141,9 +141,9 @@ class DMLClass {
     update accounts;
     update new Account(Id = accountId, Name = 'Acme One');
     update new List<Account>{
-        new Account(Id = accountId, Name = 'Inner Acme Three'),
-        new Account(Id = accountId, Name = 'Inner Acme Four')
-      };
+      new Account(Id = accountId, Name = 'Inner Acme Three'),
+      new Account(Id = accountId, Name = 'Inner Acme Four')
+    };
   }
   void upsertWithoutOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -156,9 +156,9 @@ class DMLClass {
     upsert accounts;
     upsert new Account(Id = accountId, Name = 'Acme One');
     upsert new List<Account>{
-        new Account(Name = 'Inner Acme Three'),
-        new Account(Id = accountId, Name = 'Inner Acme Four')
-      };
+      new Account(Name = 'Inner Acme Three'),
+      new Account(Id = accountId, Name = 'Inner Acme Four')
+    };
   }
   void upsertWithOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -176,9 +176,9 @@ class DMLClass {
     upsert new Account(Id = accountId, Name = 'Acme One')
       Account.Fields.External_Id__c;
     upsert new List<Account>{
-        new Account(Name = 'Inner Acme Three'),
-        new Account(Id = accountId, Name = 'Inner Acme Four')
-      }
+      new Account(Name = 'Inner Acme Three'),
+      new Account(Id = accountId, Name = 'Inner Acme Four')
+    }
       Account.Fields.External_Id__c;
   }
   void deleteTest() {
@@ -192,9 +192,9 @@ class DMLClass {
     delete accounts;
     delete new Account(Id = accountId, Name = 'Acme One');
     delete new List<Account>{
-        new Account(Id = accountId, Name = 'Inner Acme Three'),
-        new Account(Id = accountId, Name = 'Inner Acme Four')
-      };
+      new Account(Id = accountId, Name = 'Inner Acme Three'),
+      new Account(Id = accountId, Name = 'Inner Acme Four')
+    };
   }
   void undeleteTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1 ALL ROWS].Id;
@@ -210,9 +210,9 @@ class DMLClass {
     undelete accountIds;
     undelete new Account(Id = accountId, Name = 'Acme One');
     undelete new List<Account>{
-        new Account(Id = accountId, Name = 'Inner Acme Three'),
-        new Account(Id = accountId, Name = 'Inner Acme Four')
-      };
+      new Account(Id = accountId, Name = 'Inner Acme Three'),
+      new Account(Id = accountId, Name = 'Inner Acme Four')
+    };
   }
   void mergeTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;

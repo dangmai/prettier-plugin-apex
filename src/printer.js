@@ -463,10 +463,10 @@ function handleStatement(childClass, path, print) {
   parts.push(path.call(print, "expr"));
   // upsert statement has an extra param that can be tacked on at the end
   if (node.id) {
-    _pushIfExist(parts, path.call(print, "id", "value"), null, [line]);
+    _pushIfExist(parts, path.call(print, "id", "value"), null, [indent(line)]);
   }
   parts.push(";");
-  return groupIndentConcat(parts);
+  return groupConcat(parts);
 }
 
 function handleDmlMergeStatement(path, print) {
