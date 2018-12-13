@@ -1,6 +1,7 @@
 ## 1.0.0-alpha.3
 
 - Fix DML operation having double indents ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/8)).
+- Rename scripts to start and stop Apex Parser Server.
 
 ## 1.0.0-alpha.2
 

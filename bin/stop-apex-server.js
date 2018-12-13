@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const nailgunServer = require("../src/ng-server");
 
 async function teardown() {
