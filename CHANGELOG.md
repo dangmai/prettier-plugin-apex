@@ -1,3 +1,7 @@
+## 1.0.0-alpha.4
+- Support `WITH SECURITY_ENFORCED` in SOQL ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/9)).
+- Fix `npm scripts` pointing to old files.
+
 ## 1.0.0-alpha.3
 
 - Fix DML operation having double indents ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/8)).

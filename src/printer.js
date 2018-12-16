@@ -1266,11 +1266,15 @@ function handleWhereInnerExpression(path, print) {
 }
 
 function handleQuery(path, print) {
+  const withIdentifierDocs = path.map(print, "withIdentifiers");
   const parts = [];
   parts.push(path.call(print, "select"));
   parts.push(path.call(print, "from"));
   _pushIfExist(parts, path.call(print, "where", "value"));
   _pushIfExist(parts, path.call(print, "with", "value"));
+  if (withIdentifierDocs.length > 0) {
+    parts.push(join(" ", withIdentifierDocs));
+  }
   _pushIfExist(parts, path.call(print, "groupBy", "value"));
   _pushIfExist(parts, path.call(print, "orderBy", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
@@ -2202,6 +2206,8 @@ nodeHandler[apexNames.SEARCH_USING_CLAUSE] = (path, print) =>
 nodeHandler[apexNames.USING_TYPE] = handleUsingType;
 nodeHandler[apexNames.BIND_CLAUSE] = handleBindClause;
 nodeHandler[apexNames.BIND_EXPRESSION] = handleBindExpression;
+nodeHandler[apexNames.WITH_IDENTIFIER] = (path, print) =>
+  concat(["WITH", " ", path.call(print, "identifier")]);
 
 function handleTrailingEmptyLines(doc, node) {
   if (node.trailingEmptyLine) {

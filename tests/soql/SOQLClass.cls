@@ -110,6 +110,12 @@ class SOQLClass {
     Contact[] fullOrder = [SELECT Id FROM Contact ORDER BY Name ASC NULLS FIRST];
   }
 
+  void withIdentifiersSoql() {
+    Account[] withSecurityEnforced = [SELECT Id FROM Account WITH SECURITY_ENFORCED];
+    Account[] withRandomIdentifiers = [SELECT Id FROM Account WITH SECURITY_ENFORCED WITH RANDOM_IDENTIFIER];
+    Account[] withIdentifierOrder = [SELECT Id FROM Account WHERE Name = 'Hello' WITH SECURITY_ENFORCED GROUP BY Id];
+  }
+
   void nicheSoql() {
     Contact[] forView = [SELECT Name, ID FROM Contact  LIMIT 1 FOR VIEW];
     Contact[] forReference = [SELECT Name, ID FROM Contact  LIMIT 1 FOR REFERENCE];
