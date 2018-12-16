@@ -15,8 +15,8 @@
   "scripts": {
     "pretest": "npm run lint",
     "test": "jest",
-    "start-server": "node tests_config/set_up.js",
-    "stop-server": "node tests_config/tear_down.js",
+    "start-server": "node bin/start-apex-server.js",
+    "stop-server": "node bin/stop-apex-server.js",
     "execute": "node src/execute.js",
     "lint": "eslint \"{src,tests_config}/**/*.js\"",
     "prettier": "prettier --write \"{src,tests_config}/**/*.js\""
