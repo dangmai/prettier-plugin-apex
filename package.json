@@ -5,7 +5,9 @@
   "main": "src/index.js",
   "bin": {
     "start-apex-server": "./bin/start-apex-server.js",
-    "stop-apex-server": "./bin/stop-apex-server.js"
+    "stop-apex-server": "./bin/stop-apex-server.js",
+    "apex-ast-serializer": "./vendor/apex-ast-serializer/bin/apex-ast-serializer",
+    "apex-ast-serializer-ng": "./vendor/apex-ast-serializer/bin/apex-ast-serializer-ng"
   },
   "files": [
     "/bin",
