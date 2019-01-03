@@ -1,4 +1,9 @@
+## 1.0.0-alpha.5
+
+- Fix `apex-ast-serializer` executables not having their execute bits set on *nix ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/10)).
+
 ## 1.0.0-alpha.4
+
 - Support `WITH SECURITY_ENFORCED` in SOQL ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/9)).
 - Fix `npm scripts` pointing to old files.
 
