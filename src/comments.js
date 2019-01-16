@@ -4,7 +4,7 @@
 const assert = require("assert");
 const prettier = require("prettier");
 
-const { concat, hardline } = prettier.doc.builders;
+const { concat, lineSuffix, hardline } = prettier.doc.builders;
 const { skipWhitespace } = prettier.util;
 const childNodesCacheKey = require("private").makeUniqueKey();
 const values = require("./values");
@@ -279,15 +279,28 @@ function printTrailingComment(commentPath, options, print) {
   const leadingSpace = sourceCode.slice(fromPos, loc.startIndex);
   const numberOfNewLines = (leadingSpace.match(/\n/g) || []).length;
 
-  if (leadingSpace.length > 0 && numberOfNewLines === 0) {
-    // If the leading space contains no newlines, then we add at most 1 space
-    parts.push(" ");
-  } else if (numberOfNewLines > 0) {
+  if (numberOfNewLines > 0) {
     // If the leading space contains newlines, then add at most 2 new lines
     const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
     parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
-  parts.push(print(commentPath));
+  if (comment["@class"] === apexNames.INLINE_COMMENT) {
+    // When we print trailing inline comments, we have to make sure that nothing
+    // else is printed after it (e.g. a semicolon), so we'll use lineSuffix
+    // from prettier to buffer the output
+    if (leadingSpace.length > 0 && numberOfNewLines === 0) {
+      parts.push(lineSuffix(concat([" ", print(commentPath)])));
+    } else {
+      parts.push(lineSuffix(print(commentPath)));
+    }
+  } else {
+    // Handling block comment, which does not need lineSuffix
+    if (leadingSpace.length > 0 && numberOfNewLines === 0) {
+      // If the leading space contains no newlines, then we add at most 1 space
+      parts.push(" ");
+    }
+    parts.push(print(commentPath));
+  }
 
   return concat(parts);
 }
@@ -338,6 +351,16 @@ function printComments(path, options, print) {
       leadingParts.push(printLeadingComment(commentPath, options, print));
     } else if (trailing) {
       trailingParts.push(printTrailingComment(commentPath, options, print));
+    } else if (!leading && !trailing) {
+      // Dangling comments
+      // Note: in this statement `Integer a = 1 /* Comment */;`
+      // the comment is considered dangling, since jorje considers the literal
+      // number 1 node to end after the comment
+      trailingParts.push(printTrailingComment(commentPath, options, print));
+    } else {
+      throw new Error(
+        "Comment is not printed because we cannot determine its property. Please submit a bug report with your code sample",
+      );
     }
   }, "apexComments");
 

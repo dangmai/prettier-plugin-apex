@@ -24,6 +24,14 @@ class Comments {
       b = 2;
   }
 
+  void beforeSemicolon() {
+    Integer a = 1 // before semicolon line comment
+      ;
+    Integer b = 1 /* before same line semicolon block comment */;
+    Integer c = 1 /* before next line semicolon block comment */
+      ;
+  }
+
   void binaryExpression() {
     Integer i = 1;
     Integer j = 2;
