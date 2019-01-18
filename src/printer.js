@@ -104,7 +104,7 @@ function handleGenericExpression(path, print) {
   docs.push(operationDoc);
   docs.push(" ");
   docs.push(rightDoc);
-  return indentConcat(docs);
+  return concat(docs);
 }
 
 function handleVariableExpression(path, print) {
@@ -654,7 +654,7 @@ function handleVariableDeclaration(path, print) {
     parts.push(" ");
     parts.push(assignmentDocs);
   }
-  return indentConcat(parts);
+  return concat(parts);
 }
 
 function handleNewStandard(path, print) {
