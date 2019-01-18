@@ -32,6 +32,32 @@ class Comments {
       ;
   }
 
+  void blockStatementTrailingInlineComment() {
+    Integer a = 1;
+    // Block Statement Trailing Inline Comment
+  }
+
+  void blockStatementTrailingMultiInlineComments() {
+    Integer a = 1;
+
+    // Block Statement Trailing Multi Inline Comment 1
+    // Block Statement Trailing Multi Inline Comment 2
+
+  }
+
+  void blockStatementTrailingBlockComment() {
+    Integer a = 1;
+    /* Block Statement Trailing Block Comment */
+  }
+
+
+  void blockStatementTrailingMultiBlockComments() {
+    Integer a = 1;
+
+    /* Block Statement Trailing Multi Block Comment 1 */
+    /* Block Statement Trailing Multi Block Comment 2 */
+  }
+
   void binaryExpression() {
     Integer i = 1;
     Integer j = 2;

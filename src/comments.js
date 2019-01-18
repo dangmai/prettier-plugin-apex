@@ -210,9 +210,18 @@ function attach(ast, sourceCode) {
 
       tiesToBreak.push(comment);
     } else if (pn) {
-      // No contest: we have a trailing comment.
-      breakTies(tiesToBreak, sourceCode);
-      addTrailingComment(pn, comment);
+      if (en && en["@class"] === apexNames.BLOCK_STATEMENT && !fn) {
+        // Special case: this is a trailing comment in a block statement
+        breakTies(tiesToBreak, sourceCode);
+        // Our algorithm for attaching comment generally attaches the comment
+        // to the last node, however we want to attach this comment to the last
+        // statement node instead.
+        addTrailingComment(en.stmnts[en.stmnts.length - 1], comment);
+      } else {
+        // No contest: we have a trailing comment.
+        breakTies(tiesToBreak, sourceCode);
+        addTrailingComment(pn, comment);
+      }
     } else if (fn) {
       // No contest: we have a leading comment.
       breakTies(tiesToBreak, sourceCode);
