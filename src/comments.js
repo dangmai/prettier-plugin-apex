@@ -238,6 +238,7 @@ function attach(ast, sourceCode) {
   breakTies(tiesToBreak, sourceCode);
 
   comments.forEach(comment => {
+    comment.printed = false;
     // These node references were useful for breaking ties, but we
     // don't need them anymore, and they create cycles in the AST that
     // may lead to infinite recursion if we don't delete them here.
@@ -272,6 +273,7 @@ function printLeadingComment(commentPath, options, print) {
       parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
     }
   }
+  comment.printed = true;
   return concat(parts);
 }
 
@@ -311,6 +313,7 @@ function printTrailingComment(commentPath, options, print) {
     parts.push(print(commentPath));
   }
 
+  comment.printed = true;
   return concat(parts);
 }
 

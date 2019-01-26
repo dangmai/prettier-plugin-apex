@@ -1,5 +1,6 @@
 /* eslint no-underscore-dangle: 0 */
 
+const assert = require("assert");
 const docBuilders = require("prettier").doc.builders;
 
 const {
@@ -2234,6 +2235,17 @@ function genericPrint(path, options, print) {
     docs.push(path.call(print, apexNames.PARSER_OUTPUT, "unit"));
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
+
+    // Check to make sure we have printed all the comments
+    const unprintedComments = n[apexNames.PARSER_OUTPUT].hiddenTokenMap.filter(
+      commentNode => !commentNode[1].printed,
+    );
+    assert.equal(
+      unprintedComments.length,
+      0,
+      "There are unprinted comments. Please file a bug report with your code sample",
+    );
+
     return concat(docs);
   }
   if (!apexClass) {

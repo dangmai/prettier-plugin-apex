@@ -1,6 +1,7 @@
 ## 1.0.0-alpha.6
 - Fix formatting for trailing comments at the end of block statements ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/12)).
 - Fix issue in which comments right before semi colon are not printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/11)).
+- Assert that all comments have been printed out in the formatted code.
 
 ## 1.0.0-alpha.5
 
