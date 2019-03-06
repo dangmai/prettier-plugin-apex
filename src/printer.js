@@ -82,19 +82,6 @@ function handleReturnStatement(path, print) {
   return concat(docs);
 }
 
-function handleBinaryExpression(path, print) {
-  const docs = [];
-  const leftDoc = path.call(print, "left");
-  const operationDoc = path.call(print, "op");
-  const rightDoc = path.call(print, "right");
-  docs.push(leftDoc);
-  docs.push(" ");
-  docs.push(operationDoc);
-  docs.push(" ");
-  docs.push(rightDoc);
-  return concat(docs);
-}
-
 function handleGenericExpression(path, print) {
   const docs = [];
   const leftDoc = path.call(print, "left");
@@ -103,9 +90,22 @@ function handleGenericExpression(path, print) {
   docs.push(leftDoc);
   docs.push(" ");
   docs.push(operationDoc);
+  docs.push(line);
+  docs.push(rightDoc);
+  return groupConcat(docs);
+}
+
+function handleAssignmentExpression(path, print) {
+  const docs = [];
+  const leftDoc = path.call(print, "left");
+  const operationDoc = path.call(print, "op");
+  const rightDoc = path.call(print, "right");
+  docs.push(leftDoc);
+  docs.push(" ");
+  docs.push(operationDoc);
   docs.push(" ");
   docs.push(rightDoc);
-  return concat(docs);
+  return groupConcat(docs);
 }
 
 function handleVariableExpression(path, print) {
@@ -947,12 +947,16 @@ function handleIfBlock(path, print) {
   const statementDoc = path.call(print, "stmnt");
 
   const parts = [];
+  const conditionParts = [];
   parts.push("if");
   parts.push(" ");
   // Condition expression
-  parts.push("(");
-  parts.push(path.call(print, "expr"));
-  parts.push(")");
+  conditionParts.push("(");
+  conditionParts.push(softline);
+  conditionParts.push(path.call(print, "expr"));
+  conditionParts.push(dedent(softline));
+  conditionParts.push(")");
+  parts.push(groupIndentConcat(conditionParts));
   // Body block
   if (statementType === apexNames.BLOCK_STATEMENT) {
     parts.push(" ");
@@ -2072,11 +2076,11 @@ nodeHandler[apexNames.INNER_INTERFACE_MEMBER] = _handlePassthroughCall("body");
 // Expression
 nodeHandler[apexNames.TERNARY_EXPRESSION] = handleTernaryExpression;
 nodeHandler[apexNames.BOOLEAN_EXPRESSION] = handleGenericExpression;
-nodeHandler[apexNames.ASSIGNMENT_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexNames.ASSIGNMENT_EXPRESSION] = handleAssignmentExpression;
 nodeHandler[apexNames.NESTED_EXPRESSION] = handleNestedExpression;
 nodeHandler[apexNames.VARIABLE_EXPRESSION] = handleVariableExpression;
 nodeHandler[apexNames.LITERAL_EXPRESSION] = handleLiteralExpression;
-nodeHandler[apexNames.BINARY_EXPRESSION] = handleBinaryExpression;
+nodeHandler[apexNames.BINARY_EXPRESSION] = handleGenericExpression;
 nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) =>
   concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;

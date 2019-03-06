@@ -165,24 +165,31 @@ class Comments {
     Integer a;
 
     a = // Comment
-    i + j;
-    a = i - // Comment
+    i +
+    j;
+    a = i -
+    // Comment
     j;
     a = i
-    /* Comment */ * j;
-    a = i / /* Comment */
+    /* Comment */ *
+    j;
+    a = i /
+    /* Comment */
     j;
     a = // Comment
-    i << /* Comment */
+    i <<
+    /* Comment */
     j;
     a = i /* Comment */ >> /* Comment 2 */ j;
     a = /* Comments */ i >>> j /* Comments 2 */;
     a = /* Comments */ i ^ /* Comments 2 */ j;
     a = // Comments
-    i & // Comments
+    i &
+    // Comments
     j;
     a = /* Comments */
-    i | j
+    i |
+    j
     /* Comments */;
   }
 }
