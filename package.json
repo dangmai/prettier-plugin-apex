@@ -30,13 +30,13 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^5.9.0",
+    "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^3.3.0",
-    "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-prettier": "^3.0.0",
-    "jest": "^23.6.0",
-    "prettier": "^1.15.0"
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-prettier": "^3.0.1",
+    "jest": "^24.1.0",
+    "prettier": "^1.16.4"
   },
   "peerDependencies": {
     "prettier": "^1.15.0"
@@ -45,6 +45,6 @@
     "node-nailgun-client": "github:dangmai/node-nailgun-client#send_input",
     "private": "^0.1.8",
     "wait-on": "^3.2.0",
-    "yargs": "^12.0.5"
+    "yargs": "^13.2.1"
   }
 }
