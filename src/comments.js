@@ -62,9 +62,7 @@ function getRootNodeLocation(ast) {
 function decorateComment(node, comment, ast) {
   // Special case: Comment is the first thing in the document,
   // then "unit" node would be the followingNode to it.
-  if (
-    comment.location.endIndex < getRootNodeLocation(ast).startIndex
-  ) {
+  if (comment.location.endIndex < getRootNodeLocation(ast).startIndex) {
     comment.followingNode = ast[apexNames.PARSER_OUTPUT].unit;
     return;
   }
