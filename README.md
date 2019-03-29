@@ -57,6 +57,22 @@ Then in order to run it:
 npm run prettier -- --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
+### Configuration
+
+This library follows the same configuration format as Prettier,
+which is documented [here](https://prettier.io/docs/en/configuration.html).
+
+The amount of configuration is very limited,
+because this is intended to be a very opinionated formatter.
+Here is the default configuration that can be overriden:
+
+```json
+{
+  "tabWidth": 2,
+  "printWidth": 80
+}
+```
+
 ## Performance Tips/3rd party integration
 
 By default,
