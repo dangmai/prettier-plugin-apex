@@ -1,4 +1,5 @@
 ## Unreleased
+- Fix comments not being printed if they appear before the root node ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/17)).
 
 ## 1.0.0-alpha.7
 - Fix Annotated Declaration being indented too far ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/18)).

@@ -44,7 +44,31 @@ function getSortedChildNodes(node, resultArray) {
   return resultArray;
 }
 
-function decorateComment(node, comment) {
+function getRootNodeLocation(ast) {
+  // Some root node like TriggerDeclUnit has the `loc` property directly on it,
+  // while others has it in the `body` property. This function abstracts away
+  // that difference.
+  if (ast[apexNames.PARSER_OUTPUT].unit.loc) {
+    return ast[apexNames.PARSER_OUTPUT].unit.loc;
+  }
+  if (ast[apexNames.PARSER_OUTPUT].unit.body.loc) {
+    return ast[apexNames.PARSER_OUTPUT].unit.body.loc;
+  }
+  throw new Error(
+    "Cannot find the root node location. Please file a bug report with your code sample",
+  );
+}
+
+function decorateComment(node, comment, ast) {
+  // Special case: Comment is the first thing in the document,
+  // then "unit" node would be the followingNode to it.
+  if (
+    comment.location.endIndex < getRootNodeLocation(ast).startIndex
+  ) {
+    comment.followingNode = ast[apexNames.PARSER_OUTPUT].unit;
+    return;
+  }
+  // Handling the normal cases
   const childNodes = getSortedChildNodes(node);
 
   let left = 0;
@@ -61,7 +85,7 @@ function decorateComment(node, comment) {
     ) {
       // The comment is completely contained by this child node
       comment.enclosingNode = child;
-      decorateComment(child, comment);
+      decorateComment(child, comment, ast);
       return; // Abandon the binary search at this level
     }
 
@@ -187,7 +211,7 @@ function attach(ast, sourceCode) {
   const tiesToBreak = [];
 
   comments.forEach(comment => {
-    decorateComment(ast[apexNames.PARSER_OUTPUT].unit, comment);
+    decorateComment(ast[apexNames.PARSER_OUTPUT].unit, comment, ast);
 
     const pn = comment.precedingNode;
     const en = comment.enclosingNode;
