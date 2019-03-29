@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 1.0.0-alpha.7
 - Fix Annotated Declaration being indented too far ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/18)).
 - Getter and setter will no longer break if they can fit on the same line.
 - Add documentation for configuration options.
