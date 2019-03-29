@@ -361,6 +361,7 @@ function handlePropertyDeclaration(path, print) {
   const setterDoc = path.call(print, "setter", "value");
 
   const parts = [];
+  const innerParts = [];
   parts.push(join("", modifierDocs));
   parts.push(path.call(print, "type"));
   parts.push(" ");
@@ -368,19 +369,20 @@ function handlePropertyDeclaration(path, print) {
   parts.push(" ");
   parts.push("{");
   if (getterDoc || setterDoc) {
-    parts.push(line);
+    innerParts.push(line);
   }
   if (getterDoc) {
-    parts.push(getterDoc);
+    innerParts.push(getterDoc);
     if (setterDoc) {
-      parts.push(line);
+      innerParts.push(line);
     } else {
-      parts.push(dedent(line));
+      innerParts.push(dedent(line));
     }
   }
-  _pushIfExist(parts, setterDoc, [dedent(line)]);
+  _pushIfExist(innerParts, setterDoc, [dedent(line)]);
+  parts.push(groupIndentConcat(innerParts));
   parts.push("}");
-  return groupIndentConcat(parts);
+  return groupConcat(parts);
 }
 
 function _handlePropertyGetterSetter(action) {

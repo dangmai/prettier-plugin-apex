@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AnnotatedMethod.cls - apex-verify: AnnotatedMethod.cls 1`] = `
+class topLevelClass {
+  @AuraEnabled
+  public String someProperty {
+    get;
+    set;
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class topLevelClass {
+  @AuraEnabled
+  public String someProperty { get; set; }
+}
+
+`;
