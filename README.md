@@ -69,9 +69,13 @@ Here is the default configuration that can be overriden:
 ```json
 {
   "tabWidth": 2,
-  "printWidth": 80
+  "printWidth": 80,
+  "useTab": false
 }
 ```
+
+Which means that by default, the formatted code will use 2 spaces for indentation,
+and will try to format every line to contain under 80 characters.
 
 ## Performance Tips/3rd party integration
 
