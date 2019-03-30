@@ -57,7 +57,8 @@ interface CommentsBeforeInterfaceDeclaration {
 /**
  * First ApexDoc
  */
-interface CommentsBeforeInterfaceDeclaration {}
+interface CommentsBeforeInterfaceDeclaration {
+}
 
 `;
 

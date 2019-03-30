@@ -5,6 +5,7 @@ private class PrivateEmptyClass
 {}
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-private class PrivateEmptyClass {}
+private class PrivateEmptyClass {
+}
 
 `;

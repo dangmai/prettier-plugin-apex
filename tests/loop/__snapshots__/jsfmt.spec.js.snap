@@ -91,7 +91,8 @@ class LoopClass {
     for (count = 0; count < 10; count++) {
       System.debug(count);
     }
-    for (;;) {}
+    for (;;) {
+    }
     for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
       System.debug(j);
       System.debug('Hi');
@@ -102,9 +103,11 @@ class LoopClass {
       }
     }
 
-    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {}
+    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {
+    }
 
-    for (Integer i = 0; i < 10; i++) {}
+    for (Integer i = 0; i < 10; i++) {
+    }
 
     for (Contact a: [SELECT Id FROM Contact]) {
       System.debug(a);
@@ -137,7 +140,8 @@ class LoopClass {
         continue;
       }
     }
-    while (i < 5) {}
+    while (i < 5) {
+    }
     while (true) {
       break;
     }
@@ -154,7 +158,8 @@ class LoopClass {
         continue;
       }
     } while (count < 10);
-    do {} while (count < 10);
+    do {
+    } while (count < 10);
   }
 }
 

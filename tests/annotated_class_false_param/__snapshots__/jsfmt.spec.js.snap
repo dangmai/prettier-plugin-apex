@@ -6,6 +6,7 @@ exports[`AnnotatedFalseParamClass.cls - apex-verify: AnnotatedFalseParamClass.cl
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @IsTest(SeeAllData=false)
-class AnnotatedFalseParamClass {}
+class AnnotatedFalseParamClass {
+}
 
 `;

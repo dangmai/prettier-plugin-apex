@@ -6,6 +6,7 @@ exports[`AnnotatedClass.cls - apex-verify: AnnotatedClass.cls 1`] = `
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @IsTest
-class TestClass {}
+class TestClass {
+}
 
 `;

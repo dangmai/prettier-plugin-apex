@@ -194,10 +194,8 @@ function handleTriggerDeclarationUnit(path, print) {
   });
   if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
-    parts.push(dedent(concat([hardline, "}"])));
-  } else {
-    parts.push("}");
   }
+  parts.push(dedent(concat([hardline, "}"])));
   return concat(parts);
 }
 
@@ -252,13 +250,10 @@ function handleInterfaceDeclaration(path, print) {
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
-    parts.push(concat([hardline, "}"]));
   } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
-    parts.push(concat([hardline, "}"]));
-  } else {
-    parts.push("}");
   }
+  parts.push(concat([hardline, "}"]));
   return concat(parts);
 }
 
@@ -299,13 +294,10 @@ function handleClassDeclaration(path, print) {
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
-    parts.push(concat([hardline, "}"]));
   } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
-    parts.push(concat([hardline, "}"]));
-  } else {
-    parts.push("}");
   }
+  parts.push(concat([hardline, "}"]));
   return concat(parts);
 }
 
@@ -614,12 +606,11 @@ function handleBlockStatement(path, print) {
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
     parts.push(concat([hardline, ...danglingCommentDocs]));
-    parts.push(dedent(hardline));
   } else if (statementDocs.length > 0) {
     parts.push(hardline);
     parts.push(join(hardline, statementDocs));
-    parts.push(dedent(hardline));
   }
+  parts.push(dedent(hardline));
   parts.push("}");
   return groupIndentConcat(parts);
 }

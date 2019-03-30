@@ -170,17 +170,28 @@ class Conditional extends Object {
   void assignmentExpression() {
     Integer i = 0;
     Integer j = 1;
-    if (i = j) {}
-    if (i &= j) {}
-    if (i |= j) {}
-    if (i ^= j) {}
-    if (i += j) {}
-    if (i -= j) {}
-    if (i *= j) {}
-    if (i /= j) {}
-    if (i <<= j) {}
-    if (i >>= j) {}
-    if (i >>>= j) {}
+    if (i = j) {
+    }
+    if (i &= j) {
+    }
+    if (i |= j) {
+    }
+    if (i ^= j) {
+    }
+    if (i += j) {
+    }
+    if (i -= j) {
+    }
+    if (i *= j) {
+    }
+    if (i /= j) {
+    }
+    if (i <<= j) {
+    }
+    if (i >>= j) {
+    }
+    if (i >>>= j) {
+    }
   }
 
   void ternaryExpression() {
@@ -237,7 +248,8 @@ class Conditional extends Object {
     c = a || b;
   }
 
-  void triggerVariableExpr_inOtherSuite() {}
+  void triggerVariableExpr_inOtherSuite() {
+  }
 
   void packageVersionExpression() {
     Package.Version.Request;
@@ -293,9 +305,11 @@ class Conditional extends Object {
     ).callAnotherMethod().getStringResult();
   }
 
-  void javaMethodCallExpression_notNeeded() {}
+  void javaMethodCallExpression_notNeeded() {
+  }
 
-  void javaVariableExpression_notNeeded() {}
+  void javaVariableExpression_notNeeded() {
+  }
 
   void superVariableExpression() {
     super.methodCall();
@@ -322,9 +336,11 @@ class Conditional extends Object {
     Object h = null;
   }
 
-  void soqlExpression_inOtherSuite() {}
+  void soqlExpression_inOtherSuite() {
+  }
 
-  void soslExpression_inOtherSuite() {}
+  void soslExpression_inOtherSuite() {
+  }
 
   class InnerClass extends ExpressionClass {
     InnerClass() {

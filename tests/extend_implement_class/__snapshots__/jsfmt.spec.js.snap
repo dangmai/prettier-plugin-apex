@@ -21,13 +21,17 @@ class ExtendImplementClass extends FirstExtend implements FirstImplement, Second
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class ExtendImplementClass extends FirstExtend implements FirstImplement, SecondImplement {
-  public virtual class VirtualExtendInnerClass extends FirstExtend {}
+  public virtual class VirtualExtendInnerClass extends FirstExtend {
+  }
 
-  private abstract class AbstractImplementInnerClass implements FirstImplement {}
+  private abstract class AbstractImplementInnerClass implements FirstImplement {
+  }
 
-  global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {}
+  global class ExtendImplementInnerClass extends FirstExtend implements FirstImplement, SecondImplement {
+  }
 
-  public override Integer compareTo(Object anotherObject) {}
+  public override Integer compareTo(Object anotherObject) {
+  }
 }
 
 `;

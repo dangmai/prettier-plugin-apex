@@ -1,0 +1,72 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`EmptyBlockStatement.cls - apex-verify: EmptyBlockStatement.cls 1`] = `
+class EmptyBlockStatement {
+  public EmptyBlockStatement() {
+
+  }
+
+  public static void emptyForLoop() {
+    for (Integer i = 1; i ++; i < 5) {
+
+    }
+  }
+
+  public static void emptyIfElse() {
+    if (1 == 1) {
+
+    } else {
+
+    }
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class EmptyBlockStatement {
+  public EmptyBlockStatement() {
+  }
+
+  public static void emptyForLoop() {
+    for (Integer i = 1; i++; i < 5) {
+    }
+  }
+
+  public static void emptyIfElse() {
+    if (1 == 1) {
+    } else {
+    }
+  }
+}
+
+`;
+
+exports[`EmptyClass.cls - apex-verify: EmptyClass.cls 1`] = `
+class EmptyClass {}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class EmptyClass {
+}
+
+`;
+
+exports[`EmptyEnum.cls - apex-verify: EmptyEnum.cls 1`] = `
+enum Season {}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+enum Season {}
+
+`;
+
+exports[`EmptyInterface.cls - apex-verify: EmptyInterface.cls 1`] = `
+interface EmptyInterface {}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+interface EmptyInterface {
+}
+
+`;
+
+exports[`EmptyTrigger.trigger - apex-verify: EmptyTrigger.trigger 1`] = `
+trigger myAccountTrigger on Account(before delete) {}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trigger myAccountTrigger on Account(
+  before delete) {
+}
+
+`;

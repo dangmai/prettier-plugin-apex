@@ -51,7 +51,8 @@ class RunAsClass {
       }
     }
 
-    System.runAs([SELECT Id FROM User LIMIT 1]) {}
+    System.runAs([SELECT Id FROM User LIMIT 1]) {
+    }
 
     System.runAs(new Version(1, 0)) {
       System.debug('I am running as a different version');
