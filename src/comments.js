@@ -83,6 +83,24 @@ function decorateComment(node, comment, ast) {
     ) {
       // The comment is completely contained by this child node
       comment.enclosingNode = child;
+
+      // Special case: if the child is a declaration type and has no members,
+      // we should go no deeper; otherwise the `name` node will mistakenly
+      // be decorated as the preceding node to this comment.
+      const declarationUnits = [
+        apexNames.CLASS_DECLARATION,
+        apexNames.TRIGGER_DECLARATION_UNIT,
+        apexNames.ENUM_DECLARATION,
+        apexNames.INTERFACE_DECLARATION,
+      ];
+      if (
+        declarationUnits.includes(child["@class"]) &&
+        child.members.length === 0
+      ) {
+        return;
+      }
+
+      // Standard case: recursively decorating the children nodes
       decorateComment(child, comment, ast);
       return; // Abandon the binary search at this level
     }
@@ -295,7 +313,6 @@ function printLeadingComment(commentPath, options, print) {
       parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
     }
   }
-  comment.printed = true;
   return concat(parts);
 }
 
@@ -335,7 +352,6 @@ function printTrailingComment(commentPath, options, print) {
     parts.push(print(commentPath));
   }
 
-  comment.printed = true;
   return concat(parts);
 }
 
@@ -363,7 +379,7 @@ function printComments(path, options, print) {
   const innerLines = print(path);
   const comments = value ? value.apexComments : null;
 
-  if (!comments || comments.length === 0) {
+  if (!comments || comments.filter(comment => !comment.printed).length === 0) {
     return innerLines;
   }
 

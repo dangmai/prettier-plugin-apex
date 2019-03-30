@@ -228,6 +228,13 @@ function resolveLineIndexes(node, lineIndexes) {
   if (nodeLoc) {
     nodeLoc.endLine =
       lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;
+
+    // Edge case: root node
+    if (nodeLoc.endLine < 0) {
+      nodeLoc.endLine = lineIndexes.length - 1;
+    }
+    // Edge case: Trigger Declaration Unit.
+    // Somehow jorje thinks this node ends after the word `trigger`.
   }
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {

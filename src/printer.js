@@ -201,10 +201,32 @@ function handleTriggerDeclarationUnit(path, print) {
   return concat(parts);
 }
 
+function _getDanglingCommentDocs(path, print) {
+  const node = path.getValue();
+  if (!node.apexComments) {
+    return [];
+  }
+  node.danglingComments = node.apexComments.filter(
+    comment => !comment.leading && !comment.trailing,
+  );
+  const danglingCommentParts = path.map(print, "danglingComments");
+  const danglingCommentDocs = danglingCommentParts.map(
+    (danglingCommentDoc, index, allDanglingCommentDocs) => {
+      if (index !== allDanglingCommentDocs.length - 1) {
+        return concat([danglingCommentDoc, hardline]);
+      }
+      return danglingCommentDoc;
+    },
+  );
+  delete node.danglingComments;
+  return danglingCommentDocs;
+}
+
 function handleInterfaceDeclaration(path, print) {
   const superInterface = path.call(print, "superInterface", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
@@ -228,7 +250,10 @@ function handleInterfaceDeclaration(path, print) {
   }
   parts.push(" ");
   parts.push("{");
-  if (memberDocs.length > 0) {
+  if (danglingCommentDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+    parts.push(concat([hardline, "}"]));
+  } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
     parts.push(concat([hardline, "}"]));
   } else {
@@ -241,6 +266,7 @@ function handleClassDeclaration(path, print) {
   const superClass = path.call(print, "superClass", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
@@ -271,7 +297,10 @@ function handleClassDeclaration(path, print) {
   }
   parts.push(" ");
   parts.push("{");
-  if (memberDocs.length > 0) {
+  if (danglingCommentDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+    parts.push(concat([hardline, "}"]));
+  } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
     parts.push(concat([hardline, "}"]));
   } else {
@@ -486,6 +515,7 @@ function handleDmlMergeStatement(path, print) {
 function handleEnumDeclaration(path, print) {
   const modifierDocs = path.map(print, "modifiers");
   const memberDocs = path.map(print, "members");
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
 
   const parts = [];
   _pushIfExist(parts, join(" ", modifierDocs));
@@ -495,6 +525,7 @@ function handleEnumDeclaration(path, print) {
   parts.push(" ");
   parts.push("{");
   parts.push(softline);
+  parts.push(join(concat([line]), danglingCommentDocs));
   parts.push(join(concat([",", line]), memberDocs));
   parts.push(dedent(softline));
   parts.push("}");
@@ -577,9 +608,14 @@ function handleRunAsBlock(path, print) {
 
 function handleBlockStatement(path, print) {
   const parts = [];
-  parts.push("{");
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
   const statementDocs = path.map(print, "stmnts");
-  if (statementDocs.length > 0) {
+
+  parts.push("{");
+  if (danglingCommentDocs.length > 0) {
+    parts.push(concat([hardline, ...danglingCommentDocs]));
+    parts.push(dedent(hardline));
+  } else if (statementDocs.length > 0) {
     parts.push(hardline);
     parts.push(join(hardline, statementDocs));
     parts.push(dedent(hardline));
@@ -1960,6 +1996,7 @@ function handleForInit(path, print) {
  */
 function handleApexDocComment(comment) {
   const lines = comment.value.split("\n");
+  comment.printed = true; // eslint-disable-line no-param-reassign
   return concat([
     join(
       hardline,
@@ -1983,6 +2020,7 @@ function handleComment(path) {
   if (isApexDocComment(node)) {
     return handleApexDocComment(node);
   }
+  node.printed = true;
   return node.value;
 }
 

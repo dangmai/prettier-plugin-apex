@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CommentsDanglingInBlockStatement.cls - apex-verify: CommentsDanglingInBlockStatement.cls 1`] = `
+class CommentDanglingInBlockStatement {
+  public void emptyMethod() {
+    // Inline Comment
+
+    /* Block Comment */
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class CommentDanglingInBlockStatement {
+  public void emptyMethod() {
+    // Inline Comment
+    /* Block Comment */
+  }
+}
+
+`;
+
+exports[`CommentsDanglingInClass.cls - apex-verify: CommentsDanglingInClass.cls 1`] = `
+class DanglingCommentsInClass {
+  // Inline Comment
+
+  /* Block Comment */
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class DanglingCommentsInClass {
+  // Inline Comment
+  /* Block Comment */
+}
+
+`;
+
+exports[`CommentsDanglingInEnum.cls - apex-verify: CommentsDanglingInEnum.cls 1`] = `
+enum DanglingCommentsInEnum {
+  // Inline Comment
+
+  /* Block Comment */
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+enum DanglingCommentsInEnum {
+  // Inline Comment
+
+  /* Block Comment */
+}
+
+`;
+
+exports[`CommentsDanglingInInterface.cls - apex-verify: CommentsDanglingInInterface.cls 1`] = `
+interface DanglingCommentsInInterface {
+  // Inline Comment
+
+  /* Block Comment */
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+interface DanglingCommentsInInterface {
+  // Inline Comment
+  /* Block Comment */
+}
+
+`;
