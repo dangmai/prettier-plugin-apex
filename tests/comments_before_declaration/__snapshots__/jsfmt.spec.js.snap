@@ -1,0 +1,84 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CommentsBeforeClassDeclaration.cls - apex-verify: CommentsBeforeClassDeclaration.cls 1`] = `
+// First Test Comment
+
+/**
+* First ApexDoc
+*/
+class CommentsBeforeClassDeclaration {
+  public CommentsBeforeClassDeclaration() {
+    System.debug('SOMETHING');
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// First Test Comment
+
+/**
+ * First ApexDoc
+ */
+class CommentsBeforeClassDeclaration {
+  public CommentsBeforeClassDeclaration() {
+    System.debug('SOMETHING');
+  }
+}
+
+`;
+
+exports[`CommentsBeforeEnumDeclaration.cls - apex-verify: CommentsBeforeEnumDeclaration.cls 1`] = `
+// First Test Comment
+
+/**
+* First ApexDoc
+*/
+enum Season {WINTER, SPRING, SUMMER, FALL}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// First Test Comment
+
+/**
+ * First ApexDoc
+ */
+enum Season {WINTER, SPRING, SUMMER, FALL}
+
+`;
+
+exports[`CommentsBeforeInterfaceDeclaration.cls - apex-verify: CommentsBeforeInterfaceDeclaration.cls 1`] = `
+// First Test Comment
+
+/**
+* First ApexDoc
+*/
+interface CommentsBeforeInterfaceDeclaration {
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// First Test Comment
+
+/**
+ * First ApexDoc
+ */
+interface CommentsBeforeInterfaceDeclaration {}
+
+`;
+
+exports[`CommentsBeforeTriggerDeclaration.cls - apex-verify: CommentsBeforeTriggerDeclaration.cls 1`] = `
+// First Test Comment
+
+/**
+* First ApexDoc
+*/
+trigger Case_trg on Case(before update) {
+  System.debug('SOMETHING');
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+// First Test Comment
+
+/**
+ * First ApexDoc
+ */
+trigger Case_trg on Case(
+  before update) {
+  System.debug('SOMETHING');
+}
+
+`;
