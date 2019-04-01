@@ -44,6 +44,18 @@ function parseTextWithNailgun(text, serverPort) {
   return executionResult.stdout.toString();
 }
 
+// jorje calls the location node differently for different types of nodes,
+// so we use this method to abstract away that difference
+function _getNodeLocation(node) {
+  if (node.loc) {
+    return node.loc;
+  }
+  if (node.location) {
+    return node.location;
+  }
+  return null;
+}
+
 // The serialized string given back contains references (to avoid circular references),
 // which need to be resolved. This method recursively walks through the
 // deserialized object and resolve those references.
@@ -163,7 +175,7 @@ function generateExtraMetadata(
         // arrays
         lastNodeLoc = nodeLoc;
       } else if (!nodeLoc && !lastNodeLoc) {
-        lastNodeLoc = node.loc;
+        lastNodeLoc = _getNodeLocation(node);
       }
     }
   });
@@ -174,9 +186,10 @@ function generateExtraMetadata(
     node.lastNodeLoc = lastNodeLoc;
     generateEndIndexForNode(node, sourceCode, lineIndexes);
   }
+  const nodeLoc = _getNodeLocation(node);
   if (
     apexClass &&
-    (node.loc || node.lastNodeLoc) &&
+    (nodeLoc || node.lastNodeLoc) &&
     allowTrailingEmptyLine &&
     !node.isLastNodeInArray
   ) {
@@ -189,7 +202,7 @@ function generateExtraMetadata(
     // it off for all but the last one.
     const nextLine = isSpecialClass
       ? node.lastNodeLoc.endLine + 1
-      : node.loc.endLine + 1;
+      : nodeLoc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
     if (trailingEmptyLineAllowed && nextEmptyLine !== -1) {
       node.trailingEmptyLine = true;
@@ -197,10 +210,10 @@ function generateExtraMetadata(
       if (emptyLineNodeMap[nextLine]) {
         const nodeMapEndIndex = emptyLineNodeMap[nextLine].lastNodeLoc
           ? emptyLineNodeMap[nextLine].lastNodeLoc.endIndex
-          : emptyLineNodeMap[nextLine].loc.endIndex;
+          : _getNodeLocation(emptyLineNodeMap[nextLine]).endIndex;
         const thisEndIndex = node.lastNodeLoc
           ? node.lastNodeLoc.endIndex
-          : node.loc.endIndex;
+          : nodeLoc.endIndex;
 
         if (nodeMapEndIndex > thisEndIndex) {
           node.trailingEmptyLine = false;
@@ -216,7 +229,7 @@ function generateExtraMetadata(
   if (lastNodeLoc) {
     return lastNodeLoc;
   }
-  return node.loc;
+  return nodeLoc;
 }
 
 // For each node, the jorje compiler gives us its line and its index within
@@ -224,7 +237,7 @@ function generateExtraMetadata(
 // index of that node within the source code. That allows us to use prettier
 // utility methods.
 function resolveLineIndexes(node, lineIndexes) {
-  const nodeLoc = node.loc;
+  const nodeLoc = _getNodeLocation(node);
   if (nodeLoc) {
     nodeLoc.endLine =
       lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;

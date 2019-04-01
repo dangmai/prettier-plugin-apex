@@ -14,7 +14,11 @@ const {
   dedent,
 } = docBuilders;
 
-const { isApexDocComment, printComments } = require("./comments");
+const {
+  isApexDocComment,
+  printComments,
+  printDanglingComment,
+} = require("./comments");
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
@@ -199,7 +203,7 @@ function handleTriggerDeclarationUnit(path, print) {
   return concat(parts);
 }
 
-function _getDanglingCommentDocs(path, print) {
+function _getDanglingCommentDocs(path, print, options) {
   const node = path.getValue();
   if (!node.apexComments) {
     return [];
@@ -207,24 +211,21 @@ function _getDanglingCommentDocs(path, print) {
   node.danglingComments = node.apexComments.filter(
     comment => !comment.leading && !comment.trailing,
   );
-  const danglingCommentParts = path.map(print, "danglingComments");
-  const danglingCommentDocs = danglingCommentParts.map(
-    (danglingCommentDoc, index, allDanglingCommentDocs) => {
-      if (index !== allDanglingCommentDocs.length - 1) {
-        return concat([danglingCommentDoc, hardline]);
-      }
-      return danglingCommentDoc;
-    },
-  );
+  const danglingCommentParts = [];
+  path.each(commentPath => {
+    danglingCommentParts.push(
+      printDanglingComment(commentPath, options, print),
+    );
+  }, "danglingComments");
   delete node.danglingComments;
-  return danglingCommentDocs;
+  return danglingCommentParts;
 }
 
-function handleInterfaceDeclaration(path, print) {
+function handleInterfaceDeclaration(path, print, options) {
   const superInterface = path.call(print, "superInterface", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
@@ -257,11 +258,11 @@ function handleInterfaceDeclaration(path, print) {
   return concat(parts);
 }
 
-function handleClassDeclaration(path, print) {
+function handleClassDeclaration(path, print, options) {
   const superClass = path.call(print, "superClass", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
@@ -504,10 +505,10 @@ function handleDmlMergeStatement(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleEnumDeclaration(path, print) {
+function handleEnumDeclaration(path, print, options) {
   const modifierDocs = path.map(print, "modifiers");
   const memberDocs = path.map(print, "members");
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const parts = [];
   _pushIfExist(parts, join(" ", modifierDocs));
@@ -598,9 +599,9 @@ function handleRunAsBlock(path, print) {
   return concat(parts);
 }
 
-function handleBlockStatement(path, print) {
+function handleBlockStatement(path, print, options) {
   const parts = [];
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print);
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
   const statementDocs = path.map(print, "stmnts");
 
   parts.push("{");

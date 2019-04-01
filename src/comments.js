@@ -355,6 +355,31 @@ function printTrailingComment(commentPath, options, print) {
   return concat(parts);
 }
 
+function printDanglingComment(commentPath, options, print) {
+  const sourceCode = options.originalText;
+  const comment = commentPath.getValue(commentPath);
+  const loc = comment.location;
+  const isFirstComment = commentPath.getName() === 0;
+  const parts = [];
+
+  const fromPos =
+    skipWhitespace(sourceCode, loc.startIndex - 1, {
+      backwards: true,
+    }) + 1;
+  const leadingSpace = sourceCode.slice(fromPos, loc.startIndex);
+  const numberOfNewLines = isFirstComment
+    ? 0
+    : (leadingSpace.match(/\n/g) || []).length;
+
+  if (numberOfNewLines > 0) {
+    // If the leading space contains newlines, then add at most 2 new lines
+    const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
+    parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
+  }
+  parts.push(print(commentPath));
+  return concat(parts);
+}
+
 function allowTrailingComments(apexClass) {
   let trailingCommentsAllowed = false;
   const separatorIndex = apexClass.indexOf("$");
@@ -438,4 +463,5 @@ module.exports = {
   attach,
   isApexDocComment,
   printComments,
+  printDanglingComment,
 };
