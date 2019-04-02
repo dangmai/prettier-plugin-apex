@@ -1,4 +1,4 @@
-/* eslint no-param-reassign:0 */
+/* eslint no-param-reassign: 0 no-underscore-dangle: 0 */
 
 const childProcess = require("child_process");
 const path = require("path");
