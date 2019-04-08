@@ -517,12 +517,15 @@ function handleEnumDeclaration(path, print, options) {
   parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("{");
-  parts.push(softline);
-  parts.push(join(concat([line]), danglingCommentDocs));
-  parts.push(join(concat([",", line]), memberDocs));
-  parts.push(dedent(softline));
-  parts.push("}");
-  return groupIndentConcat(parts);
+  if (danglingCommentDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+  } else if (memberDocs.length > 0) {
+    parts.push(
+      indent(concat([hardline, join(concat([",", hardline]), memberDocs)])),
+    );
+  }
+  parts.push(concat([hardline, "}"]));
+  return concat(parts);
 }
 
 function handleSwitchStatement(path, print) {

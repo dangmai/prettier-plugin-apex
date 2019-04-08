@@ -339,9 +339,13 @@ class EmptyLine {
     }
   }
 
-  enum NUMBER {ONE, TWO}
+  enum NUMBER {
+    ONE,
+    TWO
+  }
 
-  enum NUMBER {}
+  enum NUMBER {
+  }
   void blockStatement() {
   }
 
@@ -553,9 +557,11 @@ class EmptyLine {
   }
 
   class InnerClassThree {
-    enum InnerEnumMember {}
+    enum InnerEnumMember {
+    }
 
-    enum InnerEnumMemberTwo {}
+    enum InnerEnumMemberTwo {
+    }
   }
 
   class InnerClassFour {

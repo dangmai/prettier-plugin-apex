@@ -50,7 +50,8 @@ class EmptyClass {
 exports[`EmptyEnum.cls - apex-verify: EmptyEnum.cls 1`] = `
 enum Season {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-enum Season {}
+enum Season {
+}
 
 `;
 

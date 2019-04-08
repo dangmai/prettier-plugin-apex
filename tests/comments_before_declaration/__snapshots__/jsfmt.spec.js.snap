@@ -38,7 +38,12 @@ enum Season {WINTER, SPRING, SUMMER, FALL}
 /**
  * First ApexDoc
  */
-enum Season {WINTER, SPRING, SUMMER, FALL}
+enum Season {
+  WINTER,
+  SPRING,
+  SUMMER,
+  FALL
+}
 
 `;
 
