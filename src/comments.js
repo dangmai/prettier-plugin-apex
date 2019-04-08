@@ -376,25 +376,29 @@ function printDanglingComment(commentPath, options, print) {
     const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
     parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
-  parts.push(print(commentPath));
+  if (comment["@class"] === apexNames.INLINE_COMMENT) {
+    parts.push(lineSuffix(print(commentPath)));
+  } else {
+    parts.push(print(commentPath));
+  }
   return concat(parts);
 }
 
 function allowTrailingComments(apexClass) {
-  let trailingCommentsAllowed = false;
+  const allowedTypes = [
+    apexNames.CLASS_DECLARATION,
+    apexNames.INTERFACE_DECLARATION,
+    apexNames.METHOD_DECLARATION,
+    apexNames.ENUM_DECLARATION,
+    apexNames.VARIABLE_DECLARATION,
+    apexNames.LOCATION_IDENTIFIER,
+  ];
+  let trailingCommentsAllowed = allowedTypes.includes(apexClass);
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
-    trailingCommentsAllowed = parentClass === apexNames.STATEMENT;
-  } else {
-    const allowedTypes = [
-      apexNames.CLASS_DECLARATION,
-      apexNames.INTERFACE_DECLARATION,
-      apexNames.METHOD_DECLARATION,
-      apexNames.ENUM_DECLARATION,
-      apexNames.VARIABLE_DECLARATION,
-    ];
-    trailingCommentsAllowed = allowedTypes.includes(apexClass);
+    trailingCommentsAllowed =
+      trailingCommentsAllowed || parentClass === apexNames.STATEMENT;
   }
   return trailingCommentsAllowed;
 }

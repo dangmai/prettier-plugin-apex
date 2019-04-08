@@ -177,7 +177,7 @@ function handleTriggerDeclarationUnit(path, print) {
   const parts = [];
   parts.push("trigger");
   parts.push(" ");
-  parts.push(path.call(print, "name", "value"));
+  parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("on");
   parts.push(" ");
@@ -240,7 +240,7 @@ function handleInterfaceDeclaration(path, print, options) {
   }
   parts.push("interface");
   parts.push(" ");
-  parts.push(path.call(print, "name", "value"));
+  parts.push(path.call(print, "name"));
   if (superInterface) {
     parts.push(" ");
     parts.push("extends");
@@ -277,7 +277,7 @@ function handleClassDeclaration(path, print, options) {
   }
   parts.push("class");
   parts.push(" ");
-  parts.push(path.call(print, "name", "value"));
+  parts.push(path.call(print, "name"));
   if (superClass !== "") {
     parts.push(" ");
     parts.push("extends");

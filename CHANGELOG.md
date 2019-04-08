@@ -1,4 +1,5 @@
 ## Unreleased
+- Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).
 - Add new lines in empty blocks for Enum.
 
 ## 1.0.0-alpha.8
