@@ -58,6 +58,16 @@ class Comments {
     /* Block Statement Trailing Multi Block Comment 2 */
   }
 
+  void blockStatementCommentAttachmentOrder() {
+    PageReference returnPage = someClass.doSomething();
+    // Inline Comment Attachment Order
+    someClass.doSomethingElse();
+
+    someClass.doAnotherThing();
+    /* Block Comment Attachment Order */
+    someClass.doYetAnotherThing();
+  }
+
   void binaryExpression() {
     Integer i = 1;
     Integer j = 2;

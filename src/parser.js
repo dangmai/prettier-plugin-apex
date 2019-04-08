@@ -78,6 +78,57 @@ function resolveAstReferences(node, referenceMap) {
 }
 
 /**
+ * Sometimes jorje lies about a node location, so we will fix it here before
+ * using that information. We do it by enforcing that a parent node start
+ * index is always <= any child node start index, and a parent node end index
+ * is always >= any child node end index.
+ * @param node the node being visited.
+ */
+function fixNodeLocation(node) {
+  let currentLocation;
+  Object.keys(node).forEach(key => {
+    if (typeof node[key] === "object") {
+      const location = fixNodeLocation(node[key]);
+      if (location && currentLocation) {
+        if (currentLocation.startIndex > location.startIndex) {
+          currentLocation.startIndex = location.startIndex;
+        }
+        if (currentLocation.endIndex < location.endIndex) {
+          currentLocation.endIndex = location.endIndex;
+        }
+      }
+      if (location && !currentLocation) {
+        currentLocation = location;
+      }
+    }
+  });
+  if (
+    node.loc &&
+    currentLocation &&
+    node.loc.startIndex > currentLocation.startIndex
+  ) {
+    node.loc.startIndex = currentLocation.startIndex;
+  }
+  if (
+    node.loc &&
+    currentLocation &&
+    node.loc.endIndex < currentLocation.endIndex
+  ) {
+    node.loc.endIndex = currentLocation.endIndex;
+  }
+  if (currentLocation) {
+    return currentLocation;
+  }
+  if (node.loc) {
+    return {
+      startIndex: node.loc.startIndex,
+      endIndex: node.loc.endIndex,
+    };
+  }
+  return null;
+}
+
+/**
  * Certain node types do not get their endIndex reported from the jorje compiler,
  * or the number they report is not the end of the entire block,
  * so we'll have to figure it out by hand here.
@@ -312,6 +363,7 @@ function parse(sourceCode, _, options) {
       throw new Error(errors.join("\r\n"));
     }
     ast = resolveAstReferences(ast, {});
+    fixNodeLocation(ast);
     ast = resolveLineIndexes(ast, lineIndexes);
     generateExtraMetadata(
       ast,
