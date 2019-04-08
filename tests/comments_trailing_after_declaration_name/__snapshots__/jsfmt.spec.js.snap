@@ -1,0 +1,92 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`BlockTrailingCommentAfterClass.cls - apex-verify: BlockTrailingCommentAfterClass.cls 1`] = `
+class BlockTrailingCommentAfterClass { /* Block Comment */
+  public BlockTrailingCommentsAfterClass() {}
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class BlockTrailingCommentAfterClass {
+  /* Block Comment */
+  public BlockTrailingCommentsAfterClass() {
+  }
+}
+
+`;
+
+exports[`BlockTrailingCommentAfterEnum.cls - apex-verify: BlockTrailingCommentAfterEnum.cls 1`] = `
+enum Season { /* Block Comment */
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+enum Season {
+  /* Block Comment */
+}
+
+`;
+
+exports[`BlockTrailingCommentAfterInterface.cls - apex-verify: BlockTrailingCommentAfterInterface.cls 1`] = `
+interface InlineTrailingCommentAfterInterface { // Inline Comment
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+interface InlineTrailingCommentAfterInterface {
+  // Inline Comment
+}
+
+`;
+
+exports[`BlockTrailingCommentAfterTrigger.cls - apex-verify: BlockTrailingCommentAfterTrigger.cls 1`] = `
+trigger InlineTrailingCommentAfterTrigger on Account(after insert) { /* Block Comment */
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trigger InlineTrailingCommentAfterTrigger on Account /* Block Comment */(
+  after insert) {
+}
+
+`;
+
+exports[`InlineTrailingCommentAferEnum.cls - apex-verify: InlineTrailingCommentAferEnum.cls 1`] = `
+enum Season { // Inline Comment
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+enum Season {
+  // Inline Comment
+}
+
+`;
+
+exports[`InlineTrailingCommentAfterClass.cls - apex-verify: InlineTrailingCommentAfterClass.cls 1`] = `
+class InlineTrailingCommentsAfterClass { // Inline Comment
+  public InlineTrailingCommentsAfterClass() {}
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class InlineTrailingCommentsAfterClass { // Inline Comment
+  public InlineTrailingCommentsAfterClass() {
+  }
+}
+
+`;
+
+exports[`InlineTrailingCommentAfterInterface.cls - apex-verify: InlineTrailingCommentAfterInterface.cls 1`] = `
+interface BlockTrailingCommentAfterInterface { /* Block Comment */
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+interface BlockTrailingCommentAfterInterface {
+  /* Block Comment */
+}
+
+`;
+
+exports[`InlineTrailingCommentAfterTrigger.cls - apex-verify: InlineTrailingCommentAfterTrigger.cls 1`] = `
+trigger InlineTrailingCommentAfterTrigger on Account(after insert) { // Inline Comment
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trigger InlineTrailingCommentAfterTrigger on Account( // Inline Comment
+  after insert) {
+}
+
+`;
