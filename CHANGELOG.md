@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 1.0.0-alpha.8
 - Fix comments not being printed if they appear before the root node ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/17)).
 - Fix dangling comments not being printed for Class, Interface, Enum and Block Statement ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/13)).
 - Add new lines in empty blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/15)).
