@@ -304,13 +304,17 @@ function handleClassDeclaration(path, print, options) {
 
 function handleAnnotation(path, print) {
   const parts = [];
+  const parameterParts = [];
+  const parameterDocs = path.map(print, "parameters");
   parts.push("@");
   parts.push(path.call(print, "name", "value"));
-  const parameterDocs = path.map(print, "parameters");
   if (parameterDocs.length > 0) {
-    parts.push("(");
-    parts.push(join(" ", parameterDocs));
-    parts.push(")");
+    parameterParts.push("(");
+    parameterParts.push(softline);
+    parameterParts.push(join(line, parameterDocs));
+    parameterParts.push(dedent(softline));
+    parameterParts.push(")");
+    parts.push(groupIndentConcat(parameterParts));
   }
   parts.push(hardline);
   return concat(parts);
