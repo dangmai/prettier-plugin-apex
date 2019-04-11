@@ -1881,13 +1881,14 @@ function handlePrefixOperator(path, print) {
 function handleWhileLoop(path, print) {
   const statementDoc = path.call(print, "stmnt", "value");
   const statementType = path.call(print, "stmnt", "value", "@class");
+  const conditionDoc = path.call(print, "condition");
 
   const parts = [];
   parts.push("while");
   parts.push(" ");
   parts.push("(");
   // Condition
-  parts.push(path.call(print, "condition"));
+  parts.push(groupIndentConcat([softline, conditionDoc, dedent(softline)]));
   parts.push(")");
   // Body
   if (statementType === apexNames.BLOCK_STATEMENT) {
@@ -1901,6 +1902,7 @@ function handleWhileLoop(path, print) {
 
 function handleDoLoop(path, print) {
   const statementDoc = path.call(print, "stmnt");
+  const conditionDoc = path.call(print, "condition");
 
   const parts = [];
   parts.push("do");
@@ -1912,7 +1914,7 @@ function handleDoLoop(path, print) {
   parts.push(" ");
   parts.push("(");
   // Condition
-  parts.push(path.call(print, "condition"));
+  parts.push(groupIndentConcat([softline, conditionDoc, dedent(softline)]));
   parts.push(")");
   parts.push(";");
   return concat(parts);
@@ -1928,7 +1930,8 @@ function handleForLoop(path, print) {
   parts.push(" ");
   parts.push("(");
   // For Control
-  parts.push(forControlDoc);
+  parts.push(groupIndentConcat([softline, forControlDoc, dedent(softline)]));
+  // parts.push(forControlDoc);
   parts.push(")");
   // Body
   if (statementType === apexNames.BLOCK_STATEMENT) {
@@ -1963,7 +1966,7 @@ function handleForCStyleControl(path, print) {
   _pushIfExist(parts, conditionDoc, null, [line]);
   parts.push(";");
   _pushIfExist(parts, controlDoc, null, [line]);
-  return groupIndentConcat(parts);
+  return groupConcat(parts);
 }
 
 function handleForInits(path, print) {

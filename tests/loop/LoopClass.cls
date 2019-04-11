@@ -7,6 +7,9 @@ class LoopClass {
     for (count = 0; count < 10; count ++) {
       System.debug(count);
     }
+    for (count = 50000000 * 100000000; count < 1000000 * 3430000; count = count * 100000) {
+      System.debug(count);
+    }
     for (;;) {
     }
     for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
@@ -56,6 +59,10 @@ class LoopClass {
     while (i < 5) {
 
     }
+
+    while (i > 5000000 && i < 34034034 && i != 384294723 && i != 47289347 && i != 43249034) {
+      System.debug(i);
+    }
     while (true) {
       break;
     }
@@ -75,6 +82,9 @@ class LoopClass {
     do {
 
     } while (count < 10);
+    do {
+
+    } while (i > 5000000 && i < 34034034 && i != 384294723 && i != 47289347 && i != 43249034);
   }
 }
 
