@@ -1,7 +1,8 @@
 ## Unreleased
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).
 - Add new lines in empty blocks for Enum.
-- Add new lines to long annotation parameters.
+- Add new lines to long list of annotation parameters.
+- Add new lines to long list of method declaration parameters.
 
 ## 1.0.0-alpha.8
 - Fix comments not being printed if they appear before the root node ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/17)).

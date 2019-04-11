@@ -434,6 +434,7 @@ function handleMethodDeclaration(path, print) {
   const parameterDocs = path.map(print, "parameters");
 
   const parts = [];
+  const parameterParts = [];
   // Modifiers
   if (modifierDocs.length > 0) {
     parts.push(concat(modifierDocs));
@@ -444,7 +445,10 @@ function handleMethodDeclaration(path, print) {
   parts.push(path.call(print, "name"));
   // Params
   parts.push("(");
-  parts.push(join(", ", parameterDocs));
+  parameterParts.push(softline);
+  parameterParts.push(join(concat([",", line]), parameterDocs));
+  parameterParts.push(dedent(softline));
+  parts.push(groupIndentConcat(parameterParts));
   parts.push(")");
   // Body
   _pushIfExist(parts, statementDoc, null, [" "]);

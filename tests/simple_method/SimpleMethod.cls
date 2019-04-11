@@ -17,6 +17,10 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
     return action + ' ' + subject;
   }
 
+  private String sayHelloWithLongListOfParameters(String action, String subject, String location, Datetime dt) {
+    return action + ' ' + subject + location + String.valueOf(dt);
+  }
+
   void doNothing() {
     return;
   }
