@@ -43,7 +43,8 @@ trigger myAccountTrigger on Account(
   after insert,
   after update,
   after undelete,
-  before undelete) {
+  before undelete
+) {
   System.debug('Inside trigger');
   if (Trigger.isBefore) {
     if (Trigger.isDelete) {

@@ -175,6 +175,7 @@ function handleTriggerDeclarationUnit(path, print) {
   const targetDocs = path.map(print, "target");
 
   const parts = [];
+  const usageParts = [];
   parts.push("trigger");
   parts.push(" ");
   parts.push(path.call(print, "name"));
@@ -183,8 +184,12 @@ function handleTriggerDeclarationUnit(path, print) {
   parts.push(" ");
   parts.push(join(",", targetDocs));
   parts.push("(");
-  const usagePart = concat([softline, join(concat([",", line]), usageDocs)]);
-  parts.push(indent(usagePart));
+  // Usage
+  usageParts.push(softline);
+  usageParts.push(join(concat([",", line]), usageDocs));
+  usageParts.push(dedent(softline));
+  parts.push(groupIndentConcat(usageParts));
+
   parts.push(")");
   parts.push(" ");
   parts.push("{");

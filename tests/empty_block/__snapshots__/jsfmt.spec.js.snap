@@ -66,8 +66,7 @@ interface EmptyInterface {
 exports[`EmptyTrigger.trigger - apex-verify: EmptyTrigger.trigger 1`] = `
 trigger myAccountTrigger on Account(before delete) {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-trigger myAccountTrigger on Account(
-  before delete) {
+trigger myAccountTrigger on Account(before delete) {
 }
 
 `;
