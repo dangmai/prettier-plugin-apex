@@ -63,7 +63,9 @@ function stripLocation(ast) {
         key === "apexComments" ||
         key === "$" ||
         key === "leading" ||
-        key === "trailing"
+        key === "trailing" ||
+        key === "hiddenTokenMap" ||
+        key === "trailingEmptyLine"
       ) {
         return;
       }
