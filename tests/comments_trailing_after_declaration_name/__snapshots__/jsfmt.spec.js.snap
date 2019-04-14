@@ -63,7 +63,8 @@ class InlineTrailingCommentsAfterClass { // Inline Comment
   public InlineTrailingCommentsAfterClass() {}
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class InlineTrailingCommentsAfterClass { // Inline Comment
+class InlineTrailingCommentsAfterClass {
+  // Inline Comment
   public InlineTrailingCommentsAfterClass() {
   }
 }
