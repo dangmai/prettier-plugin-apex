@@ -184,7 +184,7 @@ class Comments {
     Integer a;
 
     a = i
-     +// Comment
+     + // Comment
     j;
     a = i -
     // Comment
@@ -196,14 +196,14 @@ class Comments {
     /* Comment */
     j;
     a = i
-     <<// Comment
+     << // Comment
     /* Comment */
     j;
     a = i /* Comment */ >> /* Comment 2 */ j;
     a = /* Comments */ i >>> j /* Comments 2 */;
     a = /* Comments */ i ^ /* Comments 2 */ j;
     a = i
-     &// Comments
+     & // Comments
     // Comments
     j;
     a = /* Comments */

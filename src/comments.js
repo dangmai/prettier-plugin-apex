@@ -319,6 +319,7 @@ function printLeadingComment(commentPath, options, print) {
 function printTrailingComment(commentPath, options, print) {
   const sourceCode = options.originalText;
   const comment = commentPath.getValue(commentPath);
+  const parentNode = commentPath.getParentNode();
   const loc = comment.location;
   const parts = [];
 
@@ -334,11 +335,14 @@ function printTrailingComment(commentPath, options, print) {
     const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
     parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
+  // When we print trailing inline comments, we have to make sure that nothing
+  // else is printed after it (e.g. a semicolon), so we'll use lineSuffix
+  // from prettier to buffer the output
   if (comment["@class"] === apexNames.INLINE_COMMENT) {
-    // When we print trailing inline comments, we have to make sure that nothing
-    // else is printed after it (e.g. a semicolon), so we'll use lineSuffix
-    // from prettier to buffer the output
-    if (leadingSpace.length > 0 && numberOfNewLines === 0) {
+    if (
+      (leadingSpace.length > 0 && numberOfNewLines === 0) ||
+      parentNode["@class"] === apexNames.LOCATION_IDENTIFIER
+    ) {
       parts.push(lineSuffix(concat([" ", print(commentPath)])));
     } else {
       parts.push(lineSuffix(print(commentPath)));
