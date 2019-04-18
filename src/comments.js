@@ -193,6 +193,21 @@ function breakTies(tiesToBreak, sourceCode) {
     gapEndPos = comment.location.startIndex;
   }
 
+  comment = tiesToBreak[indexOfFirstLeadingComment];
+  while (
+    comment &&
+    indexOfFirstLeadingComment <= tieCount &&
+    // If the comment is a //-style comment and indented more
+    // deeply than the node itself, and there's non-whitespace before it on
+    // the same line, reconsider it as trailing.
+    comment["@class"] === apexNames.INLINE_COMMENT &&
+    comment.location.column > fn.loc.column &&
+    !/\n(\s*)$/.test(sourceCode.slice(0, comment.location.startIndex))
+  ) {
+    indexOfFirstLeadingComment += 1;
+    comment = tiesToBreak[indexOfFirstLeadingComment];
+  }
+
   tiesToBreak.forEach((commentNode, i) => {
     if (i < indexOfFirstLeadingComment) {
       addTrailingComment(pn, commentNode);

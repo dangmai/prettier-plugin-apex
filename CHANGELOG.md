@@ -5,7 +5,6 @@
 - Add new lines to long list of method declaration parameters.
 - Add new line after last usage parameter in long list for triggers.
 - Add new lines to long list of conditions in loops.
-- Stop taking comment and node columns into consideration as part of comment tie break algorithm.
 - Fix missing alias in FROM expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/25)).
 - Fix double quotes being escaped unnecessarily ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/24)).
 
