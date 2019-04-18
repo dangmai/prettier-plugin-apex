@@ -1454,6 +1454,7 @@ function handleFromClause(path, print) {
 function handleFromExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "table"));
+  _pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
   _pushIfExist(
     parts,
     path.call(print, "using", "value"),

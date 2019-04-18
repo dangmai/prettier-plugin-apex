@@ -6,6 +6,7 @@
 - Add new line after last usage parameter in long list for triggers.
 - Add new lines to long list of conditions in loops.
 - Stop taking comment and node columns into consideration as part of comment tie break algorithm.
+- Fix missing alias in FROM expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/25)).
 
 ## 1.0.0-alpha.8
 - Fix comments not being printed if they appear before the root node ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/17)).
