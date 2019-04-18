@@ -197,10 +197,9 @@ function breakTies(tiesToBreak, sourceCode) {
   while (
     comment &&
     indexOfFirstLeadingComment <= tieCount &&
-    // If the comment is a //-style comment and indented more
-    // deeply than the node itself, and there's non-whitespace before it on
-    // the same line, reconsider it as trailing.
-    comment["@class"] === apexNames.INLINE_COMMENT &&
+    // If the comment is indented more deeply than the node itself, and there's
+    // non-whitespace characters before it on the same line, reconsider it as
+    // trailing.
     comment.location.column > fn.loc.column &&
     !/\n(\s*)$/.test(sourceCode.slice(0, comment.location.startIndex))
   ) {

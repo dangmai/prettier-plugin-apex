@@ -2266,7 +2266,7 @@ nodeHandler[apexNames.WITH_IDENTIFIER] = (path, print) =>
   concat(["WITH", " ", path.call(print, "identifier")]);
 
 function handleTrailingEmptyLines(doc, node) {
-  if (node.trailingEmptyLine) {
+  if (node && node.trailingEmptyLine) {
     doc = concat([doc, hardline]); // eslint-disable-line no-param-reassign
   }
   return doc;
@@ -2307,16 +2307,14 @@ function genericPrint(path, options, print) {
     return "";
   }
   if (apexClass in nodeHandler) {
-    const doc = nodeHandler[apexClass](path, print, options);
-    return handleTrailingEmptyLines(doc, n);
+    return nodeHandler[apexClass](path, print, options);
   }
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
     const childClass = apexClass.substring(separatorIndex + 1);
     if (parentClass in nodeHandler) {
-      const doc = nodeHandler[parentClass](childClass, path, print, options);
-      return handleTrailingEmptyLines(doc, n);
+      return nodeHandler[parentClass](childClass, path, print, options);
     }
   }
   console.warn(`No handler found for ${apexClass}`); // eslint-disable-line no-console
@@ -2329,7 +2327,9 @@ module.exports = function printGenerically(path, opts) {
   if (typeof opts === "object") {
     options = opts;
   }
-  return printComments(path, options, innerPath =>
+  const node = path.getValue();
+  const doc = printComments(path, options, innerPath =>
     genericPrint(innerPath, options, printGenerically),
   );
+  return handleTrailingEmptyLines(doc, node);
 };

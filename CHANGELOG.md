@@ -8,6 +8,7 @@
 - Fix missing alias in FROM expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/25)).
 - Fix double quotes being escaped unnecessarily ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/24)).
 - Fix inline comments in blocks being attached to wrong node ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/23)).
+- Fix comments being pushed to next lines because of node's trailing empty line ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/26)).
 
 ## 1.0.0-alpha.8
 - Fix comments not being printed if they appear before the root node ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/17)).

@@ -19,6 +19,16 @@ class Comments {
       = 1;
   }
 
+  void trailingCommentAfterStatement() {
+    System.debug('Hello');  // Trailing Inline Comment after Statement
+
+    System.debug('World');
+
+    System.debug('Hello Block'); /* Trailing Block Comment after Statement */
+
+    System.debug('World Block');
+  }
+
   void beforeComma() {
     Integer a = 1 /* comment */,
       b = 2;
