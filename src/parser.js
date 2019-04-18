@@ -102,19 +102,17 @@ function fixNodeLocation(node) {
       }
     }
   });
-  if (
-    node.loc &&
-    currentLocation &&
-    node.loc.startIndex > currentLocation.startIndex
-  ) {
-    node.loc.startIndex = currentLocation.startIndex;
-  }
-  if (
-    node.loc &&
-    currentLocation &&
-    node.loc.endIndex < currentLocation.endIndex
-  ) {
-    node.loc.endIndex = currentLocation.endIndex;
+  if (node.loc && currentLocation) {
+    if (node.loc.startIndex > currentLocation.startIndex) {
+      node.loc.startIndex = currentLocation.startIndex;
+    } else {
+      currentLocation.startIndex = node.loc.startIndex;
+    }
+    if (node.loc.endIndex < currentLocation.endIndex) {
+      node.loc.endIndex = currentLocation.endIndex;
+    } else {
+      currentLocation.endIndex = node.loc.endIndex;
+    }
   }
   if (currentLocation) {
     return currentLocation;

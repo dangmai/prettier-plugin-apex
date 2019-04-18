@@ -66,6 +66,12 @@ class Comments {
     someClass.doAnotherThing();
     /* Block Comment Attachment Order */
     someClass.doYetAnotherThing();
+
+    if (1 == 1) {
+      doSomething(); // if inline comment
+    } else {
+      doSomethingElse(); // else inline comment
+    }
   }
 
   void binaryExpression() {
