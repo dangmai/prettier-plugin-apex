@@ -70,8 +70,7 @@ function _escapeString(text) {
     .replace(/\n/g, "\\n")
     .replace(/\f/g, "\\f")
     .replace(/\r/g, "\\r")
-    .replace(/'/g, "\\'")
-    .replace(/"/g, '\\"');
+    .replace(/'/g, "\\'");
 }
 
 function handleReturnStatement(path, print) {

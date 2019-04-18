@@ -6,6 +6,7 @@ class Literal {
   }
   void stringLiteral() {
     return 'a';
+    return '"non-escaped quotes"';
   }
   void integerLiteral() {
     return 1;
