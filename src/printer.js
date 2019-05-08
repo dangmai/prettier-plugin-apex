@@ -90,6 +90,9 @@ function handleReturnStatement(path, print) {
 }
 
 function handleGenericExpression(path, print) {
+  // const parentNode = path.getParentNode();
+  const node = path.getValue();
+
   const docs = [];
   const leftDoc = path.call(print, "left");
   const operationDoc = path.call(print, "op");
@@ -97,6 +100,9 @@ function handleGenericExpression(path, print) {
   docs.push(leftDoc);
   docs.push(" ");
   docs.push(group(concat([operationDoc, line, rightDoc])));
+  if (node.disableGroup) {
+    return concat(docs);
+  }
   return groupConcat(docs);
 }
 
@@ -108,9 +114,9 @@ function handleAssignmentExpression(path, print) {
   docs.push(leftDoc);
   docs.push(" ");
   docs.push(operationDoc);
-  docs.push(" ");
+  docs.push(line);
   docs.push(rightDoc);
-  return groupConcat(docs);
+  return groupIndentConcat(docs);
 }
 
 function handleVariableExpression(path, print) {
@@ -728,10 +734,10 @@ function handleVariableDeclaration(path, print) {
   if (assignmentDocs) {
     parts.push(" ");
     parts.push("=");
-    parts.push(" ");
+    parts.push(line);
     parts.push(assignmentDocs);
   }
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleNewStandard(path, print) {

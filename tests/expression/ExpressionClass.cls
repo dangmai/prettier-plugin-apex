@@ -40,6 +40,20 @@ class Conditional extends Object {
 
     Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + 1;
     Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
+
+    // Variable declaration
+    String myString = 'a long string ' +
+      'from concatenating ' +
+      'many other strings ' +
+      'together.';
+
+    // Assignment Statement
+    myString = 'a long string ' +
+      'from concatenating ' +
+      'many other strings ' +
+      'together.';
+
+    myVeryLongIntegerVariable = aVeryLongInteger + anotherVeryLongInteger * yetAnotherLongInterger - finallyThisVariable;
   }
 
   void castExpression() {
@@ -78,6 +92,14 @@ class Conditional extends Object {
     ]).get(0).get('num') > 0;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > 1;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
+
+    Boolean myVeryLongBooleanVariable = anExtremelyVeryLongVariable >
+      anotherVeryLongVariable >
+      yetAnotherVeryLongVariable;
+
+    myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable && yetAnotherVeryLongVariable;
+
+    myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable == anExtremelyVeryLongVariable < anotherVeryLongVariable;
   }
 
   void triggerVariableExpr_inOtherSuite() {}
