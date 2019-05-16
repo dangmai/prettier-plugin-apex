@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Comments.cls - apex-verify: Comments.cls 1`] = `
+exports[`Format apex: Comments.cls: Comments.cls 1`] = `
 // Leading Inline Comment
 
 /* Leading Block Comment */ /* Another Leading Block Comment */

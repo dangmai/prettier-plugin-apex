@@ -1,7 +1,9 @@
 /* eslint no-underscore-dangle: 0 */
 
 const assert = require("assert");
-const docBuilders = require("prettier").doc.builders;
+const prettier = require("prettier");
+
+const docBuilders = prettier.doc.builders;
 
 const {
   concat,
@@ -19,6 +21,7 @@ const {
   printComments,
   printDanglingComment,
 } = require("./comments");
+const { massageMetadata } = require("./util");
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
@@ -2275,8 +2278,20 @@ function genericPrint(path, options, print) {
       0,
       "There are unprinted comments. Please file a bug report with your code sample",
     );
+    const outputDoc = concat(docs);
 
-    return concat(docs);
+    if (options.apexVerifyAst) {
+      const output = prettier.__debug.printDocToString(concat(docs), options)
+        .formatted;
+      const outputAst = prettier.__debug.parse(output, options).ast;
+      const massagedOriginalAst = massageMetadata(n[apexNames.PARSER_OUTPUT]);
+      const massagedOutputAst = massageMetadata(
+        outputAst[apexNames.PARSER_OUTPUT],
+      );
+      assert.deepEqual(massagedOriginalAst, massagedOutputAst);
+    }
+
+    return outputDoc;
   }
   if (!apexClass) {
     return "";

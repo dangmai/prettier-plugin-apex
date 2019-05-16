@@ -52,6 +52,13 @@ const options = {
     description:
       "The standalone server port to connect to. Only applicable if apexStandaloneParser is true",
   },
+  apexVerifyAst: {
+    type: "boolean",
+    category: "Global",
+    default: false,
+    description:
+      "Verify that the abstract syntax trees for the formatted code is the same as the unformatted code. This heavily degrades performance, but is recommended for initial runs on big code bases",
+  },
 };
 
 const defaultOptions = {};

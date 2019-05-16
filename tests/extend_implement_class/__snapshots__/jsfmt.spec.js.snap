@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ExtendImplementClass.cls - apex-verify: ExtendImplementClass.cls 1`] = `
+exports[`Format apex: ExtendImplementClass.cls: ExtendImplementClass.cls 1`] = `
 class ExtendImplementClass extends FirstExtend implements FirstImplement, SecondImplement {
   public virtual class VirtualExtendInnerClass extends FirstExtend {
 

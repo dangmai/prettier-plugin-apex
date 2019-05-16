@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PublicEmptyClass.cls - apex-verify: PublicEmptyClass.cls 1`] = `
+exports[`Format apex: PublicEmptyClass.cls: PublicEmptyClass.cls 1`] = `
 public class PublicEmptyClass
 {}
 

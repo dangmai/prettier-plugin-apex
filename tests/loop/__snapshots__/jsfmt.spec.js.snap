@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`LoopClass.cls - apex-verify: LoopClass.cls 1`] = `
+exports[`Format apex: LoopClass.cls: LoopClass.cls 1`] = `
 class LoopClass {
   void forLoop() {
     Integer count = 0;

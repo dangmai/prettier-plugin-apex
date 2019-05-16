@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BlockTrailingCommentAfterClass.cls - apex-verify: BlockTrailingCommentAfterClass.cls 1`] = `
+exports[`Format apex: BlockTrailingCommentAfterClass.cls: BlockTrailingCommentAfterClass.cls 1`] = `
 class BlockTrailingCommentAfterClass { /* Block Comment */
   public BlockTrailingCommentsAfterClass() {}
 }
@@ -12,7 +12,7 @@ class BlockTrailingCommentAfterClass /* Block Comment */ {
 
 `;
 
-exports[`BlockTrailingCommentAfterEnum.cls - apex-verify: BlockTrailingCommentAfterEnum.cls 1`] = `
+exports[`Format apex: BlockTrailingCommentAfterEnum.cls: BlockTrailingCommentAfterEnum.cls 1`] = `
 enum Season { /* Block Comment */
 
 }
@@ -23,7 +23,7 @@ enum Season {
 
 `;
 
-exports[`BlockTrailingCommentAfterInterface.cls - apex-verify: BlockTrailingCommentAfterInterface.cls 1`] = `
+exports[`Format apex: BlockTrailingCommentAfterInterface.cls: BlockTrailingCommentAfterInterface.cls 1`] = `
 interface InlineTrailingCommentAfterInterface { // Inline Comment
 
 }
@@ -34,7 +34,7 @@ interface InlineTrailingCommentAfterInterface {
 
 `;
 
-exports[`BlockTrailingCommentAfterTrigger.cls - apex-verify: BlockTrailingCommentAfterTrigger.cls 1`] = `
+exports[`Format apex: BlockTrailingCommentAfterTrigger.cls: BlockTrailingCommentAfterTrigger.cls 1`] = `
 trigger InlineTrailingCommentAfterTrigger on Account(after insert) { /* Block Comment */
 
 }
@@ -45,7 +45,7 @@ trigger InlineTrailingCommentAfterTrigger on Account(after insert) {
 
 `;
 
-exports[`InlineTrailingCommentAferEnum.cls - apex-verify: InlineTrailingCommentAferEnum.cls 1`] = `
+exports[`Format apex: InlineTrailingCommentAferEnum.cls: InlineTrailingCommentAferEnum.cls 1`] = `
 enum Season { // Inline Comment
 
 }
@@ -56,7 +56,7 @@ enum Season {
 
 `;
 
-exports[`InlineTrailingCommentAfterClass.cls - apex-verify: InlineTrailingCommentAfterClass.cls 1`] = `
+exports[`Format apex: InlineTrailingCommentAfterClass.cls: InlineTrailingCommentAfterClass.cls 1`] = `
 class InlineTrailingCommentsAfterClass { // Inline Comment
   public InlineTrailingCommentsAfterClass() {}
 }
@@ -68,7 +68,7 @@ class InlineTrailingCommentsAfterClass { // Inline Comment
 
 `;
 
-exports[`InlineTrailingCommentAfterInterface.cls - apex-verify: InlineTrailingCommentAfterInterface.cls 1`] = `
+exports[`Format apex: InlineTrailingCommentAfterInterface.cls: InlineTrailingCommentAfterInterface.cls 1`] = `
 interface BlockTrailingCommentAfterInterface { /* Block Comment */
 
 }
@@ -79,7 +79,7 @@ interface BlockTrailingCommentAfterInterface {
 
 `;
 
-exports[`InlineTrailingCommentAfterTrigger.cls - apex-verify: InlineTrailingCommentAfterTrigger.cls 1`] = `
+exports[`Format apex: InlineTrailingCommentAfterTrigger.cls: InlineTrailingCommentAfterTrigger.cls 1`] = `
 trigger InlineTrailingCommentAfterTrigger on Account(after insert) { // Inline Comment
 
 }

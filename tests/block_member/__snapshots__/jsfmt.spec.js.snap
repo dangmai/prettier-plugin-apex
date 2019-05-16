@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`BlockMember.cls - apex-verify: BlockMember.cls 1`] = `
+exports[`Format apex: BlockMember.cls: BlockMember.cls 1`] = `
 class BlockMember {
   String fieldMemberOne;
   String anotherFieldMember = 'Hello';
