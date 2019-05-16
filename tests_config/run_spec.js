@@ -13,7 +13,7 @@ function read(filename) {
   return fs.readFileSync(filename, "utf8");
 }
 
-function prettyprint(src, filename, options) {
+function prettyPrint(src, filename, options) {
   return prettier.format(
     src,
     Object.assign(
@@ -26,9 +26,9 @@ function prettyprint(src, filename, options) {
   );
 }
 
-function stripLocation(ast) {
+function massageMetadata(ast) {
   if (Array.isArray(ast)) {
-    return ast.map(e => stripLocation(e));
+    return ast.map(e => massageMetadata(e));
   }
   if (typeof ast === "object") {
     let newObj = {};
@@ -58,8 +58,6 @@ function stripLocation(ast) {
         key === "@id" ||
         // It is impossible to preserve the comment AST. Neither recase nor
         // prettier tries to do it so we are not going to bother either.
-        // We are still striving to not lose comments however, hence why we
-        // don't blacklist hiddenToken
         key === "apexComments" ||
         key === "$" ||
         key === "leading" ||
@@ -75,7 +73,7 @@ function stripLocation(ast) {
         // the original and parsed strings.
         newObj[key] = ast[key].toUpperCase();
       } else {
-        newObj[key] = stripLocation(ast[key]);
+        newObj[key] = massageMetadata(ast[key]);
       }
     });
     return newObj;
@@ -84,7 +82,7 @@ function stripLocation(ast) {
 }
 
 function parse(string, opts) {
-  return stripLocation(
+  return massageMetadata(
     // eslint-disable-next-line no-underscore-dangle
     prettier.__debug.parse(
       string,
@@ -137,7 +135,7 @@ function runSpec(dirname, parsers, options) {
       const mergedOptions = Object.assign({}, options, {
         parser: parsers[0],
       });
-      const output = prettyprint(source, path, mergedOptions);
+      const output = prettyPrint(source, path, mergedOptions);
       test(`Format ${mergedOptions.parser}: ${filename}`, () => {
         expect(raw(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
           filename,
