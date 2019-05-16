@@ -38,19 +38,19 @@ const printers = {
 };
 
 const options = {
-  useStandaloneServer: {
+  apexStandaloneParser: {
     type: "boolean",
     category: "Global",
     default: false,
     description:
-      "Use a standalone server to speed up the parsing process. This server needs to be started and stopped separately from the Prettier process",
+      "Use a standalone process to speed up parsing. This process needs to be started and stopped separately from the Prettier process",
   },
-  serverPort: {
+  apexStandalonePort: {
     type: "int",
     category: "Global",
     default: 2113,
     description:
-      "The standalone server port to connect to. Only applicable if useStandaloneServer is true",
+      "The standalone server port to connect to. Only applicable if apexStandaloneParser is true",
   },
 };
 

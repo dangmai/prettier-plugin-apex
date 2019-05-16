@@ -19,7 +19,7 @@ function prettyprint(src, filename, options) {
     Object.assign(
       {
         filepath: filename,
-        useStandaloneServer: true,
+        apexStandaloneParser: true,
       },
       options,
     ),
@@ -90,7 +90,7 @@ function parse(string, opts) {
       string,
       Object.assign(
         {
-          useStandaloneServer: true,
+          apexStandaloneParser: true,
         },
         opts,
       ),

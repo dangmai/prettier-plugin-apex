@@ -99,7 +99,7 @@ start-apex-server
 node /path/to/libary/bin/start-apex-server.js
 
 # In a separate console
-prettier --use-standalone-server --write "/path/to/project/**/*.{trigger,cls}"
+prettier --apex-standalone-parser --write "/path/to/project/**/*.{trigger,cls}"
 
 # After you are done, stop the server (if installed globally)
 stop-apex-server

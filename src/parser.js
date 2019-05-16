@@ -343,8 +343,11 @@ function parse(sourceCode, _, options) {
   sourceCode = sourceCode.trim();
   const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst;
-  if (options.useStandaloneServer) {
-    serializedAst = parseTextWithNailgun(sourceCode, options.serverPort);
+  if (options.apexStandaloneParser) {
+    serializedAst = parseTextWithNailgun(
+      sourceCode,
+      options.apexStandalonePort,
+    );
   } else {
     serializedAst = parseTextWithSpawn(sourceCode);
   }
