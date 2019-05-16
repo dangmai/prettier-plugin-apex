@@ -2,6 +2,7 @@
 - CLI/Option change:
   - `use-standalone-server` option is now `apex-standalone-parser`.
   - `server-port` option is now `apex-standalone-port`.
+  - Add `apex-verify-ast` option.
 - Fix dangling comments being printed incorrectly for Triggers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/13)).
 Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 

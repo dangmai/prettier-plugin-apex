@@ -57,6 +57,24 @@ Then in order to run it:
 npm run prettier -- --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
+#### Tip
+
+If you are formatting a big code base for the first time,
+please make sure that you have some form of version control in place,
+so that you can revert any change if necessary.
+You should also run Prettier with the `--apex-verify-ast` argument. For example:
+
+```bash
+prettier --write "/path/to/project/**/*.{trigger,cls}" --apex-verify-ast
+```
+
+This will guarantee that the behavior of your code did not change because of
+the format.
+
+Note that this argument does degrade performance, so after the initial commit
+feel free to stop using it in your day to day operation, provided that you only
+format a small amount of code each time (for example, on a file save).
+
 ### Configuration
 
 This library follows the same configuration format as Prettier,
