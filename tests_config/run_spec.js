@@ -146,10 +146,7 @@ function runSpec(dirname, parsers, options) {
 
       if (AST_COMPARE) {
         const ast = parse(source, mergedOptions);
-        const ppast = parse(
-          prettyprint(source, path, mergedOptions),
-          mergedOptions,
-        );
+        const ppast = parse(output, mergedOptions);
 
         test(`Verify AST: ${filename}`, () => {
           expect(ppast).toBeDefined();
