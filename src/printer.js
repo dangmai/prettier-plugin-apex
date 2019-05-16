@@ -1144,37 +1144,6 @@ function handleDivisionValue(childClass, path, print) {
   return doc;
 }
 
-function handleWithSnippetClause(path, print) {
-  const maxLengthDoc = path.call(print, "maxLength", "value");
-
-  const parts = [];
-  parts.push("WITH SNIPPET");
-  _pushIfExist(parts, maxLengthDoc, [")"], ["(target_length = "]);
-  return concat(parts);
-}
-
-function handleWithNetworkClause(path, print) {
-  const networkDocs = path.map(print, "networks");
-
-  const parts = [];
-  parts.push("WITH NETWORK ");
-
-  if (networkDocs.length === 1) {
-    parts.push("=");
-    parts.push(" ");
-    parts.push(networkDocs[0]);
-  } else {
-    parts.push("IN");
-    parts.push(" ");
-    parts.push("(");
-    parts.push(softline);
-    parts.push(join(concat([",", line]), networkDocs));
-    parts.push(dedent(softline));
-    parts.push(")");
-  }
-  return groupIndentConcat(parts);
-}
-
 function handleSearchWithClause(path, print) {
   const parts = [];
   parts.push("WITH");
@@ -1201,6 +1170,13 @@ function handleSearchWithClauseValue(childClass, path, print) {
         parts.push(dedent(softline));
         parts.push(")");
       }
+      break;
+    case "SearchWithTargetValue":
+      parts.push("(");
+      parts.push(path.call(print, "target"));
+      parts.push(" = ");
+      parts.push(path.call(print, "value"));
+      parts.push(")");
       break;
     case "SearchWithTrueValue":
       parts.push(" = ");
@@ -1257,6 +1233,7 @@ function handleReturningSelectExpression(path, print) {
 }
 
 function handleSearch(path, print) {
+  const node = path.getValue();
   const withDocs = path.map(print, "withs");
 
   const parts = [];
@@ -1264,8 +1241,6 @@ function handleSearch(path, print) {
   _pushIfExist(parts, path.call(print, "in", "value"));
   _pushIfExist(parts, path.call(print, "division", "value"));
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
-  _pushIfExist(parts, path.call(print, "snippet", "value"));
-  _pushIfExist(parts, path.call(print, "network", "value"));
   _pushIfExist(parts, path.call(print, "returning", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "updateStats", "value"));
@@ -2175,8 +2150,6 @@ nodeHandler[apexNames.IN_CLAUSE] = handleInClause;
 nodeHandler[apexNames.WITH_DIVISION_CLAUSE] = handleDivisionClause;
 nodeHandler[apexNames.DIVISION_VALUE] = handleDivisionValue;
 nodeHandler[apexNames.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
-nodeHandler[apexNames.WITH_SNIPPET_CLAUSE] = handleWithSnippetClause;
-nodeHandler[apexNames.WITH_NETWORK_CLAUSE] = handleWithNetworkClause;
 nodeHandler[apexNames.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
 nodeHandler[apexNames.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
 nodeHandler[apexNames.RETURNING_CLAUSE] = handleReturningClause;

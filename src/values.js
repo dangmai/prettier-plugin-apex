@@ -134,8 +134,6 @@ const values = {
     WITH_DIVISION_CLAUSE: "apex.jorje.data.sosl.WithDivisionClause",
     DIVISION_VALUE: "apex.jorje.data.sosl.DivisionValue",
     WITH_DATA_CATEGORY_CLAUSE: "apex.jorje.data.sosl.WithDataCategoryClause",
-    WITH_SNIPPET_CLAUSE: "apex.jorje.data.sosl.WithSnippetClause",
-    WITH_NETWORK_CLAUSE: "apex.jorje.data.sosl.WithNetworkClause",
     SEARCH_WITH_CLAUSE: "apex.jorje.data.sosl.SearchWithClause",
     SEARCH_WITH_CLAUSE_VALUE: "apex.jorje.data.sosl.SearchWithClauseValue",
     RETURNING_CLAUSE: "apex.jorje.data.sosl.ReturningClause",
