@@ -95,3 +95,26 @@ interface DanglingCommentsInInterface {
 }
 
 `;
+
+exports[`CommentsDanglingInTrigger.cls - apex-verify: CommentsDanglingInTrigger.cls 1`] = `
+trigger myAccountTrigger on Account(before delete) {
+  // Inline Comment
+
+  /* Block Comment */
+
+
+  // Second Inline Comment
+  /* Second Block Comment */
+
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trigger myAccountTrigger on Account(before delete) {
+  // Inline Comment
+
+  /* Block Comment */
+
+  // Second Inline Comment
+  /* Second Block Comment */
+}
+
+`;

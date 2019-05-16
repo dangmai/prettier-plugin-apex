@@ -169,9 +169,28 @@ function handleAssignmentOperation(path) {
   return values.ASSIGNMENT[node.$];
 }
 
-function handleTriggerDeclarationUnit(path, print) {
+function _getDanglingCommentDocs(path, print, options) {
+  const node = path.getValue();
+  if (!node.apexComments) {
+    return [];
+  }
+  node.danglingComments = node.apexComments.filter(
+    comment => !comment.leading && !comment.trailing,
+  );
+  const danglingCommentParts = [];
+  path.each(commentPath => {
+    danglingCommentParts.push(
+      printDanglingComment(commentPath, options, print),
+    );
+  }, "danglingComments");
+  delete node.danglingComments;
+  return danglingCommentParts;
+}
+
+function handleTriggerDeclarationUnit(path, print, options) {
   const usageDocs = path.map(print, "usages");
   const targetDocs = path.map(print, "target");
+  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const parts = [];
   const usageParts = [];
@@ -200,29 +219,13 @@ function handleTriggerDeclarationUnit(path, print) {
     }
     return memberDoc;
   });
-  if (memberDocs.length > 0) {
+  if (danglingCommentDocs.length > 0) {
+    parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+  } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
   }
   parts.push(dedent(concat([hardline, "}"])));
   return concat(parts);
-}
-
-function _getDanglingCommentDocs(path, print, options) {
-  const node = path.getValue();
-  if (!node.apexComments) {
-    return [];
-  }
-  node.danglingComments = node.apexComments.filter(
-    comment => !comment.leading && !comment.trailing,
-  );
-  const danglingCommentParts = [];
-  path.each(commentPath => {
-    danglingCommentParts.push(
-      printDanglingComment(commentPath, options, print),
-    );
-  }, "danglingComments");
-  delete node.danglingComments;
-  return danglingCommentParts;
 }
 
 function handleInterfaceDeclaration(path, print, options) {
@@ -1233,7 +1236,6 @@ function handleReturningSelectExpression(path, print) {
 }
 
 function handleSearch(path, print) {
-  const node = path.getValue();
   const withDocs = path.map(print, "withs");
 
   const parts = [];

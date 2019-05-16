@@ -229,7 +229,7 @@ function attach(ast, sourceCode) {
   const tiesToBreak = [];
 
   comments.forEach(comment => {
-    decorateComment(ast[apexNames.PARSER_OUTPUT].unit, comment, ast);
+    decorateComment(ast[apexNames.PARSER_OUTPUT], comment, ast);
 
     const pn = comment.precedingNode;
     const en = comment.enclosingNode;

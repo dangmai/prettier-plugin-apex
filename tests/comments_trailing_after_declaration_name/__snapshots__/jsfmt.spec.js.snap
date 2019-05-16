@@ -39,9 +39,8 @@ trigger InlineTrailingCommentAfterTrigger on Account(after insert) { /* Block Co
 
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-trigger InlineTrailingCommentAfterTrigger on Account /* Block Comment */(
-  after insert
-) {
+trigger InlineTrailingCommentAfterTrigger on Account(after insert) {
+  /* Block Comment */
 }
 
 `;
@@ -85,7 +84,8 @@ trigger InlineTrailingCommentAfterTrigger on Account(after insert) { // Inline C
 
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-trigger InlineTrailingCommentAfterTrigger on Account(after insert) { // Inline Comment
+trigger InlineTrailingCommentAfterTrigger on Account(after insert) {
+  // Inline Comment
 }
 
 `;
