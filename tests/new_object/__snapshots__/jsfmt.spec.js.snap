@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`NewObject.cls - apex-verify: NewObject.cls 1`] = `
+exports[`Format apex: NewObject.cls: NewObject.cls 1`] = `
 class NewObject {
   void newListTest() {
     List<String> a = new List<String>();

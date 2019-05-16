@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SwitchClass.cls - apex-verify: SwitchClass.cls 1`] = `
+exports[`Format apex: SwitchClass.cls: SwitchClass.cls 1`] = `
 class SwitchClass {
   enum Month {JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER}
 

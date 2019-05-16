@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ConditionalClass.cls - apex-verify: ConditionalClass.cls 1`] = `
+exports[`Format apex: ConditionalClass.cls: ConditionalClass.cls 1`] = `
 class Conditional {
   public void conditionalTest() {
     Integer a = 2;

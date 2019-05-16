@@ -138,7 +138,7 @@ function runSpec(dirname, parsers, options) {
         parser: parsers[0],
       });
       const output = prettyprint(source, path, mergedOptions);
-      test(`${filename} - ${mergedOptions.parser}-verify`, () => {
+      test(`Format ${mergedOptions.parser}: ${filename}`, () => {
         expect(raw(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
           filename,
         );
@@ -151,7 +151,7 @@ function runSpec(dirname, parsers, options) {
           mergedOptions,
         );
 
-        test(`${path} parse`, () => {
+        test(`Verify AST: ${filename}`, () => {
           expect(ppast).toBeDefined();
           expect(ast).toEqual(ppast);
         });

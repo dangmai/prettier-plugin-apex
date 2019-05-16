@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`GetterSetter.cls - apex-verify: GetterSetter.cls 1`] = `
+exports[`Format apex: GetterSetter.cls: GetterSetter.cls 1`] = `
 class GetterSetter {
   public String shortProperty {
     get;

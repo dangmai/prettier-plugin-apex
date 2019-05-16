@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SOQLClass.cls - apex-verify: SOQLClass.cls 1`] = `
+exports[`Format apex: SOQLClass.cls: SOQLClass.cls 1`] = `
 class SOQLClass {
   public void simpleSOQL() {
     Id[] contactIds = new Id[]{};

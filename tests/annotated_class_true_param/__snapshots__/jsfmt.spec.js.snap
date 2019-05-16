@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AnnotatedTrueParamClass.cls - apex-verify: AnnotatedTrueParamClass.cls 1`] = `
+exports[`Format apex: AnnotatedTrueParamClass.cls: AnnotatedTrueParamClass.cls 1`] = `
 @IsTest(SeeAllData=true) class AnnotedTrueParamClass
 {}
 

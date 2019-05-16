@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AnnotatedClass.cls - apex-verify: AnnotatedClass.cls 1`] = `
+exports[`Format apex: AnnotatedClass.cls: AnnotatedClass.cls 1`] = `
 @IsTest class TestClass
 {}
 

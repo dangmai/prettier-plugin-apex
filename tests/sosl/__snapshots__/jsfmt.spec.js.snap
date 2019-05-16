@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SOSL.cls - apex-verify: SOSL.cls 1`] = `
+exports[`Format apex: SOSL.cls: SOSL.cls 1`] = `
 class SOSLClass {
   void simpleSOSL() {
     String a = 'Hello';

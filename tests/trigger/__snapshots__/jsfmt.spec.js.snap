@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Trigger.cls - apex-verify: Trigger.cls 1`] = `
+exports[`Format apex: Trigger.cls: Trigger.cls 1`] = `
 trigger myAccountTrigger on Account(before delete, before insert, before update,
   after delete, after insert, after update, after undelete, before undelete) {
   System.debug('Inside trigger');

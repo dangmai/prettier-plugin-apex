@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`VariableDeclaration.cls - apex-verify: VariableDeclaration.cls 1`] = `
+exports[`Format apex: VariableDeclaration.cls: VariableDeclaration.cls 1`] = `
 public class VariableDeclaration {
   public void declareVariables() {
     String firstString, secondString;

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ExceptionClass.cls - apex-verify: ExceptionClass.cls 1`] = `
+exports[`Format apex: ExceptionClass.cls: ExceptionClass.cls 1`] = `
 class ExceptionClass {
   void throwTestTest() {
     throw new CustomException('Custom Exception');

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ExpressionClass.cls - apex-verify: ExpressionClass.cls 1`] = `
+exports[`Format apex: ExpressionClass.cls: ExpressionClass.cls 1`] = `
 class Conditional extends Object {
   void assignmentExpression() {
     Integer i = 0;

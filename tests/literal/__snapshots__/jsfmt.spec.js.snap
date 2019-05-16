@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Literal.cls - apex-verify: Literal.cls 1`] = `
+exports[`Format apex: Literal.cls: Literal.cls 1`] = `
 class Literal {
   void nullExpression() {
     return null;

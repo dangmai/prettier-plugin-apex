@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`EmptyBlockStatement.cls - apex-verify: EmptyBlockStatement.cls 1`] = `
+exports[`Format apex: EmptyBlockStatement.cls: EmptyBlockStatement.cls 1`] = `
 class EmptyBlockStatement {
   public EmptyBlockStatement() {
 
@@ -39,7 +39,7 @@ class EmptyBlockStatement {
 
 `;
 
-exports[`EmptyClass.cls - apex-verify: EmptyClass.cls 1`] = `
+exports[`Format apex: EmptyClass.cls: EmptyClass.cls 1`] = `
 class EmptyClass {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class EmptyClass {
@@ -47,7 +47,7 @@ class EmptyClass {
 
 `;
 
-exports[`EmptyEnum.cls - apex-verify: EmptyEnum.cls 1`] = `
+exports[`Format apex: EmptyEnum.cls: EmptyEnum.cls 1`] = `
 enum Season {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 enum Season {
@@ -55,7 +55,7 @@ enum Season {
 
 `;
 
-exports[`EmptyInterface.cls - apex-verify: EmptyInterface.cls 1`] = `
+exports[`Format apex: EmptyInterface.cls: EmptyInterface.cls 1`] = `
 interface EmptyInterface {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 interface EmptyInterface {
@@ -63,7 +63,7 @@ interface EmptyInterface {
 
 `;
 
-exports[`EmptyTrigger.trigger - apex-verify: EmptyTrigger.trigger 1`] = `
+exports[`Format apex: EmptyTrigger.trigger: EmptyTrigger.trigger 1`] = `
 trigger myAccountTrigger on Account(before delete) {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 trigger myAccountTrigger on Account(before delete) {

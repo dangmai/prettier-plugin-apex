@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SharingClass.cls - apex-verify: SharingClass.cls 1`] = `
+exports[`Format apex: SharingClass.cls: SharingClass.cls 1`] = `
 class SharingClass {
   public with sharing class PublicWithSharingClass {
 

@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Enum.cls - apex-verify: Enum.cls 1`] = `
+exports[`Format apex: Enum.cls: Enum.cls 1`] = `
 class EnumTest {
   public enum Season {WINTER, SPRING, SUMMER, FALL}
   enum Month {JANUARY, FEBRUARY, MARCH, APRIL, MAY, JUNE, JULY, AUGUST, SEPTEMBER, OCTOBER, NOVEMBER, DECEMBER}

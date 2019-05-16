@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CommentsBeforeClassDeclaration.cls - apex-verify: CommentsBeforeClassDeclaration.cls 1`] = `
+exports[`Format apex: CommentsBeforeClassDeclaration.cls: CommentsBeforeClassDeclaration.cls 1`] = `
 // First Test Comment
 
 /**
@@ -25,7 +25,7 @@ class CommentsBeforeClassDeclaration {
 
 `;
 
-exports[`CommentsBeforeEnumDeclaration.cls - apex-verify: CommentsBeforeEnumDeclaration.cls 1`] = `
+exports[`Format apex: CommentsBeforeEnumDeclaration.cls: CommentsBeforeEnumDeclaration.cls 1`] = `
 // First Test Comment
 
 /**
@@ -47,7 +47,7 @@ enum Season {
 
 `;
 
-exports[`CommentsBeforeInterfaceDeclaration.cls - apex-verify: CommentsBeforeInterfaceDeclaration.cls 1`] = `
+exports[`Format apex: CommentsBeforeInterfaceDeclaration.cls: CommentsBeforeInterfaceDeclaration.cls 1`] = `
 // First Test Comment
 
 /**
@@ -67,7 +67,7 @@ interface CommentsBeforeInterfaceDeclaration {
 
 `;
 
-exports[`CommentsBeforeTriggerDeclaration.cls - apex-verify: CommentsBeforeTriggerDeclaration.cls 1`] = `
+exports[`Format apex: CommentsBeforeTriggerDeclaration.cls: CommentsBeforeTriggerDeclaration.cls 1`] = `
 // First Test Comment
 
 /**

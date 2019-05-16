@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`RunAsClass.cls - apex-verify: RunAsClass.cls 1`] = `
+exports[`Format apex: RunAsClass.cls: RunAsClass.cls 1`] = `
 @isTest
 class RunAsClass {
   static testmethod void runAsTest() {

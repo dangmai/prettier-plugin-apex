@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`DmlClass.cls - apex-verify: DmlClass.cls 1`] = `
+exports[`Format apex: DmlClass.cls: DmlClass.cls 1`] = `
 class DMLClass {
   void insertTest() {
     Account account = new Account(Name='Acme');

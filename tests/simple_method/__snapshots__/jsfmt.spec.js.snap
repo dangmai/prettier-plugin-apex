@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`SimpleMethod.cls - apex-verify: SimpleMethod.cls 1`] = `
+exports[`Format apex: SimpleMethod.cls: SimpleMethod.cls 1`] = `
 public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface {
   public String sayHello() {
     return this.sayHello('Hello', 'World');

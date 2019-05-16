@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`CommentsDanglingInBlockStatement.cls - apex-verify: CommentsDanglingInBlockStatement.cls 1`] = `
+exports[`Format apex: CommentsDanglingInBlockStatement.cls: CommentsDanglingInBlockStatement.cls 1`] = `
 class CommentDanglingInBlockStatement {
   public void emptyMethod() {
     // Inline Comment
@@ -27,7 +27,7 @@ class CommentDanglingInBlockStatement {
 
 `;
 
-exports[`CommentsDanglingInClass.cls - apex-verify: CommentsDanglingInClass.cls 1`] = `
+exports[`Format apex: CommentsDanglingInClass.cls: CommentsDanglingInClass.cls 1`] = `
 class DanglingCommentsInClass {
   // Inline Comment
 
@@ -50,7 +50,7 @@ class DanglingCommentsInClass {
 
 `;
 
-exports[`CommentsDanglingInEnum.cls - apex-verify: CommentsDanglingInEnum.cls 1`] = `
+exports[`Format apex: CommentsDanglingInEnum.cls: CommentsDanglingInEnum.cls 1`] = `
 enum DanglingCommentsInEnum {
   // Inline Comment
 
@@ -73,7 +73,7 @@ enum DanglingCommentsInEnum {
 
 `;
 
-exports[`CommentsDanglingInInterface.cls - apex-verify: CommentsDanglingInInterface.cls 1`] = `
+exports[`Format apex: CommentsDanglingInInterface.cls: CommentsDanglingInInterface.cls 1`] = `
 interface DanglingCommentsInInterface {
   // Inline Comment
 
@@ -96,7 +96,7 @@ interface DanglingCommentsInInterface {
 
 `;
 
-exports[`CommentsDanglingInTrigger.cls - apex-verify: CommentsDanglingInTrigger.cls 1`] = `
+exports[`Format apex: CommentsDanglingInTrigger.cls: CommentsDanglingInTrigger.cls 1`] = `
 trigger myAccountTrigger on Account(before delete) {
   // Inline Comment
 
