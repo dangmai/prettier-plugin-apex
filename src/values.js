@@ -10,6 +10,8 @@ const values = {
     ANNOTATION_KEY_VALUE:
       "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
     ANNOTATION_VALUE: "apex.jorje.data.ast.AnnotationValue",
+    MODIFIER_PARAMETER_REF:
+      "apex.jorje.data.ast.ParameterRefs$ModifierParameterRef",
     EMPTY_MODIFIER_PARAMETER_REF:
       "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef",
     BLOCK_STATEMENT: "apex.jorje.data.ast.Stmnt$BlockStmnt",

@@ -7,7 +7,7 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
     return sayHello('Hello', subject);
   }
 
-  public String sayHelloWithModifier(final String subject) {
+  public String sayHelloWithModifier(static final String subject) {
     return null;
   }
 
