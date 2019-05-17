@@ -1,0 +1,18 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Format apex: PackageVersion.cls: PackageVersion.cls 1`] = `
+class PackageVersion {
+  void packageVersionTest() {
+    Object v = Package.Version.1.0;
+    v = Package.Version.Request;
+  }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class PackageVersion {
+  void packageVersionTest() {
+    Object v = Package.Version.1.0;
+    v = Package.Version.Request;
+  }
+}
+
+`;

@@ -1096,6 +1096,21 @@ function handleInstanceOfExpression(path, print) {
   return concat(parts);
 }
 
+function handlePackageVersionExpression(path, print) {
+  const parts = [];
+  parts.push("Package.Version.");
+  parts.push(path.call(print, "version"));
+  return concat(parts);
+}
+
+function handleStructuredVersion(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "major"));
+  parts.push(".");
+  parts.push(path.call(print, "minor"));
+  return concat(parts);
+}
+
 function handleArrayExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "expr"));
@@ -2131,6 +2146,8 @@ nodeHandler[apexNames.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexNames.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
 nodeHandler[apexNames.BLOCK_COMMENT] = handleComment;
 nodeHandler[apexNames.INLINE_COMMENT] = handleComment;
+nodeHandler[apexNames.STRUCTURED_VERSION] = handleStructuredVersion;
+nodeHandler[apexNames.REQUEST_VERSION] = () => "Request";
 nodeHandler.int = (path, print) => path.call(print, "$");
 nodeHandler.string = (path, print) => concat(["'", path.call(print, "$"), "'"]);
 
@@ -2190,8 +2207,9 @@ nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexNames.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexNames.CAST_EXPRESSION] = handleCastExpression;
 nodeHandler[apexNames.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
-nodeHandler[apexNames.PACKAGE_VERSION_EXPRESSION] = () =>
-  "Package.Version.Request"; // Not sure what this is
+nodeHandler[
+  apexNames.PACKAGE_VERSION_EXPRESSION
+] = handlePackageVersionExpression;
 nodeHandler[apexNames.ARRAY_EXPRESSION] = handleArrayExpression;
 nodeHandler[apexNames.CLASS_REF_EXPRESSION] = (path, print) =>
   concat([path.call(print, "type"), ".", "class"]);
