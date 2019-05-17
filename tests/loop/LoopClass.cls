@@ -42,6 +42,9 @@ class LoopClass {
     for (Contact a: contacts) {
       System.debug(a);
     }
+    for (Contact a: contacts);
+    for (;; voidCall());
+    for (String s: stringSet);
   }
 
   void whileLoop() {

@@ -1933,9 +1933,8 @@ function handleDoLoop(path, print) {
 }
 
 function handleForLoop(path, print) {
+  const node = path.getValue();
   const forControlDoc = path.call(print, "forControl");
-  const statementType = path.call(print, "stmnt", "value", "@class");
-  const statementDoc = path.call(print, "stmnt", "value");
 
   const parts = [];
   parts.push("for");
@@ -1943,9 +1942,14 @@ function handleForLoop(path, print) {
   parts.push("(");
   // For Control
   parts.push(groupIndentConcat([softline, forControlDoc, dedent(softline)]));
-  // parts.push(forControlDoc);
   parts.push(")");
+  if (!node.stmnt.value) {
+    parts.push(";");
+    return concat(parts);
+  }
   // Body
+  const statementType = path.call(print, "stmnt", "value", "@class");
+  const statementDoc = path.call(print, "stmnt", "value");
   if (statementType === apexNames.BLOCK_STATEMENT) {
     parts.push(" ");
     _pushIfExist(parts, statementDoc);
