@@ -2289,7 +2289,11 @@ function genericPrint(path, options, print) {
       const massagedOutputAst = massageMetadata(
         outputAst[apexNames.PARSER_OUTPUT],
       );
-      assert.deepEqual(massagedOriginalAst, massagedOutputAst);
+      assert.deepEqual(
+        massagedOriginalAst,
+        massagedOutputAst,
+        "The code behavior might have changed after the format, therefore it has been reverted. Please file a bug report with your code sample",
+      );
     }
 
     return outputDoc;
