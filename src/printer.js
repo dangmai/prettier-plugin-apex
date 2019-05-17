@@ -1532,6 +1532,20 @@ function handleDataCategoryOperator(childClass) {
   return values.DATA_CATEGORY[childClass];
 }
 
+function handleWhereCalcExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "field1"));
+  parts.push(" ");
+  parts.push(path.call(print, "calc"));
+  parts.push(" ");
+  parts.push(path.call(print, "field2"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return groupConcat(parts);
+}
+
 function handleWhereOperationExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "field"));
@@ -2234,6 +2248,9 @@ nodeHandler[apexNames.QUERY_USING_CLAUSE] = handleQueryUsingClause;
 nodeHandler[apexNames.USING_EXPRESSION] = handleUsingExpression;
 nodeHandler[apexNames.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
 nodeHandler[apexNames.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
+nodeHandler[apexNames.WHERE_CALC_EXPRESSION] = handleWhereCalcExpression;
+nodeHandler[apexNames.WHERE_CALC_OPERATOR_PLUS] = () => "+";
+nodeHandler[apexNames.WHERE_CALC_OPERATOR_MINUS] = () => "-";
 nodeHandler[apexNames.WHERE_COMPOUND_OPERATOR] = childClass =>
   values.QUERY_WHERE[childClass];
 nodeHandler[apexNames.SEARCH_USING_CLAUSE] = (path, print) =>

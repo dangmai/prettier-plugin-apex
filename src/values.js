@@ -178,6 +178,10 @@ const values = {
     LIMIT_EXPRESSION: "apex.jorje.data.soql.LimitClause$LimitExpr",
     OFFSET_VALUE: "apex.jorje.data.soql.OffsetClause$OffsetValue",
     OFFSET_EXPRESSION: "apex.jorje.data.soql.OffsetClause$OffsetExpr",
+    WHERE_CALC_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereCalcExpr",
+    WHERE_CALC_OPERATOR_PLUS: "apex.jorje.data.soql.WhereCalcOp$WhereCalcPlus",
+    WHERE_CALC_OPERATOR_MINUS:
+      "apex.jorje.data.soql.WhereCalcOp$WhereCalcMinus",
     WHERE_COMPOUND_EXPRESSION:
       "apex.jorje.data.soql.WhereExpr$WhereCompoundExpr",
     WHERE_COMPOUND_OPERATOR: "apex.jorje.data.soql.WhereCompoundOp",
