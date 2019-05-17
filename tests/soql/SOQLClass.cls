@@ -35,6 +35,8 @@ class SOQLClass {
     Contact[] nestedFrom = [SELECT Id FROM Contact WHERE Id IN (SELECT Id FROM Contact) AND Account.Id <> NULL];
     User[] withAlias = [SELECT u.Name, u.Email, u.Id, u.IsPortalEnabled FROM User u WHERE u.Id = :Userinfo.getUserId()];
     User[] notQuery = [SELECT Id FROM Contact WHERE NOT NAME LIKE '%Test%'];
+    Account[] wherePlusCalc = [SELECT Id FROM Account WHERE NumberOfEmployees + AnnualRevenue > 27];
+    Account[] whereMinusCalc = [SELECT Id FROM Account WHERE NumberOfEmployees - AnnualRevenue > 27];
   }
 
   void limitBinds() {
