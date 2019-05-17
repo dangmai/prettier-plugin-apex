@@ -5,6 +5,7 @@ const values = {
     PARSER_OUTPUT: "apex.jorje.semantic.compiler.parser.ParserOutput",
     CLASS_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ClassTypeRef",
     ARRAY_TYPE_REF: "apex.jorje.data.ast.TypeRefs$ArrayTypeRef",
+    JAVA_TYPE_REF: "apex.jorje.data.ast.TypeRefs$JavaTypeRef",
     MODIFIER: "apex.jorje.data.ast.Modifier",
     ANNOTATION: "apex.jorje.data.ast.Modifier$Annotation",
     ANNOTATION_KEY_VALUE:
@@ -116,6 +117,8 @@ const values = {
       "apex.jorje.data.ast.Expr$SuperMethodCallExpr",
     SOQL_EXPRESSION: "apex.jorje.data.ast.Expr$SoqlExpr",
     SOSL_EXPRESSION: "apex.jorje.data.ast.Expr$SoslExpr",
+    JAVA_VARIABLE_EXPRESSION: "apex.jorje.data.ast.Expr$JavaVariableExpr",
+    JAVA_METHOD_CALL_EXPRESSION: "apex.jorje.data.ast.Expr$JavaMethodCallExpr",
 
     // New Object Init
     NEW_SET_INIT: "apex.jorje.data.ast.NewObject$NewSetInit",
