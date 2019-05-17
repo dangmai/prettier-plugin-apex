@@ -7,6 +7,10 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
     return sayHello('Hello', subject);
   }
 
+  public String sayHelloWithModifier(static final String subject) {
+    return null;
+  }
+
   public String sayHelloWithDate() {
     SimpleMethod that = new SimpleMethod();
     DateTime rightNow = that.getNow(), tomorrow, yesterday = DateTime.now().addDays(-1);

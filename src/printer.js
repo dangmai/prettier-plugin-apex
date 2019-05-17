@@ -468,6 +468,18 @@ function handleMethodDeclaration(path, print) {
   return concat(parts);
 }
 
+function handleModifierParameterRef(path, print) {
+  const parts = [];
+  // Modifiers
+  parts.push(join("", path.map(print, "modifiers")));
+  // Type
+  parts.push(path.call(print, "typeRef"));
+  parts.push(" ");
+  // Value
+  parts.push(path.call(print, "name"));
+  return concat(parts);
+}
+
 function handleEmptyModifierParameterRef(path, print) {
   const parts = [];
   // Type
@@ -2041,6 +2053,7 @@ nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) =>
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[apexNames.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
+nodeHandler[apexNames.MODIFIER_PARAMETER_REF] = handleModifierParameterRef;
 nodeHandler[
   apexNames.EMPTY_MODIFIER_PARAMETER_REF
 ] = handleEmptyModifierParameterRef;
