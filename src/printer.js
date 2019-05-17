@@ -127,6 +127,13 @@ function handleVariableExpression(path, print) {
   return concat(parts);
 }
 
+function handleJavaVariableExpression(path, print) {
+  const parts = [];
+  parts.push("java:");
+  parts.push(join(".", path.map(print, "names")));
+  return concat(parts);
+}
+
 function handleLiteralExpression(path, print) {
   const literalType = path.call(print, "type", "$");
   if (literalType === "NULL") {
@@ -374,6 +381,13 @@ function handleArrayTypeRef(path, print) {
   const parts = [];
   parts.push(path.call(print, "heldType"));
   parts.push("[]");
+  return concat(parts);
+}
+
+function handleJavaTypeRef(path, print) {
+  const parts = [];
+  parts.push("java:");
+  parts.push(join(".", path.map(print, "names")));
   return concat(parts);
 }
 
@@ -816,6 +830,18 @@ function handleMethodCallExpression(path, print) {
     ]),
   );
   return groupConcat(parts);
+}
+
+function handleJavaMethodCallExpression(path, print) {
+  const parts = [];
+  parts.push("java:");
+  parts.push(join(".", path.map(print, "names")));
+  parts.push("(");
+  parts.push(softline);
+  parts.push(join(concat([",", line]), path.map(print, "inputParameters")));
+  parts.push(dedent(softline));
+  parts.push(")");
+  return groupIndentConcat(parts);
 }
 
 function handleNestedExpression(path, print) {
@@ -2059,6 +2085,7 @@ nodeHandler[apexNames.EXPRESSION_STATEMENT] = handleExpressionStatement;
 nodeHandler[apexNames.RETURN_STATEMENT] = handleReturnStatement;
 nodeHandler[apexNames.TRIGGER_USAGE] = (path, print) =>
   values.TRIGGER_USAGE[path.call(print, "$")];
+nodeHandler[apexNames.JAVA_TYPE_REF] = handleJavaTypeRef;
 nodeHandler[apexNames.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexNames.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[apexNames.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
@@ -2147,12 +2174,16 @@ nodeHandler[apexNames.BOOLEAN_EXPRESSION] = handleGenericExpression;
 nodeHandler[apexNames.ASSIGNMENT_EXPRESSION] = handleAssignmentExpression;
 nodeHandler[apexNames.NESTED_EXPRESSION] = handleNestedExpression;
 nodeHandler[apexNames.VARIABLE_EXPRESSION] = handleVariableExpression;
+nodeHandler[apexNames.JAVA_VARIABLE_EXPRESSION] = handleJavaVariableExpression;
 nodeHandler[apexNames.LITERAL_EXPRESSION] = handleLiteralExpression;
 nodeHandler[apexNames.BINARY_EXPRESSION] = handleGenericExpression;
 nodeHandler[apexNames.TRIGGER_VARIABLE_EXPRESSION] = (path, print) =>
   concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexNames.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[apexNames.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
+nodeHandler[
+  apexNames.JAVA_METHOD_CALL_EXPRESSION
+] = handleJavaMethodCallExpression;
 nodeHandler[apexNames.THIS_VARIABLE_EXPRESSION] = () => "this";
 nodeHandler[apexNames.SUPER_VARIABLE_EXPRESSION] = () => "super";
 nodeHandler[apexNames.POSTFIX_EXPRESSION] = handlePostfixExpression;
