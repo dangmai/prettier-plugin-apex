@@ -1608,6 +1608,7 @@ function handleWhereUnaryExpression(path, print) {
   const parts = [];
   parts.push("(");
   parts.push(path.call(print, "op"));
+  parts.push(" ");
   parts.push(path.call(print, "expr"));
   parts.push(")");
   return concat(parts);

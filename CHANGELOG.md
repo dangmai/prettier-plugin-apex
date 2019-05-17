@@ -5,6 +5,7 @@
   - Add `apex-verify-ast` option.
 - Fix dangling comments being printed incorrectly for Triggers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/13)).
 Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
+- Fix SOQL unary expression not generating space before next expression.
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).

@@ -34,6 +34,7 @@ class SOQLClass {
     Contact[] subquery = [SELECT Id, (SELECT Id FROM Contacts LIMIT 5 OFFSET 5) sampleAlias FROM Account ORDER BY Name DESC LIMIT 1];
     Contact[] nestedFrom = [SELECT Id FROM Contact WHERE Id IN (SELECT Id FROM Contact) AND Account.Id <> NULL];
     User[] withAlias = [SELECT u.Name, u.Email, u.Id, u.IsPortalEnabled FROM User u WHERE u.Id = :Userinfo.getUserId()];
+    User[] notQuery = [SELECT Id FROM Contact WHERE NOT NAME LIKE '%Test%'];
   }
 
   void limitBinds() {
