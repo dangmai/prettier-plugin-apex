@@ -69,6 +69,7 @@ class LoopClass {
     while (true) {
       break;
     }
+    while (true);
   }
 
   void doWhileLoop() {
@@ -171,6 +172,7 @@ class LoopClass {
     while (true) {
       break;
     }
+    while (true);
   }
 
   void doWhileLoop() {

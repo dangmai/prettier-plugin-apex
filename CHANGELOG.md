@@ -8,6 +8,7 @@ Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 - Fix SOQL unary expression not generating space before next expression.
 - Add support for SOQL WHERE Calculation Expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/34)).
 - Add support for parameter modifiers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/37)).
+- Add support for `while` loop without body ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/33)).
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).

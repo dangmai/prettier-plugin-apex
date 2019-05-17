@@ -1886,8 +1886,7 @@ function handlePrefixOperator(path, print) {
 }
 
 function handleWhileLoop(path, print) {
-  const statementDoc = path.call(print, "stmnt", "value");
-  const statementType = path.call(print, "stmnt", "value", "@class");
+  const node = path.getValue();
   const conditionDoc = path.call(print, "condition");
 
   const parts = [];
@@ -1897,7 +1896,13 @@ function handleWhileLoop(path, print) {
   // Condition
   parts.push(groupIndentConcat([softline, conditionDoc, dedent(softline)]));
   parts.push(")");
+  if (!node.stmnt.value) {
+    parts.push(";");
+    return concat(parts);
+  }
   // Body
+  const statementDoc = path.call(print, "stmnt", "value");
+  const statementType = path.call(print, "stmnt", "value", "@class");
   if (statementType === apexNames.BLOCK_STATEMENT) {
     parts.push(" ");
     _pushIfExist(parts, statementDoc);
