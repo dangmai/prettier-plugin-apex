@@ -1,15 +1,42 @@
+/* eslint no-param-reassign: 0 */
+
 const { isApexDocComment } = require("./comments");
 const values = require("./values");
 
 const apexNames = values.APEX_NAMES;
 
+// The metadata corresponding to these keys cannot be compared for some reason
+// or another, so we will delete them before the AST comparison
+const METADATA_TO_IGNORE = [
+  "loc",
+  "location",
+  "lastNodeLoc",
+  "text",
+  "rawQuery",
+  "@id",
+  // It is impossible to preserve the comment AST. Neither recast nor
+  // prettier tries to do it so we are not going to bother either.
+  "apexComments",
+  "$",
+  "leading",
+  "trailing",
+  "hiddenTokenMap",
+  "trailingEmptyLine",
+  "isLastNodeInArray",
+];
+
+/**
+ * Massaging the AST so that it can be compared
+ * @param ast the Abstract Syntax Tree to compare
+ * @returns the massaged AST
+ */
 function massageMetadata(ast) {
   if (Array.isArray(ast)) {
     return ast.map(e => massageMetadata(e));
   }
   if (typeof ast === "object") {
     let newObj = {};
-    // ApexDoc needs to be massaged a bit before they can be compared
+    // Handling ApexDoc
     if (
       ast["@class"] &&
       ast["@class"] === apexNames.BLOCK_COMMENT &&
@@ -26,22 +53,7 @@ function massageMetadata(ast) {
       return newObj;
     }
     Object.keys(ast).forEach(key => {
-      if (
-        key === "loc" ||
-        key === "location" ||
-        key === "lastNodeLoc" ||
-        key === "text" ||
-        key === "rawQuery" ||
-        key === "@id" ||
-        // It is impossible to preserve the comment AST. Neither recase nor
-        // prettier tries to do it so we are not going to bother either.
-        key === "apexComments" ||
-        key === "$" ||
-        key === "leading" ||
-        key === "trailing" ||
-        key === "hiddenTokenMap" ||
-        key === "trailingEmptyLine"
-      ) {
+      if (METADATA_TO_IGNORE.indexOf(key) !== -1) {
         return;
       }
       if (key === "scope" && typeof ast[key] === "string") {
@@ -50,6 +62,19 @@ function massageMetadata(ast) {
         // the original and parsed strings.
         newObj[key] = ast[key].toUpperCase();
       } else {
+        // This is a workaround for #38 - jorje sometimes groups names with
+        // spaces as dottedExpr, so we can't compare AST effectively.
+        // In those cases we will bring the dottedExpr out into the names.
+        if (
+          key === "dottedExpr" &&
+          ast.dottedExpr.value &&
+          ast.dottedExpr.value.names &&
+          ast.dottedExpr.value["@class"] === apexNames.VARIABLE_EXPRESSION &&
+          ast.names
+        ) {
+          ast.names = ast.dottedExpr.value.names.concat(ast.names);
+          ast.dottedExpr = {};
+        }
         newObj[key] = massageMetadata(ast[key]);
       }
     });
