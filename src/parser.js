@@ -127,6 +127,33 @@ function fixNodeLocation(node) {
 }
 
 /**
+ * Helper function to find a character in a string, starting at an index.
+ * It will ignore characters that are part of comments.
+ */
+function findNextUncommentedCharacter(
+  sourceCode,
+  character,
+  fromIndex,
+  commentNodes,
+) {
+  let indexFound = false;
+  let index;
+  while (!indexFound) {
+    index = sourceCode.indexOf(character, fromIndex);
+    indexFound =
+      // eslint-disable-next-line no-loop-func
+      commentNodes.filter(comment => {
+        return (
+          comment.location.startIndex <= index &&
+          comment.location.endIndex >= index
+        );
+      }).length === 0;
+    fromIndex = index + 1;
+  }
+  return index;
+}
+
+/**
  * Certain node types do not get their endIndex reported from the jorje compiler,
  * or the number they report is not the end of the entire block,
  * so we'll have to figure it out by hand here.
@@ -134,23 +161,28 @@ function fixNodeLocation(node) {
  * is set on it.
  * @param node the node to look at
  * @param sourceCode the entire source code
+ * @param commentNodes all the comment nodes
  * @param lineIndexes the indexes of the lines
  */
-function generateEndIndexForNode(node, sourceCode, lineIndexes) {
+function generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes) {
   switch (node["@class"]) {
     case apexNames.PROPERTY_MEMBER:
     case apexNames.SWITCH_STATEMENT:
-      node.lastNodeLoc.endIndex = sourceCode.indexOf(
+      node.lastNodeLoc.endIndex = findNextUncommentedCharacter(
+        sourceCode,
         "}",
         node.lastNodeLoc.endIndex,
+        commentNodes,
       );
       node.lastNodeLoc.endLine =
         lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
       break;
     case apexNames.VARIABLE_DECLARATION_STATEMENT:
-      node.lastNodeLoc.endIndex = sourceCode.indexOf(
+      node.lastNodeLoc.endIndex = findNextUncommentedCharacter(
+        sourceCode,
         ";",
         node.lastNodeLoc.endIndex,
+        commentNodes,
       );
       node.lastNodeLoc.endLine =
         lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
@@ -166,6 +198,7 @@ function generateEndIndexForNode(node, sourceCode, lineIndexes) {
  *
  * @param node the node being visited
  * @param sourceCode the entire source code
+ * @param commentNodes all comment nodes
  * @param lineIndexes the indexes of the lines in the source code
  * @param emptyLineLocations a list of lines that are empty in the source code
  * @param emptyLineNodeMap a map of empty line to the node that is attached to
@@ -181,6 +214,7 @@ function generateEndIndexForNode(node, sourceCode, lineIndexes) {
 function generateExtraMetadata(
   node,
   sourceCode,
+  commentNodes,
   lineIndexes,
   emptyLineLocations,
   emptyLineNodeMap,
@@ -210,6 +244,7 @@ function generateExtraMetadata(
       const nodeLoc = generateExtraMetadata(
         node[key],
         sourceCode,
+        commentNodes,
         lineIndexes,
         emptyLineLocations,
         emptyLineNodeMap,
@@ -233,7 +268,7 @@ function generateExtraMetadata(
     // Store the last node information for some special node types, so that
     // we can add trailing empty lines after them.
     node.lastNodeLoc = lastNodeLoc;
-    generateEndIndexForNode(node, sourceCode, lineIndexes);
+    generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes);
   }
   const nodeLoc = _getNodeLocation(node);
   if (
@@ -366,9 +401,18 @@ function parse(sourceCode, _, options) {
     ast = resolveAstReferences(ast, {});
     fixNodeLocation(ast);
     ast = resolveLineIndexes(ast, lineIndexes);
+
+    const commentNodes = ast[apexNames.PARSER_OUTPUT].hiddenTokenMap
+      .map(item => item[1])
+      .filter(
+        node =>
+          node["@class"] === apexNames.BLOCK_COMMENT ||
+          node["@class"] === apexNames.INLINE_COMMENT,
+      );
     generateExtraMetadata(
       ast,
       sourceCode,
+      commentNodes,
       lineIndexes,
       getEmptyLineLocations(sourceCode),
       {},

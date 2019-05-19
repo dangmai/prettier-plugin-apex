@@ -84,6 +84,23 @@ class Comments {
     }
   }
 
+  void commentWithSpecialCharacters() {
+    datetime inDateTime = datetime.newInstance(
+      dtEnddate.year(),
+      dtEnddate.month(),
+      dtEnddate.day(),
+      system.now().hour(),
+      system.now().minute(),
+      system.now().second() //DATETIME.VALUEOF(dtEnddate);
+    );
+
+    switch on s {
+      when JANUARY {
+        System.debug('January'); // Fake closing }
+      }
+    }
+  }
+
   void binaryExpression() {
     Integer i = 1;
     Integer j = 2;

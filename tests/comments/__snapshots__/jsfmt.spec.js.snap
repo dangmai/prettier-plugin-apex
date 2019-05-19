@@ -87,6 +87,23 @@ class Comments {
     }
   }
 
+  void commentWithSpecialCharacters() {
+    datetime inDateTime = datetime.newInstance(
+      dtEnddate.year(),
+      dtEnddate.month(),
+      dtEnddate.day(),
+      system.now().hour(),
+      system.now().minute(),
+      system.now().second() //DATETIME.VALUEOF(dtEnddate);
+    );
+
+    switch on s {
+      when JANUARY {
+        System.debug('January'); // Fake closing }
+      }
+    }
+  }
+
   void binaryExpression() {
     Integer i = 1;
     Integer j = 2;
@@ -166,7 +183,7 @@ class Comments {
 
   void beforeSemicolon() {
     Integer a = 1; // before semicolon line comment
-    Integer b = 1 /* before same line semicolon block comment */;
+    Integer b /* before same line semicolon block comment */ = 1;
     Integer c = 1 /* before next line semicolon block comment */;
   }
 
@@ -207,6 +224,23 @@ class Comments {
       doSomething(); // if inline comment
     } else {
       doSomethingElse(); // else inline comment
+    }
+  }
+
+  void commentWithSpecialCharacters() {
+    datetime inDateTime = datetime.newInstance(
+      dtEnddate.year(),
+      dtEnddate.month(),
+      dtEnddate.day(),
+      system.now().hour(),
+      system.now().minute(),
+      system.now().second() //DATETIME.VALUEOF(dtEnddate);
+    );
+
+    switch on s {
+      when JANUARY {
+        System.debug('January'); // Fake closing }
+      }
     }
   }
 
