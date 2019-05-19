@@ -111,17 +111,17 @@ public class Apex {
                         new WithClassMapper(defaultMapper));
                 setUpXStream(xstream, mode);
 
-                System.out.println(xstream.toXML(output));
+                Writer writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
+                xstream.toXML(output, writer);
             } else {
                 xstream = new XStream();
                 setUpXStream(xstream, mode);
 
+                Writer writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
                 if (cmd.hasOption("p")) {
-                    System.out.println(xstream.toXML(output));
+                    xstream.toXML(output, writer);
                 } else {
-                    StringWriter writer = new StringWriter();
                     xstream.marshal(output, new CompactWriter(writer));
-                    System.out.print(writer.toString());
                 }
             }
         }
