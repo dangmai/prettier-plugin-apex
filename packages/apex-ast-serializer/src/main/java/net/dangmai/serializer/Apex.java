@@ -21,6 +21,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.LogManager;
 
@@ -60,7 +61,7 @@ public class Apex {
             if (cmd.hasOption("l")) {
                 apexReader = new FileReader(cmd.getOptionValue("l"));
             } else {
-                apexReader = new BufferedReader(new InputStreamReader(System.in));
+                apexReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             }
 
             String sourceCode = IOUtils.toString(apexReader);
