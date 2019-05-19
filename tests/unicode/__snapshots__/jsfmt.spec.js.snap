@@ -1,0 +1,26 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Format apex: Unicode.cls: Unicode.cls 1`] = `
+public class Unicode {
+    public void unicodeCharacterTest(){
+        String a = '––––';
+        Account[] accounts = [SELECT Id FROM Account WHERE Name = 'Test – Name'];
+
+        /*
+        system.debug('Hi');
+        */
+    }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+public class Unicode {
+  public void unicodeCharacterTest() {
+    String a = '––––';
+    Account[] accounts = [SELECT Id FROM Account WHERE Name = 'Test – Name'];
+
+    /*
+        system.debug('Hi');
+        */
+  }
+}
+
+`;

@@ -12,6 +12,7 @@ Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 - Add support for `for` loop without body ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/36)).
 - Add support for Java expressions/typerefs ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/35)).
 - Fix Package Version Expression.
+- Fix Unicode characters being printed incorrectly ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/51)).
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).
