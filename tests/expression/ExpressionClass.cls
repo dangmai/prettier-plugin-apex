@@ -119,6 +119,7 @@ class Conditional extends Object {
     String longResult = o.callMethod('first param', 'second param', 'thirdParam').callAnotherMethod().getStringResult();
     String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
     String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam').callAnotherMethod().getStringResult();
+    String longResult = o.callAnotherMethod().getStringResult().callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
     controller.callMethod(
       'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
     );

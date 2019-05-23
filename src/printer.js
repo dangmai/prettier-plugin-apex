@@ -818,17 +818,10 @@ function handleMethodCallExpression(path, print) {
 
   const resultParamDoc =
     paramDocs.length > 0
-      ? conditionalGroup([
-          groupIndentConcat([
-            softline,
-            join(concat([",", line]), paramDocs),
-            dedent(softline),
-          ]),
-          groupConcat([
-            softline,
-            join(concat([",", line]), paramDocs),
-            dedent(softline),
-          ]),
+      ? concat([
+          softline,
+          join(concat([",", line]), paramDocs),
+          dedent(softline),
         ])
       : "";
 
@@ -843,14 +836,6 @@ function handleMethodCallExpression(path, print) {
     join(concat([softline, "."]), nameDocs),
   ]);
 
-  const methodCallExpressionDoc = concat([
-    concat(dottedExpressionParts),
-    methodCallChainDoc,
-    "(",
-    resultParamDoc,
-    ")",
-  ]);
-
   return isNestedDottedExpression
     ? concat([
         concat(dottedExpressionParts),
@@ -858,12 +843,30 @@ function handleMethodCallExpression(path, print) {
         // know that this is a nested expression
         join(concat([softline, "."]), nameDocs),
         "(",
-        resultParamDoc,
+        group(indent(resultParamDoc)),
         ")",
       ])
     : conditionalGroup([
-        methodCallExpressionDoc,
-        group(indent(methodCallExpressionDoc)),
+        concat([
+          ...dottedExpressionParts,
+          methodCallChainDoc,
+          "(",
+          resultParamDoc,
+          ")",
+        ]),
+        group(
+          indent(
+            concat([
+              ...dottedExpressionParts,
+              methodCallChainDoc,
+              "(",
+              dottedExpressionDoc
+                ? group(indent(resultParamDoc))
+                : resultParamDoc,
+              ")",
+            ]),
+          ),
+        ),
       ]);
 }
 
