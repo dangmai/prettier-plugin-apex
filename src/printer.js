@@ -96,9 +96,7 @@ function handleGenericExpression(path, print) {
   const rightDoc = path.call(print, "right");
   docs.push(leftDoc);
   docs.push(" ");
-  docs.push(operationDoc);
-  docs.push(line);
-  docs.push(rightDoc);
+  docs.push(group(concat([operationDoc, line, rightDoc])));
   return groupConcat(docs);
 }
 

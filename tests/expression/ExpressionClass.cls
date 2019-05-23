@@ -37,6 +37,9 @@ class Conditional extends Object {
     a = i ^ j;
     a = i & j;
     a = i | j;
+
+    Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + 1;
+    Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
   }
 
   void castExpression() {
@@ -67,6 +70,14 @@ class Conditional extends Object {
     c = a >= b;
     c = a && b;
     c = a || b;
+
+    Boolean hasPrivateReports = (Integer) ([
+      SELECT COUNT(Id) num
+      FROM Report
+      WHERE OwnerId = :UserInfo.getUserId()
+    ]).get(0).get('num') > 0;
+    Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > 1;
+    Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
   }
 
   void triggerVariableExpr_inOtherSuite() {}
