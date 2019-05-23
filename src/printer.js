@@ -975,12 +975,7 @@ function handleNewMapLiteral(path, print) {
   // Type
   parts.push("Map");
   parts.push("<");
-  const typeGroup = groupConcat([
-    softline,
-    join(concat([",", line]), path.map(print, "types")),
-    softline,
-  ]);
-  parts.push(typeGroup);
+  parts.push(join(", ", path.map(print, "types")));
   parts.push(">");
   // Values
   parts.push("{");

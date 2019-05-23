@@ -28,6 +28,10 @@ class NewObject {
       'a' => new String[]{'a','b'},
       'b' => new String[]{'c','d'}
     };
+    Map<String, Decimal> fmaIntegerParameterNameDefaultValue = new Map<string, decimal>
+    {'Parameter1'=> 1,
+    'Parameter2' => 0 ,
+    'Parameter3'=> 500 };
   }
 
   void newKeyValueTest() {
