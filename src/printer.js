@@ -12,6 +12,7 @@ const {
   line,
   softline,
   group,
+  conditionalGroup,
   indent,
   dedent,
 } = docBuilders;
@@ -801,35 +802,69 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
+  let isNestedDottedExpression = false;
+  // We're making an assumption here that `callParent` is always synchronous.
+  // We're doing it because FastPath does not expose other ways to find the
+  // parent name.
+  path.callParent(innerPath => {
+    if (innerPath.getName() === "dottedExpr") {
+      isNestedDottedExpression = true;
+    }
+  });
+
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
   const nameDocs = path.map(print, "names");
   const paramDocs = path.map(print, "inputParameters");
 
-  const parts = [];
+  const resultParamDoc =
+    paramDocs.length > 0
+      ? conditionalGroup([
+          groupIndentConcat([
+            softline,
+            join(concat([",", line]), paramDocs),
+            dedent(softline),
+          ]),
+          groupConcat([
+            softline,
+            join(concat([",", line]), paramDocs),
+            dedent(softline),
+          ]),
+        ])
+      : "";
+
   const dottedExpressionParts = [];
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
+    dottedExpressionParts.push(softline);
     dottedExpressionParts.push(".");
   }
-  parts.push(
-    groupConcat([
-      ...dottedExpressionParts,
-      groupConcat([
-        // Method call chain
-        join(".", nameDocs),
+  const methodCallChainDoc = conditionalGroup([
+    join(".", nameDocs),
+    join(concat([softline, "."]), nameDocs),
+  ]);
+
+  const methodCallExpressionDoc = concat([
+    concat(dottedExpressionParts),
+    methodCallChainDoc,
+    "(",
+    resultParamDoc,
+    ")",
+  ]);
+
+  return isNestedDottedExpression
+    ? concat([
+        concat(dottedExpressionParts),
+        // Method call chain, which should not be a conditional group since we
+        // know that this is a nested expression
+        join(concat([softline, "."]), nameDocs),
         "(",
-        paramDocs.length > 0
-          ? groupIndentConcat([
-              softline,
-              join(concat([",", line]), paramDocs),
-              dedent(softline),
-            ])
-          : "",
+        resultParamDoc,
         ")",
-      ]),
-    ]),
-  );
-  return groupConcat(parts);
+      ])
+    : conditionalGroup([
+        methodCallExpressionDoc,
+        group(indent(methodCallExpressionDoc)),
+      ]);
 }
 
 function handleJavaMethodCallExpression(path, print) {

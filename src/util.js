@@ -62,6 +62,7 @@ function massageMetadata(ast) {
         // the original and parsed strings.
         newObj[key] = ast[key].toUpperCase();
       } else {
+        newObj[key] = massageMetadata(ast[key]);
         // This is a workaround for #38 - jorje sometimes groups names with
         // spaces as dottedExpr, so we can't compare AST effectively.
         // In those cases we will bring the dottedExpr out into the names.
@@ -73,9 +74,9 @@ function massageMetadata(ast) {
           ast.names
         ) {
           ast.names = ast.dottedExpr.value.names.concat(ast.names);
-          ast.dottedExpr = {};
+          newObj.names = ast.names;
+          newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
         }
-        newObj[key] = massageMetadata(ast[key]);
       }
     });
     return newObj;

@@ -15,6 +15,7 @@ Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 - Fix Unicode characters being printed incorrectly ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/51)).
 - Workaround for certain cases of AST verification failing ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/38)).
 - Fix overlapping node with comment when comment contains special characters.
+- Fix awkward breaks for long method call chain ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/53)),
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).

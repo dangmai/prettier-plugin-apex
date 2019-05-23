@@ -116,10 +116,13 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
         'Another_Long_SObject_Chain__r.Name'
       }
     );
-    ((SObject) a).get('Very_Long_Field_Name__c').subString(
-      0,
-      5
-    ).escapeHtml4().escapeEcmaScript().escapeJava().escapeUnicode();
+    ((SObject) a)
+      .get('Very_Long_Field_Name__c')
+      .subString(0, 5)
+      .escapeHtml4()
+      .escapeEcmaScript()
+      .escapeJava()
+      .escapeUnicode();
   }
 
   @InvocableMethod(

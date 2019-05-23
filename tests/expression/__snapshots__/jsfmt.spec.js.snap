@@ -112,12 +112,19 @@ class Conditional extends Object {
     Integer a = 1;
     Integer b = 2;
     Integer c = a + b;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
   }
 
   void methodCallExpression() {
     SomeObject o = new SomeObject();
     String result = o.callMethod().getStringResult();
+    String longResult = o.callMethod('first param').callAnotherMethod().getStringResult();
     String longResult = o.callMethod('first param', 'second param', 'thirdParam').callAnotherMethod().getStringResult();
+    String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
+    String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam').callAnotherMethod().getStringResult();
+    controller.callMethod(
+      'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
+    );
   }
 
   void javaMethodCallExpression_notNeeded() {}
@@ -293,16 +300,42 @@ class Conditional extends Object {
     Integer a = 1;
     Integer b = 2;
     Integer c = a + b;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
   }
 
   void methodCallExpression() {
     SomeObject o = new SomeObject();
     String result = o.callMethod().getStringResult();
+    String longResult = o
+      .callMethod('first param')
+      .callAnotherMethod()
+      .getStringResult();
+    String longResult = o
+      .callMethod('first param', 'second param', 'thirdParam')
+      .callAnotherMethod()
+      .getStringResult();
     String longResult = o.callMethod(
       'first param',
       'second param',
-      'thirdParam'
-    ).callAnotherMethod().getStringResult();
+      'thirdParam',
+      'fourthParam',
+      'fifthParam',
+      'sixthParam'
+    );
+    String longResult = o
+      .callMethod(
+      'first param',
+      'second param',
+      'thirdParam',
+      'fourthParam',
+      'fifthParam',
+      'sixthParam'
+    )
+      .callAnotherMethod()
+      .getStringResult();
+    controller.callMethod(
+      'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
+    );
   }
 
   void javaMethodCallExpression_notNeeded() {
