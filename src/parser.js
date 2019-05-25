@@ -337,7 +337,13 @@ function generateExtraMetadata(
 // utility methods.
 function resolveLineIndexes(node, lineIndexes) {
   const nodeLoc = _getNodeLocation(node);
-  if (nodeLoc) {
+  if (nodeLoc && !("startLine" in nodeLoc)) {
+    // The location node that we manually generate do not contain startLine
+    // information, so we will create them here.
+    nodeLoc.startLine =
+      lineIndexes.findIndex(index => index > nodeLoc.startIndex) - 1;
+  }
+  if (nodeLoc && !("endLine" in nodeLoc)) {
     nodeLoc.endLine =
       lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;
 
