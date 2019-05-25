@@ -39,9 +39,19 @@ const printers = {
 
 const options = {
   apexStandaloneParser: {
-    type: "boolean",
+    type: "choice",
     category: "Global",
-    default: false,
+    default: "none",
+    choices: [
+      {
+        value: "none",
+        description: "Do not use a standalone parser",
+      },
+      {
+        value: "built-in",
+        description: "Use the built in standalone parser",
+      },
+    ],
     description:
       "Use a standalone process to speed up parsing. This process needs to be started and stopped separately from the Prettier process",
   },

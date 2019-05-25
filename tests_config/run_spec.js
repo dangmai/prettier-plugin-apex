@@ -16,7 +16,7 @@ function prettyPrint(src, filename, options) {
     Object.assign(
       {
         filepath: filename,
-        apexStandaloneParser: true,
+        apexStandaloneParser: "built-in",
       },
       options,
     ),
@@ -30,7 +30,7 @@ function parse(string, opts) {
       string,
       Object.assign(
         {
-          apexStandaloneParser: true,
+          apexStandaloneParser: "built-in",
         },
         opts,
       ),

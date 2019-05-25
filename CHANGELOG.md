@@ -1,6 +1,7 @@
 ## Unreleased
 - CLI/Option change:
-  - `use-standalone-server` option is now `apex-standalone-parser`.
+  - `use-standalone-server` option is now `apex-standalone-parser`,
+  and it is now a choice between `none` and `built-in`.
   - `server-port` option is now `apex-standalone-port`.
   - Add `apex-verify-ast` option.
 - Fix dangling comments being printed incorrectly for Triggers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/13)).

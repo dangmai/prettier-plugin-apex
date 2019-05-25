@@ -376,7 +376,7 @@ function parse(sourceCode, _, options) {
   sourceCode = sourceCode.trim();
   const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst;
-  if (options.apexStandaloneParser) {
+  if (options.apexStandaloneParser === "built-in") {
     serializedAst = parseTextWithNailgun(
       sourceCode,
       options.apexStandalonePort,
