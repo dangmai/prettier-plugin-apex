@@ -84,6 +84,43 @@ function massageMetadata(ast) {
   return ast;
 }
 
+/**
+ * Helper function to find a character in a string, starting at an index.
+ * It will ignore characters that are part of comments.
+ */
+function findNextUncommentedCharacter(
+  sourceCode,
+  character,
+  fromIndex,
+  commentNodes,
+  backwards = false,
+) {
+  let indexFound = false;
+  let index;
+  while (!indexFound) {
+    if (backwards) {
+      index = sourceCode.lastIndexOf(character, fromIndex);
+    } else {
+      index = sourceCode.indexOf(character, fromIndex);
+    }
+    indexFound =
+      // eslint-disable-next-line no-loop-func
+      commentNodes.filter(comment => {
+        return (
+          comment.location.startIndex <= index &&
+          comment.location.endIndex >= index
+        );
+      }).length === 0;
+    if (backwards) {
+      fromIndex = index - 1;
+    } else {
+      fromIndex = index + 1;
+    }
+  }
+  return index;
+}
+
 module.exports = {
+  findNextUncommentedCharacter,
   massageMetadata,
 };

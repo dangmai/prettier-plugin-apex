@@ -1505,7 +1505,7 @@ function handleField(path, print) {
     parts.push(dedent(softline));
     parts.push(")");
   }
-  return groupIndentConcat(parts);
+  return groupConcat(parts);
 }
 
 function handleFromClause(path, print) {

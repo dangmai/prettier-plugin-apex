@@ -19,6 +19,7 @@ Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 - Fix awkward breaks for long method call chain ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/53)),
 - Remove breaks in Map types ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/57)).
 - Fix binary/boolean expressions breaking after operation despite available space ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/40)).
+- Fix leading comment to SOQL inner query being misindentified as trailing comment to previous column clause ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/58)).
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).

@@ -139,6 +139,25 @@ class Comments {
       /* Comments */
       ;
   }
+
+  void commentInSOQL() {
+    List<Contact> Contact = [
+      SELECT
+        Id,
+        Name,
+        // Leading Comment to a Column Clause
+        Address
+      FROM Contact
+    ];
+    List<Contact> Contact = [
+      SELECT
+        Id,
+        Name,
+        // Leading Comment to an Inner Query
+        (SELECT Id FROM Accounts)
+      FROM Contact
+    ];
+  }
 }
 // Trailing Inline Comment
 
