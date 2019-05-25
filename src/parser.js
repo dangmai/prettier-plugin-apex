@@ -5,9 +5,9 @@ const path = require("path");
 
 const { spawnSync } = childProcess;
 const attachComments = require("./comments").attach;
-const values = require("./values");
+const constants = require("./contants");
 
-const apexNames = values.APEX_NAMES;
+const apexTypes = constants.APEX_TYPES;
 
 function parseTextWithSpawn(text) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
@@ -166,8 +166,8 @@ function findNextUncommentedCharacter(
  */
 function generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes) {
   switch (node["@class"]) {
-    case apexNames.PROPERTY_MEMBER:
-    case apexNames.SWITCH_STATEMENT:
+    case apexTypes.PROPERTY_MEMBER:
+    case apexTypes.SWITCH_STATEMENT:
       node.lastNodeLoc.endIndex = findNextUncommentedCharacter(
         sourceCode,
         "}",
@@ -177,7 +177,7 @@ function generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes) {
       node.lastNodeLoc.endLine =
         lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
       break;
-    case apexNames.VARIABLE_DECLARATION_STATEMENT:
+    case apexTypes.VARIABLE_DECLARATION_STATEMENT:
       node.lastNodeLoc.endIndex = findNextUncommentedCharacter(
         sourceCode,
         ";",
@@ -222,10 +222,10 @@ function generateExtraMetadata(
 ) {
   const apexClass = node["@class"];
   let allowTrailingEmptyLineWithin;
-  const isSpecialClass = values.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(
+  const isSpecialClass = constants.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(
     apexClass,
   );
-  const trailingEmptyLineAllowed = values.ALLOW_TRAILING_EMPTY_LINE.includes(
+  const trailingEmptyLineAllowed = constants.ALLOW_TRAILING_EMPTY_LINE.includes(
     apexClass,
   );
   if (isSpecialClass) {
@@ -388,10 +388,10 @@ function parse(sourceCode, _, options) {
   if (serializedAst) {
     ast = JSON.parse(serializedAst);
     if (
-      ast[apexNames.PARSER_OUTPUT] &&
-      ast[apexNames.PARSER_OUTPUT].parseErrors.length > 0
+      ast[apexTypes.PARSER_OUTPUT] &&
+      ast[apexTypes.PARSER_OUTPUT].parseErrors.length > 0
     ) {
-      const errors = ast[apexNames.PARSER_OUTPUT].parseErrors.map(
+      const errors = ast[apexTypes.PARSER_OUTPUT].parseErrors.map(
         err => `${err.message}. ${err.detailMessage}`,
       );
       throw new Error(errors.join("\r\n"));
@@ -400,12 +400,12 @@ function parse(sourceCode, _, options) {
     fixNodeLocation(ast);
     ast = resolveLineIndexes(ast, lineIndexes);
 
-    const commentNodes = ast[apexNames.PARSER_OUTPUT].hiddenTokenMap
+    const commentNodes = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
       .map(item => item[1])
       .filter(
         node =>
-          node["@class"] === apexNames.BLOCK_COMMENT ||
-          node["@class"] === apexNames.INLINE_COMMENT,
+          node["@class"] === apexTypes.BLOCK_COMMENT ||
+          node["@class"] === apexTypes.INLINE_COMMENT,
       );
     generateExtraMetadata(
       ast,

@@ -1,9 +1,9 @@
 /* eslint no-param-reassign: 0 */
 
 const { isApexDocComment } = require("./comments");
-const values = require("./values");
+const constants = require("./contants");
 
-const apexNames = values.APEX_NAMES;
+const apexNames = constants.APEX_TYPES;
 
 // The metadata corresponding to these keys cannot be compared for some reason
 // or another, so we will delete them before the AST comparison

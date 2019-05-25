@@ -7,9 +7,9 @@ const prettier = require("prettier");
 const { concat, lineSuffix, hardline } = prettier.doc.builders;
 const { skipWhitespace } = prettier.util;
 const childNodesCacheKey = require("private").makeUniqueKey();
-const values = require("./values");
+const constants = require("./contants");
 
-const apexNames = values.APEX_NAMES;
+const apexTypes = constants.APEX_TYPES;
 
 function getSortedChildNodes(node, resultArray) {
   if (resultArray && node.loc) {
@@ -48,11 +48,11 @@ function getRootNodeLocation(ast) {
   // Some root node like TriggerDeclUnit has the `loc` property directly on it,
   // while others has it in the `body` property. This function abstracts away
   // that difference.
-  if (ast[apexNames.PARSER_OUTPUT].unit.loc) {
-    return ast[apexNames.PARSER_OUTPUT].unit.loc;
+  if (ast[apexTypes.PARSER_OUTPUT].unit.loc) {
+    return ast[apexTypes.PARSER_OUTPUT].unit.loc;
   }
-  if (ast[apexNames.PARSER_OUTPUT].unit.body.loc) {
-    return ast[apexNames.PARSER_OUTPUT].unit.body.loc;
+  if (ast[apexTypes.PARSER_OUTPUT].unit.body.loc) {
+    return ast[apexTypes.PARSER_OUTPUT].unit.body.loc;
   }
   throw new Error(
     "Cannot find the root node location. Please file a bug report with your code sample",
@@ -63,7 +63,7 @@ function decorateComment(node, comment, ast) {
   // Special case: Comment is the first thing in the document,
   // then "unit" node would be the followingNode to it.
   if (comment.location.endIndex < getRootNodeLocation(ast).startIndex) {
-    comment.followingNode = ast[apexNames.PARSER_OUTPUT].unit;
+    comment.followingNode = ast[apexTypes.PARSER_OUTPUT].unit;
     return;
   }
   // Handling the normal cases
@@ -88,10 +88,10 @@ function decorateComment(node, comment, ast) {
       // we should go no deeper; otherwise the `name` node will mistakenly
       // be decorated as the preceding node to this comment.
       const declarationUnits = [
-        apexNames.CLASS_DECLARATION,
-        apexNames.TRIGGER_DECLARATION_UNIT,
-        apexNames.ENUM_DECLARATION,
-        apexNames.INTERFACE_DECLARATION,
+        apexTypes.CLASS_DECLARATION,
+        apexTypes.TRIGGER_DECLARATION_UNIT,
+        apexTypes.ENUM_DECLARATION,
+        apexTypes.INTERFACE_DECLARATION,
       ];
       if (
         declarationUnits.includes(child["@class"]) &&
@@ -219,17 +219,17 @@ function breakTies(tiesToBreak, sourceCode) {
 }
 
 function attach(ast, sourceCode) {
-  const comments = ast[apexNames.PARSER_OUTPUT].hiddenTokenMap
+  const comments = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
     .map(item => item[1])
     .filter(
       item =>
-        item["@class"] === apexNames.INLINE_COMMENT ||
-        item["@class"] === apexNames.BLOCK_COMMENT,
+        item["@class"] === apexTypes.INLINE_COMMENT ||
+        item["@class"] === apexTypes.BLOCK_COMMENT,
     );
   const tiesToBreak = [];
 
   comments.forEach(comment => {
-    decorateComment(ast[apexNames.PARSER_OUTPUT], comment, ast);
+    decorateComment(ast[apexTypes.PARSER_OUTPUT], comment, ast);
 
     const pn = comment.precedingNode;
     const en = comment.enclosingNode;
@@ -252,7 +252,7 @@ function attach(ast, sourceCode) {
 
       tiesToBreak.push(comment);
     } else if (pn) {
-      if (en && en["@class"] === apexNames.BLOCK_STATEMENT && !fn) {
+      if (en && en["@class"] === apexTypes.BLOCK_STATEMENT && !fn) {
         // Special case: this is a trailing comment in a block statement
         breakTies(tiesToBreak, sourceCode);
         // Our algorithm for attaching comment generally attaches the comment
@@ -340,10 +340,10 @@ function printTrailingComment(commentPath, options, print) {
   // When we print trailing inline comments, we have to make sure that nothing
   // else is printed after it (e.g. a semicolon), so we'll use lineSuffix
   // from prettier to buffer the output
-  if (comment["@class"] === apexNames.INLINE_COMMENT) {
+  if (comment["@class"] === apexTypes.INLINE_COMMENT) {
     if (
       (leadingSpace.length > 0 && numberOfNewLines === 0) ||
-      parentNode["@class"] === apexNames.LOCATION_IDENTIFIER
+      parentNode["@class"] === apexTypes.LOCATION_IDENTIFIER
     ) {
       parts.push(lineSuffix(concat([" ", print(commentPath)])));
     } else {
@@ -382,7 +382,7 @@ function printDanglingComment(commentPath, options, print) {
     const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
     parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
-  if (comment["@class"] === apexNames.INLINE_COMMENT) {
+  if (comment["@class"] === apexTypes.INLINE_COMMENT) {
     parts.push(lineSuffix(print(commentPath)));
   } else {
     parts.push(print(commentPath));
@@ -392,19 +392,19 @@ function printDanglingComment(commentPath, options, print) {
 
 function allowTrailingComments(apexClass) {
   const allowedTypes = [
-    apexNames.CLASS_DECLARATION,
-    apexNames.INTERFACE_DECLARATION,
-    apexNames.METHOD_DECLARATION,
-    apexNames.ENUM_DECLARATION,
-    apexNames.VARIABLE_DECLARATION,
-    apexNames.LOCATION_IDENTIFIER,
+    apexTypes.CLASS_DECLARATION,
+    apexTypes.INTERFACE_DECLARATION,
+    apexTypes.METHOD_DECLARATION,
+    apexTypes.ENUM_DECLARATION,
+    apexTypes.VARIABLE_DECLARATION,
+    apexTypes.LOCATION_IDENTIFIER,
   ];
   let trailingCommentsAllowed = allowedTypes.includes(apexClass);
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
     trailingCommentsAllowed =
-      trailingCommentsAllowed || parentClass === apexNames.STATEMENT;
+      trailingCommentsAllowed || parentClass === apexTypes.STATEMENT;
   }
   return trailingCommentsAllowed;
 }
@@ -430,7 +430,7 @@ function printComments(path, options, print) {
       (trailing &&
         !(
           allowTrailingComments(value["@class"]) ||
-          comment["@class"] === apexNames.BLOCK_COMMENT
+          comment["@class"] === apexTypes.BLOCK_COMMENT
         ))
     ) {
       leadingParts.push(printLeadingComment(commentPath, options, print));
