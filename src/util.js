@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: 0 */
 
 const { isApexDocComment } = require("./comments");
-const constants = require("./contants");
+const constants = require("./constants");
 
 const apexNames = constants.APEX_TYPES;
 

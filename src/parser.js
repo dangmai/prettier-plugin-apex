@@ -5,7 +5,7 @@ const path = require("path");
 
 const { spawnSync } = childProcess;
 const attachComments = require("./comments").attach;
-const constants = require("./contants");
+const constants = require("./constants");
 const { findNextUncommentedCharacter } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;

@@ -23,7 +23,7 @@ const {
   printDanglingComment,
 } = require("./comments");
 const { massageMetadata } = require("./util");
-const constants = require("./contants");
+const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
 

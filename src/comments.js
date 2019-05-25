@@ -7,7 +7,7 @@ const prettier = require("prettier");
 const { concat, lineSuffix, hardline } = prettier.doc.builders;
 const { skipWhitespace } = prettier.util;
 const childNodesCacheKey = require("private").makeUniqueKey();
-const constants = require("./contants");
+const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
 
