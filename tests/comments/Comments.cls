@@ -153,7 +153,7 @@ class Comments {
       SELECT
         Id,
         Name,
-        // Trailing Comment to a Column Clause
+        // Leading Comment to an Inner Query
         (SELECT Id FROM Accounts)
       FROM Contact
     ];

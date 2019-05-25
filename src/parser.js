@@ -6,6 +6,7 @@ const path = require("path");
 const { spawnSync } = childProcess;
 const attachComments = require("./comments").attach;
 const constants = require("./contants");
+const { findNextUncommentedCharacter } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
@@ -77,18 +78,50 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
+function handleInnerQueryLocation(location, sourceCode, commentNodes) {
+  const resultLocation = {};
+  resultLocation.startIndex = findNextUncommentedCharacter(
+    sourceCode,
+    "(",
+    location.startIndex,
+    commentNodes,
+    /* backwards */ true,
+  );
+  resultLocation.endIndex = findNextUncommentedCharacter(
+    sourceCode,
+    ")",
+    location.startIndex,
+    commentNodes,
+    /* backwards */ false,
+  );
+  return resultLocation;
+}
+
+// We need to generate the location for a node differently based on the node
+// type. This object holds a String => Function mapping in order to do that.
+const locationGenerationHandler = {};
+locationGenerationHandler[apexTypes.QUERY] = location => location;
+locationGenerationHandler[
+  apexTypes.SELECT_INNER_QUERY
+] = handleInnerQueryLocation;
+
 /**
- * Sometimes jorje lies about a node location, so we will fix it here before
- * using that information. We do it by enforcing that a parent node start
+ * Generate and/or fix node locations, because jorje sometimes either provides
+ * wrong location information or a node, or doesn't provide any information at
+ * all.
+ * We will fix it here by enforcing that a parent node start
  * index is always <= any child node start index, and a parent node end index
  * is always >= any child node end index.
  * @param node the node being visited.
+ * @param sourceCode the entire source code.
+ * @param commentNodes all the comment nodes.
+ * @return the corrected node.
  */
-function fixNodeLocation(node) {
+function handleNodeLocation(node, sourceCode, commentNodes) {
   let currentLocation;
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
-      const location = fixNodeLocation(node[key]);
+      const location = handleNodeLocation(node[key], sourceCode, commentNodes);
       if (location && currentLocation) {
         if (currentLocation.startIndex > location.startIndex) {
           currentLocation.startIndex = location.startIndex;
@@ -102,6 +135,15 @@ function fixNodeLocation(node) {
       }
     }
   });
+
+  const apexClass = node["@class"];
+  if (apexClass && apexClass in locationGenerationHandler && currentLocation) {
+    node.loc = locationGenerationHandler[apexClass](
+      currentLocation,
+      sourceCode,
+      commentNodes,
+    );
+  }
   if (node.loc && currentLocation) {
     if (node.loc.startIndex > currentLocation.startIndex) {
       node.loc.startIndex = currentLocation.startIndex;
@@ -124,33 +166,6 @@ function fixNodeLocation(node) {
     };
   }
   return null;
-}
-
-/**
- * Helper function to find a character in a string, starting at an index.
- * It will ignore characters that are part of comments.
- */
-function findNextUncommentedCharacter(
-  sourceCode,
-  character,
-  fromIndex,
-  commentNodes,
-) {
-  let indexFound = false;
-  let index;
-  while (!indexFound) {
-    index = sourceCode.indexOf(character, fromIndex);
-    indexFound =
-      // eslint-disable-next-line no-loop-func
-      commentNodes.filter(comment => {
-        return (
-          comment.location.startIndex <= index &&
-          comment.location.endIndex >= index
-        );
-      }).length === 0;
-    fromIndex = index + 1;
-  }
-  return index;
 }
 
 /**
@@ -396,10 +411,6 @@ function parse(sourceCode, _, options) {
       );
       throw new Error(errors.join("\r\n"));
     }
-    ast = resolveAstReferences(ast, {});
-    fixNodeLocation(ast);
-    ast = resolveLineIndexes(ast, lineIndexes);
-
     const commentNodes = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
       .map(item => item[1])
       .filter(
@@ -407,6 +418,10 @@ function parse(sourceCode, _, options) {
           node["@class"] === apexTypes.BLOCK_COMMENT ||
           node["@class"] === apexTypes.INLINE_COMMENT,
       );
+    ast = resolveAstReferences(ast, {});
+    handleNodeLocation(ast, sourceCode, commentNodes);
+    ast = resolveLineIndexes(ast, lineIndexes);
+
     generateExtraMetadata(
       ast,
       sourceCode,
