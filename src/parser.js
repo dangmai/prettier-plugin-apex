@@ -78,28 +78,6 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-function generateExtraExpressionMetadata(node) {
-  const nestableExpressionTypes = [
-    apexTypes.BOOLEAN_EXPRESSION,
-    apexTypes.BINARY_EXPRESSION,
-  ];
-  Object.keys(node).forEach(key => {
-    if (typeof node[key] === "object") {
-      if (
-        nestableExpressionTypes.indexOf(node["@class"]) !== -1 &&
-        key === "left" &&
-        node.left &&
-        node.left["@class"] &&
-        node["@class"] === node.left["@class"]
-      ) {
-        node.left.disableGroup = true;
-      }
-      node[key] = generateExtraExpressionMetadata(node[key]);
-    }
-  });
-  return node;
-}
-
 function handleInnerQueryLocation(location, sourceCode, commentNodes) {
   const resultLocation = {};
   resultLocation.startIndex = findNextUncommentedCharacter(
@@ -448,7 +426,6 @@ function parse(sourceCode, _, options) {
       );
     ast = resolveAstReferences(ast, {});
     handleNodeLocation(ast, sourceCode, commentNodes);
-    ast = generateExtraExpressionMetadata(ast);
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(

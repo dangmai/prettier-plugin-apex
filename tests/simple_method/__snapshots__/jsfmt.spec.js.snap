@@ -22,6 +22,15 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
 
   private String sayHello(String action, String subject) {
     return action + ' ' + subject;
+
+    return 'a long string ' +
+      'from concatenating ' +
+      'many other strings ' +
+      'together.';
+
+    return generator.objectBuilder
+      .setExternalId(account.personContactId)
+      .getInstance();
   }
 
   private String sayHelloWithLongListOfParameters(String action, String subject, String location, Datetime dt) {
@@ -81,6 +90,15 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
 
   private String sayHello(String action, String subject) {
     return action + ' ' + subject;
+
+    return 'a long string ' +
+      'from concatenating ' +
+      'many other strings ' +
+      'together.';
+
+    return generator.objectBuilder
+      .setExternalId(account.personContactId)
+      .getInstance();
   }
 
   private String sayHelloWithLongListOfParameters(

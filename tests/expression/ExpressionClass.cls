@@ -108,6 +108,10 @@ class Conditional extends Object {
 
     myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable && yetAnotherVeryLongVariable;
 
+    Boolean veryLongBoolean =
+          i > 5000000 && i < 34034034 && i != 384294723 && i != 47289347 &&
+          i != 43249034;
+
     // This is different than what you'd expect. jorje does not automatically
     // group this as left(anExtremelyVeryLongVariable > anotherVeryLongVariable)
     // and right (anExtremelyVeryLongVariable < anotherVeryLongVariable).

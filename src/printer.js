@@ -22,7 +22,7 @@ const {
   printComments,
   printDanglingComment,
 } = require("./comments");
-const { getPrecedence, massageMetadata } = require("./util");
+const { getPrecedence, isBinaryish, massageMetadata } = require("./util");
 const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
@@ -78,6 +78,7 @@ function _escapeString(text) {
 }
 
 function handleReturnStatement(path, print) {
+  const node = path.getValue();
   const docs = [];
   docs.push("return");
   const childDocs = path.call(print, "expr", "value");
@@ -86,14 +87,10 @@ function handleReturnStatement(path, print) {
     docs.push(childDocs);
   }
   docs.push(";");
-  return concat(docs);
-}
-
-function isBinaryish(node) {
-  return (
-    node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
-    node["@class"] === apexTypes.BINARY_EXPRESSION
-  );
+  if (node.expr.value && isBinaryish(node.expr.value)) {
+    return groupIndentConcat(docs);
+  }
+  return groupConcat(docs);
 }
 
 function getOperator(node) {
@@ -110,6 +107,7 @@ function handleBinaryishExpression(path, print) {
   const parentNode = path.getParentNode();
 
   const isLeftNodeBinaryish = isBinaryish(node.left);
+  const isRightNodeBinaryish = isBinaryish(node.right);
   const isNestedExpression = isBinaryish(parentNode);
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
@@ -137,6 +135,15 @@ function handleBinaryishExpression(path, print) {
     isNestedExpression &&
     isNodeSamePrecedenceAsParent &&
     !isNestedRightExpression;
+  // This variable signifies that the left node and right has the same
+  // precedence, and thus they should be laid out on the same indent level, e.g.:
+  // a = b > 1 &&
+  //   c > 1
+  const leftChildNodeSamePrecedenceAsRightChildNode =
+    isLeftNodeBinaryish &&
+    isRightNodeBinaryish &&
+    getPrecedence(getOperator(node.left)) ===
+      getPrecedence(getOperator(node.right));
   // This variable signifies that this node is the top most binaryish node,
   // and its left child node has the same precedence, e.g:
   // a = b > -> this node here
@@ -145,7 +152,11 @@ function handleBinaryishExpression(path, print) {
   const isTopMostParentNodeWithoutGrouping =
     isNodeSamePrecedenceAsLeftChild && !isNestedExpression;
 
-  if (isLeftChildNodeWithoutGrouping || isTopMostParentNodeWithoutGrouping) {
+  if (
+    isLeftChildNodeWithoutGrouping ||
+    leftChildNodeSamePrecedenceAsRightChildNode ||
+    isTopMostParentNodeWithoutGrouping
+  ) {
     docs.push(leftDoc);
     docs.push(" ");
     docs.push(concat([operationDoc, line, rightDoc]));

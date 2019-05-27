@@ -3,7 +3,14 @@
 const { isApexDocComment } = require("./comments");
 const constants = require("./constants");
 
-const apexNames = constants.APEX_TYPES;
+const apexTypes = constants.APEX_TYPES;
+
+function isBinaryish(node) {
+  return (
+    node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
+    node["@class"] === apexTypes.BINARY_EXPRESSION
+  );
+}
 
 // The metadata corresponding to these keys cannot be compared for some reason
 // or another, so we will delete them before the AST comparison
@@ -39,7 +46,7 @@ function massageMetadata(ast) {
     // Handling ApexDoc
     if (
       ast["@class"] &&
-      ast["@class"] === apexNames.BLOCK_COMMENT &&
+      ast["@class"] === apexTypes.BLOCK_COMMENT &&
       isApexDocComment(ast)
     ) {
       newObj = Object.assign({}, ast, {
@@ -70,7 +77,7 @@ function massageMetadata(ast) {
           key === "dottedExpr" &&
           ast.dottedExpr.value &&
           ast.dottedExpr.value.names &&
-          ast.dottedExpr.value["@class"] === apexNames.VARIABLE_EXPRESSION &&
+          ast.dottedExpr.value["@class"] === apexTypes.VARIABLE_EXPRESSION &&
           ast.names
         ) {
           ast.names = ast.dottedExpr.value.names.concat(ast.names);
@@ -153,5 +160,6 @@ function getPrecedence(op) {
 module.exports = {
   findNextUncommentedCharacter,
   getPrecedence,
+  isBinaryish,
   massageMetadata,
 };
