@@ -90,6 +90,15 @@ class Conditional extends Object {
       FROM Report
       WHERE OwnerId = :UserInfo.getUserId()
     ]).get(0).get('num') > 0;
+    Boolean hasPrivateReports = (Integer) ([
+      SELECT COUNT(Id) num
+      FROM Report
+      WHERE OwnerId = :UserInfo.getUserId()
+    ]).get(0).get('num') > 0 && (Integer) ([
+      SELECT COUNT(Id) num
+      FROM Report
+      WHERE OwnerId = :UserInfo.getUserId()
+    ]).get(0).get('num') > 0;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > 1;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
 
@@ -99,7 +108,17 @@ class Conditional extends Object {
 
     myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable && yetAnotherVeryLongVariable;
 
+    // This is different than what you'd expect. jorje does not automatically
+    // group this as left(anExtremelyVeryLongVariable > anotherVeryLongVariable)
+    // and right (anExtremelyVeryLongVariable < anotherVeryLongVariable).
+    // Instead it is
+    // left (anExtremelyVeryLongVariable > anotherVeryLongVariable == anExtremelyVeryLongVariable)
+    // and right (anotherVeryLongVariable).
+    // Therefore the formatted code does not look as nice as Prettier's core,
+    // but we can't change it because it will change the code's behavior.
     myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable == anExtremelyVeryLongVariable < anotherVeryLongVariable;
+
+    myVeryLongBooleanVariable = (anExtremelyVeryLongVariable > anotherVeryLongVariable) == (anExtremelyVeryLongVariable < anotherVeryLongVariable);
   }
 
   void triggerVariableExpr_inOtherSuite() {}

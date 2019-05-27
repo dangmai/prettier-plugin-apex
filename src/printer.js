@@ -22,7 +22,7 @@ const {
   printComments,
   printDanglingComment,
 } = require("./comments");
-const { massageMetadata } = require("./util");
+const { getPrecedence, massageMetadata } = require("./util");
 const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
@@ -89,34 +89,96 @@ function handleReturnStatement(path, print) {
   return concat(docs);
 }
 
-function handleGenericExpression(path, print) {
-  // const parentNode = path.getParentNode();
+function isBinaryish(node) {
+  return (
+    node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
+    node["@class"] === apexTypes.BINARY_EXPRESSION
+  );
+}
+
+function getOperator(node) {
+  if (node.op["@class"] === apexTypes.BOOLEAN_OPERATOR) {
+    return constants.BOOLEAN[node.op.$];
+  }
+  return constants.BINARY[node.op.$];
+}
+
+function handleBinaryishExpression(path, print) {
   const node = path.getValue();
+  const nodeOp = getOperator(node);
+  const nodePrecedence = getPrecedence(nodeOp);
+  const parentNode = path.getParentNode();
+
+  const isLeftNodeBinaryish = isBinaryish(node.left);
+  const isNestedExpression = isBinaryish(parentNode);
+  const isNestedRightExpression =
+    isNestedExpression && node === parentNode.right;
+
+  const isNodeSamePrecedenceAsLeftChild =
+    isLeftNodeBinaryish &&
+    nodePrecedence === getPrecedence(getOperator(node.left));
+  const isNodeSamePrecedenceAsParent =
+    isBinaryish(parentNode) &&
+    nodePrecedence === getPrecedence(getOperator(parentNode));
 
   const docs = [];
   const leftDoc = path.call(print, "left");
   const operationDoc = path.call(print, "op");
   const rightDoc = path.call(print, "right");
-  docs.push(leftDoc);
-  docs.push(" ");
-  docs.push(group(concat([operationDoc, line, rightDoc])));
-  if (node.disableGroup) {
+
+  // This variable signifies that this node is a left child with the same
+  // predence as its parent, and thus should be laid out on the same indent
+  // level as its parent, e.g:
+  // a = b >
+  //   c >  -> this node here
+  //   d -> this node here
+  const isLeftChildNodeWithoutGrouping =
+    (isNodeSamePrecedenceAsLeftChild || !isLeftNodeBinaryish) &&
+    isNestedExpression &&
+    isNodeSamePrecedenceAsParent &&
+    !isNestedRightExpression;
+  // This variable signifies that this node is the top most binaryish node,
+  // and its left child node has the same precedence, e.g:
+  // a = b > -> this node here
+  //   c >
+  //   d
+  const isTopMostParentNodeWithoutGrouping =
+    isNodeSamePrecedenceAsLeftChild && !isNestedExpression;
+
+  if (isLeftChildNodeWithoutGrouping || isTopMostParentNodeWithoutGrouping) {
+    docs.push(leftDoc);
+    docs.push(" ");
+    docs.push(concat([operationDoc, line, rightDoc]));
     return concat(docs);
   }
+  // At this point we know that this node is not in a binaryish chain, so we
+  // can safely group the left doc and right doc separately to have this effect:
+  // a = b
+  //  .c() > d
+  docs.push(group(leftDoc));
+  docs.push(" ");
+  docs.push(groupConcat([operationDoc, line, rightDoc]));
   return groupConcat(docs);
 }
 
 function handleAssignmentExpression(path, print) {
+  const node = path.getValue();
   const docs = [];
+
   const leftDoc = path.call(print, "left");
   const operationDoc = path.call(print, "op");
   const rightDoc = path.call(print, "right");
   docs.push(leftDoc);
   docs.push(" ");
   docs.push(operationDoc);
-  docs.push(line);
+  if (isBinaryish(node.right)) {
+    docs.push(line);
+    docs.push(rightDoc);
+    return groupIndentConcat(docs);
+  }
+  docs.push(" ");
   docs.push(rightDoc);
-  return groupIndentConcat(docs);
+  return groupConcat(docs);
 }
 
 function handleVariableExpression(path, print) {
@@ -728,16 +790,28 @@ function handleVariableDeclarations(path, print) {
 }
 
 function handleVariableDeclaration(path, print) {
+  const node = path.getValue();
   const parts = [];
+  let resultDoc;
+
   parts.push(path.call(print, "name"));
   const assignmentDocs = path.call(print, "assignment", "value");
-  if (assignmentDocs) {
+  if (assignmentDocs && isBinaryish(node.assignment.value)) {
     parts.push(" ");
     parts.push("=");
     parts.push(line);
     parts.push(assignmentDocs);
+    resultDoc = groupIndentConcat(parts);
+  } else if (assignmentDocs) {
+    parts.push(" ");
+    parts.push("=");
+    parts.push(" ");
+    parts.push(assignmentDocs);
+    resultDoc = groupConcat(parts);
+  } else {
+    resultDoc = groupConcat(parts);
   }
-  return groupIndentConcat(parts);
+  return resultDoc;
 }
 
 function handleNewStandard(path, print) {
@@ -2224,13 +2298,13 @@ nodeHandler[apexTypes.INNER_INTERFACE_MEMBER] = _handlePassthroughCall("body");
 
 // Expression
 nodeHandler[apexTypes.TERNARY_EXPRESSION] = handleTernaryExpression;
-nodeHandler[apexTypes.BOOLEAN_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexTypes.BOOLEAN_EXPRESSION] = handleBinaryishExpression;
 nodeHandler[apexTypes.ASSIGNMENT_EXPRESSION] = handleAssignmentExpression;
 nodeHandler[apexTypes.NESTED_EXPRESSION] = handleNestedExpression;
 nodeHandler[apexTypes.VARIABLE_EXPRESSION] = handleVariableExpression;
 nodeHandler[apexTypes.JAVA_VARIABLE_EXPRESSION] = handleJavaVariableExpression;
 nodeHandler[apexTypes.LITERAL_EXPRESSION] = handleLiteralExpression;
-nodeHandler[apexTypes.BINARY_EXPRESSION] = handleGenericExpression;
+nodeHandler[apexTypes.BINARY_EXPRESSION] = handleBinaryishExpression;
 nodeHandler[apexTypes.TRIGGER_VARIABLE_EXPRESSION] = (path, print) =>
   concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexTypes.NEW_EXPRESSION] = handleNewExpression;

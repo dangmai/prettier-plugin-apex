@@ -120,7 +120,38 @@ function findNextUncommentedCharacter(
   return index;
 }
 
+// One big difference between our precedence list vs Prettier's core
+// is that == (and its precedence equivalences) has the same precedence
+// as < (and its precedence equivalences).
+// e.g. a > b == c > d:
+// in Javascript, this would be parsed this as: left (a > b), op (==), right (c > d)
+// instead, jorje parses this as:
+// left (a > b == c), op (>), right (d)
+// The consequence is that formatted code does not look as nice as Prettier's core,
+// but we can't change it because it will change the code's behavior.
+const PRECEDENCE = {};
+[
+  ["||"],
+  ["&&"],
+  ["|"],
+  ["^"],
+  ["&"],
+  ["==", "===", "!=", "!==", "<>", "<", ">", "<=", ">="],
+  [">>", "<<", ">>>"],
+  ["+", "-"],
+  ["*", "/", "%"],
+].forEach((tier, i) => {
+  tier.forEach(op => {
+    PRECEDENCE[op] = i;
+  });
+});
+
+function getPrecedence(op) {
+  return PRECEDENCE[op];
+}
+
 module.exports = {
   findNextUncommentedCharacter,
+  getPrecedence,
   massageMetadata,
 };
