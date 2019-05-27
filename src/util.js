@@ -3,7 +3,14 @@
 const { isApexDocComment } = require("./comments");
 const constants = require("./constants");
 
-const apexNames = constants.APEX_TYPES;
+const apexTypes = constants.APEX_TYPES;
+
+function isBinaryish(node) {
+  return (
+    node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
+    node["@class"] === apexTypes.BINARY_EXPRESSION
+  );
+}
 
 // The metadata corresponding to these keys cannot be compared for some reason
 // or another, so we will delete them before the AST comparison
@@ -39,7 +46,7 @@ function massageMetadata(ast) {
     // Handling ApexDoc
     if (
       ast["@class"] &&
-      ast["@class"] === apexNames.BLOCK_COMMENT &&
+      ast["@class"] === apexTypes.BLOCK_COMMENT &&
       isApexDocComment(ast)
     ) {
       newObj = Object.assign({}, ast, {
@@ -70,7 +77,7 @@ function massageMetadata(ast) {
           key === "dottedExpr" &&
           ast.dottedExpr.value &&
           ast.dottedExpr.value.names &&
-          ast.dottedExpr.value["@class"] === apexNames.VARIABLE_EXPRESSION &&
+          ast.dottedExpr.value["@class"] === apexTypes.VARIABLE_EXPRESSION &&
           ast.names
         ) {
           ast.names = ast.dottedExpr.value.names.concat(ast.names);
@@ -120,7 +127,39 @@ function findNextUncommentedCharacter(
   return index;
 }
 
+// One big difference between our precedence list vs Prettier's core
+// is that == (and its precedence equivalences) has the same precedence
+// as < (and its precedence equivalences).
+// e.g. a > b == c > d:
+// in Javascript, this would be parsed this as: left (a > b), op (==), right (c > d)
+// instead, jorje parses this as:
+// left (a > b == c), op (>), right (d)
+// The consequence is that formatted code does not look as nice as Prettier's core,
+// but we can't change it because it will change the code's behavior.
+const PRECEDENCE = {};
+[
+  ["||"],
+  ["&&"],
+  ["|"],
+  ["^"],
+  ["&"],
+  ["==", "===", "!=", "!==", "<>", "<", ">", "<=", ">="],
+  [">>", "<<", ">>>"],
+  ["+", "-"],
+  ["*", "/", "%"],
+].forEach((tier, i) => {
+  tier.forEach(op => {
+    PRECEDENCE[op] = i;
+  });
+});
+
+function getPrecedence(op) {
+  return PRECEDENCE[op];
+}
+
 module.exports = {
   findNextUncommentedCharacter,
+  getPrecedence,
+  isBinaryish,
   massageMetadata,
 };
