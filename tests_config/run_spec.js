@@ -4,8 +4,6 @@ const prettier = require("prettier");
 
 const { AST_COMPARE } = process.env;
 
-const { massageMetadata } = require("../src/util");
-
 function read(filename) {
   return fs.readFileSync(filename, "utf8");
 }
@@ -24,18 +22,17 @@ function prettyPrint(src, filename, options) {
 }
 
 function parse(string, opts) {
-  return massageMetadata(
-    // eslint-disable-next-line no-underscore-dangle
-    prettier.__debug.parse(
-      string,
-      Object.assign(
-        {
-          apexStandaloneParser: "built-in",
-        },
-        opts,
-      ),
+  // eslint-disable-next-line no-underscore-dangle
+  return prettier.__debug.parse(
+    string,
+    Object.assign(
+      {
+        apexStandaloneParser: "built-in",
+      },
+      opts,
     ),
-  );
+    /* massage */ true,
+  ).ast;
 }
 
 /**

@@ -1,5 +1,6 @@
 const parse = require("./parser");
 const print = require("./printer");
+const { massageAstNode } = require("./util");
 
 const languages = [
   {
@@ -34,6 +35,7 @@ const parsers = {
 const printers = {
   apex: {
     print,
+    massageAstNode,
   },
 };
 

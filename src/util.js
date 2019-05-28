@@ -33,62 +33,39 @@ const METADATA_TO_IGNORE = [
 ];
 
 /**
- * Massaging the AST so that it can be compared
+ * Massaging the AST node so that it can be compared. This gets called by
+ * Prettier's internal code
  * @param ast the Abstract Syntax Tree to compare
- * @returns the massaged AST
+ * @param newObj the newly created object
  */
-function massageMetadata(ast) {
-  if (Array.isArray(ast)) {
-    return ast.map(e => massageMetadata(e));
+function massageAstNode(ast, newObj) {
+  // Handling ApexDoc
+  if (
+    ast["@class"] &&
+    ast["@class"] === apexTypes.BLOCK_COMMENT &&
+    isApexDocComment(ast)
+  ) {
+    newObj.value = ast.value.replace(/\s/g, "");
   }
-  if (typeof ast === "object") {
-    let newObj = {};
-    // Handling ApexDoc
-    if (
-      ast["@class"] &&
-      ast["@class"] === apexTypes.BLOCK_COMMENT &&
-      isApexDocComment(ast)
-    ) {
-      newObj = Object.assign({}, ast, {
-        value: ast.value.replace(/\s/g, ""),
-      });
-
-      delete newObj.$;
-      delete newObj.leading;
-      delete newObj.trailing;
-      delete newObj.location;
-      return newObj;
-    }
-    Object.keys(ast).forEach(key => {
-      if (METADATA_TO_IGNORE.indexOf(key) !== -1) {
-        return;
-      }
-      if (key === "scope" && typeof ast[key] === "string") {
-        // Apex is case insensitivity, but in sone case we're forcing the strings
-        // to be uppercase for consistency so the ASTs may be different between
-        // the original and parsed strings.
-        newObj[key] = ast[key].toUpperCase();
-      } else {
-        newObj[key] = massageMetadata(ast[key]);
-        // This is a workaround for #38 - jorje sometimes groups names with
-        // spaces as dottedExpr, so we can't compare AST effectively.
-        // In those cases we will bring the dottedExpr out into the names.
-        if (
-          key === "dottedExpr" &&
-          ast.dottedExpr.value &&
-          ast.dottedExpr.value.names &&
-          ast.dottedExpr.value["@class"] === apexTypes.VARIABLE_EXPRESSION &&
-          ast.names
-        ) {
-          ast.names = ast.dottedExpr.value.names.concat(ast.names);
-          newObj.names = ast.names;
-          newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
-        }
-      }
-    });
-    return newObj;
+  if (ast.scope && typeof ast.scope === "string") {
+    // Apex is case insensitivity, but in sone case we're forcing the strings
+    // to be uppercase for consistency so the ASTs may be different between
+    // the original and parsed strings.
+    newObj.scope = ast.scope.toUpperCase();
+  } else if (
+    ast.dottedExpr &&
+    ast.dottedExpr.value &&
+    ast.dottedExpr.value.names &&
+    ast.dottedExpr.value["@class"] === apexTypes.VARIABLE_EXPRESSION &&
+    ast.names
+  ) {
+    // This is a workaround for #38 - jorje sometimes groups names with
+    // spaces as dottedExpr, so we can't compare AST effectively.
+    // In those cases we will bring the dottedExpr out into the names.
+    newObj.names = newObj.dottedExpr.value.names.concat(newObj.names);
+    newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
   }
-  return ast;
+  METADATA_TO_IGNORE.forEach(name => delete newObj[name]);
 }
 
 /**
@@ -161,5 +138,5 @@ module.exports = {
   findNextUncommentedCharacter,
   getPrecedence,
   isBinaryish,
-  massageMetadata,
+  massageAstNode,
 };

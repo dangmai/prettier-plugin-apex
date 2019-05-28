@@ -22,7 +22,7 @@ const {
   printComments,
   printDanglingComment,
 } = require("./comments");
-const { getPrecedence, isBinaryish, massageMetadata } = require("./util");
+const { getPrecedence, isBinaryish } = require("./util");
 const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
@@ -2535,16 +2535,21 @@ function genericPrint(path, options, print) {
     const outputDoc = concat(docs);
 
     if (options.apexVerifyAst) {
+      const originalAst = prettier.__debug.parse(
+        options.originalText,
+        options,
+        /* massage */ true,
+      ).ast;
       const output = prettier.__debug.printDocToString(concat(docs), options)
         .formatted;
-      const outputAst = prettier.__debug.parse(output, options).ast;
-      const massagedOriginalAst = massageMetadata(n[apexTypes.PARSER_OUTPUT]);
-      const massagedOutputAst = massageMetadata(
-        outputAst[apexTypes.PARSER_OUTPUT],
-      );
+      const outputAst = prettier.__debug.parse(
+        output,
+        options,
+        /* massage */ true,
+      ).ast;
       assert.deepEqual(
-        massagedOriginalAst,
-        massagedOutputAst,
+        originalAst,
+        outputAst,
         "The code behavior might have changed after the format, therefore it has been reverted. Please file a bug report with your code sample",
       );
     }
