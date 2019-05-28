@@ -10,14 +10,18 @@ const { findNextUncommentedCharacter } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
-function parseTextWithSpawn(text) {
+function parseTextWithSpawn(text, anonymous) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
   } else {
     serializerBin = path.join(serializerBin, "apex-ast-serializer");
   }
-  const executionResult = spawnSync(serializerBin, ["-f", "json", "-i"], {
+  const args = ["-f", "json", "-i"];
+  if (anonymous) {
+    args.push("-a");
+  }
+  const executionResult = spawnSync(serializerBin, args, {
     input: text,
   });
 
@@ -30,9 +34,12 @@ function parseTextWithSpawn(text) {
   return executionResult.stdout.toString();
 }
 
-function parseTextWithNailgun(text, serverPort) {
+function parseTextWithNailgun(text, serverPort, anonymous) {
   const ngClientLocation = path.join(__dirname, "ng-client.js");
   const args = [ngClientLocation, "-a", "localhost", "-p", serverPort];
+  if (anonymous) {
+    args.push("-n");
+  }
   const executionResult = childProcess.spawnSync(process.argv[0], args, {
     input: text,
   });
@@ -97,6 +104,13 @@ function handleInnerQueryLocation(location, sourceCode, commentNodes) {
   return resultLocation;
 }
 
+function handleAnonymousUnitLocation(location, sourceCode) {
+  return {
+    startIndex: 0,
+    endIndex: sourceCode.length,
+  };
+}
+
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler = {};
@@ -104,6 +118,9 @@ locationGenerationHandler[apexTypes.QUERY] = location => location;
 locationGenerationHandler[
   apexTypes.SELECT_INNER_QUERY
 ] = handleInnerQueryLocation;
+locationGenerationHandler[
+  apexTypes.ANONYMOUS_BLOCK_UNIT
+] = handleAnonymousUnitLocation;
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -401,9 +418,10 @@ function parse(sourceCode, _, options) {
     serializedAst = parseTextWithNailgun(
       sourceCode,
       options.apexStandalonePort,
+      options.apexAnonymous,
     );
   } else {
-    serializedAst = parseTextWithSpawn(sourceCode);
+    serializedAst = parseTextWithSpawn(sourceCode, options.apexAnonymous);
   }
   let ast = {};
   if (serializedAst) {

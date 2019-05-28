@@ -81,6 +81,8 @@ const constants = {
       "apex.jorje.data.ast.CompilationUnit$TriggerDeclUnit",
     INTERFACE_DECLARATION_UNIT:
       "apex.jorje.data.ast.CompilationUnit$InterfaceDeclUnit",
+    ANONYMOUS_BLOCK_UNIT:
+      "apex.jorje.data.ast.CompilationUnit$AnonymousBlockUnit",
 
     // Block Member
     PROPERTY_MEMBER: "apex.jorje.data.ast.BlockMember$PropertyMember",

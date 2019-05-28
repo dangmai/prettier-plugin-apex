@@ -276,6 +276,24 @@ function _getDanglingCommentDocs(path, print, options) {
   return danglingCommentParts;
 }
 
+function handleAnonymousBlockUnit(path, print) {
+  // Unlike other compilation units, Anonymous Unit cannot have dangling comments,
+  // so we don't have to handle them here.
+  const parts = [];
+  const memberParts = path.map(print, "members").filter(member => member);
+
+  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
+    if (index !== allMemberDocs.length - 1) {
+      return concat([memberDoc, hardline]);
+    }
+    return memberDoc;
+  });
+  if (memberDocs.length > 0) {
+    parts.push(concat([hardline, ...memberDocs]));
+  }
+  return concat(parts);
+}
+
 function handleTriggerDeclarationUnit(path, print, options) {
   const usageDocs = path.map(print, "usages");
   const targetDocs = path.map(print, "target");
@@ -2329,13 +2347,14 @@ nodeHandler[apexTypes.METHOD_DECLARATION] = handleMethodDeclaration;
 nodeHandler[apexTypes.VARIABLE_DECLARATION] = handleVariableDeclaration;
 nodeHandler[apexTypes.ENUM_DECLARATION] = handleEnumDeclaration;
 
-// Compilation Unit: we're not handling AnonymousBlockUnit and InvalidDeclUnit
+// Compilation Unit: we're not handling  InvalidDeclUnit
 nodeHandler[apexTypes.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
 nodeHandler[apexTypes.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexTypes.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexTypes.INTERFACE_DECLARATION_UNIT] = _handlePassthroughCall(
   "body",
 );
+nodeHandler[apexTypes.ANONYMOUS_BLOCK_UNIT] = handleAnonymousBlockUnit;
 
 // Block Member
 nodeHandler[apexTypes.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");

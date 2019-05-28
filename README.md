@@ -57,7 +57,9 @@ Then in order to run it:
 npm run prettier -- --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
-#### Tip
+### Tip
+
+#### Initial run
 
 If you are formatting a big code base for the first time,
 please make sure that you have some form of version control in place,
@@ -74,6 +76,22 @@ the format.
 Note that this argument does degrade performance, so after the initial commit
 feel free to stop using it in your day to day operation, provided that you only
 format a small amount of code each time (for example, on a file save).
+
+#### Anonymous Apex
+
+You can also format anonymous Apex with this program by using the
+`--apex-anonymous` flag.
+
+For example:
+
+```bash
+prettier --write "/path/to/project/anonymous/**/*.cls" --apex-anonymous
+```
+
+Note that Prettier will treat any Apex file that it finds using the glob above
+as anonymous code blocks,
+so it is recommended that you collect all of your anonymous Apex files into
+one directory and limit the use of `--apex-anonymous` only in that directory.
 
 ### Configuration
 

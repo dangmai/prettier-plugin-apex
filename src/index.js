@@ -71,6 +71,12 @@ const options = {
     description:
       "Verify that the abstract syntax trees for the formatted code is the same as the unformatted code. This heavily degrades performance, but is recommended for initial runs on big code bases",
   },
+  apexAnonymous: {
+    type: "boolean",
+    category: "Global",
+    default: false,
+    description: "Treat the code as anonymous Apex",
+  },
 };
 
 const defaultOptions = {};
