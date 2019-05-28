@@ -19,7 +19,6 @@
     "test": "jest",
     "start-server": "node bin/start-apex-server.js",
     "stop-server": "node bin/stop-apex-server.js",
-    "execute": "node src/execute.js",
     "lint": "eslint \"{src,tests_config}/**/*.js\"",
     "prettier": "prettier --write \"{src,tests_config}/**/*.js\""
   },
