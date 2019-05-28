@@ -109,6 +109,10 @@ class Comments {
     Integer j = 2;
     Integer a;
 
+    a =
+      // Comment
+      i + j;
+
     a = i
       // Comment
       + j;
@@ -269,37 +273,41 @@ class Comments {
     Integer a;
 
     a =
-      i
-         + j; // Comment
+      // Comment
+      i + j;
+
+    a =
+      // Comment
+      i + j;
     a =
       i -
       // Comment
-        j;
+      j;
     a =
       i
-        /* Comment */ * j;
+      /* Comment */ * j;
     a =
       i /
       /* Comment */
-        j;
+      j;
     a =
-      i
-         << // Comment
+      // Comment
+      i <<
       /* Comment */
-        j;
+      j;
     a = i /* Comment */ >> /* Comment 2 */ j;
     a = /* Comments */ i >>> j /* Comments 2 */;
     a = /* Comments */ i ^ /* Comments 2 */ j;
     a =
-      i
-         & // Comments
       // Comments
-        j;
+      i &
+      // Comments
+      j;
     a =
       /* Comments */
-        i |
+      i |
       j
-        /* Comments */;
+      /* Comments */;
   }
 
   void commentInSOQL() {

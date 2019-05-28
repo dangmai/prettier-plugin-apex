@@ -106,6 +106,10 @@ class Comments {
     Integer j = 2;
     Integer a;
 
+    a =
+      // Comment
+      i + j;
+
     a = i
       // Comment
       + j;

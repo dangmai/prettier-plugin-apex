@@ -114,7 +114,9 @@ function handleAnonymousUnitLocation(location, sourceCode) {
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler = {};
-locationGenerationHandler[apexTypes.QUERY] = location => location;
+const identityFunction = location => location;
+locationGenerationHandler[apexTypes.QUERY] = identityFunction;
+locationGenerationHandler[apexTypes.VARIABLE_EXPRESSION] = identityFunction;
 locationGenerationHandler[
   apexTypes.SELECT_INNER_QUERY
 ] = handleInnerQueryLocation;
@@ -174,7 +176,7 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
     }
   }
   if (currentLocation) {
-    return currentLocation;
+    return Object.assign({}, currentLocation);
   }
   if (node.loc) {
     return {
