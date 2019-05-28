@@ -170,6 +170,7 @@ class Conditional extends Object {
     Integer b = 2;
     Integer c = a + b;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.getSObjectFields().Another_Very_Long_SObject_Field_Name__c;
   }
 
   void methodCallExpression() {
@@ -454,6 +455,9 @@ class Conditional extends Object {
     Integer b = 2;
     Integer c = a + b;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
+      .getSObjectFields()
+      .Another_Very_Long_SObject_Field_Name__c;
   }
 
   void methodCallExpression() {

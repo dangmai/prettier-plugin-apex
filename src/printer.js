@@ -197,12 +197,13 @@ function handleVariableExpression(path, print) {
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
   if (dottedExpressionDoc) {
     parts.push(dottedExpressionDoc);
+    parts.push(softline);
     parts.push(".");
   }
   // Name chain
   const nameDocs = path.map(print, "names");
   parts.push(join(".", nameDocs));
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleJavaVariableExpression(path, print) {
