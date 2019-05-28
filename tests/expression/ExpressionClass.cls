@@ -66,6 +66,7 @@ class Conditional extends Object {
   void instanceOfExpression() {
     SObject o;
     Boolean b = o instanceof Account;
+    Boolean b = veryLongVariableNameThatWillForSureOneHundredPercentBreak.getMethod().getSObject() instanceof Account;
   }
 
   void booleanExpression() {

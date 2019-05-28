@@ -655,8 +655,7 @@ function handleSwitchStatement(path, print) {
 
   const parts = [];
   parts.push("switch on");
-  parts.push(" ");
-  parts.push(path.call(print, "expr"));
+  parts.push(groupConcat([line, path.call(print, "expr")]));
   parts.push(" ");
   parts.push("{");
   parts.push(hardline);
@@ -981,6 +980,8 @@ function handleNestedExpression(path, print) {
 
 function handleNewSetInit(path, print) {
   const parts = [];
+  const expressionDoc = path.call(print, "expr", "value");
+
   // Type
   parts.push("Set");
   parts.push("<");
@@ -988,9 +989,9 @@ function handleNewSetInit(path, print) {
   parts.push(">");
   // Param
   parts.push("(");
-  parts.push(path.call(print, "expr", "value"));
+  _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
   parts.push(")");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleNewSetLiteral(path, print) {
@@ -1038,13 +1039,15 @@ function handleNewListInit(path, print) {
   parts.push(">");
   // Param
   parts.push("(");
-  _pushIfExist(parts, expressionDoc);
+  _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
   parts.push(")");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleNewMapInit(path, print) {
   const parts = [];
+  const expressionDoc = path.call(print, "expr", "value");
+
   parts.push("Map");
   // Type
   parts.push("<");
@@ -1052,9 +1055,9 @@ function handleNewMapInit(path, print) {
   parts.push(join(", ", typeDocs));
   parts.push(">");
   parts.push("(");
-  parts.push(path.call(print, "expr", "value"));
+  _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
   parts.push(")");
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleNewMapLiteral(path, print) {

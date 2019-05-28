@@ -4,6 +4,7 @@ class ExceptionClass {
 
     Exception e = new Exception();
     throw new CustomException('Custom Inner Exception', e);
+    throw exceptionGenerator.setExceptionType('TestException').setSeverityLevel('High').setMessage('Oh no it broke').getInstance();
   }
 
   void tryCatchTest() {
