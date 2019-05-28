@@ -1201,15 +1201,31 @@ function handleElseBlock(path, print) {
 function handleTernaryExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "condition"));
-  parts.push(" ");
+
+  parts.push(line);
   parts.push("?");
   parts.push(" ");
-  parts.push(path.call(print, "trueExpr"));
-  parts.push(" ");
+  // Here we indent the true and false expressions twice, because the ? and :
+  // characters already take up some space, and without adding another level
+  // of indentation it is difficult to tell the correct nesting level, for
+  // example:
+  // a == 1
+  //   ? someVariable
+  //     .callMethod()
+  //   : anotherVariable
+  //     .anotherMethod()
+  // Instead, formatting this way makes it easier to read:
+  // a == 1
+  //   ? someVariable
+  //       .callMethod()
+  //   : anotherVariable
+  //       .anotherMethod()
+  parts.push(group(indent(path.call(print, "trueExpr"))));
+  parts.push(line);
   parts.push(":");
   parts.push(" ");
-  parts.push(path.call(print, "falseExpr"));
-  return groupConcat(parts);
+  parts.push(group(indent(path.call(print, "falseExpr"))));
+  return groupIndentConcat(parts);
 }
 
 function handleInstanceOfExpression(path, print) {
