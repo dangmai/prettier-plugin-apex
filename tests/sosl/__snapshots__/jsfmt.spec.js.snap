@@ -278,9 +278,9 @@ class SOSLClass {
         FAQ__kav(
           Title
           WHERE
-            (PublishStatus = 'Online'
+            PublishStatus = 'Online'
             AND language = 'en_US'
-            AND KnowledgeArticleVersion = 'ka230000000PCiy'))
+            AND KnowledgeArticleVersion = 'ka230000000PCiy')
       UPDATE VIEWSTAT
     ];
     searchResult = [
@@ -288,7 +288,7 @@ class SOSLClass {
       RETURNING
         KnowledgeArticleVersion(
           Title
-          WHERE (PublishStatus = 'Online' AND language = 'en_US'))
+          WHERE PublishStatus = 'Online' AND language = 'en_US')
       UPDATE TRACKING
     ];
     searchResult = [
@@ -296,7 +296,7 @@ class SOSLClass {
       RETURNING
         KnowledgeArticleVersion(
           Title
-          WHERE (PublishStatus = 'Online' AND language = 'en_US'))
+          WHERE PublishStatus = 'Online' AND language = 'en_US')
       UPDATE TRACKING, VIEWSTAT
     ];
   }

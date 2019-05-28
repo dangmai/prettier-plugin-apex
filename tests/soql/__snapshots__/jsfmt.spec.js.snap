@@ -208,18 +208,18 @@ class SOQLClass {
       SELECT Id
       FROM Contact
       WHERE
-        ((Name = 'Hi'
+        (Name = 'Hi'
         OR Name = 'Hello')
         AND NAME != 'World'
         AND (NOT (Name = 'Oops'
-        OR Name = 'Another')))
+        OR Name = 'Another'))
       ORDER BY Name NULLS LAST
     ];
     Account[] comparisonOperators = [
       SELECT Id
       FROM Account
       WHERE
-        ((Name = 'Hi'
+        (Name = 'Hi'
         OR Name != 'Hello'
         OR Name LIKE '%Hi%'
         OR Name IN ('Test', 'World')
@@ -229,7 +229,7 @@ class SOQLClass {
         AND (Employees < 100
         OR Employees > 101
         OR Employees >= 200
-        OR Employees <= 120))
+        OR Employees <= 120)
     ];
 
     Integer i = [SELECT COUNT() FROM Contact];
@@ -242,14 +242,14 @@ class SOQLClass {
     Contact[] nestedFrom = [
       SELECT Id
       FROM Contact
-      WHERE (Id IN (SELECT Id FROM Contact) AND Account.Id != null)
+      WHERE Id IN (SELECT Id FROM Contact) AND Account.Id != null
     ];
     User[] withAlias = [
       SELECT u.Name, u.Email, u.Id, u.IsPortalEnabled
       FROM User u
       WHERE u.Id = :Userinfo.getUserId()
     ];
-    User[] notQuery = [SELECT Id FROM Contact WHERE (NOT NAME LIKE '%Test%')];
+    User[] notQuery = [SELECT Id FROM Contact WHERE NOT NAME LIKE '%Test%'];
     Account[] wherePlusCalc = [
       SELECT Id
       FROM Account
@@ -287,12 +287,12 @@ class SOQLClass {
       SELECT Id
       FROM Contact
       WHERE
-        (Name = '\\'Test Name\\''
+        Name = '\\'Test Name\\''
         OR Name = '\\\\Hi'
         OR Name = 'Hello\\nWorld'
         OR Name = 'Hello\\tWorld'
         OR Name = 'Hello\\r\\nWorld'
-        OR Name = '\\n\\n\\nHi')
+        OR Name = '\\n\\n\\nHi'
     ];
   }
 
@@ -301,18 +301,18 @@ class SOQLClass {
       SELECT Id
       FROM Contact
       WHERE
-        (CreatedDate > 2018-01-01T00:00:00Z
+        CreatedDate > 2018-01-01T00:00:00Z
         OR CreatedDate < 2017-01-01T05:00:00+01:00
-        OR CreatedDate < 2016-01-01T01:00:00-02:00)
+        OR CreatedDate < 2016-01-01T01:00:00-02:00
       GROUP BY CALENDAR_YEAR(CreatedDate)
     ];
     Contact[] contacts = [
       SELECT Id
       FROM Contact
       WHERE
-        (CreatedDate < 2018-01-01
+        CreatedDate < 2018-01-01
         OR CreatedDate > TOMORROW
-        OR CreatedDate = LAST_N_DAYS:365)
+        OR CreatedDate = LAST_N_DAYS:365
     ];
   }
 
@@ -429,27 +429,27 @@ class SOQLClass {
       SELECT Title
       FROM FAQ__kav
       WHERE
-        (Keyword = 'Apex'
+        Keyword = 'Apex'
         AND Language = 'en_US'
-        AND KnowledgeArticleVersion = 'ka230000000PCiy')
+        AND KnowledgeArticleVersion = 'ka230000000PCiy'
       UPDATE TRACKING
     ];
     FAQ__kav[] updateViewStats = [
       SELECT Title
       FROM FAQ__kav
       WHERE
-        (PublishStatus = 'online'
+        PublishStatus = 'online'
         AND Language = 'en_US'
-        AND KnowledgeArticleVersion = 'ka230000000PCiy')
+        AND KnowledgeArticleVersion = 'ka230000000PCiy'
       UPDATE VIEWSTAT
     ];
     FAQ__kav[] updateViewStatsAllRows = [
       SELECT Title
       FROM FAQ__kav
       WHERE
-        (PublishStatus = 'online'
+        PublishStatus = 'online'
         AND Language = 'en_US'
-        AND KnowledgeArticleVersion = 'ka230000000PCiy')
+        AND KnowledgeArticleVersion = 'ka230000000PCiy'
       UPDATE VIEWSTAT
       ALL ROWS
     ];

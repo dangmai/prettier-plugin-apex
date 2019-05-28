@@ -22,6 +22,7 @@ Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 - Fix leading comment to SOQL inner query being misindentified as trailing comment to previous column clause ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/58)).
 - Fix awkward breaks for multiline binaryish expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/21)).
 - Fix formatting for Apex types containing expressions but do not add groups and/or breaks.
+- Fix SOQL/SOSL boolean expressions having extra parentheses [issue](https://github.com/dangmai/prettier-plugin-apex/issues/56).
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).

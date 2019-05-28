@@ -1788,22 +1788,44 @@ function handleWhereQueryLiteral(childClass, path, print, options) {
 }
 
 function handleWhereCompoundExpression(path, print) {
+  const node = path.getValue();
+  const parentNode = path.getParentNode();
+  const isNestedExpression =
+    parentNode["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION ||
+    parentNode["@class"] === apexTypes.WHERE_UNARY_EXPRESSION;
+  const nodeOp = node.op["@class"];
+  const isSamePrecedenceWithParent =
+    parentNode.op && nodeOp === parentNode.op["@class"];
+
   const parts = [];
-  parts.push("(");
+
+  if (isNestedExpression && !isSamePrecedenceWithParent) {
+    parts.push("(");
+  }
   const operatorDoc = path.call(print, "op");
   const expressionDocs = path.map(print, "expr");
   parts.push(join(concat([line, operatorDoc, " "]), expressionDocs));
-  parts.push(")");
+  if (isNestedExpression && !isSamePrecedenceWithParent) {
+    parts.push(")");
+  }
   return concat(parts);
 }
 
 function handleWhereUnaryExpression(path, print) {
+  const parentNode = path.getParentNode();
+  const isNestedExpression =
+    parentNode["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION ||
+    parentNode["@class"] === apexTypes.WHERE_UNARY_EXPRESSION;
   const parts = [];
-  parts.push("(");
+  if (isNestedExpression) {
+    parts.push("(");
+  }
   parts.push(path.call(print, "op"));
   parts.push(" ");
   parts.push(path.call(print, "expr"));
-  parts.push(")");
+  if (isNestedExpression) {
+    parts.push(")");
+  }
   return concat(parts);
 }
 
