@@ -64,6 +64,22 @@ function massageAstNode(ast, newObj) {
     // In those cases we will bring the dottedExpr out into the names.
     newObj.names = newObj.dottedExpr.value.names.concat(newObj.names);
     newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
+  } else if (
+    ast["@class"] &&
+    ast["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION
+  ) {
+    // This flattens the SOQL/SOSL Compound Expression, e.g.:
+    // SELECT Id FROM Account WHERE Name = 'Name' AND (Status = 'Active' AND City = 'Boston')
+    // is equivalent to:
+    // SELECT Id FROM Account WHERE Name = 'Name' AND Status = 'Active' AND City = 'Boston'
+    for (let i = newObj.expr.length - 1; i >= 0; i -= 1) {
+      if (
+        newObj.expr[i]["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION &&
+        newObj.expr[i].op["@class"] === newObj.op["@class"]
+      ) {
+        newObj.expr.splice(i, 1, ...newObj.expr[i].expr);
+      }
+    }
   }
   METADATA_TO_IGNORE.forEach(name => delete newObj[name]);
 }

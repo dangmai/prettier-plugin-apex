@@ -177,5 +177,52 @@ class SOQLClass {
         END
       FROM Event];
   }
+
+  void whereCompoundClauses() {
+    Account[] accounts = [
+      select id
+      from Account
+      where
+      (
+        Name = 'Test Account'
+        AND
+        Name = 'Test Account 2'
+      )
+      AND Status = 'Active'
+    ];
+    Account[] accounts = [
+      select id
+      from Account
+      where
+      (
+        Name = 'Test Account'
+        OR
+        Name = 'Test Account 2'
+      )
+      AND Status = 'Active'
+    ];
+    Account[] accounts = [
+      select id
+      from Account
+      where
+      (
+        Name = 'Test Account'
+        AND
+        Name = 'Test Account 2'
+      )
+      AND (Status = 'Active' AND Status != 'Inactive')
+    ];
+    Account[] accounts = [
+      select id
+      from Account
+      where
+      (
+        Name = 'Test Account'
+        OR
+        Name = 'Test Account 2'
+      )
+      AND (Status = 'Active' AND Status != 'Inactive')
+    ];
+  }
 }
 
