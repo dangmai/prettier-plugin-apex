@@ -102,6 +102,7 @@ class Conditional extends Object {
     ]).get(0).get('num') > 0;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > 1;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
+    Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure And Make This Line Go Very Long').get('Yet Another Very Long Variable To Help Breaking') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure And Make This Line Go Very Long').get('Yet Another Variable To Help Breaking');
 
     Boolean myVeryLongBooleanVariable = anExtremelyVeryLongVariable >
       anotherVeryLongVariable >
