@@ -972,7 +972,9 @@ function handleMethodCallExpression(path, print) {
           dottedExpressionDoc,
           group(methodCallChainDoc),
           "(",
-          dottedExpressionDoc ? group(indent(resultParamDoc)) : resultParamDoc,
+          dottedExpressionDoc
+            ? group(indent(resultParamDoc))
+            : group(resultParamDoc),
           ")",
         ]),
       ),

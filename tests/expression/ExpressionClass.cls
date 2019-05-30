@@ -182,6 +182,8 @@ class Conditional extends Object {
     controller.callMethod(
       'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
     );
+
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable.veryLongPropertyMember.get(accountId);
   }
 
   void javaMethodCallExpression_notNeeded() {}
