@@ -12,7 +12,6 @@ const {
   line,
   softline,
   group,
-  conditionalGroup,
   indent,
   dedent,
 } = docBuilders;
@@ -22,7 +21,11 @@ const {
   printComments,
   printDanglingComment,
 } = require("./comments");
-const { getPrecedence, isBinaryish } = require("./util");
+const {
+  checkIfParentIsDottedExpression,
+  getPrecedence,
+  isBinaryish,
+} = require("./util");
 const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
@@ -125,11 +128,11 @@ function handleBinaryishExpression(path, print) {
   const rightDoc = path.call(print, "right");
 
   // This variable signifies that this node is a left child with the same
-  // predence as its parent, and thus should be laid out on the same indent
+  // precedence as its parent, and thus should be laid out on the same indent
   // level as its parent, e.g:
   // a = b >
-  //   c >  -> this node here
-  //   d -> this node here
+  //   c >  // -> the (b > c) node here
+  //   d
   const isLeftChildNodeWithoutGrouping =
     (isNodeSamePrecedenceAsLeftChild || !isLeftNodeBinaryish) &&
     isNestedExpression &&
@@ -146,9 +149,9 @@ function handleBinaryishExpression(path, print) {
       getPrecedence(getOperator(node.right));
   // This variable signifies that this node is the top most binaryish node,
   // and its left child node has the same precedence, e.g:
-  // a = b > -> this node here
+  // a = b >
   //   c >
-  //   d
+  //   d  // -> the entire node (b > c > d) here
   const isTopMostParentNodeWithoutGrouping =
     isNodeSamePrecedenceAsLeftChild && !isNestedExpression;
 
@@ -918,15 +921,7 @@ function handleSuperMethodCallExpression(path, print) {
 function handleMethodCallExpression(path, print) {
   const node = path.getValue();
 
-  let isNestedDottedExpression = false;
-  // We're making an assumption here that `callParent` is always synchronous.
-  // We're doing it because FastPath does not expose other ways to find the
-  // parent name.
-  path.callParent(innerPath => {
-    if (innerPath.getName() === "dottedExpr") {
-      isNestedDottedExpression = true;
-    }
-  });
+  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
 
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
   const nameDocs = path.map(print, "names");
@@ -952,43 +947,43 @@ function handleMethodCallExpression(path, print) {
     }
     dottedExpressionParts.push(".");
   }
-  const methodCallChainDoc = conditionalGroup([
-    join(".", nameDocs),
-    join(concat([softline, "."]), nameDocs),
-  ]);
+  const methodCallChainDoc = join(concat([softline, "."]), nameDocs);
 
-  return isNestedDottedExpression
-    ? concat([
-        concat(dottedExpressionParts),
-        // Method call chain, which should not be a conditional group since we
-        // know that this is a nested expression
-        join(concat([softline, "."]), nameDocs),
-        "(",
-        group(indent(resultParamDoc)),
-        ")",
-      ])
-    : conditionalGroup([
+  let resultDoc;
+  if (isParentDottedExpression) {
+    // If this is a nested dotted expression, we do not want to group it,
+    // since we want it to be part of the method call chain group, e.g:
+    // a
+    //   .b()  // <- this node here
+    //   .c()  // <- this node here
+    //   .d()
+    resultDoc = concat([
+      concat(dottedExpressionParts),
+      methodCallChainDoc,
+      "(",
+      group(indent(resultParamDoc)),
+      ")",
+    ]);
+  } else {
+    // This means it is the highest level method call expression,
+    // and we do need to group and indent the expressions in it, e.g:
+    // a
+    //   .b()
+    //   .c()
+    //   .d()  // <- this node here
+    resultDoc = group(
+      indent(
         concat([
-          ...dottedExpressionParts,
-          methodCallChainDoc,
+          concat(dottedExpressionParts),
+          group(methodCallChainDoc),
           "(",
-          resultParamDoc,
+          dottedExpressionDoc ? group(indent(resultParamDoc)) : resultParamDoc,
           ")",
         ]),
-        group(
-          indent(
-            concat([
-              ...dottedExpressionParts,
-              methodCallChainDoc,
-              "(",
-              dottedExpressionDoc
-                ? group(indent(resultParamDoc))
-                : resultParamDoc,
-              ")",
-            ]),
-          ),
-        ),
-      ]);
+      ),
+    );
+  }
+  return resultDoc;
 }
 
 function handleJavaMethodCallExpression(path, print) {

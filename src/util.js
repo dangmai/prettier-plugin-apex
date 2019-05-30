@@ -12,6 +12,19 @@ function isBinaryish(node) {
   );
 }
 
+function checkIfParentIsDottedExpression(path) {
+  let result = false;
+  // We're making an assumption here that `callParent` is always synchronous.
+  // We're doing it because FastPath does not expose other ways to find the
+  // parent name.
+  path.callParent(innerPath => {
+    if (innerPath.getName() === "dottedExpr") {
+      result = true;
+    }
+  });
+  return result;
+}
+
 // The metadata corresponding to these keys cannot be compared for some reason
 // or another, so we will delete them before the AST comparison
 const METADATA_TO_IGNORE = [
@@ -151,6 +164,7 @@ function getPrecedence(op) {
 }
 
 module.exports = {
+  checkIfParentIsDottedExpression,
   findNextUncommentedCharacter,
   getPrecedence,
   isBinaryish,
