@@ -190,6 +190,12 @@ class Conditional extends Object {
   void superVariableExpression() {
     super.methodCall();
     super.methodCall(1, 2, 3);
+
+    // Super cannot be followed by any whitespace, so we can't add newlines after it
+    // even if the chain is very long
+    String longResult = super.callMethod('first param').callAnotherMethod().getStringResult();
+    String longResult = super.longPropertyName.anotherLongPropertyName.yetAnotherLongPropertyName;
+    String longResult = super.longPropertyName.callMethod('first param').callAnotherMethod().getStringResult();
   }
 
   void thisVariableExpression() {

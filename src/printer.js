@@ -193,11 +193,18 @@ function handleAssignmentExpression(path, print) {
 }
 
 function handleVariableExpression(path, print) {
+  const node = path.getValue();
+
   const parts = [];
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
   if (dottedExpressionDoc) {
     parts.push(dottedExpressionDoc);
-    parts.push(softline);
+    // #62 - `super` cannot  be followed any white spaces
+    if (
+      node.dottedExpr.value["@class"] !== apexTypes.SUPER_VARIABLE_EXPRESSION
+    ) {
+      parts.push(softline);
+    }
     parts.push(".");
   }
   // Name chain
@@ -909,6 +916,8 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
+  const node = path.getValue();
+
   let isNestedDottedExpression = false;
   // We're making an assumption here that `callParent` is always synchronous.
   // We're doing it because FastPath does not expose other ways to find the
@@ -935,7 +944,12 @@ function handleMethodCallExpression(path, print) {
   const dottedExpressionParts = [];
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
-    dottedExpressionParts.push(softline);
+    // #62 - `super` cannot  be followed any white spaces
+    if (
+      node.dottedExpr.value["@class"] !== apexTypes.SUPER_VARIABLE_EXPRESSION
+    ) {
+      dottedExpressionParts.push(softline);
+    }
     dottedExpressionParts.push(".");
   }
   const methodCallChainDoc = conditionalGroup([
