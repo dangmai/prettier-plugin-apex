@@ -195,21 +195,29 @@ function handleAssignmentExpression(path, print) {
   return groupConcat(docs);
 }
 
-function handleVariableExpression(path, print) {
+function handleDottedExpression(path, print) {
   const node = path.getValue();
-
-  const parts = [];
+  const dottedExpressionParts = [];
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
+
   if (dottedExpressionDoc) {
-    parts.push(dottedExpressionDoc);
+    dottedExpressionParts.push(dottedExpressionDoc);
     // #62 - `super` cannot  be followed any white spaces
     if (
       node.dottedExpr.value["@class"] !== apexTypes.SUPER_VARIABLE_EXPRESSION
     ) {
-      parts.push(softline);
+      dottedExpressionParts.push(softline);
     }
-    parts.push(".");
+    dottedExpressionParts.push(".");
+    return concat(dottedExpressionParts);
   }
+  return "";
+}
+
+function handleVariableExpression(path, print) {
+  const parts = [];
+  const dottedExpressionDoc = handleDottedExpression(path, print);
+  parts.push(dottedExpressionDoc);
   // Name chain
   const nameDocs = path.map(print, "names");
   parts.push(join(".", nameDocs));
@@ -919,11 +927,9 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
-  const node = path.getValue();
-
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
 
-  const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
+  const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
   const paramDocs = path.map(print, "inputParameters");
 
@@ -936,17 +942,6 @@ function handleMethodCallExpression(path, print) {
         ])
       : "";
 
-  const dottedExpressionParts = [];
-  if (dottedExpressionDoc) {
-    dottedExpressionParts.push(dottedExpressionDoc);
-    // #62 - `super` cannot  be followed any white spaces
-    if (
-      node.dottedExpr.value["@class"] !== apexTypes.SUPER_VARIABLE_EXPRESSION
-    ) {
-      dottedExpressionParts.push(softline);
-    }
-    dottedExpressionParts.push(".");
-  }
   const methodCallChainDoc = join(concat([softline, "."]), nameDocs);
 
   let resultDoc;
@@ -958,7 +953,7 @@ function handleMethodCallExpression(path, print) {
     //   .c()  // <- this node here
     //   .d()
     resultDoc = concat([
-      concat(dottedExpressionParts),
+      dottedExpressionDoc,
       methodCallChainDoc,
       "(",
       group(indent(resultParamDoc)),
@@ -974,7 +969,7 @@ function handleMethodCallExpression(path, print) {
     resultDoc = group(
       indent(
         concat([
-          concat(dottedExpressionParts),
+          dottedExpressionDoc,
           group(methodCallChainDoc),
           "(",
           dottedExpressionDoc ? group(indent(resultParamDoc)) : resultParamDoc,
