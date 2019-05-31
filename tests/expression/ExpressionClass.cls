@@ -176,6 +176,9 @@ class Conditional extends Object {
     b = a.b.c()[
       veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
       ];
+
+    b = 'String Literal'[0];
+    b = 'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[0];
   }
 
   void variableExpression() {
