@@ -61,6 +61,10 @@ class Conditional extends Object {
 
     Id b = (Id) a;
     Schema.SObjectType sobjectType = ((Id) a).getSObjectType();
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(anotherVariableName.Very_Long_Property_Meber__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(
+      anotherVariableName.Very_Long_Property_Meber__c, VeryLongOuterClassName.VeryLongInnerClassName.class
+    );
   }
 
   void instanceOfExpression() {
@@ -217,6 +221,8 @@ class Conditional extends Object {
     ));
     variableName.propertyMember.get('Name').status = variableName.propertyOptions[0].getValue();
     a = b.c().d('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure.deserialize(anotherVariableName.Very_Long_Property_Member__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatIsAMethodThatWillBreakForSure(anotherVariableName.Very_Long_Property_Member__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
   }
 
   void javaMethodCallExpression_notNeeded() {}
