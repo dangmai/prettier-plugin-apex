@@ -215,6 +215,8 @@ class Conditional extends Object {
         .callYetAnotherMethod('Hello')
         .callYetAnotherYetAnotherMethod(Date.today())
     ));
+    variableName.propertyMember.get('Name').status = variableName.propertyOptions[0].getValue();
+    a = b.c().d('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
   }
 
   void javaMethodCallExpression_notNeeded() {}
