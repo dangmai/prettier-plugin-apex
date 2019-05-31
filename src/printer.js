@@ -215,6 +215,8 @@ function handleDottedExpression(path, print) {
 }
 
 function handleVariableExpression(path, print) {
+  const parentNode = path.getParentNode();
+  const nodeName = path.getName();
   const parts = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
@@ -222,11 +224,51 @@ function handleVariableExpression(path, print) {
   parts.push(dottedExpressionDoc);
   // Name chain
   const nameDocs = path.map(print, "names");
-  parts.push(join(".", nameDocs));
-  if (isParentDottedExpression) {
-    return concat(parts);
+  parts.push(join(concat([softline, "."]), nameDocs));
+
+  // Technically a variable expression is a child of an array expression.
+  // However, for certain situation we need to print the [] part as part of
+  // the group from the variable expression. For example:
+  // a
+  //   .b
+  //   .c[
+  //     d.callMethod()
+  //   ]
+  // If we print the [] as part of the array expression, like we usually do,
+  // the result will be:
+  // a
+  //   .b
+  //   .c[
+  //   d.callMethod()
+  // ]
+  // Hence why we are deferring the printing of the [] part from handleArrayExpression
+  // to here.
+  let arrayIndexDoc = "";
+  if (
+    parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    nodeName === "expr"
+  ) {
+    arrayIndexDoc = concat([
+      "[",
+      softline,
+      path.callParent(innerPath => innerPath.call(print, "index")),
+      dedent(softline),
+      "]",
+    ]);
   }
-  return groupIndentConcat(parts);
+  if (isParentDottedExpression) {
+    return concat([...parts, group(indent(arrayIndexDoc))]);
+  }
+  if (!dottedExpressionDoc && nameDocs.length < 2) {
+    // Example:
+    // a[
+    //   b[
+    //     c
+    //   ]
+    // ]
+    return groupIndentConcat([...parts, arrayIndexDoc]);
+  }
+  return groupIndentConcat([...parts, group(indent(arrayIndexDoc))]);
 }
 
 function handleJavaVariableExpression(path, print) {
@@ -975,7 +1017,20 @@ function handleMethodCallExpression(path, print) {
       indent(
         concat([
           dottedExpressionDoc,
-          group(methodCallChainDoc),
+          // If there are 2 names or less, we should group the method call chain
+          // to have this effect:
+          // a.callMethod(  // <- 2 names (a and callMethod)
+          //   'a',
+          //   'b')
+          // Otherwise we don't want to group them, so that they're part of the
+          // parent group. It will format this code:
+          // a.b.c.callMethod('a', 'b') // <- 4 names (a, b, c, callMethod)
+          // into this:
+          // a
+          //   .b
+          //   .c
+          //   .callMethod('a', 'b')
+          nameDocs.length > 2 ? methodCallChainDoc : group(methodCallChainDoc),
           "(",
           dottedExpressionDoc
             ? group(indent(resultParamDoc))
@@ -1283,14 +1338,31 @@ function handleStructuredVersion(path, print) {
 }
 
 function handleArrayExpression(path, print) {
+  const node = path.getValue();
   const parts = [];
-  parts.push(path.call(print, "expr"));
-  parts.push("[");
-  parts.push(softline);
-  parts.push(path.call(print, "index"));
-  parts.push(dedent(softline));
-  parts.push("]");
-  return groupIndentConcat(parts);
+  const expressionDoc = path.call(print, "expr");
+  // In certain situations we need to defer printing the [] part to be part of
+  // the `expr` printing. Take a look at handleVariableExpression for example.
+  if (node.expr && node.expr["@class"] === apexTypes.VARIABLE_EXPRESSION) {
+    return expressionDoc;
+  }
+  // For the rest of the situations we can safely print the [index] as part
+  // of the array expression group.
+  parts.push(expressionDoc);
+  parts.push(
+    group(
+      indent(
+        concat([
+          "[",
+          softline,
+          path.call(print, "index"),
+          dedent(softline),
+          "]",
+        ]),
+      ),
+    ),
+  );
+  return groupConcat(parts);
 }
 
 function handleCastExpression(path, print) {

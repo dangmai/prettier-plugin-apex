@@ -13,15 +13,36 @@ function isBinaryish(node) {
 }
 
 function checkIfParentIsDottedExpression(path) {
+  const node = path.getValue();
+  const parentNode = path.getParentNode();
+
   let result = false;
   // We're making an assumption here that `callParent` is always synchronous.
   // We're doing it because FastPath does not expose other ways to find the
   // parent name.
+  let parentNodeName = "";
+  let grandParentNodeName = "";
   path.callParent(innerPath => {
-    if (innerPath.getName() === "dottedExpr") {
-      result = true;
-    }
+    parentNodeName = innerPath.getName();
   });
+  path.callParent(innerPath => {
+    grandParentNodeName = innerPath.getName();
+  }, 1);
+  if (parentNodeName === "dottedExpr") {
+    result = true;
+  } else if (
+    node["@class"] === apexTypes.VARIABLE_EXPRESSION &&
+    parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    grandParentNodeName === "dottedExpr"
+  ) {
+    // a
+    //   .b[0]  // <- Node b here
+    //   .c()
+    // For this situation we want to flag b as a nested dotted expression,
+    // so that we can make it part of the grand parent's group, even though
+    // technically it's the grandchild of the dotted expression.
+    result = true;
+  }
   return result;
 }
 

@@ -164,6 +164,13 @@ class Conditional extends Object {
     b = a[0];
     b = a[a[0]];
     b = a[a[veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay]];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions[veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .propertyMember.systemStatusOptions[a[a[veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay]]];
+    b = a.b.c[
+      veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+    ];
   }
 
   void variableExpression() {
@@ -192,6 +199,7 @@ class Conditional extends Object {
       .get(
         accountId
       );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0].getValue();
   }
 
   void javaMethodCallExpression_notNeeded() {}
@@ -486,13 +494,35 @@ class Conditional extends Object {
         veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
       ]
     ];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .systemStatusOptions[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .propertyMember
+      .systemStatusOptions[
+        veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
+      ];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .propertyMember
+      .systemStatusOptions[
+        a[
+          a[
+            veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+          ]
+        ]
+      ];
+    b = a
+      .b
+      .c[
+        veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+      ];
   }
 
   void variableExpression() {
     Integer a = 1;
     Integer b = 2;
     Integer c = a + b;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
+      .Another_Very_Long_SObject_Field_Name__c;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
       .getSObjectFields()
       .Another_Very_Long_SObject_Field_Name__c;
@@ -549,6 +579,9 @@ class Conditional extends Object {
     VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable
       .veryLongPropertyMember
       .get(accountId);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .systemStatusOptions[0]
+      .getValue();
   }
 
   void javaMethodCallExpression_notNeeded() {
@@ -566,7 +599,9 @@ class Conditional extends Object {
     String longResult = super.callMethod('first param')
       .callAnotherMethod()
       .getStringResult();
-    String longResult = super.longPropertyName.anotherLongPropertyName.yetAnotherLongPropertyName;
+    String longResult = super.longPropertyName
+      .anotherLongPropertyName
+      .yetAnotherLongPropertyName;
     String longResult = super.longPropertyName
       .callMethod('first param')
       .callAnotherMethod()
@@ -596,14 +631,16 @@ class Conditional extends Object {
   void dottedExprMethod() {
     a.Field__c = null;
     a.Field__c = null;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
+      .Another_Very_Long_SObject_Field_Name__c;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
       .Another_Very_Long_SObject_Field_Name__c;
     CustomObject__c customObject = generator
       .objectBuilder
       .setExternalId(account.personContactId)
       .getInstance();
-    CustomObject__c customObject = generator.objectBuilder
+    CustomObject__c customObject = generator
+      .objectBuilder
       .setExternalId(account.personContactId)
       .getInstance();
     customObject = generator
@@ -611,7 +648,9 @@ class Conditional extends Object {
       .setExternalId(account.personContactId)
       .Name
       .toString()
-      .Name.Name.toString();
+      .Name
+      .Name
+      .toString();
   }
 
   void soqlExpression_inOtherSuite() {

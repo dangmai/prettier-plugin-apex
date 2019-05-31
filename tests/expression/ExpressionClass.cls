@@ -161,6 +161,13 @@ class Conditional extends Object {
     b = a[0];
     b = a[a[0]];
     b = a[a[veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay]];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions[veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .propertyMember.systemStatusOptions[a[a[veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay]]];
+    b = a.b.c[
+      veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+    ];
   }
 
   void variableExpression() {
@@ -189,6 +196,7 @@ class Conditional extends Object {
       .get(
         accountId
       );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0].getValue();
   }
 
   void javaMethodCallExpression_notNeeded() {}
