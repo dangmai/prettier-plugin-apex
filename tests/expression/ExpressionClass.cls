@@ -208,6 +208,13 @@ class Conditional extends Object {
         accountId
       );
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0].getValue();
+    variableName.propertyName.add(new InnerClass(
+      objectBuilder
+        .callMethod()
+        .callAnotherMethod(null)
+        .callYetAnotherMethod('Hello')
+        .callYetAnotherYetAnotherMethod(Date.today())
+    ));
   }
 
   void javaMethodCallExpression_notNeeded() {}

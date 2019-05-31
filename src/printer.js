@@ -1067,7 +1067,7 @@ function handleMethodCallExpression(path, print) {
           //   .callMethod('a', 'b')
           nameDocs.length > 2 ? methodCallChainDoc : group(methodCallChainDoc),
           "(",
-          dottedExpressionDoc
+          dottedExpressionDoc || nameDocs.length > 2
             ? group(indent(resultParamDoc))
             : group(resultParamDoc),
           ")",
