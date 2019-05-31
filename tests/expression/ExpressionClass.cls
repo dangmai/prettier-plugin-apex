@@ -168,6 +168,14 @@ class Conditional extends Object {
     b = a.b.c[
       veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
     ];
+
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions()[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions()[veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
+      .propertyMember.systemStatusOptions()[a[a[veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay]]];
+    b = a.b.c()[
+      veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+      ];
   }
 
   void variableExpression() {

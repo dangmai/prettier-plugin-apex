@@ -976,6 +976,8 @@ function handleSuperMethodCallExpression(path, print) {
 
 function handleMethodCallExpression(path, print) {
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const parentNode = path.getParentNode();
+  const nodeName = path.getName();
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
@@ -992,6 +994,37 @@ function handleMethodCallExpression(path, print) {
 
   const methodCallChainDoc = join(concat([softline, "."]), nameDocs);
 
+  // Handling the array expression index.
+  // Technically, in this statement: a()[b],
+  // the method call expression is a child of the array expression.
+  // However, for certain situation we need to print the [] part as part of
+  // the group from the method call expression. For example:
+  // a
+  //   .b
+  //   .c()[
+  //     d.callMethod()
+  //   ]
+  // If we print the [] as part of the array expression, like we usually do,
+  // the result will be:
+  // a
+  //   .b
+  //   .c()[
+  //   d.callMethod()
+  // ]
+  // Hence why we are deferring the printing of the [] part from handleArrayExpression
+  // to here.
+  let arrayIndexDoc = "";
+  if (
+    parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    nodeName === "expr"
+  ) {
+    path.callParent(innerPath => {
+      const withGroup =
+        isParentDottedExpression || dottedExpressionDoc || nameDocs.length >= 2;
+
+      arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
+    });
+  }
   let resultDoc;
   if (isParentDottedExpression) {
     // If this is a nested dotted expression, we do not want to group it,
@@ -1006,6 +1039,7 @@ function handleMethodCallExpression(path, print) {
       "(",
       group(indent(resultParamDoc)),
       ")",
+      arrayIndexDoc,
     ]);
   } else {
     // This means it is the highest level method call expression,
@@ -1037,6 +1071,7 @@ function handleMethodCallExpression(path, print) {
             ? group(indent(resultParamDoc))
             : group(resultParamDoc),
           ")",
+          arrayIndexDoc,
         ]),
       ),
     );
@@ -1343,8 +1378,13 @@ function handleArrayExpression(path, print) {
   const parts = [];
   const expressionDoc = path.call(print, "expr");
   // In certain situations we need to defer printing the [] part to be part of
-  // the `expr` printing. Take a look at handleVariableExpression for example.
-  if (node.expr && node.expr["@class"] === apexTypes.VARIABLE_EXPRESSION) {
+  // the `expr` printing. Take a look at handleVariableExpression or
+  // handleMethodCallExpression for example.
+  if (
+    node.expr &&
+    (node.expr["@class"] === apexTypes.VARIABLE_EXPRESSION ||
+      node.expr["@class"] === apexTypes.METHOD_CALL_EXPRESSION)
+  ) {
     return expressionDoc;
   }
   // For the rest of the situations we can safely print the [index] as part
