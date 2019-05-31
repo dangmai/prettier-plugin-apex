@@ -214,6 +214,17 @@ function handleDottedExpression(path, print) {
   return "";
 }
 
+function handleArrayExpressionIndex(path, print, withGroup = true) {
+  const parts = [
+    "[",
+    softline,
+    path.call(print, "index"),
+    dedent(softline),
+    "]",
+  ];
+  return withGroup ? groupIndentConcat(parts) : concat(parts);
+}
+
 function handleVariableExpression(path, print) {
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
@@ -226,7 +237,8 @@ function handleVariableExpression(path, print) {
   const nameDocs = path.map(print, "names");
   parts.push(join(concat([softline, "."]), nameDocs));
 
-  // Technically a variable expression is a child of an array expression.
+  // Technically, in a typical array expression (e.g: a[b]),
+  // the variable expression is a child of the array expression.
   // However, for certain situation we need to print the [] part as part of
   // the group from the variable expression. For example:
   // a
@@ -243,32 +255,21 @@ function handleVariableExpression(path, print) {
   // ]
   // Hence why we are deferring the printing of the [] part from handleArrayExpression
   // to here.
-  let arrayIndexDoc = "";
   if (
     parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
-    arrayIndexDoc = concat([
-      "[",
-      softline,
-      path.callParent(innerPath => innerPath.call(print, "index")),
-      dedent(softline),
-      "]",
-    ]);
+    path.callParent(innerPath => {
+      const withGroup =
+        isParentDottedExpression || dottedExpressionDoc || nameDocs.length >= 2;
+
+      parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
+    });
   }
   if (isParentDottedExpression) {
-    return concat([...parts, group(indent(arrayIndexDoc))]);
+    return concat(parts);
   }
-  if (!dottedExpressionDoc && nameDocs.length < 2) {
-    // Example:
-    // a[
-    //   b[
-    //     c
-    //   ]
-    // ]
-    return groupIndentConcat([...parts, arrayIndexDoc]);
-  }
-  return groupIndentConcat([...parts, group(indent(arrayIndexDoc))]);
+  return groupIndentConcat(parts);
 }
 
 function handleJavaVariableExpression(path, print) {
@@ -1349,19 +1350,7 @@ function handleArrayExpression(path, print) {
   // For the rest of the situations we can safely print the [index] as part
   // of the array expression group.
   parts.push(expressionDoc);
-  parts.push(
-    group(
-      indent(
-        concat([
-          "[",
-          softline,
-          path.call(print, "index"),
-          dedent(softline),
-          "]",
-        ]),
-      ),
-    ),
-  );
+  parts.push(handleArrayExpressionIndex(path, print, /* withGroup */ true));
   return groupConcat(parts);
 }
 
