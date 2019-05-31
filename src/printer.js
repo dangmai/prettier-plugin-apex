@@ -217,10 +217,15 @@ function handleDottedExpression(path, print) {
 function handleVariableExpression(path, print) {
   const parts = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
+  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+
   parts.push(dottedExpressionDoc);
   // Name chain
   const nameDocs = path.map(print, "names");
   parts.push(join(".", nameDocs));
+  if (isParentDottedExpression) {
+    return concat(parts);
+  }
   return groupIndentConcat(parts);
 }
 

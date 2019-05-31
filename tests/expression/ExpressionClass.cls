@@ -184,6 +184,11 @@ class Conditional extends Object {
     );
 
     VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable.veryLongPropertyMember.get(accountId);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable
+      .veryLongPropertyMember
+      .get(
+        accountId
+      );
   }
 
   void javaMethodCallExpression_notNeeded() {}
