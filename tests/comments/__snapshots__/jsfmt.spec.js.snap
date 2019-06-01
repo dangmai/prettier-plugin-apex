@@ -20,6 +20,9 @@ class Comments {
     Integer a /* comment */ = 1;
     Integer b // comment
       = 1;
+
+    Integer a = 1; // Trailing Comment 1
+    Integer b = 2;
   }
 
   void trailingCommentAfterStatement() {
@@ -188,6 +191,9 @@ class Comments {
   void assignmentComments() {
     Integer a /* comment */ = 1;
     Integer b = 1; // comment
+
+    Integer a = 1; // Trailing Comment 1
+    Integer b = 2;
   }
 
   void trailingCommentAfterStatement() {

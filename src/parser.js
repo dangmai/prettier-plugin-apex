@@ -340,6 +340,13 @@ function resolveLineIndexes(node, lineIndexes) {
       nodeLoc.endLine = lineIndexes.length - 1;
     }
   }
+  if (nodeLoc && !("column" in nodeLoc)) {
+    nodeLoc.column =
+      nodeLoc.startIndex -
+      lineIndexes[
+        lineIndexes.findIndex(index => index > nodeLoc.startIndex) - 1
+      ];
+  }
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
@@ -382,7 +389,6 @@ function getEmptyLineLocations(sourceCode) {
 }
 
 function parse(sourceCode, _, options) {
-  sourceCode = sourceCode.trim();
   const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst;
   if (options.apexStandaloneParser === "built-in") {
