@@ -104,6 +104,21 @@ function handleInnerQueryLocation(location, sourceCode, commentNodes) {
   return resultLocation;
 }
 
+function handleNodeEndedWithCharacter(endCharacter) {
+  return (location, sourceCode, commentNodes) => {
+    const resultLocation = {};
+    resultLocation.startIndex = location.startIndex;
+    resultLocation.endIndex = findNextUncommentedCharacter(
+      sourceCode,
+      endCharacter,
+      location.endIndex,
+      commentNodes,
+      /* backwards */ false,
+    );
+    return resultLocation;
+  };
+}
+
 function handleAnonymousUnitLocation(location, sourceCode) {
   return {
     startIndex: 0,
@@ -117,12 +132,29 @@ const locationGenerationHandler = {};
 const identityFunction = location => location;
 locationGenerationHandler[apexTypes.QUERY] = identityFunction;
 locationGenerationHandler[apexTypes.VARIABLE_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.INNER_CLASS_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.INNER_INTERFACE_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.INNER_ENUM_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.METHOD_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.IF_ELSE_BLOCK] = identityFunction;
 locationGenerationHandler[
   apexTypes.SELECT_INNER_QUERY
 ] = handleInnerQueryLocation;
 locationGenerationHandler[
   apexTypes.ANONYMOUS_BLOCK_UNIT
 ] = handleAnonymousUnitLocation;
+locationGenerationHandler[
+  apexTypes.PROPERTY_MEMBER
+] = handleNodeEndedWithCharacter("}");
+locationGenerationHandler[
+  apexTypes.SWITCH_STATEMENT
+] = handleNodeEndedWithCharacter("}");
+locationGenerationHandler[
+  apexTypes.VARIABLE_DECLARATION_STATEMENT
+] = handleNodeEndedWithCharacter(";");
+locationGenerationHandler[
+  apexTypes.FIELD_MEMBER
+] = handleNodeEndedWithCharacter(";");
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -188,57 +220,11 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
 }
 
 /**
- * Certain node types do not get their endIndex reported from the jorje compiler,
- * or the number they report is not the end of the entire block,
- * so we'll have to figure it out by hand here.
- * This method mutates the node that was passed in, and assumes that `lastNodeLoc`
- * is set on it.
- * @param node the node to look at
- * @param sourceCode the entire source code
- * @param commentNodes all the comment nodes
- * @param lineIndexes the indexes of the lines
- */
-function generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes) {
-  switch (node["@class"]) {
-    case apexTypes.PROPERTY_MEMBER:
-    case apexTypes.SWITCH_STATEMENT:
-      node.lastNodeLoc.endIndex = findNextUncommentedCharacter(
-        sourceCode,
-        "}",
-        node.lastNodeLoc.endIndex,
-        commentNodes,
-      );
-      node.lastNodeLoc.endLine =
-        lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
-      break;
-    case apexTypes.VARIABLE_DECLARATION_STATEMENT:
-      node.lastNodeLoc.endIndex = findNextUncommentedCharacter(
-        sourceCode,
-        ";",
-        node.lastNodeLoc.endIndex,
-        commentNodes,
-      );
-      node.lastNodeLoc.endLine =
-        lineIndexes.findIndex(index => index > node.lastNodeLoc.endIndex) - 1;
-      break;
-    default:
-  }
-  return node;
-}
-
-/**
  * Generate metadata about empty lines for statement nodes.
  * This method is called recursively while visiting each node in the tree.
  *
  * @param node the node being visited
- * @param sourceCode the entire source code
- * @param commentNodes all comment nodes
- * @param lineIndexes the indexes of the lines in the source code
  * @param emptyLineLocations a list of lines that are empty in the source code
- * @param emptyLineNodeMap a map of empty line to the node that is attached to
- * that line. Usually it is the statement right before it; however for certain
- * node type (e.g. IfElseBlock) that contains BlockStatement, it'll be the
- * outermost node (e.g. IfElseBlock instead of BlockStatement)
  * @param allowTrailingEmptyLine whether trailing empty line is allowed
  * for this node. This helps when dealing with statements that contain other
  * statements. For example, we turn this to `false` for the block statements
@@ -247,11 +233,7 @@ function generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes) {
  */
 function generateExtraMetadata(
   node,
-  sourceCode,
-  commentNodes,
-  lineIndexes,
   emptyLineLocations,
-  emptyLineNodeMap,
   allowTrailingEmptyLine,
 ) {
   const apexClass = node["@class"];
@@ -269,83 +251,31 @@ function generateExtraMetadata(
   } else {
     allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
   }
-  let lastNodeLoc;
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
       if (Array.isArray(node) && parseInt(key, 10) === node.length - 1) {
         node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
       }
-      const nodeLoc = generateExtraMetadata(
+      generateExtraMetadata(
         node[key],
-        sourceCode,
-        commentNodes,
-        lineIndexes,
         emptyLineLocations,
-        emptyLineNodeMap,
         allowTrailingEmptyLineWithin,
       );
-      if (
-        nodeLoc &&
-        (!lastNodeLoc || nodeLoc.endIndex > lastNodeLoc.endIndex)
-      ) {
-        // This might not be the same node that `isLastNodeInArray` refers to,
-        // since this searches for node in child objects instead of just child
-        // arrays
-        lastNodeLoc = nodeLoc;
-      } else if (!nodeLoc && !lastNodeLoc) {
-        lastNodeLoc = _getNodeLocation(node);
-      }
     }
   });
 
-  if (isSpecialClass && lastNodeLoc) {
-    // Store the last node information for some special node types, so that
-    // we can add trailing empty lines after them.
-    node.lastNodeLoc = lastNodeLoc;
-    generateEndIndexForNode(node, sourceCode, commentNodes, lineIndexes);
-  }
   const nodeLoc = _getNodeLocation(node);
   if (
     apexClass &&
-    (nodeLoc || node.lastNodeLoc) &&
+    nodeLoc &&
     allowTrailingEmptyLine &&
     !node.isLastNodeInArray
   ) {
-    // There's a chance that multiple statements exist on 1 line,
-    // so we only want to tag one of them as having a trailing empty line.
-    // We do that by applying the trailing empty line only after the last node.
-    // e.g. `if (a === 1) {} else {}\n\n`,the empty line should be applied
-    // after the `else`, not the `if`. We keep track of which
-    // nodes have trailingEmptyLine turned on for a certain line, then turn
-    // it off for all but the last one.
-    const nextLine = isSpecialClass
-      ? node.lastNodeLoc.endLine + 1
-      : nodeLoc.endLine + 1;
+    const nextLine = nodeLoc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
     if (trailingEmptyLineAllowed && nextEmptyLine !== -1) {
       node.trailingEmptyLine = true;
-
-      if (emptyLineNodeMap[nextLine]) {
-        const nodeMapEndIndex = emptyLineNodeMap[nextLine].lastNodeLoc
-          ? emptyLineNodeMap[nextLine].lastNodeLoc.endIndex
-          : _getNodeLocation(emptyLineNodeMap[nextLine]).endIndex;
-        const thisEndIndex = node.lastNodeLoc
-          ? node.lastNodeLoc.endIndex
-          : nodeLoc.endIndex;
-
-        if (nodeMapEndIndex > thisEndIndex) {
-          node.trailingEmptyLine = false;
-        } else {
-          emptyLineNodeMap[nextLine].trailingEmptyLine = false;
-          emptyLineNodeMap[nextLine] = node;
-        }
-      } else {
-        emptyLineNodeMap[nextLine] = node;
-      }
     }
-  }
-  if (lastNodeLoc) {
-    return lastNodeLoc;
   }
   return nodeLoc;
 }
@@ -488,15 +418,7 @@ function parse(sourceCode, _, options) {
     ast = resolveLineIndexes(ast, lineIndexes);
     ast = generateDottedExpressionMetadata(ast);
 
-    generateExtraMetadata(
-      ast,
-      sourceCode,
-      commentNodes,
-      lineIndexes,
-      getEmptyLineLocations(sourceCode),
-      {},
-      true,
-    );
+    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
     attachComments(ast, sourceCode);
   }
   return ast;

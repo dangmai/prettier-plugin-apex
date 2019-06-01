@@ -5,7 +5,8 @@ class BlockTrailingCommentAfterClass { /* Block Comment */
   public BlockTrailingCommentsAfterClass() {}
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class BlockTrailingCommentAfterClass /* Block Comment */ {
+class BlockTrailingCommentAfterClass {
+  /* Block Comment */
   public BlockTrailingCommentsAfterClass() {
   }
 }
@@ -61,7 +62,8 @@ class InlineTrailingCommentsAfterClass { // Inline Comment
   public InlineTrailingCommentsAfterClass() {}
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class InlineTrailingCommentsAfterClass { // Inline Comment
+class InlineTrailingCommentsAfterClass {
+  // Inline Comment
   public InlineTrailingCommentsAfterClass() {
   }
 }
