@@ -206,7 +206,7 @@ class Comments {
 
   void beforeSemicolon() {
     Integer a = 1; // before semicolon line comment
-    Integer b /* before same line semicolon block comment */ = 1;
+    Integer b = 1 /* before same line semicolon block comment */;
     Integer c = 1 /* before next line semicolon block comment */;
   }
 

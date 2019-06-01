@@ -398,6 +398,7 @@ function allowTrailingComments(apexClass) {
     apexTypes.ENUM_DECLARATION,
     apexTypes.VARIABLE_DECLARATION,
     apexTypes.LOCATION_IDENTIFIER,
+    apexTypes.LITERAL_EXPRESSION,
   ];
   let trailingCommentsAllowed = allowedTypes.includes(apexClass);
   const separatorIndex = apexClass.indexOf("$");
