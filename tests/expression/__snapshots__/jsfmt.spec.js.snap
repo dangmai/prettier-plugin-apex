@@ -562,9 +562,7 @@ class Conditional extends Object {
         veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
       ];
 
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions()[
-        0
-      ];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions()[0];
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
       .propertyMember
       .systemStatusOptions()[
@@ -586,9 +584,7 @@ class Conditional extends Object {
       ];
 
     b = 'String Literal'[0];
-    b = 'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[
-      0
-    ];
+    b = 'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[0];
 
     String longResult = o[0].callMethod('first param');
     String longResult = o[0].callMethod(

@@ -232,13 +232,15 @@ function handleDottedExpression(path, print) {
 }
 
 function handleArrayExpressionIndex(path, print, withGroup = true) {
-  const parts = [
-    "[",
-    softline,
-    path.call(print, "index"),
-    dedent(softline),
-    "]",
-  ];
+  const node = path.getValue();
+  let parts;
+  if (node.index["@class"] === apexTypes.LITERAL_EXPRESSION) {
+    // For literal index, we will make sure it's always attached to the [],
+    // because it's usually short and will look bad being broken up.
+    parts = ["[", path.call(print, "index"), "]"];
+  } else {
+    parts = ["[", softline, path.call(print, "index"), dedent(softline), "]"];
+  }
   return withGroup ? groupIndentConcat(parts) : concat(parts);
 }
 
