@@ -84,10 +84,15 @@ function runSpec(dirname, parsers, options) {
       if (AST_COMPARE) {
         const ast = parse(source, mergedOptions);
         const ppast = parse(output, mergedOptions);
+        const secondOutput = prettyPrint(output, path, mergedOptions);
 
         test(`Verify AST: ${filename}`, () => {
           expect(ppast).toBeDefined();
           expect(ast).toEqual(ppast);
+        });
+
+        test(`Stable format: ${filename}`, () => {
+          expect(secondOutput).toEqual(output);
         });
       }
     }
