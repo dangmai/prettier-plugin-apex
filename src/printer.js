@@ -195,17 +195,34 @@ function handleAssignmentExpression(path, print) {
   return groupConcat(docs);
 }
 
-function handleDottedExpression(path, print) {
+function shouldDottedExpressionBreak(path) {
   const node = path.getValue();
+  // #62 - `super` cannot  be followed any white spaces
+  if (node.dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION) {
+    return false;
+  }
+  if (node["@class"] !== apexTypes.METHOD_CALL_EXPRESSION) {
+    return true;
+  }
+  if (checkIfParentIsDottedExpression(path)) {
+    return true;
+  }
+  if (
+    node.dottedExpr.value &&
+    node.dottedExpr.value["@class"] === apexTypes.METHOD_CALL_EXPRESSION
+  ) {
+    return true;
+  }
+  return node.numberOfDottedExpressions > 2;
+}
+
+function handleDottedExpression(path, print) {
   const dottedExpressionParts = [];
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
 
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
-    // #62 - `super` cannot  be followed any white spaces
-    if (
-      node.dottedExpr.value["@class"] !== apexTypes.SUPER_VARIABLE_EXPRESSION
-    ) {
+    if (shouldDottedExpressionBreak(path)) {
       dottedExpressionParts.push(softline);
     }
     dottedExpressionParts.push(".");
@@ -215,13 +232,15 @@ function handleDottedExpression(path, print) {
 }
 
 function handleArrayExpressionIndex(path, print, withGroup = true) {
-  const parts = [
-    "[",
-    softline,
-    path.call(print, "index"),
-    dedent(softline),
-    "]",
-  ];
+  const node = path.getValue();
+  let parts;
+  if (node.index["@class"] === apexTypes.LITERAL_EXPRESSION) {
+    // For literal index, we will make sure it's always attached to the [],
+    // because it's usually short and will look bad being broken up.
+    parts = ["[", path.call(print, "index"), "]"];
+  } else {
+    parts = ["[", softline, path.call(print, "index"), dedent(softline), "]"];
+  }
   return withGroup ? groupIndentConcat(parts) : concat(parts);
 }
 
@@ -975,9 +994,10 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
-  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
+  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
@@ -992,7 +1012,12 @@ function handleMethodCallExpression(path, print) {
         ])
       : "";
 
-  const methodCallChainDoc = join(concat([softline, "."]), nameDocs);
+  const methodCallChainDoc =
+    isParentDottedExpression ||
+    // Here we know that this is the top most expression
+    node.numberOfDottedExpressions > 2
+      ? join(concat([softline, "."]), nameDocs)
+      : join(".", nameDocs);
 
   // Handling the array expression index.
   // Technically, in this statement: a()[b],
@@ -1020,7 +1045,7 @@ function handleMethodCallExpression(path, print) {
   ) {
     path.callParent(innerPath => {
       const withGroup =
-        isParentDottedExpression || dottedExpressionDoc || nameDocs.length >= 2;
+        isParentDottedExpression || node.numberOfDottedExpressions >= 2;
 
       arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
     });
@@ -1065,9 +1090,11 @@ function handleMethodCallExpression(path, print) {
           //   .b
           //   .c
           //   .callMethod('a', 'b')
-          nameDocs.length > 2 ? methodCallChainDoc : group(methodCallChainDoc),
+          node.numberOfDottedExpressions > 2
+            ? methodCallChainDoc
+            : group(methodCallChainDoc),
           "(",
-          dottedExpressionDoc || nameDocs.length > 2
+          node.numberOfDottedExpressions > 2
             ? group(indent(resultParamDoc))
             : group(resultParamDoc),
           ")",

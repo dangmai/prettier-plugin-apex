@@ -64,6 +64,7 @@ const METADATA_TO_IGNORE = [
   "hiddenTokenMap",
   "trailingEmptyLine",
   "isLastNodeInArray",
+  "numberOfDottedExpressions",
 ];
 
 /**

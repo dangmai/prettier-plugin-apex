@@ -61,6 +61,10 @@ class Conditional extends Object {
 
     Id b = (Id) a;
     Schema.SObjectType sobjectType = ((Id) a).getSObjectType();
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(anotherVariableName.Very_Long_Property_Meber__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(
+      anotherVariableName.Very_Long_Property_Meber__c, VeryLongOuterClassName.VeryLongInnerClassName.class
+    );
   }
 
   void instanceOfExpression() {
@@ -179,6 +183,13 @@ class Conditional extends Object {
 
     b = 'String Literal'[0];
     b = 'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[0];
+
+    String longResult = o[0].callMethod('first param');
+    String longResult = o[0].callMethod('first param', 'second param', 'third param', 'fourth param');
+    String longResult = o[
+      veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+    ].callMethod('first param');
+    String longResult = o[0].callMethod('first param').callAnotherMethod().getStringResult();
   }
 
   void variableExpression() {
@@ -217,6 +228,13 @@ class Conditional extends Object {
     ));
     variableName.propertyMember.get('Name').status = variableName.propertyOptions[0].getValue();
     a = b.c().d('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure.deserialize(anotherVariableName.Very_Long_Property_Member__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure
+      .deserialize(anotherVariableName.Very_Long_Property_Member__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatIsAMethodThatWillBreakForSure(anotherVariableName.Very_Long_Property_Member__c, VeryLongOuterClassName.VeryLongInnerClassName.class);
+
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod();
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod().callAnotherMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
   }
 
   void javaMethodCallExpression_notNeeded() {}
