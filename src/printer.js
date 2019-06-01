@@ -195,17 +195,51 @@ function handleAssignmentExpression(path, print) {
   return groupConcat(docs);
 }
 
-function handleDottedExpression(path, print) {
+function calculateNumberOfNestedDottedExpressions(node) {
+  let result = 1;
+  if (node.names) {
+    result = node.names.length;
+  }
+  if (node.dottedExpr && node.dottedExpr.value) {
+    if (node.dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION) {
+      result += calculateNumberOfNestedDottedExpressions(
+        node.dottedExpr.value.expr,
+      );
+    } else {
+      result += calculateNumberOfNestedDottedExpressions(node.dottedExpr.value);
+    }
+  }
+  return result;
+}
+
+function shouldDottedExpressionBreak(path) {
   const node = path.getValue();
+  // #62 - `super` cannot  be followed any white spaces
+  if (node.dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION) {
+    return false;
+  }
+  if (node["@class"] !== apexTypes.METHOD_CALL_EXPRESSION) {
+    return true;
+  }
+  if (checkIfParentIsDottedExpression(path)) {
+    return true;
+  }
+  if (
+    node.dottedExpr.value &&
+    node.dottedExpr.value["@class"] === apexTypes.METHOD_CALL_EXPRESSION
+  ) {
+    return true;
+  }
+  return calculateNumberOfNestedDottedExpressions(node) > 2;
+}
+
+function handleDottedExpression(path, print) {
   const dottedExpressionParts = [];
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
 
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
-    // #62 - `super` cannot  be followed any white spaces
-    if (
-      node.dottedExpr.value["@class"] !== apexTypes.SUPER_VARIABLE_EXPRESSION
-    ) {
+    if (shouldDottedExpressionBreak(path)) {
       dottedExpressionParts.push(softline);
     }
     dottedExpressionParts.push(".");
@@ -975,9 +1009,9 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
-  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
+  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
@@ -992,7 +1026,15 @@ function handleMethodCallExpression(path, print) {
         ])
       : "";
 
-  const methodCallChainDoc = join(concat([softline, "."]), nameDocs);
+  const numberOfNestedDottedExpressions = calculateNumberOfNestedDottedExpressions(
+    path.getValue(),
+  );
+  const methodCallChainDoc =
+    isParentDottedExpression ||
+    // Here we know that this is the top most expression
+    numberOfNestedDottedExpressions > 2
+      ? join(concat([softline, "."]), nameDocs)
+      : join(".", nameDocs);
 
   // Handling the array expression index.
   // Technically, in this statement: a()[b],
@@ -1020,7 +1062,7 @@ function handleMethodCallExpression(path, print) {
   ) {
     path.callParent(innerPath => {
       const withGroup =
-        isParentDottedExpression || dottedExpressionDoc || nameDocs.length >= 2;
+        isParentDottedExpression || numberOfNestedDottedExpressions >= 2;
 
       arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
     });
@@ -1065,9 +1107,11 @@ function handleMethodCallExpression(path, print) {
           //   .b
           //   .c
           //   .callMethod('a', 'b')
-          nameDocs.length > 2 ? methodCallChainDoc : group(methodCallChainDoc),
+          numberOfNestedDottedExpressions > 2
+            ? methodCallChainDoc
+            : group(methodCallChainDoc),
           "(",
-          dottedExpressionDoc || nameDocs.length > 2
+          numberOfNestedDottedExpressions > 2
             ? group(indent(resultParamDoc))
             : group(resultParamDoc),
           ")",
