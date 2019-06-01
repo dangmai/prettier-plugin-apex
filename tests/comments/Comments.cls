@@ -17,6 +17,9 @@ class Comments {
     Integer a /* comment */ = 1;
     Integer b // comment
       = 1;
+
+    Integer a = 1; // Trailing Comment 1
+    Integer b = 2;
   }
 
   void trailingCommentAfterStatement() {

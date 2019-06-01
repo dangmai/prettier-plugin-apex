@@ -29,6 +29,7 @@ const parsers = {
     parse,
     locStart,
     locEnd,
+    preprocess: text => text.trim(),
   },
 };
 
