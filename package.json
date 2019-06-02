@@ -21,7 +21,8 @@
     "start-server": "node bin/start-apex-server.js",
     "stop-server": "node bin/stop-apex-server.js",
     "lint": "eslint \"{src,tests_config}/**/*.js\"",
-    "prettier": "prettier --write \"{src,tests_config}/**/*.js\""
+    "prettier": "prettier --write \"{src,tests_config}/**/*.js\"",
+    "debug-check": "prettier --apex-standalone-parser built-in --debug-check --plugin=."
   },
   "keywords": [
     "apex",
