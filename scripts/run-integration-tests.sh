@@ -3,7 +3,6 @@
 set -euxo pipefail
 
 mapfile repos <<EOF
-https://github.com/financialforcedev/apex-mdapi.git
 https://github.com/afawcett/declarative-lookup-rollup-summaries.git
 https://github.com/SalesforceFoundation/Cumulus.git
 https://github.com/financialforcedev/fflib-apex-common.git
@@ -14,5 +13,5 @@ EOF
 for repo in ${repos[@]}; do
   rm -rf repo
   git clone --depth 1 "$repo" repo
-  npm run debug-check -- "./repo/**/*.{trigger,cls}"
+  npm run verify-ast -- "./repo/**/*.{trigger,cls}"
 done
