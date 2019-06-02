@@ -387,6 +387,7 @@ constants.ALLOW_TRAILING_COMMENT = [
   constants.APEX_TYPES.LOCATION_IDENTIFIER,
   constants.APEX_TYPES.LITERAL_EXPRESSION,
   constants.APEX_TYPES.IF_BLOCK,
+  constants.APEX_TYPES.NAME_VALUE_PARAMETER,
 ];
 
 module.exports = constants;

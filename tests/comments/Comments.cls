@@ -197,6 +197,25 @@ class Comments {
       System.debug('World'); /* Trailing Block Conditional COmment 3 */
     }
   }
+
+  void newObjectComments() {
+    SObject a = new SObject(
+      Field__c = 'Test',
+      Another_Field__c = 'Another Test' // Hello
+    );
+    SObject a = new SObject(
+      Field__c = 'Test', // Hi
+      Another_Field__c = 'Another Test' // World
+    );
+    SObject a = new SObject(
+      Field__c = 'Test',
+      Another_Field__c = 'Another Test' /* Hello */
+    );
+    SObject a = new SObject(
+      Field__c = 'Test', /* Hi */
+      Another_Field__c = 'Another Test' /* World */
+    );
+  }
 }
 // Trailing Inline Comment
 
