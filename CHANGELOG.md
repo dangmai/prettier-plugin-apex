@@ -27,6 +27,9 @@ Thanks to @praksb, @ntotten and @vazexqi for their help on getting jorje fixed.
 - Fix ternary expressions not breaking correctly ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/29)).
 - Fix comments not being indented in binaryish expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/14)).
 - Fix array index indentation surrounding variable expressions and method call expressions.
+- Fix unstable IfBlock trailing comments.
+- Fix unstable NameValueParameter trailing comments.
+- Fix unstable WhereOpExpr trailing comments.
 
 ## 1.0.0-alpha.9
 - Fix trailing comments after class names not being printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/20)).

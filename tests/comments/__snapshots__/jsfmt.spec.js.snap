@@ -167,6 +167,92 @@ class Comments {
         (SELECT Id FROM Accounts)
       FROM Contact
     ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' // Trailing Inline SOQL Test 1
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name'
+      AND Name = 'Another Name' // Trailing Inline SOQL Test 2
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' // Trailing Inline SOQL Test 3
+      AND Name = 'Another Name' // Trailing Inline SOQL Test 4
+    ];
+
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' /* Trailing Block SOQL Test 1 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name'
+      AND Name = 'Another Name' /* Trailing Inline SOQL Test 2 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' /* Trailing Inline SOQL Test 3 */
+      AND Name = 'Another Name' /* Trailing Inline SOQL Test 4 */
+    ];
+  }
+
+  void conditionalComments() {
+    if (a > 1)
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    else if (b > 2)
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    else
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+
+    if (a > 1) {
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    } else if (b > 2) {
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    } else {
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+    }
+
+    if (c > 1)
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    else if (d > 2)
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    else
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+
+    if (c > 1) {
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    } else if (d > 2) {
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    } else {
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
+  }
+
+  void newObjectComments() {
+    SObject a = new SObject(
+      Field__c = 'Test',
+      Another_Field__c = 'Another Test' // Hello
+    );
+    SObject a = new SObject(
+      Field__c = 'Test', // Hi
+      Another_Field__c = 'Another Test' // World
+    );
+    SObject a = new SObject(
+      Field__c = 'Test',
+      Another_Field__c = 'Another Test' /* Hello */
+    );
+    SObject a = new SObject(
+      Field__c = 'Test', /* Hi */
+      Another_Field__c = 'Another Test' /* World */
+    );
   }
 }
 // Trailing Inline Comment
@@ -333,6 +419,88 @@ class Comments {
         (SELECT Id FROM Accounts)
       FROM Contact
     ];
+    List<Contact> contact = [SELECT Id FROM Contact WHERE Name = 'Name']; // Trailing Inline SOQL Test 1
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' AND Name = 'Another Name' // Trailing Inline SOQL Test 2
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' AND Name = 'Another Name' // Trailing Inline SOQL Test 3 // Trailing Inline SOQL Test 4
+    ];
+
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' /* Trailing Block SOQL Test 1 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE
+        Name = 'Name'
+        AND Name = 'Another Name' /* Trailing Inline SOQL Test 2 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE
+        Name = 'Name' /* Trailing Inline SOQL Test 3 */
+        AND Name = 'Another Name' /* Trailing Inline SOQL Test 4 */
+    ];
+  }
+
+  void conditionalComments() {
+    if (a > 1)
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    else if (b > 2)
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    else
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+
+    if (a > 1) {
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    } else if (b > 2) {
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    } else {
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+    }
+
+    if (c > 1)
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    else if (d > 2)
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    else
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+
+    if (c > 1) {
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    } else if (d > 2) {
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    } else {
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
+  }
+
+  void newObjectComments() {
+    SObject a = new SObject(
+      Field__c = 'Test',
+      Another_Field__c = 'Another Test' // Hello
+    );
+    SObject a = new SObject(
+      Field__c = 'Test', // Hi
+      Another_Field__c = 'Another Test' // World
+    );
+    SObject a = new SObject(
+      Field__c = 'Test',
+      Another_Field__c = 'Another Test' /* Hello */
+    );
+    SObject a = new SObject(
+      Field__c = 'Test' /* Hi */,
+      Another_Field__c = 'Another Test' /* World */
+    );
   }
 }
 // Trailing Inline Comment
