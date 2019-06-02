@@ -168,6 +168,38 @@ class Comments {
       FROM Contact
     ];
   }
+
+  void conditionalComments() {
+    if (a > 1)
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    else if (b > 2)
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    else
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+
+    if (a > 1) {
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    } else if (b > 2) {
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    } else {
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+    }
+
+    if (c > 1)
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    else if (d > 2)
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    else
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+
+    if (c > 1) {
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    } else if (d > 2) {
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    } else {
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
+  }
 }
 // Trailing Inline Comment
 
@@ -333,6 +365,38 @@ class Comments {
         (SELECT Id FROM Accounts)
       FROM Contact
     ];
+  }
+
+  void conditionalComments() {
+    if (a > 1)
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    else if (b > 2)
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    else
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+
+    if (a > 1) {
+      System.debug('Hi'); // Trailing Inline Conditional Comment 1
+    } else if (b > 2) {
+      System.debug('Hello'); // Trailing Inline Conditional Comment 2
+    } else {
+      System.debug('World'); // Trailing Inline Conditional COmment 3
+    }
+
+    if (c > 1)
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    else if (d > 2)
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    else
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+
+    if (c > 1) {
+      System.debug('Hi'); /* Trailing Block Conditional Comment 1 */
+    } else if (d > 2) {
+      System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
+    } else {
+      System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
   }
 }
 // Trailing Inline Comment

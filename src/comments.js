@@ -391,16 +391,9 @@ function printDanglingComment(commentPath, options, print) {
 }
 
 function allowTrailingComments(apexClass) {
-  const allowedTypes = [
-    apexTypes.CLASS_DECLARATION,
-    apexTypes.INTERFACE_DECLARATION,
-    apexTypes.METHOD_DECLARATION,
-    apexTypes.ENUM_DECLARATION,
-    apexTypes.VARIABLE_DECLARATION,
-    apexTypes.LOCATION_IDENTIFIER,
-    apexTypes.LITERAL_EXPRESSION,
-  ];
-  let trailingCommentsAllowed = allowedTypes.includes(apexClass);
+  let trailingCommentsAllowed = constants.ALLOW_TRAILING_COMMENT.includes(
+    apexClass,
+  );
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
