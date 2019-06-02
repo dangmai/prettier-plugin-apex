@@ -167,6 +167,41 @@ class Comments {
         (SELECT Id FROM Accounts)
       FROM Contact
     ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' // Trailing Inline SOQL Test 1
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name'
+      AND Name = 'Another Name' // Trailing Inline SOQL Test 2
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' // Trailing Inline SOQL Test 3
+      AND Name = 'Another Name' // Trailing Inline SOQL Test 4
+    ];
+
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' /* Trailing Block SOQL Test 1 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name'
+      AND Name = 'Another Name' /* Trailing Inline SOQL Test 2 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' /* Trailing Inline SOQL Test 3 */
+      AND Name = 'Another Name' /* Trailing Inline SOQL Test 4 */
+    ];
   }
 
   void conditionalComments() {
@@ -383,6 +418,37 @@ class Comments {
         // Leading Comment to an Inner Query
         (SELECT Id FROM Accounts)
       FROM Contact
+    ];
+    List<Contact> contact = [SELECT Id FROM Contact WHERE Name = 'Name']; // Trailing Inline SOQL Test 1
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' AND Name = 'Another Name' // Trailing Inline SOQL Test 2
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' AND Name = 'Another Name' // Trailing Inline SOQL Test 3 // Trailing Inline SOQL Test 4
+    ];
+
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' /* Trailing Block SOQL Test 1 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE
+        Name = 'Name'
+        AND Name = 'Another Name' /* Trailing Inline SOQL Test 2 */
+    ];
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE
+        Name = 'Name' /* Trailing Inline SOQL Test 3 */
+        AND Name = 'Another Name' /* Trailing Inline SOQL Test 4 */
     ];
   }
 

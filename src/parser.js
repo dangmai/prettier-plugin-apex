@@ -139,6 +139,9 @@ locationGenerationHandler[apexTypes.METHOD_MEMBER] = identityFunction;
 locationGenerationHandler[apexTypes.IF_ELSE_BLOCK] = identityFunction;
 locationGenerationHandler[apexTypes.NAME_VALUE_PARAMETER] = identityFunction;
 locationGenerationHandler[
+  apexTypes.WHERE_OPERATION_EXPRESSION
+] = identityFunction;
+locationGenerationHandler[
   apexTypes.SELECT_INNER_QUERY
 ] = handleInnerQueryLocation;
 locationGenerationHandler[
@@ -159,6 +162,7 @@ locationGenerationHandler[
 locationGenerationHandler[
   apexTypes.NEW_EXPRESSION
 ] = handleNodeEndedWithCharacter(")");
+locationGenerationHandler[apexTypes.QUERY] = handleNodeEndedWithCharacter("]");
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
