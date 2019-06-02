@@ -160,7 +160,7 @@ locationGenerationHandler[
   apexTypes.FIELD_MEMBER
 ] = handleNodeEndedWithCharacter(";");
 locationGenerationHandler[
-  apexTypes.NEW_EXPRESSION
+  apexTypes.NEW_KEY_VALUE
 ] = handleNodeEndedWithCharacter(")");
 locationGenerationHandler[apexTypes.QUERY] = handleNodeEndedWithCharacter("]");
 
