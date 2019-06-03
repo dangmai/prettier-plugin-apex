@@ -17,8 +17,8 @@ const {
 } = docBuilders;
 
 const {
+  getTrailingComments,
   isApexDocComment,
-  printComments,
   printDanglingComment,
 } = require("./comments");
 const {
@@ -344,10 +344,10 @@ function handleAssignmentOperation(path) {
 
 function _getDanglingCommentDocs(path, print, options) {
   const node = path.getValue();
-  if (!node.apexComments) {
+  if (!node.comments) {
     return [];
   }
-  node.danglingComments = node.apexComments.filter(
+  node.danglingComments = node.comments.filter(
     comment => !comment.leading && !comment.trailing,
   );
   const danglingCommentParts = [];
@@ -2038,7 +2038,7 @@ function handleOrderByExpression(childClass, path, print) {
 
 function handleOrderOperation(childClass, path, print, opts) {
   const loc = opts.locStart(path.getValue());
-  if (loc.line !== -1 && loc.column !== -1) {
+  if (loc) {
     return constants.ORDER[childClass];
   }
   return "";
@@ -2046,7 +2046,7 @@ function handleOrderOperation(childClass, path, print, opts) {
 
 function handleNullOrderOperation(childClass, path, print, opts) {
   const loc = opts.locStart(path.getValue());
-  if (loc.line !== -1 && loc.column !== -1) {
+  if (loc) {
     return constants.ORDER_NULL[childClass];
   }
   return "";
@@ -2646,8 +2646,21 @@ nodeHandler[apexTypes.WITH_IDENTIFIER] = (path, print) =>
   concat(["WITH", " ", path.call(print, "identifier")]);
 
 function handleTrailingEmptyLines(doc, node) {
+  let insertNewLine = false;
   if (node && node.trailingEmptyLine) {
-    doc = concat([doc, hardline]); // eslint-disable-line no-param-reassign
+    if (node.comments) {
+      const trailingComments = getTrailingComments(node);
+      if (trailingComments.length === 0) {
+        insertNewLine = true;
+      } else {
+        trailingComments[trailingComments.length - 1].trailingEmptyLine = true;
+      }
+    } else {
+      insertNewLine = true;
+    }
+  }
+  if (insertNewLine) {
+    return concat([doc, hardline]);
   }
   return doc;
 }
@@ -2671,15 +2684,6 @@ function genericPrint(path, options, print) {
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
 
-    // Check to make sure we have printed all the comments
-    const unprintedComments = n[apexTypes.PARSER_OUTPUT].hiddenTokenMap.filter(
-      commentNode => !commentNode[1].printed,
-    );
-    assert.equal(
-      unprintedComments.length,
-      0,
-      "There are unprinted comments. Please file a bug report with your code sample",
-    );
     const outputDoc = concat(docs);
 
     if (options.apexVerifyAst) {
@@ -2724,13 +2728,11 @@ function genericPrint(path, options, print) {
 }
 
 let options;
-module.exports = function printGenerically(path, opts) {
+module.exports = function printGenerically(path, opts, print) {
   if (typeof opts === "object") {
     options = opts;
   }
   const node = path.getValue();
-  const doc = printComments(path, options, innerPath =>
-    genericPrint(innerPath, options, printGenerically),
-  );
+  const doc = genericPrint(path, options, print);
   return handleTrailingEmptyLines(doc, node);
 };

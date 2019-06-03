@@ -4,7 +4,6 @@ const childProcess = require("child_process");
 const path = require("path");
 
 const { spawnSync } = childProcess;
-const attachComments = require("./comments").attach;
 const constants = require("./constants");
 const { findNextUncommentedCharacter } = require("./util");
 
@@ -393,7 +392,13 @@ function parse(sourceCode, _, options) {
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
-    attachComments(ast, sourceCode);
+    ast.comments = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
+      .map(token => token[1])
+      .filter(
+        node =>
+          node["@class"] === apexTypes.INLINE_COMMENT ||
+          node["@class"] === apexTypes.BLOCK_COMMENT,
+      );
   }
   return ast;
 }
