@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 1.0.0-beta.1
 - Add support for Anonymous Code block with `--apex-anonymous` option.
 - CLI/Option change:
   - `use-standalone-server` option is now `apex-standalone-parser`,
