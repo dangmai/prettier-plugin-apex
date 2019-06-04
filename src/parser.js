@@ -110,7 +110,7 @@ function handleNodeEndedWithCharacter(endCharacter) {
     resultLocation.endIndex = findNextUncommentedCharacter(
       sourceCode,
       endCharacter,
-      location.endIndex,
+      location.endIndex + 1,
       commentNodes,
       /* backwards */ false,
     );
@@ -122,6 +122,13 @@ function handleAnonymousUnitLocation(location, sourceCode) {
   return {
     startIndex: 0,
     endIndex: sourceCode.length,
+  };
+}
+
+function handleNodeWithIncorrectEndIndex(location) {
+  return {
+    startIndex: location.startIndex,
+    endIndex: location.endIndex - 1,
   };
 }
 
@@ -137,6 +144,15 @@ locationGenerationHandler[apexTypes.INNER_ENUM_MEMBER] = identityFunction;
 locationGenerationHandler[apexTypes.METHOD_MEMBER] = identityFunction;
 locationGenerationHandler[apexTypes.IF_ELSE_BLOCK] = identityFunction;
 locationGenerationHandler[apexTypes.NAME_VALUE_PARAMETER] = identityFunction;
+locationGenerationHandler[apexTypes.VARIABLE_DECLARATION] = identityFunction;
+locationGenerationHandler[apexTypes.BINARY_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
+locationGenerationHandler[
+  apexTypes.VARIABLE_DECLARATION_STATEMENT
+] = identityFunction;
+locationGenerationHandler[
+  apexTypes.WHERE_COMPOUND_EXPRESSION
+] = identityFunction;
 locationGenerationHandler[
   apexTypes.WHERE_OPERATION_EXPRESSION
 ] = identityFunction;
@@ -153,7 +169,7 @@ locationGenerationHandler[
   apexTypes.SWITCH_STATEMENT
 ] = handleNodeEndedWithCharacter("}");
 locationGenerationHandler[
-  apexTypes.VARIABLE_DECLARATION_STATEMENT
+  apexTypes.VARIABLE_DECLARATIONS
 ] = handleNodeEndedWithCharacter(";");
 locationGenerationHandler[
   apexTypes.FIELD_MEMBER
@@ -161,7 +177,16 @@ locationGenerationHandler[
 locationGenerationHandler[
   apexTypes.NEW_KEY_VALUE
 ] = handleNodeEndedWithCharacter(")");
+locationGenerationHandler[
+  apexTypes.METHOD_CALL_EXPRESSION
+] = handleNodeEndedWithCharacter(")");
 locationGenerationHandler[apexTypes.QUERY] = handleNodeEndedWithCharacter("]");
+locationGenerationHandler[
+  apexTypes.LITERAL_EXPRESSION
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.SOQL_EXPRESSION
+] = handleNodeWithIncorrectEndIndex;
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -198,6 +223,12 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
   if (apexClass && apexClass in locationGenerationHandler && currentLocation) {
     node.loc = locationGenerationHandler[apexClass](
       currentLocation,
+      sourceCode,
+      commentNodes,
+    );
+  } else if (apexClass && apexClass in locationGenerationHandler && node.loc) {
+    node.loc = locationGenerationHandler[apexClass](
+      node.loc,
       sourceCode,
       commentNodes,
     );

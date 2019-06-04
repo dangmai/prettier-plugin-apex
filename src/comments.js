@@ -3,8 +3,13 @@
 const prettier = require("prettier");
 
 const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
-const { addDanglingComment, skipWhitespace } = prettier.util;
+const {
+  addDanglingComment,
+  addTrailingComment,
+  skipWhitespace,
+} = prettier.util;
 const constants = require("./constants");
+const { isApexDocComment, isBinaryish } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
@@ -36,21 +41,6 @@ function printDanglingComment(commentPath, options, print) {
   }
   comment.printed = true;
   return concat(parts);
-}
-
-/**
- * Check if this comment is an ApexDoc-style comment.
- * This code is straight from prettier JSDoc detection.
- * @param comment the comment to check.
- */
-function isApexDocComment(comment) {
-  const lines = comment.value.split("\n");
-  return (
-    lines.length > 1 &&
-    lines
-      .slice(1, lines.length - 1)
-      .every(commentLine => commentLine.trim()[0] === "*")
-  );
 }
 
 function canAttachComment(node) {
@@ -127,12 +117,32 @@ function handleDanglingComment(comment) {
   return false;
 }
 
+function handleBinaryishExpressionTrailingComment(comment) {
+  const { precedingNode, enclosingNode } = comment;
+  if (
+    precedingNode &&
+    enclosingNode &&
+    isBinaryish(enclosingNode) &&
+    enclosingNode.right === precedingNode
+  ) {
+    addTrailingComment(enclosingNode, comment);
+    return true;
+  }
+  return false;
+}
+
 function handleOwnLineComment(comment) {
-  return handleDanglingComment(comment);
+  return (
+    handleDanglingComment(comment) ||
+    handleBinaryishExpressionTrailingComment(comment)
+  );
 }
 
 function handleEndOfLineComment(comment) {
-  return handleDanglingComment(comment);
+  return (
+    handleDanglingComment(comment) ||
+    handleBinaryishExpressionTrailingComment(comment)
+  );
 }
 
 function handleRemainingComment() {

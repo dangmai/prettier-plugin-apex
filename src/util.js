@@ -1,6 +1,5 @@
 /* eslint no-param-reassign: 0 */
 
-const { isApexDocComment } = require("./comments");
 const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
@@ -9,6 +8,21 @@ function isBinaryish(node) {
   return (
     node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
     node["@class"] === apexTypes.BINARY_EXPRESSION
+  );
+}
+
+/**
+ * Check if this comment is an ApexDoc-style comment.
+ * This code is straight from prettier JSDoc detection.
+ * @param comment the comment to check.
+ */
+function isApexDocComment(comment) {
+  const lines = comment.value.split("\n");
+  return (
+    lines.length > 1 &&
+    lines
+      .slice(1, lines.length - 1)
+      .every(commentLine => commentLine.trim()[0] === "*")
   );
 }
 
@@ -189,6 +203,7 @@ module.exports = {
   checkIfParentIsDottedExpression,
   findNextUncommentedCharacter,
   getPrecedence,
+  isApexDocComment,
   isBinaryish,
   massageAstNode,
 };
