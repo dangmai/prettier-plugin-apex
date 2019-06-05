@@ -118,11 +118,17 @@ function handleDanglingComment(comment) {
 }
 
 function handleBinaryishExpressionTrailingComment(comment) {
-  const { precedingNode, enclosingNode } = comment;
+  // Handle this situation:
+  // a = i | j
+  // /* Comments */;
+  // We want to put the comment after the entire statement, because it is more
+  // stable and also in line with Prettier's core.
+  const { precedingNode, enclosingNode, trailingNode } = comment;
   if (
     precedingNode &&
     enclosingNode &&
-    isBinaryish(enclosingNode) &&
+    !trailingNode &&
+    isBinaryish(precedingNode) &&
     enclosingNode.right === precedingNode
   ) {
     addTrailingComment(enclosingNode, comment);

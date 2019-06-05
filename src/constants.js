@@ -202,6 +202,13 @@ const constants = {
     GEOLOCATION_LITERAL: "apex.jorje.data.soql.Geolocation$GeolocationLiteral",
     QUERY_LITERAL_EXPRESSION: "apex.jorje.data.soql.QueryExpr$LiteralExpr",
     QUERY_LITERAL: "apex.jorje.data.soql.QueryLiteral",
+    QUERY_LITERAL_STRING: "apex.jorje.data.soql.QueryLiteral$QueryString",
+    QUERY_LITERAL_NULL: "apex.jorje.data.soql.QueryLiteral$QueryNull",
+    QUERY_LITERAL_TRUE: "apex.jorje.data.soql.QueryLiteral$QueryTrue",
+    QUERY_LITERAL_FALSE: "apex.jorje.data.soql.QueryLiteral$QueryFalse",
+    QUERY_LITERAL_NUMBER: "apex.jorje.data.soql.QueryLiteral$QueryNumber",
+    QUERY_LITERAL_DATE_FORMULA:
+      "apex.jorje.data.soql.QueryLiteral$QueryDateFormula",
     QUERY_OPERATOR: "apex.jorje.data.soql.QueryOp",
     SOQL_ORDER: "apex.jorje.data.soql.Order",
     SOQL_ORDER_NULL: "apex.jorje.data.soql.OrderNull",

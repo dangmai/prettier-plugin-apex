@@ -138,6 +138,8 @@ class Comments {
       &
       // Comments
       j;
+    a = i | j
+    /* Comments */;
     a =
       /* Comments */
       i

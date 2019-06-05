@@ -147,6 +147,8 @@ locationGenerationHandler[apexTypes.NAME_VALUE_PARAMETER] = identityFunction;
 locationGenerationHandler[apexTypes.VARIABLE_DECLARATION] = identityFunction;
 locationGenerationHandler[apexTypes.BINARY_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.ASSIGNMENT_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.FIELD_MEMBER] = identityFunction;
 locationGenerationHandler[
   apexTypes.VARIABLE_DECLARATION_STATEMENT
 ] = identityFunction;
@@ -172,9 +174,6 @@ locationGenerationHandler[
   apexTypes.VARIABLE_DECLARATIONS
 ] = handleNodeEndedWithCharacter(";");
 locationGenerationHandler[
-  apexTypes.FIELD_MEMBER
-] = handleNodeEndedWithCharacter(";");
-locationGenerationHandler[
   apexTypes.NEW_KEY_VALUE
 ] = handleNodeEndedWithCharacter(")");
 locationGenerationHandler[
@@ -185,7 +184,49 @@ locationGenerationHandler[
   apexTypes.LITERAL_EXPRESSION
 ] = handleNodeWithIncorrectEndIndex;
 locationGenerationHandler[
+  apexTypes.LOCATION_IDENTIFIER
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
   apexTypes.SOQL_EXPRESSION
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.CLASS_REF_EXPRESSION
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.QUERY_LITERAL_STRING
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.QUERY_LITERAL_NUMBER
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.QUERY_LITERAL_NULL
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.QUERY_LITERAL_TRUE
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.QUERY_LITERAL_FALSE
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.QUERY_LITERAL_DATE_FORMULA
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  `${apexTypes.SOQL_ORDER}$OrderAsc`
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  `${apexTypes.SOQL_ORDER}$OrderDesc`
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  `${apexTypes.SOQL_ORDER_NULL}$OrderNullFirst`
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  `${apexTypes.SOQL_ORDER_NULL}$OrderNullLast`
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.THIS_VARIABLE_EXPRESSION
+] = handleNodeWithIncorrectEndIndex;
+locationGenerationHandler[
+  apexTypes.SUPER_VARIABLE_EXPRESSION
 ] = handleNodeWithIncorrectEndIndex;
 
 /**
