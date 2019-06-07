@@ -144,6 +144,7 @@ locationGenerationHandler[apexTypes.BINARY_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.ASSIGNMENT_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.FIELD_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.QUERY] = identityFunction;
 locationGenerationHandler[
   apexTypes.VARIABLE_DECLARATION_STATEMENT
 ] = identityFunction;
@@ -174,7 +175,6 @@ locationGenerationHandler[
 locationGenerationHandler[
   apexTypes.METHOD_CALL_EXPRESSION
 ] = handleNodeEndedWithCharacter(")");
-locationGenerationHandler[apexTypes.QUERY] = handleNodeEndedWithCharacter("]");
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
