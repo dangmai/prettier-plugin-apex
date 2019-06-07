@@ -3,13 +3,9 @@
 const prettier = require("prettier");
 
 const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
-const {
-  addDanglingComment,
-  addTrailingComment,
-  skipWhitespace,
-} = prettier.util;
+const { addDanglingComment, skipWhitespace } = prettier.util;
 const constants = require("./constants");
-const { isApexDocComment, isBinaryish } = require("./util");
+const { isApexDocComment } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
@@ -117,38 +113,12 @@ function handleDanglingComment(comment) {
   return false;
 }
 
-function handleBinaryishExpressionTrailingComment(comment) {
-  // Handle this situation:
-  // a = i | j
-  // /* Comments */;
-  // We want to put the comment after the entire statement, because it is more
-  // stable and also in line with Prettier's core.
-  const { precedingNode, enclosingNode, trailingNode } = comment;
-  if (
-    precedingNode &&
-    enclosingNode &&
-    !trailingNode &&
-    isBinaryish(precedingNode) &&
-    enclosingNode.right === precedingNode
-  ) {
-    addTrailingComment(enclosingNode, comment);
-    return true;
-  }
-  return false;
-}
-
 function handleOwnLineComment(comment) {
-  return (
-    handleDanglingComment(comment) ||
-    handleBinaryishExpressionTrailingComment(comment)
-  );
+  return handleDanglingComment(comment);
 }
 
 function handleEndOfLineComment(comment) {
-  return (
-    handleDanglingComment(comment) ||
-    handleBinaryishExpressionTrailingComment(comment)
-  );
+  return handleDanglingComment(comment);
 }
 
 function handleRemainingComment() {
