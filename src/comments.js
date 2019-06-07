@@ -3,7 +3,12 @@
 const prettier = require("prettier");
 
 const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
-const { addDanglingComment, skipWhitespace } = prettier.util;
+const {
+  addDanglingComment,
+  addLeadingComment,
+  hasNewlineInRange,
+  skipWhitespace,
+} = prettier.util;
 const constants = require("./constants");
 const { isApexDocComment } = require("./util");
 
@@ -134,16 +139,82 @@ function handleDanglingComment(comment) {
 }
 
 /**
+ * Brings the comments between if-else blocks into the trailing if/else block.
+ * For example, formating the next block:
+ * ```
+ * if (true) {
+ * }
+ * // Comment
+ * else {
+ * }
+ * ```
+ *
+ * Into:
+ *
+ * ```
+ * if (true) {
+ * } else {
+ *   // Comment
+ * }
+ * ```
+ */
+function handleInBetweenConditionalComment(comment, sourceCode) {
+  const { enclosingNode, precedingNode, followingNode } = comment;
+  if (
+    enclosingNode &&
+    precedingNode &&
+    followingNode &&
+    enclosingNode["@class"] === apexTypes.IF_ELSE_BLOCK &&
+    precedingNode["@class"] === apexTypes.IF_BLOCK &&
+    (followingNode["@class"] === apexTypes.IF_BLOCK ||
+      followingNode["@class"] === apexTypes.ELSE_BLOCK)
+  ) {
+    if (
+      precedingNode.stmnt["@class"] !== apexTypes.BLOCK_STATEMENT &&
+      precedingNode.stmnt.loc.endIndex === precedingNode.loc.endIndex &&
+      !hasNewlineInRange(
+        sourceCode,
+        precedingNode.stmnt.loc.endIndex,
+        comment.location.startIndex,
+      )
+    ) {
+      // The following code can be handled normally without us intervening,
+      // since the comment node should really be trailing to the expression
+      // if (true)
+      //   System.debug('Hello') // Comment
+      // else {
+      // }
+      return false;
+    }
+    if (followingNode.stmnt["@class"] === apexTypes.BLOCK_STATEMENT) {
+      if (followingNode.stmnt.stmnts.length > 0) {
+        addLeadingComment(followingNode.stmnt.stmnts[0], comment);
+      } else {
+        addDanglingComment(followingNode.stmnt, comment);
+      }
+    } else {
+      addLeadingComment(followingNode.stmnt, comment);
+    }
+    return true;
+  }
+  return false;
+}
+
+/**
  * This is called by Prettier's comment handling code, in order to handle
  * comments that are on their own line.
  *
  * @param comment The comment node.
+ * @param sourceCode The entire source code.
  * @returns {boolean} Whether we have manually attached this comment to some AST
  * node. If `true` is returned, Prettier will no longer try to attach this
  * comment based on its internal heuristic.
  */
-function handleOwnLineComment(comment) {
-  return handleDanglingComment(comment);
+function handleOwnLineComment(comment, sourceCode) {
+  return (
+    handleDanglingComment(comment) ||
+    handleInBetweenConditionalComment(comment, sourceCode)
+  );
 }
 
 /**
@@ -151,12 +222,16 @@ function handleOwnLineComment(comment) {
  * comments that have preceding text but no trailing text on a line.
  *
  * @param comment The comment node.
+ * @param sourceCode The entire source code.
  * @returns {boolean} Whether we have manually attached this comment to some AST
  * node. If `true` is returned, Prettier will no longer try to attach this
  * comment based on its internal heuristic.
  */
-function handleEndOfLineComment(comment) {
-  return handleDanglingComment(comment);
+function handleEndOfLineComment(comment, sourceCode) {
+  return (
+    handleDanglingComment(comment) ||
+    handleInBetweenConditionalComment(comment, sourceCode)
+  );
 }
 
 /**
@@ -164,13 +239,13 @@ function handleEndOfLineComment(comment) {
  * comments that have both preceding text and trailing text on a line.
  *
  * @param comment The comment node.
+ * @param sourceCode The entire source code.
  * @returns {boolean} Whether we have manually attached this comment to some AST
  * node. If `true` is returned, Prettier will no longer try to attach this
  * comment based on its internal heuristic.
  */
-// eslint-disable-next-line no-unused-vars
-function handleRemainingComment(comment) {
-  return false;
+function handleRemainingComment(comment, sourceCode) {
+  return handleInBetweenConditionalComment(comment, sourceCode);
 }
 
 module.exports = {
