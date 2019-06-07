@@ -4,7 +4,6 @@ const childProcess = require("child_process");
 const path = require("path");
 
 const { spawnSync } = childProcess;
-const attachComments = require("./comments").attach;
 const constants = require("./constants");
 const { findNextUncommentedCharacter } = require("./util");
 
@@ -94,13 +93,14 @@ function handleInnerQueryLocation(location, sourceCode, commentNodes) {
     commentNodes,
     /* backwards */ true,
   );
-  resultLocation.endIndex = findNextUncommentedCharacter(
-    sourceCode,
-    ")",
-    location.startIndex,
-    commentNodes,
-    /* backwards */ false,
-  );
+  resultLocation.endIndex =
+    findNextUncommentedCharacter(
+      sourceCode,
+      ")",
+      location.startIndex,
+      commentNodes,
+      /* backwards */ false,
+    ) + 1;
   return resultLocation;
 }
 
@@ -108,13 +108,14 @@ function handleNodeEndedWithCharacter(endCharacter) {
   return (location, sourceCode, commentNodes) => {
     const resultLocation = {};
     resultLocation.startIndex = location.startIndex;
-    resultLocation.endIndex = findNextUncommentedCharacter(
-      sourceCode,
-      endCharacter,
-      location.endIndex,
-      commentNodes,
-      /* backwards */ false,
-    );
+    resultLocation.endIndex =
+      findNextUncommentedCharacter(
+        sourceCode,
+        endCharacter,
+        location.endIndex,
+        commentNodes,
+        /* backwards */ false,
+      ) + 1;
     return resultLocation;
   };
 }
@@ -138,6 +139,18 @@ locationGenerationHandler[apexTypes.INNER_ENUM_MEMBER] = identityFunction;
 locationGenerationHandler[apexTypes.METHOD_MEMBER] = identityFunction;
 locationGenerationHandler[apexTypes.IF_ELSE_BLOCK] = identityFunction;
 locationGenerationHandler[apexTypes.NAME_VALUE_PARAMETER] = identityFunction;
+locationGenerationHandler[apexTypes.VARIABLE_DECLARATION] = identityFunction;
+locationGenerationHandler[apexTypes.BINARY_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.ASSIGNMENT_EXPRESSION] = identityFunction;
+locationGenerationHandler[apexTypes.FIELD_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.QUERY] = identityFunction;
+locationGenerationHandler[
+  apexTypes.VARIABLE_DECLARATION_STATEMENT
+] = identityFunction;
+locationGenerationHandler[
+  apexTypes.WHERE_COMPOUND_EXPRESSION
+] = identityFunction;
 locationGenerationHandler[
   apexTypes.WHERE_OPERATION_EXPRESSION
 ] = identityFunction;
@@ -154,15 +167,14 @@ locationGenerationHandler[
   apexTypes.SWITCH_STATEMENT
 ] = handleNodeEndedWithCharacter("}");
 locationGenerationHandler[
-  apexTypes.VARIABLE_DECLARATION_STATEMENT
-] = handleNodeEndedWithCharacter(";");
-locationGenerationHandler[
-  apexTypes.FIELD_MEMBER
+  apexTypes.VARIABLE_DECLARATIONS
 ] = handleNodeEndedWithCharacter(";");
 locationGenerationHandler[
   apexTypes.NEW_KEY_VALUE
 ] = handleNodeEndedWithCharacter(")");
-locationGenerationHandler[apexTypes.QUERY] = handleNodeEndedWithCharacter("]");
+locationGenerationHandler[
+  apexTypes.METHOD_CALL_EXPRESSION
+] = handleNodeEndedWithCharacter(")");
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -199,6 +211,12 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
   if (apexClass && apexClass in locationGenerationHandler && currentLocation) {
     node.loc = locationGenerationHandler[apexClass](
       currentLocation,
+      sourceCode,
+      commentNodes,
+    );
+  } else if (apexClass && apexClass in locationGenerationHandler && node.loc) {
+    node.loc = locationGenerationHandler[apexClass](
+      node.loc,
       sourceCode,
       commentNodes,
     );
@@ -393,7 +411,13 @@ function parse(sourceCode, _, options) {
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
-    attachComments(ast, sourceCode);
+    ast.comments = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
+      .map(token => token[1])
+      .filter(
+        node =>
+          node["@class"] === apexTypes.INLINE_COMMENT ||
+          node["@class"] === apexTypes.BLOCK_COMMENT,
+      );
   }
   return ast;
 }

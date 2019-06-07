@@ -202,6 +202,13 @@ const constants = {
     GEOLOCATION_LITERAL: "apex.jorje.data.soql.Geolocation$GeolocationLiteral",
     QUERY_LITERAL_EXPRESSION: "apex.jorje.data.soql.QueryExpr$LiteralExpr",
     QUERY_LITERAL: "apex.jorje.data.soql.QueryLiteral",
+    QUERY_LITERAL_STRING: "apex.jorje.data.soql.QueryLiteral$QueryString",
+    QUERY_LITERAL_NULL: "apex.jorje.data.soql.QueryLiteral$QueryNull",
+    QUERY_LITERAL_TRUE: "apex.jorje.data.soql.QueryLiteral$QueryTrue",
+    QUERY_LITERAL_FALSE: "apex.jorje.data.soql.QueryLiteral$QueryFalse",
+    QUERY_LITERAL_NUMBER: "apex.jorje.data.soql.QueryLiteral$QueryNumber",
+    QUERY_LITERAL_DATE_FORMULA:
+      "apex.jorje.data.soql.QueryLiteral$QueryDateFormula",
     QUERY_OPERATOR: "apex.jorje.data.soql.QueryOp",
     SOQL_ORDER: "apex.jorje.data.soql.Order",
     SOQL_ORDER_NULL: "apex.jorje.data.soql.OrderNull",
@@ -378,18 +385,12 @@ constants.TRAILING_EMPTY_LINE_AFTER_LAST_NODE = [
   constants.APEX_TYPES.INNER_ENUM_MEMBER,
 ];
 
-constants.ALLOW_TRAILING_COMMENT = [
+constants.ALLOW_DANGLING_COMMENTS = [
+  constants.APEX_TYPES.TRIGGER_DECLARATION_UNIT,
   constants.APEX_TYPES.CLASS_DECLARATION,
-  constants.APEX_TYPES.INTERFACE_DECLARATION,
-  constants.APEX_TYPES.METHOD_DECLARATION,
   constants.APEX_TYPES.ENUM_DECLARATION,
-  constants.APEX_TYPES.VARIABLE_DECLARATION,
-  constants.APEX_TYPES.LOCATION_IDENTIFIER,
-  constants.APEX_TYPES.LITERAL_EXPRESSION,
-  constants.APEX_TYPES.IF_BLOCK,
-  constants.APEX_TYPES.NAME_VALUE_PARAMETER,
-  constants.APEX_TYPES.WHERE_OPERATION_EXPRESSION,
-  constants.APEX_TYPES.WHERE_CLAUSE,
+  constants.APEX_TYPES.INTERFACE_DECLARATION,
+  constants.APEX_TYPES.BLOCK_STATEMENT,
 ];
 
 module.exports = constants;

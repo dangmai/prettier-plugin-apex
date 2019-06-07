@@ -44,7 +44,6 @@
   },
   "dependencies": {
     "node-nailgun-client": "github:dangmai/node-nailgun-client#send_input",
-    "private": "^0.1.8",
     "wait-on": "^3.2.0",
     "yargs": "^13.2.1"
   }

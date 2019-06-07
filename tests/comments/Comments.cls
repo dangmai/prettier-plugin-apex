@@ -138,6 +138,8 @@ class Comments {
       &
       // Comments
       j;
+    a = i | j
+    /* Comments */;
     a =
       /* Comments */
       i
@@ -230,6 +232,52 @@ class Comments {
       System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
     } else {
       System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
+
+    if (a > 1) {
+      System.debug('Hi');
+    }
+    // In between Inline Comment 1
+    else if (b > 2) {
+      System.debug('Hello');
+    }
+    // In between Inline Comment 2
+    else if (c > 3) {
+    }
+    // In between Inline Comment 3
+    else if (d > 3) System.debug('World');
+    // In between Inline Comment 4
+    else {
+    }
+
+    if (true) {
+    }
+    // In between Inline Comment 5
+    else {
+      System.debug('Hello');
+    }
+
+    if (a > 1) {
+      System.debug('Hi');
+    }
+    /* In between Block Comment 1 */
+    else if (b > 2) {
+      System.debug('Hello');
+    }
+    /* In between Block Comment 2 */
+    else if (c > 3) {
+    }
+    /* In between Block Comment 3 */
+    else if (d > 3) System.debug('World');
+    /* In between Block Comment 4 */
+    else {
+    }
+
+    if (true) {
+    }
+    /* In between Block Comment 5 */
+    else {
+      System.debug('Hello');
     }
   }
 

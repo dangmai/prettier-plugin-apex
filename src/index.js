@@ -1,3 +1,12 @@
+const {
+  canAttachComment,
+  handleEndOfLineComment,
+  handleOwnLineComment,
+  handleRemainingComment,
+  isBlockComment,
+  printComment,
+  willPrintOwnComments,
+} = require("./comments");
 const parse = require("./parser");
 const print = require("./printer");
 const { massageAstNode } = require("./util");
@@ -13,14 +22,13 @@ const languages = [
 ];
 
 function locStart(node) {
-  if (node.loc) {
-    return node.loc;
-  }
-  return { line: -1, column: -1 };
+  const location = node.loc ? node.loc : node.location;
+  return location.startIndex;
 }
 
-function locEnd() {
-  return -1;
+function locEnd(node) {
+  const location = node.loc ? node.loc : node.location;
+  return location.endIndex;
 }
 
 const parsers = {
@@ -37,6 +45,15 @@ const printers = {
   apex: {
     print,
     massageAstNode,
+    isBlockComment,
+    canAttachComment,
+    printComment,
+    willPrintOwnComments,
+    handleComments: {
+      ownLine: handleEndOfLineComment,
+      endOfLine: handleOwnLineComment,
+      remaining: handleRemainingComment,
+    },
   },
 };
 

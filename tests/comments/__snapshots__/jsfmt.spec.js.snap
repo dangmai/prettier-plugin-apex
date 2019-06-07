@@ -141,6 +141,8 @@ class Comments {
       &
       // Comments
       j;
+    a = i | j
+    /* Comments */;
     a =
       /* Comments */
       i
@@ -233,6 +235,52 @@ class Comments {
       System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
     } else {
       System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
+
+    if (a > 1) {
+      System.debug('Hi');
+    }
+    // In between Inline Comment 1
+    else if (b > 2) {
+      System.debug('Hello');
+    }
+    // In between Inline Comment 2
+    else if (c > 3) {
+    }
+    // In between Inline Comment 3
+    else if (d > 3) System.debug('World');
+    // In between Inline Comment 4
+    else {
+    }
+
+    if (true) {
+    }
+    // In between Inline Comment 5
+    else {
+      System.debug('Hello');
+    }
+
+    if (a > 1) {
+      System.debug('Hi');
+    }
+    /* In between Block Comment 1 */
+    else if (b > 2) {
+      System.debug('Hello');
+    }
+    /* In between Block Comment 2 */
+    else if (c > 3) {
+    }
+    /* In between Block Comment 3 */
+    else if (d > 3) System.debug('World');
+    /* In between Block Comment 4 */
+    else {
+    }
+
+    if (true) {
+    }
+    /* In between Block Comment 5 */
+    else {
+      System.debug('Hello');
     }
   }
 
@@ -369,37 +417,40 @@ class Comments {
       i + j;
 
     a =
+      i +
       // Comment
-      i + j;
+      j;
     a =
       i -
       // Comment
       j;
     a =
-      i
-      /* Comment */ * j;
+      i *
+      /* Comment */
+      j;
     a =
       i /
       /* Comment */
       j;
     a =
-      // Comment
       i <<
+      // Comment
       /* Comment */
       j;
     a = i /* Comment */ >> /* Comment 2 */ j;
     a = /* Comments */ i >>> j /* Comments 2 */;
     a = /* Comments */ i ^ /* Comments 2 */ j;
     a =
-      // Comments
       i &
       // Comments
+      // Comments
       j;
+    a = i | j;
+    /* Comments */
     a =
       /* Comments */
-      i |
-      j
-      /* Comments */;
+      i | j;
+    /* Comments */
   }
 
   void commentInSOQL() {
@@ -419,7 +470,11 @@ class Comments {
         (SELECT Id FROM Accounts)
       FROM Contact
     ];
-    List<Contact> contact = [SELECT Id FROM Contact WHERE Name = 'Name']; // Trailing Inline SOQL Test 1
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name' // Trailing Inline SOQL Test 1
+    ];
     List<Contact> contact = [
       SELECT Id
       FROM Contact
@@ -428,7 +483,9 @@ class Comments {
     List<Contact> contact = [
       SELECT Id
       FROM Contact
-      WHERE Name = 'Name' AND Name = 'Another Name' // Trailing Inline SOQL Test 3 // Trailing Inline SOQL Test 4
+      WHERE
+        Name = 'Name' // Trailing Inline SOQL Test 3
+        AND Name = 'Another Name' // Trailing Inline SOQL Test 4
     ];
 
     List<Contact> contact = [
@@ -481,6 +538,46 @@ class Comments {
       System.debug('Hello'); /* Trailing Block Conditional Comment 2 */
     } else {
       System.debug('World'); /* Trailing Block Conditional COmment 3 */
+    }
+
+    if (a > 1) {
+      System.debug('Hi');
+    } else if (b > 2) {
+      // In between Inline Comment 1
+      System.debug('Hello');
+    } else if (c > 3) {
+      // In between Inline Comment 2
+    } else if (d > 3)
+      // In between Inline Comment 3
+      System.debug('World');
+    else {
+      // In between Inline Comment 4
+    }
+
+    if (true) {
+    } else {
+      // In between Inline Comment 5
+      System.debug('Hello');
+    }
+
+    if (a > 1) {
+      System.debug('Hi');
+    } else if (b > 2) {
+      /* In between Block Comment 1 */
+      System.debug('Hello');
+    } else if (c > 3) {
+      /* In between Block Comment 2 */
+    } else if (d > 3)
+      /* In between Block Comment 3 */
+      System.debug('World');
+    else {
+      /* In between Block Comment 4 */
+    }
+
+    if (true) {
+    } else {
+      /* In between Block Comment 5 */
+      System.debug('Hello');
     }
   }
 
