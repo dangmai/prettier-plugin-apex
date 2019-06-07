@@ -71,7 +71,7 @@ const METADATA_TO_IGNORE = [
   "@id",
   // It is impossible to preserve the comment AST. Neither recast nor
   // prettier tries to do it so we are not going to bother either.
-  "apexComments",
+  "comments",
   "$",
   "leading",
   "trailing",
