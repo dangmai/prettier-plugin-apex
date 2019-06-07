@@ -213,7 +213,7 @@ function shouldDottedExpressionBreak(path) {
   ) {
     return true;
   }
-  return node.numberOfDottedExpressions > 2;
+  return node.dottedExpr.value;
 }
 
 function handleDottedExpression(path, print) {
@@ -254,7 +254,7 @@ function handleVariableExpression(path, print) {
   parts.push(dottedExpressionDoc);
   // Name chain
   const nameDocs = path.map(print, "names");
-  parts.push(join(concat([softline, "."]), nameDocs));
+  parts.push(join(".", nameDocs));
 
   // Technically, in a typical array expression (e.g: a[b]),
   // the variable expression is a child of the array expression.
@@ -279,8 +279,7 @@ function handleVariableExpression(path, print) {
     nodeName === "expr"
   ) {
     path.callParent(innerPath => {
-      const withGroup =
-        isParentDottedExpression || dottedExpressionDoc || nameDocs.length >= 2;
+      const withGroup = isParentDottedExpression || dottedExpressionDoc;
 
       parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
     });
@@ -994,7 +993,6 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
-  const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
@@ -1012,12 +1010,7 @@ function handleMethodCallExpression(path, print) {
         ])
       : "";
 
-  const methodCallChainDoc =
-    isParentDottedExpression ||
-    // Here we know that this is the top most expression
-    node.numberOfDottedExpressions > 2
-      ? join(concat([softline, "."]), nameDocs)
-      : join(".", nameDocs);
+  const methodCallChainDoc = join(".", nameDocs);
 
   // Handling the array expression index.
   // Technically, in this statement: a()[b],
@@ -1044,8 +1037,7 @@ function handleMethodCallExpression(path, print) {
     nodeName === "expr"
   ) {
     path.callParent(innerPath => {
-      const withGroup =
-        isParentDottedExpression || node.numberOfDottedExpressions >= 2;
+      const withGroup = isParentDottedExpression || dottedExpressionDoc;
 
       arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
     });
@@ -1077,24 +1069,22 @@ function handleMethodCallExpression(path, print) {
       indent(
         concat([
           dottedExpressionDoc,
-          // If there are 2 names or less, we should group the method call chain
+          // If there is no dottedExpr, we should group the method call chain
           // to have this effect:
           // a.callMethod(  // <- 2 names (a and callMethod)
           //   'a',
-          //   'b')
+          //   'b'
+          // )
           // Otherwise we don't want to group them, so that they're part of the
           // parent group. It will format this code:
-          // a.b.c.callMethod('a', 'b') // <- 4 names (a, b, c, callMethod)
+          // a.b().c().callMethod('a', 'b') // <- 4 names (a, b, c, callMethod)
           // into this:
-          // a
-          //   .b
-          //   .c
+          // a.b()
+          //   .c()
           //   .callMethod('a', 'b')
-          node.numberOfDottedExpressions > 2
-            ? methodCallChainDoc
-            : group(methodCallChainDoc),
+          dottedExpressionDoc ? methodCallChainDoc : group(methodCallChainDoc),
           "(",
-          node.numberOfDottedExpressions > 2
+          dottedExpressionDoc
             ? group(indent(resultParamDoc))
             : group(resultParamDoc),
           ")",

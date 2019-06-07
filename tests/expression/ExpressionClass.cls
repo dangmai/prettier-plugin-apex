@@ -257,6 +257,11 @@ class Conditional extends Object {
     System.debug(this.a + this.b);
   }
 
+  void longStaticMethodCallChainExpression() {
+    Map<String, Schema.RecordTypeInfo> accRTs = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+    Blob yetAnotherVeryLongVariableThatWillSurelyBreakTheLineOnItsOwn = Blob.valueOf('').size();
+  }
+
   void classRefExpression() {
     System.Type t = Integer.class;
   }

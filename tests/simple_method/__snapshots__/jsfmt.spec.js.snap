@@ -96,8 +96,7 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
       'many other strings ' +
       'together.';
 
-    return generator
-      .objectBuilder
+    return generator.objectBuilder
       .setExternalId(account.personContactId)
       .getInstance();
   }

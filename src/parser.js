@@ -288,45 +288,6 @@ function generateExtraMetadata(
   return nodeLoc;
 }
 
-/**
- * jorje sometimes gives us different ASTs depending on the white spaces
- * between keywords (#38), which makes it very difficult to know how many
- * nested expressions there are in a method call or a variable expression.
- * This method is used to calculate that number.
- * After this method is called on a node that contains a `dottedExpr`,
- * that node will contain a `numberOfDottedExpressions` property.
- * @param node the current node being visited.
- */
-function generateDottedExpressionMetadata(node) {
-  Object.keys(node).forEach(key => {
-    if (typeof node[key] === "object") {
-      node[key] = generateDottedExpressionMetadata(node[key]);
-    }
-    if (key === "dottedExpr") {
-      node.numberOfDottedExpressions = 1;
-      if (node.names) {
-        node.numberOfDottedExpressions = node.names.length;
-      }
-      if (node.dottedExpr && node.dottedExpr.value) {
-        if (node.dottedExpr.value.numberOfDottedExpressions) {
-          node.numberOfDottedExpressions +=
-            node.dottedExpr.value.numberOfDottedExpressions;
-        } else if (
-          node.dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
-          node.dottedExpr.value.expr.numberOfDottedExpressions
-        ) {
-          node.numberOfDottedExpressions +=
-            node.dottedExpr.value.expr.numberOfDottedExpressions;
-        } else {
-          node.numberOfDottedExpressions += 1;
-        }
-      }
-    }
-  });
-
-  return node;
-}
-
 // For each node, the jorje compiler gives us its line and its index within
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
@@ -430,7 +391,6 @@ function parse(sourceCode, _, options) {
     ast = resolveAstReferences(ast, {});
     handleNodeLocation(ast, sourceCode, commentNodes);
     ast = resolveLineIndexes(ast, lineIndexes);
-    ast = generateDottedExpressionMetadata(ast);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
     attachComments(ast, sourceCode);

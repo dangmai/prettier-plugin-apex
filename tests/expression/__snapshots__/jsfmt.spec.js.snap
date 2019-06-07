@@ -260,6 +260,11 @@ class Conditional extends Object {
     System.debug(this.a + this.b);
   }
 
+  void longStaticMethodCallChainExpression() {
+    Map<String, Schema.RecordTypeInfo> accRTs = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+    Blob yetAnotherVeryLongVariableThatWillSurelyBreakTheLineOnItsOwn = Blob.valueOf('').size();
+  }
+
   void classRefExpression() {
     System.Type t = Integer.class;
   }
@@ -402,8 +407,7 @@ class Conditional extends Object {
   void instanceOfExpression() {
     SObject o;
     Boolean b = o instanceof Account;
-    Boolean b = veryLongVariableNameThatWillForSureOneHundredPercentBreak
-      .getMethod()
+    Boolean b = veryLongVariableNameThatWillForSureOneHundredPercentBreak.getMethod()
       .getSObject() instanceof Account;
   }
 
@@ -455,13 +459,11 @@ class Conditional extends Object {
         'Another Super Duper Long String That Will Break For Sure'
       );
     Boolean result =
-      oneRecord
-        .get(
+      oneRecord.get(
           'Super Duper Long String That Will Break For Sure And Make This Line Go Very Long'
         )
         .get('Yet Another Very Long Variable To Help Breaking') >
-      anotherRecord
-        .get(
+      anotherRecord.get(
           'Another Super Duper Long String That Will Break For Sure And Make This Line Go Very Long'
         )
         .get('Yet Another Variable To Help Breaking');
@@ -540,62 +542,48 @@ class Conditional extends Object {
         veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
       ]
     ];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions[
+      veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
+    ];
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
-      .systemStatusOptions[0];
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
-      .propertyMember
-      .systemStatusOptions[
-        veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
-      ];
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
-      .propertyMember
-      .systemStatusOptions[
+      .propertyMember.systemStatusOptions[
         a[
           a[
             veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
           ]
         ]
       ];
-    b = a
-      .b
-      .c[
-        veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
-      ];
+    b = a.b.c[
+      veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+    ];
 
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions()[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions()[
+      veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
+    ];
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
-      .propertyMember
-      .systemStatusOptions()[
-        veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
-      ];
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
-      .propertyMember
-      .systemStatusOptions()[
+      .propertyMember.systemStatusOptions()[
         a[
           a[
             veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
           ]
         ]
       ];
-    b = a
-      .b
-      .c()[
-        veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
-      ];
+    b = a.b.c()[
+      veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
+    ];
 
     b = 'String Literal'[0];
     b = 'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[0];
 
     String longResult = o[0].callMethod('first param');
-    String longResult = o[0].callMethod(
-      'first param',
-      'second param',
-      'third param',
-      'fourth param'
-    );
+    String longResult = o[0]
+      .callMethod('first param', 'second param', 'third param', 'fourth param');
     String longResult = o[
         veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
-      ].callMethod('first param');
+      ]
+      .callMethod('first param');
     String longResult = o[0]
       .callMethod('first param')
       .callAnotherMethod()
@@ -606,22 +594,22 @@ class Conditional extends Object {
     Integer a = 1;
     Integer b = 2;
     Integer c = a + b;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
-      .Another_Very_Long_SObject_Field_Name__c;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
-      .getSObjectFields()
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.getSObjectFields()
       .Another_Very_Long_SObject_Field_Name__c;
   }
 
   void methodCallExpression() {
     SomeObject o = new SomeObject();
     String result = o.callMethod().getStringResult();
-    String longResult = o
-      .callMethod('first param')
+    String longResult = o.callMethod('first param')
       .callAnotherMethod()
       .getStringResult();
-    String longResult = o
-      .callMethod('first param', 'second param', 'thirdParam')
+    String longResult = o.callMethod(
+        'first param',
+        'second param',
+        'thirdParam'
+      )
       .callAnotherMethod()
       .getStringResult();
     String longResult = o.callMethod(
@@ -632,8 +620,7 @@ class Conditional extends Object {
       'fifthParam',
       'sixthParam'
     );
-    String longResult = o
-      .callMethod(
+    String longResult = o.callMethod(
         'first param',
         'second param',
         'thirdParam',
@@ -643,8 +630,7 @@ class Conditional extends Object {
       )
       .callAnotherMethod()
       .getStringResult();
-    String longResult = o
-      .callAnotherMethod()
+    String longResult = o.callAnotherMethod()
       .getStringResult()
       .callMethod(
         'first param',
@@ -658,31 +644,26 @@ class Conditional extends Object {
       'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
     );
 
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable.veryLongPropertyMember.get(
+      accountId
+    );
     VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable
       .veryLongPropertyMember
       .get(accountId);
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable
-      .veryLongPropertyMember
-      .get(accountId);
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
-      .systemStatusOptions[0]
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0]
       .getValue();
-    variableName
-      .propertyName
-      .add(
-        new InnerClass(
-          objectBuilder
-            .callMethod()
-            .callAnotherMethod(null)
-            .callYetAnotherMethod('Hello')
-            .callYetAnotherYetAnotherMethod(Date.today())
-        )
-      );
-    variableName.propertyMember.get('Name').status = variableName
-      .propertyOptions[0]
-      .getValue();
-    a = b
-      .c()
+    variableName.propertyName.add(
+      new InnerClass(
+        objectBuilder
+          .callMethod()
+          .callAnotherMethod(null)
+          .callYetAnotherMethod('Hello')
+          .callYetAnotherYetAnotherMethod(Date.today())
+      )
+    );
+    variableName.propertyMember.get('Name')
+      .status = variableName.propertyOptions[0].getValue();
+    a = b.c()
       .d(
         'first param',
         'second param',
@@ -695,10 +676,11 @@ class Conditional extends Object {
       anotherVariableName.Very_Long_Property_Member__c,
       VeryLongOuterClassName.VeryLongInnerClassName.class
     );
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure.deserialize(
-      anotherVariableName.Very_Long_Property_Member__c,
-      VeryLongOuterClassName.VeryLongInnerClassName.class
-    );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure
+      .deserialize(
+        anotherVariableName.Very_Long_Property_Member__c,
+        VeryLongOuterClassName.VeryLongInnerClassName.class
+      );
     VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatIsAMethodThatWillBreakForSure(
       anotherVariableName.Very_Long_Property_Member__c,
       VeryLongOuterClassName.VeryLongInnerClassName.class
@@ -707,7 +689,8 @@ class Conditional extends Object {
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [
         SELECT Id
         FROM Account
-      ].callMethod();
+      ]
+      .callMethod();
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [
         SELECT Id
         FROM Account
@@ -738,11 +721,8 @@ class Conditional extends Object {
     String longResult = super.callMethod('first param')
       .callAnotherMethod()
       .getStringResult();
-    String longResult = super.longPropertyName
-      .anotherLongPropertyName
-      .yetAnotherLongPropertyName;
-    String longResult = super.longPropertyName
-      .callMethod('first param')
+    String longResult = super.longPropertyName.anotherLongPropertyName.yetAnotherLongPropertyName;
+    String longResult = super.longPropertyName.callMethod('first param')
       .callAnotherMethod()
       .getStringResult();
   }
@@ -750,6 +730,14 @@ class Conditional extends Object {
   void thisVariableExpression() {
     this.a = 'Hello World';
     System.debug(this.a + this.b);
+  }
+
+  void longStaticMethodCallChainExpression() {
+    Map<String, Schema.RecordTypeInfo> accRTs = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+    Blob yetAnotherVeryLongVariableThatWillSurelyBreakTheLineOnItsOwn = Blob.valueOf(
+        ''
+      )
+      .size();
   }
 
   void classRefExpression() {
@@ -770,26 +758,21 @@ class Conditional extends Object {
   void dottedExprMethod() {
     a.Field__c = null;
     a.Field__c = null;
+    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
       .Another_Very_Long_SObject_Field_Name__c;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
-      .Another_Very_Long_SObject_Field_Name__c;
-    CustomObject__c customObject = generator
-      .objectBuilder
+    CustomObject__c customObject = generator.objectBuilder.setExternalId(
+        account.personContactId
+      )
+      .getInstance();
+    CustomObject__c customObject = generator.objectBuilder
       .setExternalId(account.personContactId)
       .getInstance();
-    CustomObject__c customObject = generator
-      .objectBuilder
-      .setExternalId(account.personContactId)
-      .getInstance();
-    customObject = generator
-      .objectBuilder
-      .setExternalId(account.personContactId)
-      .Name
-      .toString()
-      .Name
-      .Name
-      .toString();
+    customObject = generator.objectBuilder.setExternalId(
+        account.personContactId
+      )
+      .Name.toString()
+      .Name.Name.toString();
   }
 
   void soqlExpression_inOtherSuite() {

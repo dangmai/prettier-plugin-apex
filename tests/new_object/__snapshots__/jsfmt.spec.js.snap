@@ -68,8 +68,7 @@ class NewObject {
       veryLongVariable.getOneSet().getAnotherSet().getYetAnotherSet()
     );
     List<String> aCopy = new List<String>(
-      superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
-        .getOneSet()
+      superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak.getOneSet()
         .getAnotherSet()
         .getYetAnotherSet()
     );
@@ -97,8 +96,7 @@ class NewObject {
       veryLongVariable.getOneSet().getAnotherSet().getYetAnotherSet()
     );
     Set<String> aCopy = new Set<String>(
-      superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
-        .getOneSet()
+      superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak.getOneSet()
         .getAnotherSet()
         .getYetAnotherSet()
     );
@@ -122,8 +120,7 @@ class NewObject {
       veryLongVariable.getOneSet().getAnotherSet().getYetAnotherSet()
     );
     Map<String, String> aCopy = new Map<String, String>(
-      superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
-        .getOneSet()
+      superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak.getOneSet()
         .getAnotherSet()
         .getYetAnotherSet()
     );
