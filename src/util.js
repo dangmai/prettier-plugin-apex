@@ -88,6 +88,18 @@ function massageAstNode(ast, newObj) {
     // the original and parsed strings.
     newObj.scope = ast.scope.toUpperCase();
   } else if (
+    ast.dottedExpr &&
+    ast.dottedExpr.value &&
+    ast.dottedExpr.value.names &&
+    ast.dottedExpr.value["@class"] === apexTypes.VARIABLE_EXPRESSION &&
+    ast.names
+  ) {
+    // This is a workaround for #38 - jorje sometimes groups names with
+    // spaces as dottedExpr, so we can't compare AST effectively.
+    // In those cases we will bring the dottedExpr out into the names.
+    newObj.names = newObj.dottedExpr.value.names.concat(newObj.names);
+    newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
+  } else if (
     ast["@class"] &&
     ast["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION
   ) {
