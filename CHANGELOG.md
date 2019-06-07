@@ -1,4 +1,5 @@
 ## Unreleased
+- Implement comments using Prettier's API.
 
 ## 1.0.0-beta.2
 - Fix long static method calls producing undeployable code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/69)).
