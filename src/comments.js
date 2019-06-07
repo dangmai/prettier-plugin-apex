@@ -248,12 +248,48 @@ function handleRemainingComment(comment, sourceCode) {
   return handleInBetweenConditionalComment(comment, sourceCode);
 }
 
+/**
+ * This is called by Prettier's comment handling code, in order to find out
+ * if a node should be formatted or not.
+ * @param path The FastPath object.
+ * @returns {boolean} Whether the path should be formatted.
+ */
+function hasPrettierIgnore(path) {
+  const node = path.getValue();
+  return (
+    node &&
+    node.comments &&
+    node.comments.length > 0 &&
+    node.comments.filter(comment => {
+      let content;
+      if (!comment.leading) {
+        return false;
+      }
+      if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
+        // For simplicity sake we only support this format
+        // /* prettier-ignore */
+        content = comment.value
+          .trim()
+          .substring(2, comment.value.length - 2)
+          .trim();
+      } else {
+        content = comment.value
+          .trim()
+          .substring(2)
+          .trim();
+      }
+      return content === "prettier-ignore";
+    }).length > 0
+  );
+}
+
 module.exports = {
   canAttachComment,
   getTrailingComments,
   handleOwnLineComment,
   handleEndOfLineComment,
   handleRemainingComment,
+  hasPrettierIgnore,
   isApexDocComment,
   isBlockComment,
   printComment,

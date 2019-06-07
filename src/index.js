@@ -3,6 +3,7 @@ const {
   handleEndOfLineComment,
   handleOwnLineComment,
   handleRemainingComment,
+  hasPrettierIgnore,
   isBlockComment,
   printComment,
   willPrintOwnComments,
@@ -45,6 +46,7 @@ const printers = {
   apex: {
     print,
     massageAstNode,
+    hasPrettierIgnore,
     isBlockComment,
     canAttachComment,
     printComment,

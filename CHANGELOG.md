@@ -1,6 +1,7 @@
 ## Unreleased
 - Implement comments using Prettier's API.
 - Fix unstable comments in between If/Else blocks.
+- Add support for `prettier-ignore` directive ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/3)).
 
 ## 1.0.0-beta.2
 - Fix long static method calls producing undeployable code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/69)).
