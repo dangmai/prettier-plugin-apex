@@ -1,5 +1,8 @@
 ## Unreleased
 
+## 1.0.0-beta.2
+- Fix long static method calls producing undeployable code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/69)).
+
 ## 1.0.0-beta.1
 - Add support for Anonymous Code block with `--apex-anonymous` option.
 - CLI/Option change:
