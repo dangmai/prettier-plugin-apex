@@ -93,13 +93,14 @@ function handleInnerQueryLocation(location, sourceCode, commentNodes) {
     commentNodes,
     /* backwards */ true,
   );
-  resultLocation.endIndex = findNextUncommentedCharacter(
-    sourceCode,
-    ")",
-    location.startIndex,
-    commentNodes,
-    /* backwards */ false,
-  );
+  resultLocation.endIndex =
+    findNextUncommentedCharacter(
+      sourceCode,
+      ")",
+      location.startIndex,
+      commentNodes,
+      /* backwards */ false,
+    ) + 1;
   return resultLocation;
 }
 
@@ -107,13 +108,14 @@ function handleNodeEndedWithCharacter(endCharacter) {
   return (location, sourceCode, commentNodes) => {
     const resultLocation = {};
     resultLocation.startIndex = location.startIndex;
-    resultLocation.endIndex = findNextUncommentedCharacter(
-      sourceCode,
-      endCharacter,
-      location.endIndex + 1,
-      commentNodes,
-      /* backwards */ false,
-    );
+    resultLocation.endIndex =
+      findNextUncommentedCharacter(
+        sourceCode,
+        endCharacter,
+        location.endIndex,
+        commentNodes,
+        /* backwards */ false,
+      ) + 1;
     return resultLocation;
   };
 }
@@ -122,13 +124,6 @@ function handleAnonymousUnitLocation(location, sourceCode) {
   return {
     startIndex: 0,
     endIndex: sourceCode.length,
-  };
-}
-
-function handleNodeWithIncorrectEndIndex(location) {
-  return {
-    startIndex: location.startIndex,
-    endIndex: location.endIndex - 1,
   };
 }
 
@@ -180,54 +175,6 @@ locationGenerationHandler[
   apexTypes.METHOD_CALL_EXPRESSION
 ] = handleNodeEndedWithCharacter(")");
 locationGenerationHandler[apexTypes.QUERY] = handleNodeEndedWithCharacter("]");
-locationGenerationHandler[
-  apexTypes.LITERAL_EXPRESSION
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.LOCATION_IDENTIFIER
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.SOQL_EXPRESSION
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.CLASS_REF_EXPRESSION
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.QUERY_LITERAL_STRING
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.QUERY_LITERAL_NUMBER
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.QUERY_LITERAL_NULL
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.QUERY_LITERAL_TRUE
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.QUERY_LITERAL_FALSE
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.QUERY_LITERAL_DATE_FORMULA
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  `${apexTypes.SOQL_ORDER}$OrderAsc`
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  `${apexTypes.SOQL_ORDER}$OrderDesc`
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  `${apexTypes.SOQL_ORDER_NULL}$OrderNullFirst`
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  `${apexTypes.SOQL_ORDER_NULL}$OrderNullLast`
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.THIS_VARIABLE_EXPRESSION
-] = handleNodeWithIncorrectEndIndex;
-locationGenerationHandler[
-  apexTypes.SUPER_VARIABLE_EXPRESSION
-] = handleNodeWithIncorrectEndIndex;
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
