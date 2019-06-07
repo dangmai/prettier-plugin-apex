@@ -39,6 +39,13 @@ function printDanglingComment(commentPath, options, print) {
   return concat(parts);
 }
 
+/**
+ * This is called by Prettier's comment handling code, in order for Prettier
+ * to tell if this is a node to which a comment can be attached.
+ *
+ * @param node The current node
+ * @returns {boolean} whether a comment can be attached to this node or not.
+ */
 function canAttachComment(node) {
   return (
     node.loc &&
@@ -48,10 +55,23 @@ function canAttachComment(node) {
   );
 }
 
+/**
+ * This is called by Prettier's comment handling code, in order to find out
+ * if this is a block comment.
+ *
+ * @param comment The current comment node.
+ * @returns {boolean} whether it is a block comment.
+ */
 function isBlockComment(comment) {
   return comment["@class"] === apexTypes.BLOCK_COMMENT;
 }
 
+/**
+ * This is called by Prettier's comment handling code.
+ * We can use this to tell Prettier that we will print comments manually on
+ * certain nodes.
+ * @returns {boolean} whether or not we will print the comment on this node manually.
+ */
 function willPrintOwnComments() {
   return false;
 }
@@ -113,15 +133,43 @@ function handleDanglingComment(comment) {
   return false;
 }
 
+/**
+ * This is called by Prettier's comment handling code, in order to handle
+ * comments that are on their own line.
+ *
+ * @param comment The comment node.
+ * @returns {boolean} Whether we have manually attached this comment to some AST
+ * node. If `true` is returned, Prettier will no longer try to attach this
+ * comment based on its internal heuristic.
+ */
 function handleOwnLineComment(comment) {
   return handleDanglingComment(comment);
 }
 
+/**
+ * This is called by Prettier's comment handling code, in order to handle
+ * comments that have preceding text but no trailing text on a line.
+ *
+ * @param comment The comment node.
+ * @returns {boolean} Whether we have manually attached this comment to some AST
+ * node. If `true` is returned, Prettier will no longer try to attach this
+ * comment based on its internal heuristic.
+ */
 function handleEndOfLineComment(comment) {
   return handleDanglingComment(comment);
 }
 
-function handleRemainingComment() {
+/**
+ * This is called by Prettier's comment handling code, in order to handle
+ * comments that have both preceding text and trailing text on a line.
+ *
+ * @param comment The comment node.
+ * @returns {boolean} Whether we have manually attached this comment to some AST
+ * node. If `true` is returned, Prettier will no longer try to attach this
+ * comment based on its internal heuristic.
+ */
+// eslint-disable-next-line no-unused-vars
+function handleRemainingComment(comment) {
   return false;
 }
 
