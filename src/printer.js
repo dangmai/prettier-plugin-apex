@@ -16,11 +16,7 @@ const {
   dedent,
 } = docBuilders;
 
-const {
-  getTrailingComments,
-  isApexDocComment,
-  printDanglingComment,
-} = require("./comments");
+const { getTrailingComments, printDanglingComment } = require("./comments");
 const {
   checkIfParentIsDottedExpression,
   getPrecedence,
@@ -2369,40 +2365,6 @@ function handleForInit(path, print) {
   return parts;
 }
 
-/**
- * Print ApexDoc comment. This is straight from prettier handling of JSDoc
- * @param comment the comment to print.
- */
-function handleApexDocComment(comment) {
-  const lines = comment.value.split("\n");
-  comment.printed = true; // eslint-disable-line no-param-reassign
-  return concat([
-    join(
-      hardline,
-      lines.map(
-        (commentLine, index) =>
-          (index > 0 ? " " : "") +
-          (index < lines.length - 1
-            ? commentLine.trim()
-            : commentLine.trimLeft()),
-      ),
-    ),
-  ]);
-}
-
-function handleComment(path) {
-  // This handles both Inline and Block Comments.
-  // We don't just pass through the value because unlike other string literals,
-  // this should not be escaped
-  // TODO indentation after line ending is not correct
-  const node = path.getValue();
-  if (isApexDocComment(node)) {
-    return handleApexDocComment(node);
-  }
-  node.printed = true;
-  return node.value;
-}
-
 const nodeHandler = {};
 nodeHandler[apexTypes.IF_ELSE_BLOCK] = handleIfElseBlock;
 nodeHandler[apexTypes.IF_BLOCK] = handleIfBlock;
@@ -2455,8 +2417,6 @@ nodeHandler[apexTypes.LITERAL_CASE] = _handlePassthroughCall("expr");
 nodeHandler[apexTypes.PROPERTY_DECLATION] = handlePropertyDeclaration;
 nodeHandler[apexTypes.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
 nodeHandler[apexTypes.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
-nodeHandler[apexTypes.BLOCK_COMMENT] = handleComment;
-nodeHandler[apexTypes.INLINE_COMMENT] = handleComment;
 nodeHandler[apexTypes.STRUCTURED_VERSION] = handleStructuredVersion;
 nodeHandler[apexTypes.REQUEST_VERSION] = () => "Request";
 nodeHandler.int = (path, print) => path.call(print, "$");

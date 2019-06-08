@@ -14,7 +14,46 @@ const { isApexDocComment } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
-function printDanglingComment(commentPath, options, print) {
+/**
+ * Print ApexDoc comment. This is straight from prettier handling of JSDoc
+ * @param comment the comment to print.
+ */
+function printApexDocComment(comment) {
+  const lines = comment.value.split("\n");
+  return concat([
+    join(
+      hardline,
+      lines.map(
+        (commentLine, index) =>
+          (index > 0 ? " " : "") +
+          (index < lines.length - 1
+            ? commentLine.trim()
+            : commentLine.trimLeft()),
+      ),
+    ),
+  ]);
+}
+
+function printComment(path) {
+  // This handles both Inline and Block Comments.
+  // We don't just pass through the value because unlike other string literals,
+  // this should not be escaped
+  const comment = path.getValue();
+  let result;
+  const node = path.getValue();
+  if (isApexDocComment(node)) {
+    result = printApexDocComment(node);
+  } else {
+    result = node.value;
+  }
+  if (comment.trailingEmptyLine) {
+    result = concat([result, hardline]);
+  }
+  comment.printed = true;
+  return result;
+}
+
+function printDanglingComment(commentPath, options) {
   const sourceCode = options.originalText;
   const comment = commentPath.getValue(commentPath);
   const loc = comment.location;
@@ -36,9 +75,9 @@ function printDanglingComment(commentPath, options, print) {
     parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
   if (comment["@class"] === apexTypes.INLINE_COMMENT) {
-    parts.push(lineSuffix(print(commentPath)));
+    parts.push(lineSuffix(printComment(commentPath)));
   } else {
-    parts.push(print(commentPath));
+    parts.push(printComment(commentPath));
   }
   comment.printed = true;
   return concat(parts);
@@ -79,45 +118,6 @@ function isBlockComment(comment) {
  */
 function willPrintOwnComments() {
   return false;
-}
-
-/**
- * Print ApexDoc comment. This is straight from prettier handling of JSDoc
- * @param comment the comment to print.
- */
-function printApexDocComment(comment) {
-  const lines = comment.value.split("\n");
-  return concat([
-    join(
-      hardline,
-      lines.map(
-        (commentLine, index) =>
-          (index > 0 ? " " : "") +
-          (index < lines.length - 1
-            ? commentLine.trim()
-            : commentLine.trimLeft()),
-      ),
-    ),
-  ]);
-}
-
-function printComment(path) {
-  // This handles both Inline and Block Comments.
-  // We don't just pass through the value because unlike other string literals,
-  // this should not be escaped
-  const comment = path.getValue();
-  let result;
-  const node = path.getValue();
-  if (isApexDocComment(node)) {
-    result = printApexDocComment(node);
-  } else {
-    result = node.value;
-  }
-  if (comment.trailingEmptyLine) {
-    result = concat([result, hardline]);
-  }
-  comment.printed = true;
-  return result;
 }
 
 function getTrailingComments(node) {
