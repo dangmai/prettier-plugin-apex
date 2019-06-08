@@ -109,6 +109,11 @@ class Comments {
     Integer j = 2;
     Integer a;
 
+
+    a = (a == null) && (a != null) &&
+      /* Block Comment 1 */
+      (a == null) && (a <= null);
+
     a =
       // Comment
       i + j;

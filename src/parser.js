@@ -84,24 +84,26 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-function handleInnerQueryLocation(location, sourceCode, commentNodes) {
-  const resultLocation = {};
-  resultLocation.startIndex = findNextUncommentedCharacter(
-    sourceCode,
-    "(",
-    location.startIndex,
-    commentNodes,
-    /* backwards */ true,
-  );
-  resultLocation.endIndex =
-    findNextUncommentedCharacter(
+function handleNodeSurroundedByCharacters(startCharacter, endCharacter) {
+  return (location, sourceCode, commentNodes) => {
+    const resultLocation = {};
+    resultLocation.startIndex = findNextUncommentedCharacter(
       sourceCode,
-      ")",
+      startCharacter,
       location.startIndex,
       commentNodes,
-      /* backwards */ false,
-    ) + 1;
-  return resultLocation;
+      /* backwards */ true,
+    );
+    resultLocation.endIndex =
+      findNextUncommentedCharacter(
+        sourceCode,
+        endCharacter,
+        location.startIndex,
+        commentNodes,
+        /* backwards */ false,
+      ) + 1;
+    return resultLocation;
+  };
 }
 
 function handleNodeEndedWithCharacter(endCharacter) {
@@ -166,10 +168,13 @@ locationGenerationHandler[
 ] = identityFunction;
 locationGenerationHandler[
   apexTypes.SELECT_INNER_QUERY
-] = handleInnerQueryLocation;
+] = handleNodeSurroundedByCharacters("(", ")");
 locationGenerationHandler[
   apexTypes.ANONYMOUS_BLOCK_UNIT
 ] = handleAnonymousUnitLocation;
+locationGenerationHandler[
+  apexTypes.NESTED_EXPRESSION
+] = handleNodeSurroundedByCharacters("(", ")");
 locationGenerationHandler[
   apexTypes.PROPERTY_MEMBER
 ] = handleNodeEndedWithCharacter("}");
