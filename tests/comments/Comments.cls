@@ -299,6 +299,56 @@ class Comments {
       Another_Field__c = 'Another Test' /* World */
     );
   }
+
+  void tryCatchComments() {
+    try {
+      System.debug('Hi');
+    }
+    // In between inline comment 1
+    catch (Exception ex) {
+
+    }
+    // In between inline comment 2
+    finally {
+
+    }
+
+    try {
+      System.debug('Hi');
+    }
+    // In between inline comment 3
+    catch (Exception ex) {
+      System.debug('Hello');
+    }
+    // In between inline comment 4
+    finally {
+      System.debug('World');
+    }
+
+    try {
+      System.debug('Hi');
+    }
+    /* In between block comment 1 */
+    catch (Exception ex) {
+
+    }
+    /* In between block comment 2 */
+    finally {
+
+    }
+
+    try {
+      System.debug('Hi');
+    }
+    /* In between block comment 3 */
+    catch (Exception ex) {
+      System.debug('Hello');
+    }
+    /* In between block comment 4 */
+    finally {
+      System.debug('World');
+    }
+  }
 }
 // Trailing Inline Comment
 

@@ -201,6 +201,47 @@ function handleInBetweenConditionalComment(comment, sourceCode) {
 }
 
 /**
+ * Brings the comments between try/catch/finally blocks into the following block.
+ * For example, formating the next block:
+ * ```
+ * try {
+ * }
+ * // Comment
+ * catch (Exception ex) {
+ * }
+ * ```
+ *
+ * Into:
+ *
+ * ```
+ * try {
+ * } catch (Exception ex) {
+ *   // Comment
+ * }
+ * ```
+ */
+function handleInBetweenTryCatchFinallyComment(comment) {
+  const { enclosingNode, precedingNode, followingNode } = comment;
+  if (
+    !enclosingNode ||
+    !precedingNode ||
+    !followingNode ||
+    enclosingNode["@class"] !== apexTypes.TRY_CATCH_FINALLY_BLOCK ||
+    (precedingNode["@class"] !== apexTypes.BLOCK_STATEMENT &&
+      precedingNode["@class"] !== apexTypes.CATCH_BLOCK) ||
+    (followingNode["@class"] !== apexTypes.CATCH_BLOCK &&
+      followingNode["@class"] !== apexTypes.FINALLY_BLOCK)
+  ) {
+    return false;
+  }
+  if (followingNode.stmnt.stmnts.length > 0) {
+    addLeadingComment(followingNode.stmnt.stmnts[0], comment);
+  } else {
+    addDanglingComment(followingNode.stmnt, comment);
+  }
+  return true;
+}
+/**
  * This is called by Prettier's comment handling code, in order to handle
  * comments that are on their own line.
  *
@@ -213,7 +254,8 @@ function handleInBetweenConditionalComment(comment, sourceCode) {
 function handleOwnLineComment(comment, sourceCode) {
   return (
     handleDanglingComment(comment) ||
-    handleInBetweenConditionalComment(comment, sourceCode)
+    handleInBetweenConditionalComment(comment, sourceCode) ||
+    handleInBetweenTryCatchFinallyComment(comment)
   );
 }
 
@@ -230,7 +272,8 @@ function handleOwnLineComment(comment, sourceCode) {
 function handleEndOfLineComment(comment, sourceCode) {
   return (
     handleDanglingComment(comment) ||
-    handleInBetweenConditionalComment(comment, sourceCode)
+    handleInBetweenConditionalComment(comment, sourceCode) ||
+    handleInBetweenTryCatchFinallyComment(comment)
   );
 }
 
@@ -245,7 +288,10 @@ function handleEndOfLineComment(comment, sourceCode) {
  * comment based on its internal heuristic.
  */
 function handleRemainingComment(comment, sourceCode) {
-  return handleInBetweenConditionalComment(comment, sourceCode);
+  return (
+    handleInBetweenConditionalComment(comment, sourceCode) ||
+    handleInBetweenTryCatchFinallyComment(comment)
+  );
 }
 
 /**
