@@ -349,6 +349,32 @@ class Comments {
       System.debug('World');
     }
   }
+
+  void doWhileComments() {
+    do {
+      System.debug('Hi');
+    }
+    // In between inline comment 1
+    while (true);
+
+    do {
+      System.debug('Hi');
+    }
+    // In between inline comment 2
+    while (true);
+
+    do {
+      System.debug('Hi');
+    }
+    /* In between block comment 1 */
+    while (true);
+
+    do {
+      System.debug('Hi');
+    }
+    /* In between block comment 2 */
+    while (true);
+  }
 }
 // Trailing Inline Comment
 

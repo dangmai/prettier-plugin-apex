@@ -352,6 +352,32 @@ class Comments {
       System.debug('World');
     }
   }
+
+  void doWhileComments() {
+    do {
+      System.debug('Hi');
+    }
+    // In between inline comment 1
+    while (true);
+
+    do {
+      System.debug('Hi');
+    }
+    // In between inline comment 2
+    while (true);
+
+    do {
+      System.debug('Hi');
+    }
+    /* In between block comment 1 */
+    while (true);
+
+    do {
+      System.debug('Hi');
+    }
+    /* In between block comment 2 */
+    while (true);
+  }
 }
 // Trailing Inline Comment
 
@@ -686,6 +712,36 @@ class Comments {
       /* In between block comment 4 */
       System.debug('World');
     }
+  }
+
+  void doWhileComments() {
+    do {
+      System.debug('Hi');
+    } while (
+      // In between inline comment 1
+      true
+    );
+
+    do {
+      System.debug('Hi');
+    } while (
+      // In between inline comment 2
+      true
+    );
+
+    do {
+      System.debug('Hi');
+    } while (
+      /* In between block comment 1 */
+      true
+    );
+
+    do {
+      System.debug('Hi');
+    } while (
+      /* In between block comment 2 */
+      true
+    );
   }
 }
 // Trailing Inline Comment
