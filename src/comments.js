@@ -6,6 +6,7 @@ const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
 const {
   addDanglingComment,
   addLeadingComment,
+  addTrailingComment,
   hasNewlineInRange,
   skipWhitespace,
 } = prettier.util;
@@ -241,6 +242,57 @@ function handleInBetweenTryCatchFinallyComment(comment) {
   }
   return true;
 }
+
+/**
+ * Turn the leading comment to a WhereExpression inside a
+ * WhereCompoundExpression into a trailing comment to the previous WhereExpression.
+ * The reason is that a WhereExpression does not contain the location of
+ * the WhereCompoundOp (e.g. AND, OR), and without doing that, the following
+ * transformation occurs:
+ * ```
+ * SELECT Id
+ * FROM Contact
+ * WHERE
+ *   Name = 'Name'
+ *   AND
+ *     // Comment
+ *     Name = 'Another Name'
+ * ```
+ * Instead, this looks better:
+ * ```
+ * SELECT Id
+ * FROM Contact
+ * WHERE
+ *   Name = 'Name'
+ *   // Comment
+ *   AND Name = 'Another Name'
+ * ```
+ */
+function handleWhereExpression(comment, sourceCode) {
+  const { enclosingNode, precedingNode, followingNode } = comment;
+  if (
+    !enclosingNode ||
+    !precedingNode ||
+    !followingNode ||
+    !precedingNode["@class"] ||
+    !followingNode["@class"] ||
+    enclosingNode["@class"] !== apexTypes.WHERE_COMPOUND_EXPRESSION
+  ) {
+    return false;
+  }
+  if (
+    hasNewlineInRange(
+      sourceCode,
+      precedingNode.loc.endIndex,
+      comment.location.startIndex,
+    )
+  ) {
+    addTrailingComment(precedingNode, comment);
+    return true;
+  }
+  return false;
+}
+
 /**
  * This is called by Prettier's comment handling code, in order to handle
  * comments that are on their own line.
@@ -255,7 +307,8 @@ function handleOwnLineComment(comment, sourceCode) {
   return (
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
-    handleInBetweenTryCatchFinallyComment(comment)
+    handleInBetweenTryCatchFinallyComment(comment) ||
+    handleWhereExpression(comment, sourceCode)
   );
 }
 
@@ -273,7 +326,8 @@ function handleEndOfLineComment(comment, sourceCode) {
   return (
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
-    handleInBetweenTryCatchFinallyComment(comment)
+    handleInBetweenTryCatchFinallyComment(comment) ||
+    handleWhereExpression(comment, sourceCode)
   );
 }
 
@@ -290,7 +344,8 @@ function handleEndOfLineComment(comment, sourceCode) {
 function handleRemainingComment(comment, sourceCode) {
   return (
     handleInBetweenConditionalComment(comment, sourceCode) ||
-    handleInBetweenTryCatchFinallyComment(comment)
+    handleInBetweenTryCatchFinallyComment(comment) ||
+    handleWhereExpression(comment, sourceCode)
   );
 }
 

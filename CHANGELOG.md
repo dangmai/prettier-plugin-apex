@@ -3,6 +3,7 @@
 - Add support for `prettier-ignore` directive ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/3)).
 - Fix unstable comments in between If/Else blocks.
 - Fix unstable comments in between Try/Catch/Finally blocks.
+- Fix unstable comments in WhereCompoundExpr.
 
 ## 1.0.0-beta.2
 - Fix long static method calls producing undeployable code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/69)).

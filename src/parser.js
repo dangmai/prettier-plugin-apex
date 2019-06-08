@@ -131,6 +131,15 @@ function handleAnonymousUnitLocation(location, sourceCode) {
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler = {};
 const identityFunction = location => location;
+// Sometimes we need to delete a location node. For example, a WhereCompoundOp
+// location does not make sense since it can appear in multiple places:
+// SELECT Id FROM Account
+// WHERE Name = 'Name'
+// AND Name = 'Other Name' // <- this AND node here
+// AND Name = 'Yet Another Name' <- this AND node here
+// If we keep those locations, a comment might be duplicated since it is
+// attached to one WhereCompoundOp, and that operator is printed multiple times.
+const removeFunction = () => null;
 locationGenerationHandler[apexTypes.QUERY] = identityFunction;
 locationGenerationHandler[apexTypes.VARIABLE_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.INNER_CLASS_MEMBER] = identityFunction;
@@ -145,6 +154,7 @@ locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.ASSIGNMENT_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.FIELD_MEMBER] = identityFunction;
 locationGenerationHandler[apexTypes.QUERY] = identityFunction;
+locationGenerationHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = removeFunction;
 locationGenerationHandler[
   apexTypes.VARIABLE_DECLARATION_STATEMENT
 ] = identityFunction;
@@ -208,18 +218,26 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
   });
 
   const apexClass = node["@class"];
-  if (apexClass && apexClass in locationGenerationHandler && currentLocation) {
-    node.loc = locationGenerationHandler[apexClass](
-      currentLocation,
-      sourceCode,
-      commentNodes,
-    );
-  } else if (apexClass && apexClass in locationGenerationHandler && node.loc) {
-    node.loc = locationGenerationHandler[apexClass](
-      node.loc,
-      sourceCode,
-      commentNodes,
-    );
+  let handlerFn;
+  if (apexClass) {
+    const separatorIndex = apexClass.indexOf("$");
+    if (separatorIndex !== -1) {
+      const parentClass = apexClass.substring(0, separatorIndex);
+      if (parentClass in locationGenerationHandler) {
+        handlerFn = locationGenerationHandler[parentClass];
+      }
+    }
+    if (apexClass in locationGenerationHandler) {
+      handlerFn = locationGenerationHandler[apexClass];
+    }
+  }
+  if (handlerFn && currentLocation) {
+    node.loc = handlerFn(currentLocation, sourceCode, commentNodes);
+  } else if (handlerFn && node.loc) {
+    node.loc = handlerFn(node.loc, sourceCode, commentNodes);
+  }
+  if (!node.loc) {
+    delete node.loc;
   }
   if (node.loc && currentLocation) {
     if (node.loc.startIndex > currentLocation.startIndex) {

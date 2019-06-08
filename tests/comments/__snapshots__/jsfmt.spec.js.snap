@@ -204,6 +204,15 @@ class Comments {
       WHERE Name = 'Name' /* Trailing Inline SOQL Test 3 */
       AND Name = 'Another Name' /* Trailing Inline SOQL Test 4 */
     ];
+
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Name'
+      AND Name = 'Yet Another Name'
+      // Trailing Own Line Inline SOQL Test 5
+      AND Name = 'Another Name'
+    ];
   }
 
   void conditionalComments() {
@@ -582,6 +591,16 @@ class Comments {
       WHERE
         Name = 'Name' /* Trailing Inline SOQL Test 3 */
         AND Name = 'Another Name' /* Trailing Inline SOQL Test 4 */
+    ];
+
+    List<Contact> contact = [
+      SELECT Id
+      FROM Contact
+      WHERE
+        Name = 'Name'
+        AND Name = 'Yet Another Name'
+        // Trailing Own Line Inline SOQL Test 5
+        AND Name = 'Another Name'
     ];
   }
 
