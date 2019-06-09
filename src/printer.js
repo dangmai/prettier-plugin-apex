@@ -1,6 +1,5 @@
 /* eslint no-underscore-dangle: 0 */
 
-const assert = require("assert");
 const prettier = require("prettier");
 
 const docBuilders = prettier.doc.builders;
@@ -2695,29 +2694,7 @@ function genericPrint(path, options, print) {
     // Adding a hardline as the last thing in the document
     docs.push(hardline);
 
-    const outputDoc = concat(docs);
-
-    if (options.apexVerifyAst) {
-      const originalAst = prettier.__debug.parse(
-        options.originalText,
-        options,
-        /* massage */ true,
-      ).ast;
-      const output = prettier.__debug.printDocToString(concat(docs), options)
-        .formatted;
-      const outputAst = prettier.__debug.parse(
-        output,
-        options,
-        /* massage */ true,
-      ).ast;
-      assert.deepEqual(
-        originalAst,
-        outputAst,
-        "The code behavior might have changed after the format, therefore it has been reverted. Please file a bug report with your code sample",
-      );
-    }
-
-    return outputDoc;
+    return concat(docs);
   }
   if (!apexClass) {
     return "";

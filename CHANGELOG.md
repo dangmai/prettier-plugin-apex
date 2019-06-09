@@ -1,4 +1,6 @@
 ## Unreleased
+- CLI/Option change:
+  - Remove `apex-verify-ast` option. Please use `--debug-check` instead.
 - Implement comments using Prettier's API.
 - Add support for `prettier-ignore` directive ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/3)).
 - Add support for `--require-pragma` and `--insert-pragma` CLI directives.
