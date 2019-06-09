@@ -13,5 +13,5 @@ EOF
 for repo in ${repos[@]}; do
   rm -rf repo
   git clone --depth 1 "$repo" repo
-  npm run verify-ast -- "./repo/**/*.{trigger,cls}"
+  npm run debug-check -- "./repo/**/*.{trigger,cls}"
 done
