@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const nailgunServer = require("../src/ng-server");
+const httpServer = require("../src/http-server");
 
 async function setup() {
-  await nailgunServer.start("localhost", 2113);
+  await httpServer.start("localhost", 2117);
 }
 
 if (require.main === module) {

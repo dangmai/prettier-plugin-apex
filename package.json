@@ -43,7 +43,7 @@
     "prettier": "^1.15.0"
   },
   "dependencies": {
-    "node-nailgun-client": "github:dangmai/node-nailgun-client#send_input",
+    "axios": "^0.19.0",
     "wait-on": "^3.2.0",
     "yargs": "^13.2.1"
   }

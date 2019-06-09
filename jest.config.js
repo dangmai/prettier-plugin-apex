@@ -1,6 +1,6 @@
 const defaultConfig = require("./jest.config.standalone");
 
-// This config starts up nailgun by default
+// This config starts up the standalone parser by default
 module.exports = {
   ...defaultConfig,
   globalSetup: "<rootDir>/bin/start-apex-server.js",

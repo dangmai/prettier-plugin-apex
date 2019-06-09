@@ -71,7 +71,7 @@ const options = {
       },
       {
         value: "built-in",
-        description: "Use the built in standalone parser",
+        description: "Use the built in HTTP standalone parser",
       },
     ],
     description:

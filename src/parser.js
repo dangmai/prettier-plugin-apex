@@ -33,9 +33,17 @@ function parseTextWithSpawn(text, anonymous) {
   return executionResult.stdout.toString();
 }
 
-function parseTextWithNailgun(text, serverPort, anonymous) {
-  const ngClientLocation = path.join(__dirname, "ng-client.js");
-  const args = [ngClientLocation, "-a", "localhost", "-p", serverPort];
+function parseTextWithHttp(text, serverPort, anonymous) {
+  const httpClientLocation = path.join(__dirname, "http-client.js");
+  const args = [
+    httpClientLocation,
+    "-a",
+    "localhost",
+    "-f",
+    "json",
+    "-p",
+    serverPort,
+  ];
   if (anonymous) {
     args.push("-n");
   }
@@ -402,7 +410,7 @@ function parse(sourceCode, _, options) {
   const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst;
   if (options.apexStandaloneParser === "built-in") {
-    serializedAst = parseTextWithNailgun(
+    serializedAst = parseTextWithHttp(
       sourceCode,
       options.apexStandalonePort,
       options.apexAnonymous,
