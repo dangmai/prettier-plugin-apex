@@ -10,11 +10,8 @@ and the jorje compiler from Salesforce for parsing.
 
 ## Status
 
-This project is actively being worked on, and has been tested on production code.
-
-* Formatting still needs work.
-* Some defaults might be changed in the future, e.g. default number of spaces,
-continuation indent, etc.
+This project is production ready, and have been tested on multiple projects,
+including a mix of open source/proprietary/Salesforce internal code bases.
 
 ## Usage
 
