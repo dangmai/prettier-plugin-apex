@@ -120,7 +120,7 @@ this library invokes a CLI application to get the AST of the Apex code.
 However, since this CLI application is written in Java,
 there is a heavy start up cost associated with it.
 In order to alleviate this issue,
-we also have an optional [Nailgun](https://github.com/facebook/nailgun) server
+we also have an optional HTTP server
 that makes sure the start up is invoked exactly once.
 This is especially useful if this library is integrated in a 3rd party application.
 

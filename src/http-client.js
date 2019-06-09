@@ -3,7 +3,7 @@ const { argv } = require("yargs");
 const axios = require("axios");
 
 async function main() {
-  const result = await axios.post(`http://${argv.a}:${argv.p}/ast`, {
+  const result = await axios.post(`http://${argv.a}:${argv.p}/api/ast`, {
     sourceCode: fs.readFileSync(0, "utf-8"),
     anonymous: argv.n ? argv.n : false,
     outputFormat: argv.f,

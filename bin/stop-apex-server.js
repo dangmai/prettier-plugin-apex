@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const nailgunServer = require("../src/ng-server");
+const httpServer = require("../src/http-server");
 
 async function teardown() {
-  await nailgunServer.stop("localhost", 2113);
+  await httpServer.stop("localhost", 2117);
 }
 
 if (require.main === module) {

@@ -15,6 +15,7 @@ function prettyPrint(src, filename, options) {
       {
         filepath: filename,
         apexStandaloneParser: "built-in",
+        apexStandalonePort: 2117,
       },
       options,
     ),
@@ -28,6 +29,7 @@ function parse(string, opts) {
     Object.assign(
       {
         apexStandaloneParser: "built-in",
+        apexStandalonePort: 2117,
       },
       opts,
     ),
