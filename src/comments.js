@@ -117,8 +117,9 @@ function isBlockComment(comment) {
  * certain nodes.
  * @returns {boolean} whether or not we will print the comment on this node manually.
  */
-function willPrintOwnComments() {
-  return false;
+function willPrintOwnComments(path) {
+  const node = path.getValue();
+  return !node || !node["@class"] || node["@class"] === apexTypes.ANNOTATION;
 }
 
 function getTrailingComments(node) {

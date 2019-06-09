@@ -389,6 +389,27 @@ class Comments {
     /* In between block comment 2 */
     while (true);
   }
+
+  @isTest // Decorator Trailing Inline Comment 1
+  void trailingCommentAfterMethodName() {
+    System.debug('Hi');
+  }
+
+  @isTest // Decorator Trailing Inline Comment 2
+  @AuraEnabled // Decorater Trailing Inline Comment 3
+  void trailingCommentAfterMethodName() {
+    System.debug('Hi');
+  }
+
+  @isTest /* Decorator Trailing Block Comment 1 */
+  void trailingCommentAfterMethodName() {
+    System.debug('Hi');
+  }
+
+  /* Decorator Leading Block Comment 1 */ @isTest
+  void trailingCommentAfterMethodName() {
+    System.debug('Hi');
+  }
 }
 // Trailing Inline Comment
 

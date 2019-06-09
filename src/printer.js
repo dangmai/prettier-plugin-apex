@@ -16,7 +16,11 @@ const {
   dedent,
 } = docBuilders;
 
-const { getTrailingComments, printDanglingComment } = require("./comments");
+const {
+  getTrailingComments,
+  printComment,
+  printDanglingComment,
+} = require("./comments");
 const {
   checkIfParentIsDottedExpression,
   getPrecedence,
@@ -497,9 +501,31 @@ function handleClassDeclaration(path, print, options) {
 }
 
 function handleAnnotation(path, print) {
+  const node = path.getValue();
   const parts = [];
+  const trailingParts = [];
   const parameterParts = [];
   const parameterDocs = path.map(print, "parameters");
+  if (node.comments) {
+    // We print the comments manually because this method adds a hardline
+    // at the end of the annotation. If we left it to Prettier to print trailing
+    // comments it can lead to unstable formatting like this:
+    // ```
+    // @isTest
+    // // Trailing Comment
+    // void method() {}
+    // ```
+    path.each(innerPath => {
+      const commentNode = innerPath.getValue();
+      if (commentNode.leading) {
+        parts.push(printComment(innerPath));
+        parts.push(" ");
+      } else if (commentNode.trailing) {
+        trailingParts.push(" ");
+        trailingParts.push(printComment(innerPath));
+      }
+    }, "comments");
+  }
   parts.push("@");
   parts.push(path.call(print, "name", "value"));
   if (parameterDocs.length > 0) {
@@ -510,6 +536,7 @@ function handleAnnotation(path, print) {
     parameterParts.push(")");
     parts.push(groupIndentConcat(parameterParts));
   }
+  parts.push(...trailingParts);
   parts.push(hardline);
   return concat(parts);
 }

@@ -8,6 +8,7 @@
 - Fix unstable comments in WhereCompoundExpr.
 - Fix unstable comments for NestedExpr.
 - Fix unstable formatting for Method Declaration with no body.
+- Fix unstable comments for Annotations.
 
 ## 1.0.0-beta.2
 - Fix long static method calls producing undeployable code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/69)).
