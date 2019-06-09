@@ -3,6 +3,7 @@ package net.dangmai.serializer.server.resources;
 import net.dangmai.serializer.Apex;
 import net.dangmai.serializer.server.Request;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -12,8 +13,14 @@ import java.io.*;
 
 @Path("/")
 public class AbstractSyntaxTreeResource {
+    @GET
+    @Produces(MediaType.TEXT_PLAIN)
+    public String healthCheck() {
+        return "Server up and running";
+    }
+
     @POST
-    public Response hello(Request request) throws Exception {
+    public Response parse(Request request) throws Exception {
         Reader reader = new StringReader(request.getSourceCode());
         Writer writer = new StringWriter();
         Apex.OutputFormat format;
