@@ -104,6 +104,62 @@ class Comments {
     }
   }
 
+  void switchComments() {
+    switch on s {
+      // January comment
+      when JANUARY {
+        System.debug('January');
+      }
+      // February comment
+      when FEBRUARY {
+        System.debug('February');
+      }
+      // Default
+      when else {
+        System.debug('Default');
+      }
+    }
+
+    switch on s {
+      // January comment
+      when JANUARY {
+      }
+      // February comment
+      when FEBRUARY {
+      }
+      // Default
+      when else {
+      }
+    }
+
+    switch on s {
+      /* January comment */
+      when JANUARY {
+        System.debug('January');
+      }
+      /* February comment */
+      when FEBRUARY {
+        System.debug('February');
+      }
+      /* Default */
+      when else {
+        System.debug('Default');
+      }
+    }
+
+    switch on s {
+      /* January comment */
+      when JANUARY {
+      }
+      /* February comment */
+      when FEBRUARY {
+      }
+      /* Default */
+      when else {
+      }
+    }
+  }
+
   void binaryExpression() {
     Integer i = 1;
     Integer j = 2;

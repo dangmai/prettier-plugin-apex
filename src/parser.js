@@ -179,6 +179,8 @@ locationGenerationHandler[apexTypes.BINARY_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.ASSIGNMENT_EXPRESSION] = identityFunction;
 locationGenerationHandler[apexTypes.FIELD_MEMBER] = identityFunction;
+locationGenerationHandler[apexTypes.VALUE_WHEN] = identityFunction;
+locationGenerationHandler[apexTypes.ELSE_WHEN] = identityFunction;
 locationGenerationHandler[apexTypes.QUERY] = identityFunction;
 locationGenerationHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = removeFunction;
 locationGenerationHandler[
