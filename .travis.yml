@@ -6,6 +6,10 @@ node_js:
 - '10'
 - '9'
 - '8'
+before_script: npm run start-server &
+script:
+  - npm test -- -c jest.config.standalone.js
+  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] || [ ! -z "${TRAVIS_TAG}" ]; then ./scripts/run-integration-tests.sh; fi
 after_success: npm run coverage
 deploy:
   provider: npm

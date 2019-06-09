@@ -9,6 +9,8 @@ const { findNextUncommentedCharacter } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
+const MAX_BUFFER = 8192 * 8192;
+
 function parseTextWithSpawn(text, anonymous) {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
   if (process.platform === "win32") {
@@ -22,6 +24,7 @@ function parseTextWithSpawn(text, anonymous) {
   }
   const executionResult = spawnSync(serializerBin, args, {
     input: text,
+    maxBuffer: MAX_BUFFER,
   });
 
   const executionError = executionResult.error;
@@ -49,6 +52,7 @@ function parseTextWithHttp(text, serverPort, anonymous) {
   }
   const executionResult = childProcess.spawnSync(process.argv[0], args, {
     input: text,
+    maxBuffer: MAX_BUFFER,
   });
 
   if (executionResult.status) {
