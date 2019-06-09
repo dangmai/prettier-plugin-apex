@@ -6,13 +6,6 @@ plugins {
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
 
-task ngStartScripts(type: CreateStartScripts) {
-    mainClassName = 'com.martiansoftware.nailgun.NGServer'
-    applicationName = 'apex-ast-serializer-ng'
-    classpath = startScripts.classpath
-    outputDir = startScripts.outputDir
-}
-
 task httpStartScripts(type: CreateStartScripts) {
     mainClassName = 'net.dangmai.serializer.server.HttpServer'
     applicationName = 'apex-ast-serializer-http'
@@ -21,7 +14,6 @@ task httpStartScripts(type: CreateStartScripts) {
 }
 
 applicationDistribution.into("bin") {
-    from(ngStartScripts)
     from(httpStartScripts)
     fileMode = 0755
 }
@@ -71,9 +63,6 @@ dependencies {
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation group: 'commons-io', name: 'commons-io', version: '2.6'
-
-    // Using master for nailgun since it fixes stdin issue
-    implementation 'com.github.facebook.nailgun:nailgun-server:master'
 
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
