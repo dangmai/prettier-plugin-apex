@@ -137,6 +137,18 @@ function handleAnonymousUnitLocation(location, sourceCode) {
   };
 }
 
+function handleMethodDeclaration(location, sourceCode, commentNodes, node) {
+  // This is a method declaration with a body, so we can safely use the identity
+  // location.
+  if (node.stmnt.value) {
+    return location;
+  }
+  // This is a Method Declaration with no body, in which case we need to use the
+  // position of the closing parenthesis for the input parameters, e.g:
+  // void method();
+  return handleNodeEndedWithCharacter(")")(location, sourceCode, commentNodes);
+}
+
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler = {};
@@ -198,6 +210,9 @@ locationGenerationHandler[
 locationGenerationHandler[
   apexTypes.METHOD_CALL_EXPRESSION
 ] = handleNodeEndedWithCharacter(")");
+locationGenerationHandler[
+  apexTypes.METHOD_DECLARATION
+] = handleMethodDeclaration;
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -245,9 +260,9 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
     }
   }
   if (handlerFn && currentLocation) {
-    node.loc = handlerFn(currentLocation, sourceCode, commentNodes);
+    node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
   } else if (handlerFn && node.loc) {
-    node.loc = handlerFn(node.loc, sourceCode, commentNodes);
+    node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
   }
   if (!node.loc) {
     delete node.loc;

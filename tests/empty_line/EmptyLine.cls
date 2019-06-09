@@ -320,4 +320,12 @@ class EmptyLine {
 
 
   }
+
+  void methodOne(String testString, String anotherTestString, String yetAnotherTestString);
+
+  /*
+   * ApexDoc 1
+   */
+  void methodTwo(String testString);
+
 }
