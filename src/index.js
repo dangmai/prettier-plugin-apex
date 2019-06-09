@@ -83,9 +83,9 @@ const options = {
   apexStandalonePort: {
     type: "int",
     category: "Global",
-    default: 2113,
+    default: 2117,
     description:
-      "The standalone server port to connect to. Only applicable if apexStandaloneParser is true",
+      "The standalone server port to connect to. Only applicable if apexStandaloneParser is true. Default to 2117.",
   },
   apexVerifyAst: {
     type: "boolean",
