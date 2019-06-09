@@ -93,6 +93,22 @@ as anonymous code blocks,
 so it is recommended that you collect all of your anonymous Apex files into
 one directory and limit the use of `--apex-anonymous` only in that directory.
 
+#### Ignoring lines
+
+If there are lines in your Apex code that you do not want formatted by Prettier
+(either because you don't agree with the formatting choice,
+or there is a bug), you can instruct Prettier to ignore it by including the comment
+`// prettier-ignore` or `/* prettier-ignore */` on the line before. For example:
+
+```
+// prettier-ignore
+matrix(
+  1, 0, 0,
+  0, 1, 0,
+  0, 0, 1
+)
+```
+
 ### Configuration
 
 This library follows the same configuration format as Prettier,
