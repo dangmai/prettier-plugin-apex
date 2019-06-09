@@ -8,6 +8,11 @@ module.exports = {
   testRegex: "jsfmt\\.spec\\.js$|__tests__/.*\\.js$",
   testPathIgnorePatterns: [],
   collectCoverage: ENABLE_COVERAGE,
-  collectCoverageFrom: ["src/**/*.js", "!<rootDir>/node_modules/"],
+  collectCoverageFrom: [
+    "src/**/*.js",
+    "!<rootDir>/node_modules/",
+    "!src/http-client.js",
+    "!src/http-server.js",
+  ],
   transform: {},
 };
