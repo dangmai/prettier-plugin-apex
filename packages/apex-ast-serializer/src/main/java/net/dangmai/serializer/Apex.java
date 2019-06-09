@@ -32,6 +32,68 @@ public class Apex {
         xstream.registerConverter(new CustomTreeMapConverter(xstream.getMapper()));
     }
 
+    public enum OutputFormat { XML, JSON }
+
+    public static void getAST(OutputFormat format, Boolean anonymous, Boolean prettyPrint, Boolean idRef, Reader reader, Writer writer) throws IOException {
+        String sourceCode = IOUtils.toString(reader);
+        reader.close();
+        SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
+        ParserEngine engine;
+        if (anonymous) {
+            engine = ParserEngine.get(ParserEngine.Type.ANONYMOUS);
+        } else {
+            engine = ParserEngine.get(ParserEngine.Type.NAMED);
+        }
+        Locations.useIndexFactory();  // without this, comments won't be retained correctly
+        ParserOutput output = engine.parse(
+                sourceFile,
+                ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS
+        );
+
+        // Serializing the output
+        int mode;
+        if (idRef) {
+            mode = XStream.ID_REFERENCES;
+        } else {
+            mode = XStream.XPATH_ABSOLUTE_REFERENCES;
+        }
+        Mapper defaultMapper = (new XStream()).getMapper();
+        XStream xstream;
+        if (format == OutputFormat.JSON) {
+            xstream = new XStream(
+                    null,
+                    new JsonHierarchicalStreamDriver() {
+                        @Override
+                        public HierarchicalStreamWriter createWriter(Writer writer) {
+                            if (prettyPrint) {
+                                // By default JSON is pretty printed
+                                return super.createWriter(writer);
+                            }
+                            JsonWriter.Format format = new JsonWriter.Format(
+                                    new char[0],
+                                    "".toCharArray(),
+                                    JsonWriter.Format.SPACE_AFTER_LABEL | JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+                            );
+                            return new JsonWriter(writer, format);
+                        }
+                    },
+                    new ClassLoaderReference(new CompositeClassLoader()),
+                    new WithClassMapper(defaultMapper));
+            setUpXStream(xstream, mode);
+
+            xstream.toXML(output, writer);
+        } else {
+            xstream = new XStream();
+            setUpXStream(xstream, mode);
+
+            if (prettyPrint) {
+                xstream.toXML(output, writer);
+            } else {
+                xstream.marshal(output, new CompactWriter(writer));
+            }
+        }
+    }
+
     public static void main(String[] args) throws ParseException, IOException {
         // Disable logging, otherwise jorje puts logs onto stderr,
         // which makes the calling code thinks that something is wrong
@@ -63,67 +125,13 @@ public class Apex {
             } else {
                 apexReader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
             }
+            Writer writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
+            OutputFormat format = chosenFormat.equals("json") ? OutputFormat.JSON : OutputFormat.XML;
+            Boolean anonymous = cmd.hasOption("a");
+            Boolean idRef = cmd.hasOption("i");
+            Boolean prettyPrint = cmd.hasOption("p");
 
-            String sourceCode = IOUtils.toString(apexReader);
-            apexReader.close();
-            SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
-            ParserEngine engine;
-            if (cmd.hasOption("a")) {
-                engine = ParserEngine.get(ParserEngine.Type.ANONYMOUS);
-            } else {
-                engine = ParserEngine.get(ParserEngine.Type.NAMED);
-            }
-            Locations.useIndexFactory();  // without this, comments won't be retained correctly
-            ParserOutput output = engine.parse(
-                    sourceFile,
-                    ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS
-            );
-
-            // Serializing the output
-            int mode;
-            if (cmd.hasOption("i")) {
-                mode = XStream.ID_REFERENCES;
-            } else {
-                mode = XStream.XPATH_ABSOLUTE_REFERENCES;
-            }
-            Mapper defaultMapper = (new XStream()).getMapper();
-            XStream xstream;
-
-            if (chosenFormat.equals("json")) {
-                xstream = new XStream(
-                        null,
-                        new JsonHierarchicalStreamDriver() {
-                            @Override
-                            public HierarchicalStreamWriter createWriter(Writer writer) {
-                                if (cmd.hasOption("p")) {
-                                    // By default JSON is pretty printed
-                                    return super.createWriter(writer);
-                                }
-                                JsonWriter.Format format = new JsonWriter.Format(
-                                        new char[0],
-                                        "".toCharArray(),
-                                        JsonWriter.Format.SPACE_AFTER_LABEL | JsonWriter.Format.COMPACT_EMPTY_ELEMENT
-                                );
-                                return new JsonWriter(writer, format);
-                            }
-                        },
-                        new ClassLoaderReference(new CompositeClassLoader()),
-                        new WithClassMapper(defaultMapper));
-                setUpXStream(xstream, mode);
-
-                Writer writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
-                xstream.toXML(output, writer);
-            } else {
-                xstream = new XStream();
-                setUpXStream(xstream, mode);
-
-                Writer writer = new OutputStreamWriter(System.out, StandardCharsets.UTF_8);
-                if (cmd.hasOption("p")) {
-                    xstream.toXML(output, writer);
-                } else {
-                    xstream.marshal(output, new CompactWriter(writer));
-                }
-            }
+            getAST(format, anonymous, prettyPrint, idRef, apexReader, writer);
         }
     }
 

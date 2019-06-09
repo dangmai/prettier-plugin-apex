@@ -13,8 +13,16 @@ task ngStartScripts(type: CreateStartScripts) {
     outputDir = startScripts.outputDir
 }
 
+task httpStartScripts(type: CreateStartScripts) {
+    mainClassName = 'net.dangmai.serializer.server.HttpServer'
+    applicationName = 'apex-ast-serializer-http'
+    classpath = startScripts.classpath
+    outputDir = startScripts.outputDir
+}
+
 applicationDistribution.into("bin") {
     from(ngStartScripts)
+    from(httpStartScripts)
     fileMode = 0755
 }
 
@@ -37,11 +45,26 @@ run {
 distZip {
     archiveName = "${project.name}.zip"
 }
+ext {
+    slf4jVersion = '1.7.26'
+    jettyVersion = '9.4.18.v20190429'
+    jerseyVersion = '2.28'
+}
 
 dependencies {
     implementation name: 'apex-jorje-lsp'
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
     implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
+
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+    implementation "org.eclipse.jetty:jetty-server:${jettyVersion}"
+    implementation "org.eclipse.jetty:jetty-servlet:${jettyVersion}"
+    implementation "org.glassfish.jersey.core:jersey-server:${jerseyVersion}"
+    implementation "org.glassfish.jersey.containers:jersey-container-servlet-core:${jerseyVersion}"
+    implementation "org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}"
+    implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
+    implementation "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
 
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
