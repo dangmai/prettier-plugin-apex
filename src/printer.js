@@ -564,7 +564,9 @@ function handleAnnotationValue(childClass, path, print) {
       parts.push("'");
       break;
     default:
-      parts.push("");
+      throw new Error(
+        `AnnotationValue ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return concat(parts);
 }
@@ -727,7 +729,9 @@ function handleStatement(childClass, path, print) {
       doc = "undelete";
       break;
     default:
-      doc = "";
+      throw new Error(
+        `Statement ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   const node = path.getValue();
   const parts = [];
@@ -1478,7 +1482,9 @@ function handleFindValue(childClass, path, print) {
       doc = path.call(print, "expr");
       break;
     default:
-      throw new Error(`FindValue ${childClass} is not supported`);
+      throw new Error(
+        `FindValue ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -1510,7 +1516,9 @@ function handleDivisionValue(childClass, path, print) {
       doc = path.call(print, "expr");
       break;
     default:
-      throw new Error(`DivisionValue ${childClass} is not supported`);
+      throw new Error(
+        `DivisionValue ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -1558,7 +1566,9 @@ function handleSearchWithClauseValue(childClass, path, print) {
       parts.push("false");
       break;
     default:
-      throw new Error(`SearchWithClauseValue ${childClass} is not supported`);
+      throw new Error(
+        `SearchWithClauseValue ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return groupIndentConcat(parts);
 }
@@ -2042,7 +2052,9 @@ function handleOrderByExpression(childClass, path, print) {
       expressionField = "field";
       break;
     default:
-      expressionField = "";
+      throw new Error(
+        `OrderBy ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   parts.push(path.call(print, expressionField));
 
@@ -2111,7 +2123,9 @@ function handleGroupByType(childClass) {
       doc = "CUBE";
       break;
     default:
-      doc = "";
+      throw new Error(
+        `GroupByType ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -2162,7 +2176,9 @@ function handleUsingExpression(childClass, path, print) {
       ]);
       break;
     default:
-      throw new Error(`UsingExpr ${childClass} is not supported!`);
+      throw new Error(
+        `UsingExpr ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -2177,7 +2193,9 @@ function handleTrackingType(childClass) {
       doc = "FOR REFERENCE";
       break;
     default:
-      doc = "";
+      throw new Error(
+        `TrackingType ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -2192,7 +2210,9 @@ function handleQueryOption(childClass) {
       doc = "ALL ROWS";
       break;
     default:
-      doc = "";
+      throw new Error(
+        `QueryOption ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -2217,7 +2237,9 @@ function handleUpdateStatsOption(childClass) {
       doc = "VIEWSTAT";
       break;
     default:
-      doc = "";
+      throw new Error(
+        `UpdateStatsOption ${childClass} is not supported. Please file a bug report.`,
+      );
   }
   return doc;
 }
@@ -2233,7 +2255,9 @@ function handleUsingType(path, print) {
 function handleModifier(childClass) {
   const modifierValue = constants.MODIFIER[childClass] || "";
   if (!modifierValue) {
-    console.warn(`Modifier ${childClass} is not supported!`); // eslint-disable-line no-console
+    throw new Error(
+      `Modifier ${childClass} is not supported. Please file a bug report.`,
+    );
   }
   return concat([modifierValue, " "]);
 }
@@ -2709,9 +2733,9 @@ function genericPrint(path, options, print) {
       return nodeHandler[parentClass](childClass, path, print, options);
     }
   }
-  console.warn(`No handler found for ${apexClass}`); // eslint-disable-line no-console
-
-  return "";
+  throw new Error(
+    `No handler found for ${apexClass}. Please file a bug report.`,
+  );
 }
 
 let options;
