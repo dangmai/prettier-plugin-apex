@@ -53,7 +53,15 @@ function parseTextWithNailgun(text, serverPort, anonymous) {
 
 function parseTextWithHttp(text, serverPort, anonymous) {
   const httpClientLocation = path.join(__dirname, "http-client.js");
-  const args = [httpClientLocation, "-a", "localhost", "-p", serverPort];
+  const args = [
+    httpClientLocation,
+    "-a",
+    "localhost",
+    "-f",
+    "json",
+    "-p",
+    serverPort,
+  ];
   if (anonymous) {
     args.push("-n");
   }
