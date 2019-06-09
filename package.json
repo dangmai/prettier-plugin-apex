@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
+    "jest-docblock": "^24.3.0",
     "wait-on": "^3.2.0",
     "yargs": "^13.2.1"
   }

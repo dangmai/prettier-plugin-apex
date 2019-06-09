@@ -9,6 +9,7 @@ const {
   willPrintOwnComments,
 } = require("./comments");
 const parse = require("./parser");
+const { hasPragma, insertPragma } = require("./pragma");
 const print = require("./printer");
 const { massageAstNode } = require("./util");
 
@@ -38,6 +39,7 @@ const parsers = {
     parse,
     locStart,
     locEnd,
+    hasPragma,
     preprocess: text => text.trim(),
   },
 };
@@ -47,6 +49,7 @@ const printers = {
     print,
     massageAstNode,
     hasPrettierIgnore,
+    insertPragma,
     isBlockComment,
     canAttachComment,
     printComment,

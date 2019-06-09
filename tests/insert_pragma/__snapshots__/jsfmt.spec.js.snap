@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Format apex: PragmaClass.cls: PragmaClass.cls 1`] = `
+class PragmaClass {}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/** @format */
+
+class PragmaClass {
+}
+
+`;
