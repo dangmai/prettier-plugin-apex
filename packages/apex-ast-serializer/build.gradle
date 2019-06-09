@@ -48,6 +48,7 @@ dependencies {
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
     implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.10'
 
+    implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
     implementation "org.eclipse.jetty:jetty-server:${jettyVersion}"
