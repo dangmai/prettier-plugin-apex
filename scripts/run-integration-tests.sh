@@ -3,6 +3,7 @@
 set -euxo pipefail
 
 mapfile repos <<EOF
+https://github.com/financialforcedev/apex-mdapi.git
 https://github.com/afawcett/declarative-lookup-rollup-summaries.git
 https://github.com/SalesforceFoundation/Cumulus.git
 https://github.com/financialforcedev/fflib-apex-common.git
