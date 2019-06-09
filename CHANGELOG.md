@@ -1,4 +1,6 @@
 ## Unreleased
+
+## 1.0.0-rc.1
 - CLI/Option change:
   - Remove `apex-verify-ast` option. Please use `--debug-check` instead.
 - Implement comments using Prettier's API.
