@@ -51,6 +51,24 @@ function parseTextWithNailgun(text, serverPort, anonymous) {
   return executionResult.stdout.toString();
 }
 
+function parseTextWithHttp(text, serverPort, anonymous) {
+  const httpClientLocation = path.join(__dirname, "http-client.js");
+  const args = [httpClientLocation, "-a", "localhost", "-p", serverPort];
+  if (anonymous) {
+    args.push("-n");
+  }
+  const executionResult = childProcess.spawnSync(process.argv[0], args, {
+    input: text,
+  });
+
+  if (executionResult.status) {
+    const executionError = executionResult.stderr.toString();
+    throw new Error(executionError);
+  }
+
+  return executionResult.stdout.toString();
+}
+
 // jorje calls the location node differently for different types of nodes,
 // so we use this method to abstract away that difference
 function _getNodeLocation(node) {
@@ -403,6 +421,12 @@ function parse(sourceCode, _, options) {
   let serializedAst;
   if (options.apexStandaloneParser === "built-in") {
     serializedAst = parseTextWithNailgun(
+      sourceCode,
+      options.apexStandalonePort,
+      options.apexAnonymous,
+    );
+  } else if (options.apexStandaloneParser === "http") {
+    serializedAst = parseTextWithHttp(
       sourceCode,
       options.apexStandalonePort,
       options.apexAnonymous,

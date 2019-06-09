@@ -73,6 +73,10 @@ const options = {
         value: "built-in",
         description: "Use the built in standalone parser",
       },
+      {
+        value: "http",
+        description: "Use the built in HTTP standalone parser",
+      },
     ],
     description:
       "Use a standalone process to speed up parsing. This process needs to be started and stopped separately from the Prettier process",
