@@ -1,4 +1,5 @@
 ## Unreleased
+- Update dependency requirement for Prettier.
 
 ## 1.0.0-rc.2
 - Remove references to deleted vendor file `apex-ast-serializer-ng`.
