@@ -16,6 +16,7 @@ function prettyPrint(src, filename, options) {
         filepath: filename,
         apexStandaloneParser: "built-in",
         apexStandalonePort: 2117,
+        apexStandaloneHost: "localhost",
       },
       options,
     ),
@@ -30,6 +31,7 @@ function parse(string, opts) {
       {
         apexStandaloneParser: "built-in",
         apexStandalonePort: 2117,
+        apexStandaloneHost: "localhost",
       },
       opts,
     ),

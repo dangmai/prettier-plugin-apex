@@ -36,12 +36,12 @@ function parseTextWithSpawn(text, anonymous) {
   return executionResult.stdout.toString();
 }
 
-function parseTextWithHttp(text, serverPort, anonymous) {
+function parseTextWithHttp(text, serverHost, serverPort, anonymous) {
   const httpClientLocation = path.join(__dirname, "http-client.js");
   const args = [
     httpClientLocation,
     "-a",
-    "localhost",
+    serverHost,
     "-f",
     "json",
     "-p",
@@ -433,6 +433,7 @@ function parse(sourceCode, _, options) {
   if (options.apexStandaloneParser === "built-in") {
     serializedAst = parseTextWithHttp(
       sourceCode,
+      options.apexStandaloneHost,
       options.apexStandalonePort,
       options.apexAnonymous,
     );
