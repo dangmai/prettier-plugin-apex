@@ -6,6 +6,8 @@ node_js:
 - '10'
 - '9'
 - '8'
+before_install:
+  - sudo apt-get install -y parallel
 before_script: npm run start-server &
 script:
   - npm test -- -c jest.config.standalone.js
