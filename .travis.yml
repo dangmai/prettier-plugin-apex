@@ -7,24 +7,27 @@ node_js:
 - '9'
 - '8'
 
+cache: npm
+before_script: npm run start-server &
+script: npm test -- -c jest.config.standalone.js
+after_success: npm run coverage
+
 jobs:
   include:
-    - stage: test
-      name: "Unit Tests"
-      before_install: sudo apt-get install -y parallel
-      before_script: npm run start-server &
-      after_script: npm run stop-server &
-      script: npm test -- -c jest.config.standalone.js
-      after_success: npm run coverage
     - stage: test
       name: "Integration Tests"
       node_js: node
       if: type = cron OR tag IS present OR env(INTEGRATION_TESTS) IS present
+      cache: npm
+      before_script:
+        - sudo apt-get install -y parallel
+        - npm run start-server &
       script: ./scripts/run-integration-tests.sh
     - stage: deploy
       script: skip
       name: "Deploy to NPM"
       node_js: node
+      if: tag IS present
       deploy:
         provider: npm
         email: contact@dangmai.net
