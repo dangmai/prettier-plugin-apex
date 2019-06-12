@@ -6,18 +6,30 @@ node_js:
 - '10'
 - '9'
 - '8'
-before_install:
-  - sudo apt-get install -y parallel
-before_script: npm run start-server &
-script:
-  - npm test -- -c jest.config.standalone.js
-  - if [ "$TRAVIS_EVENT_TYPE" = "cron" ] || [ ! -z "${TRAVIS_TAG}" ]; then ./scripts/run-integration-tests.sh; fi
-after_success: npm run coverage
-deploy:
-  provider: npm
-  email: contact@dangmai.net
-  api_key:
-    secure: D4pgHYmQQ2qmNN652VzlwodlM3M6H1wCZ3Wpg5yyPCcBi37DS3dyuPqo9qDg20TnyPlhnUnKCeBfS7k3eR/Riz/F1ZzVgnRCzipOHCer9ujmbGUJ3W+gqEaEXwL+/HXptvIsRSPY6dOjuXZoeUGUjICyne24HMMdM+Pn7vezlESLfNQZ1hS/M9DrFC0+gNUZMq5iQizPFHNIWgVPQLO2Y/6vbFbMZQ85jSuWErRQ65WeQZzpFQEirl7n4m4f6blCNw44CRPIxHJYArqfx1hdn17Hc8xXee2VPzkKtwKaCNiOgYn413aGHWFKobaW4/BCj1lDIfnoNIJA5A2wTxKHdWu/xoJM5KkxffAY9NlWWXaOLtL2HA4Rr5TP4Kn9Csn8e2f1c5bOlVwrPJJaR/xoznuA1ybz5Ot+lpuO8VQ/F4GrvyYl/2UUSA9dThMaTOOuJAIQXMEyks+Ksb07BPdnmfIFl2+ckb825PB6ifVdKv9XxSkwYk0FYS82uYBD8kYwAyg/0YagtlAYY/7qTiYj+TybWq50Xl7xrO9h8KKlRMYJwc38oreQoaYCrN6e+tIPstoJzZGObLTtgzuXzPaf8oWY3KXoVAWECczS1cJYMgUlYLPsYMtObZ6XwJvsvMhQvji2xFyAp+iDnWtmgmSSvxRfIKYoWYp6nLcOrB1Kyzo=
-  on:
-    tags: true
-    repo: dangmai/prettier-plugin-apex
+
+jobs:
+  include:
+    - stage: test
+      name: "Unit Tests"
+      before_install: sudo apt-get install -y parallel
+      before_script: npm run start-server &
+      after_script: npm run stop-server &
+      script: npm test -- -c jest.config.standalone.js
+      after_success: npm run coverage
+    - stage: test
+      name: "Integration Tests"
+      node_js: node
+      if: type = cron OR tag IS present OR env(INTEGRATION_TESTS) IS present
+      script: ./scripts/run-integration-tests.sh
+    - stage: deploy
+      script: skip
+      name: "Deploy to NPM"
+      node_js: node
+      deploy:
+        provider: npm
+        email: contact@dangmai.net
+        api_key:
+          secure: D4pgHYmQQ2qmNN652VzlwodlM3M6H1wCZ3Wpg5yyPCcBi37DS3dyuPqo9qDg20TnyPlhnUnKCeBfS7k3eR/Riz/F1ZzVgnRCzipOHCer9ujmbGUJ3W+gqEaEXwL+/HXptvIsRSPY6dOjuXZoeUGUjICyne24HMMdM+Pn7vezlESLfNQZ1hS/M9DrFC0+gNUZMq5iQizPFHNIWgVPQLO2Y/6vbFbMZQ85jSuWErRQ65WeQZzpFQEirl7n4m4f6blCNw44CRPIxHJYArqfx1hdn17Hc8xXee2VPzkKtwKaCNiOgYn413aGHWFKobaW4/BCj1lDIfnoNIJA5A2wTxKHdWu/xoJM5KkxffAY9NlWWXaOLtL2HA4Rr5TP4Kn9Csn8e2f1c5bOlVwrPJJaR/xoznuA1ybz5Ot+lpuO8VQ/F4GrvyYl/2UUSA9dThMaTOOuJAIQXMEyks+Ksb07BPdnmfIFl2+ckb825PB6ifVdKv9XxSkwYk0FYS82uYBD8kYwAyg/0YagtlAYY/7qTiYj+TybWq50Xl7xrO9h8KKlRMYJwc38oreQoaYCrN6e+tIPstoJzZGObLTtgzuXzPaf8oWY3KXoVAWECczS1cJYMgUlYLPsYMtObZ6XwJvsvMhQvji2xFyAp+iDnWtmgmSSvxRfIKYoWYp6nLcOrB1Kyzo=
+        on:
+          tags: true
+          repo: dangmai/prettier-plugin-apex
