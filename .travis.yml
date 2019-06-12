@@ -22,6 +22,7 @@ jobs:
       before_script:
         - sudo apt-get install -y parallel
         - npm run start-server &
+        - sleep 5 # make sure we give enough time for Java to bring up Jetty
       script: ./tests_integration/run-integration-tests.sh
     - stage: deploy
       script: skip
