@@ -17,12 +17,12 @@ jobs:
     - stage: test
       name: "Integration Tests"
       node_js: node
-      if: type = cron OR tag IS present OR env(INTEGRATION_TESTS) IS present
+      if: type = cron OR tag IS present OR env(INTEGRATION_TESTS) = true
       cache: npm
       before_script:
         - sudo apt-get install -y parallel
         - npm run start-server &
-      script: ./scripts/run-integration-tests.sh
+      script: ./tests_integration/run-integration-tests.sh
     - stage: deploy
       script: skip
       name: "Deploy to NPM"
