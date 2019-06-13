@@ -1618,9 +1618,9 @@ function handleSearch(path, print) {
   const parts = [];
   parts.push(path.call(print, "find"));
   _pushIfExist(parts, path.call(print, "in", "value"));
+  _pushIfExist(parts, path.call(print, "returning", "value"));
   _pushIfExist(parts, path.call(print, "division", "value"));
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
-  _pushIfExist(parts, path.call(print, "returning", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "updateStats", "value"));
   _pushIfExist(parts, path.call(print, "using", "value"));
