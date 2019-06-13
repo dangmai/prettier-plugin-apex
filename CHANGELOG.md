@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 1.0.0-rc.3
+
 - Update dependency requirement for Prettier.
 - Fix incorrect format for SOQL query with multiple types in FROM clause ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/76)).
 - Fix incorrect order of expressions in SOSL query ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/75)).
