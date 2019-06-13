@@ -2,6 +2,7 @@
 - Update dependency requirement for Prettier.
 - Fix incorrect format for SOQL query with multiple types in FROM clause ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/76)).
 - Fix incorrect order of expressions in SOSL query ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/75)).
+- Add support for class and interface generics ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/77)).
 
 ## 1.0.0-rc.2
 - Remove references to deleted vendor file `apex-ast-serializer-ng`.

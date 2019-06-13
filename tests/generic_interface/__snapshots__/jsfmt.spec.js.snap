@@ -1,0 +1,10 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Format apex: GenericInterface.cls: GenericInterface.cls 1`] = `
+interface GenericInterface<T> extends AnotherInterface<T> {
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+interface GenericInterface<T> extends AnotherInterface<T> {
+}
+
+`;

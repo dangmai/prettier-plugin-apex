@@ -419,6 +419,8 @@ function handleTriggerDeclarationUnit(path, print, options) {
 }
 
 function handleInterfaceDeclaration(path, print, options) {
+  const node = path.getValue();
+
   const superInterface = path.call(print, "superInterface", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
@@ -438,6 +440,12 @@ function handleInterfaceDeclaration(path, print, options) {
   parts.push("interface");
   parts.push(" ");
   parts.push(path.call(print, "name"));
+  if (node.typeArguments.value) {
+    const typeArgumentParts = path.map(print, "typeArguments", "value");
+    parts.push("<");
+    parts.push(join(", ", typeArgumentParts));
+    parts.push(">");
+  }
   if (superInterface) {
     parts.push(" ");
     parts.push("extends");
@@ -456,6 +464,8 @@ function handleInterfaceDeclaration(path, print, options) {
 }
 
 function handleClassDeclaration(path, print, options) {
+  const node = path.getValue();
+
   const superClass = path.call(print, "superClass", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
@@ -475,6 +485,12 @@ function handleClassDeclaration(path, print, options) {
   parts.push("class");
   parts.push(" ");
   parts.push(path.call(print, "name"));
+  if (node.typeArguments.value) {
+    const typeArgumentParts = path.map(print, "typeArguments", "value");
+    parts.push("<");
+    parts.push(join(", ", typeArgumentParts));
+    parts.push(">");
+  }
   if (superClass !== "") {
     parts.push(" ");
     parts.push("extends");
