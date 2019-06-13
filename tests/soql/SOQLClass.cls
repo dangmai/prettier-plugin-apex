@@ -224,5 +224,18 @@ class SOQLClass {
       AND (Status = 'Active' AND Status != 'Inactive')
     ];
   }
+
+  void multipleTypes() {
+    Contact[] a = [
+      SELECT a.Name
+      FROM Contact, Contact.Account a
+    ];
+
+    a = [
+      SELECT count()
+      FROM Contact c, c.Account a
+      WHERE a.name = 'Name'
+    ];
+  }
 }
 

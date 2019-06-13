@@ -1800,7 +1800,9 @@ function handleField(path, print) {
 
 function handleFromClause(path, print) {
   const parts = [];
-  parts.push(indentConcat(["FROM", line, ...path.map(print, "exprs")]));
+  parts.push(
+    indentConcat(["FROM", line, join(", ", path.map(print, "exprs"))]),
+  );
   return groupConcat(parts);
 }
 
