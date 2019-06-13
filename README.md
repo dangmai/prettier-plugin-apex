@@ -119,7 +119,7 @@ Here is the default configuration that can be overriden:
 {
   "tabWidth": 2,
   "printWidth": 80,
-  "useTab": false
+  "useTabs": false
 }
 ```
 
