@@ -4,4 +4,10 @@ class topLevelClass {
     get;
     set;
   }
+
+  @SuppressWarnings('PMD.ApexCRUDViolation')
+  void someMethod(){}
+
+  @SuppressWarnings('PMD.ApexCRUDViolation, PMD.AnotherViolation')
+  void anotherMethod(){}
 }
