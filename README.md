@@ -115,16 +115,13 @@ The amount of configuration is very limited,
 because this is intended to be a very opinionated formatter.
 Here is the default configuration that can be overriden:
 
-```json
-{
-  "tabWidth": 2,
-  "printWidth": 80,
-  "useTabs": false
-}
-```
-
-Which means that by default, the formatted code will use 2 spaces for indentation,
-and will try to format every line to contain under 80 characters.
+| Name            | Default | Description                                                                                        |
+| --------------- | ------- | -------------------------------------------------------------------------------------------------- |
+| `printWidth`    | `80`    | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))    |
+| `tabWidth`      | `2`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))      |
+| `useTabs`       | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))           |
+| `requirePragma` | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma)) |
+| `insertPragma`  | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))  |
 
 ## Editor integration
 
