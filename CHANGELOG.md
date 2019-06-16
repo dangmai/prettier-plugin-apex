@@ -1,5 +1,7 @@
 ## Unreleased
 
+## 1.0.0-rc.4
+
 - Add support for AnnotationString ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/80)).
 
 ## 1.0.0-rc.3
