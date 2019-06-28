@@ -33,6 +33,9 @@ class LoopClass {
     for (Contact a: [SELECT Id FROM Contact]) {
       System.debug(a);
     }
+    for (Contact a: [SELECT Id FROM Contact WHERE Name = 'Just Barely Out Of Space']) {
+      System.debug(a);
+    }
 
     for (Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']) {
       System.debug(a);

@@ -541,13 +541,11 @@ class Comments {
     }
     for (/* Block SOQL For 2 */ Contact a: [SELECT Id FROM Contact]) {
     }
-    for (
-      /* Block SOQL For 2 */ Contact a: [
-        SELECT Id, Name, Description, Birthdate
-        FROM Contact
-        WHERE Id != null AND Name != 'Hello'
-      ]
-    ) {
+    for (/* Block SOQL For 2 */ Contact a: [
+      SELECT Id, Name, Description, Birthdate
+      FROM Contact
+      WHERE Id != null AND Name != 'Hello'
+    ]) {
     }
   }
 

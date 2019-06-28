@@ -2,6 +2,7 @@
 
 - CLI/Option change:
   - Add `apex-insert-final-newline` option ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/83)).
+- Remove newline before SOQL expression in ForInit ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/28)).
 
 ## 1.0.0-rc.4
 

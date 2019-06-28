@@ -15,6 +15,8 @@ const {
   dedent,
 } = docBuilders;
 
+const { willBreak } = prettier.doc.utils;
+
 const {
   getTrailingComments,
   printComment,
@@ -2365,7 +2367,18 @@ function handleForLoop(path, print) {
   parts.push(" ");
   parts.push("(");
   // For Control
-  parts.push(groupIndentConcat([softline, forControlDoc, dedent(softline)]));
+  if (
+    node.forControl &&
+    node.forControl.init &&
+    node.forControl.init.expr &&
+    node.forControl.init.expr.value &&
+    node.forControl.init.expr.value["@class"] === apexTypes.SOQL_EXPRESSION &&
+    !willBreak(forControlDoc) // if there are breaks, e.g. comments, we need to be conservative and group them
+  ) {
+    parts.push(forControlDoc);
+  } else {
+    parts.push(groupIndentConcat([softline, forControlDoc, dedent(softline)]));
+  }
   parts.push(")");
   if (!node.stmnt.value) {
     parts.push(";");
