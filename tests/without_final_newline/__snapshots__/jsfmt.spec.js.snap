@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Format apex: WithoutFinalNewLine.cls: WithoutFinalNewLine.cls 1`] = `
+class WithoutFinalNewLine {}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class WithoutFinalNewLine {
+}
+`;

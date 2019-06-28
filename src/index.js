@@ -62,10 +62,12 @@ const printers = {
   },
 };
 
+const CATEGORY_APEX = "apex";
+
 const options = {
   apexStandaloneParser: {
     type: "choice",
-    category: "Global",
+    category: CATEGORY_APEX,
     default: "none",
     choices: [
       {
@@ -82,16 +84,23 @@ const options = {
   },
   apexStandalonePort: {
     type: "int",
-    category: "Global",
+    category: CATEGORY_APEX,
     default: 2117,
     description:
       "The standalone server port to connect to. Only applicable if apexStandaloneParser is true. Default to 2117.",
   },
   apexAnonymous: {
     type: "boolean",
-    category: "Global",
+    category: CATEGORY_APEX,
     default: false,
     description: "Treat the code as anonymous Apex",
+  },
+  apexInsertFinalNewline: {
+    type: "boolean",
+    category: CATEGORY_APEX,
+    default: true,
+    description:
+      "Whether to insert one newline as the last thing in the output. Default to true.",
   },
 };
 

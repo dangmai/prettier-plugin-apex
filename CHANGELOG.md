@@ -1,5 +1,8 @@
 ## Unreleased
 
+- CLI/Option change:
+  - Add `apex-insert-final-newline` option ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/83)).
+
 ## 1.0.0-rc.4
 
 - Add support for AnnotationString ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/80)).

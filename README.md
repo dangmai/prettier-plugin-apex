@@ -115,13 +115,14 @@ The amount of configuration is very limited,
 because this is intended to be a very opinionated formatter.
 Here is the default configuration that can be overriden:
 
-| Name            | Default | Description                                                                                        |
-| --------------- | ------- | -------------------------------------------------------------------------------------------------- |
-| `printWidth`    | `80`    | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))    |
-| `tabWidth`      | `2`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))      |
-| `useTabs`       | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))           |
-| `requirePragma` | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma)) |
-| `insertPragma`  | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))  |
+| Name                     | Default | Description                                                                                        |
+| ------------------------ | ------- | -------------------------------------------------------------------------------------------------- |
+| `printWidth`             | `80`    | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))    |
+| `tabWidth`               | `2`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))      |
+| `useTabs`                | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))           |
+| `requirePragma`          | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma)) |
+| `insertPragma`           | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))  |
+| `apexInsertFinalNewline` | `true`  | Whether a newline is added as the last thing in the output                                         |
 
 ## Editor integration
 

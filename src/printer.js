@@ -2718,8 +2718,10 @@ function genericPrint(path, options, print) {
     // Hard code how to handle the root node here
     const docs = [];
     docs.push(path.call(print, apexTypes.PARSER_OUTPUT, "unit"));
-    // Adding a hardline as the last thing in the document
-    docs.push(hardline);
+    // Optionally, adding a hardline as the last thing in the document
+    if (options.apexInsertFinalNewline) {
+      docs.push(hardline);
+    }
 
     return concat(docs);
   }
