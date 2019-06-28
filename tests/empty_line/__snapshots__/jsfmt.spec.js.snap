@@ -516,13 +516,13 @@ class EmptyLine {
   }
 
   void forLoop() {
-    for (String a: listA) {
+    for (String a : listA) {
     }
 
-    for (String a: listA) {
+    for (String a : listA) {
     }
 
-    for (String a: listA) {
+    for (String a : listA) {
     }
   }
 

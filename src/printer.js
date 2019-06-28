@@ -31,15 +31,6 @@ const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
 
-// Places we've looked into to make sure we're not forgetting to implement things:
-// Stmnt.class, NewObject.class, Expr.class, BlockMember.class, CompilationUnit.class
-
-// TODO make sure expression inside {} are consistent, right now Enum/List/Map/Set
-// init does not have spaces around them, while everything else does.
-
-// TODO right now there are spaces around field member and property member.
-// Find a way to fix that.
-
 function indentConcat(docs) {
   return indent(concat(docs));
 }
@@ -2399,7 +2390,7 @@ function handleForLoop(path, print) {
 function handleForEnhancedControl(path, print) {
   // See the note in handleForInit to see why we have to do this
   const initDocParts = path.call(print, "init");
-  const initDoc = join(concat([":", " "]), initDocParts);
+  const initDoc = join(concat([" ", ":", " "]), initDocParts);
 
   const parts = [];
   parts.push(path.call(print, "type", "value"));

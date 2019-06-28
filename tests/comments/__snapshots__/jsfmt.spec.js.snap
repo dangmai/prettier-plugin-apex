@@ -522,12 +522,12 @@ class Comments {
   void loopComments() {
     for (
       // Inline SOQL For 1
-      Contact a: [SELECT Id FROM Contact]
+      Contact a : [SELECT Id FROM Contact]
     ) {
     }
     for (
       // Inline SOQL For 2
-      Contact a: [
+      Contact a : [
         SELECT Id, Name, Description, Birthdate
         FROM Contact
         WHERE Id != null AND Name != 'Hello'
@@ -536,12 +536,12 @@ class Comments {
     }
     for (
       /* Block SOQL For 1 */
-      Contact a: [SELECT Id FROM Contact]
+      Contact a : [SELECT Id FROM Contact]
     ) {
     }
-    for (/* Block SOQL For 2 */ Contact a: [SELECT Id FROM Contact]) {
+    for (/* Block SOQL For 2 */ Contact a : [SELECT Id FROM Contact]) {
     }
-    for (/* Block SOQL For 2 */ Contact a: [
+    for (/* Block SOQL For 2 */ Contact a : [
       SELECT Id, Name, Description, Birthdate
       FROM Contact
       WHERE Id != null AND Name != 'Hello'
