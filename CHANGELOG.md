@@ -1,5 +1,7 @@
 ## Unreleased
 
+- Fix incorrect format for decimals/doubles ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/88)).
+
 # 1.0.0-rc.5
 
 - CLI/Option change:

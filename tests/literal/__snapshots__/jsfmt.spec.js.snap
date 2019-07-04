@@ -60,16 +60,16 @@ class Literal {
     return 2147483640L;
   }
   void decimalLiteral() {
-    return 1.01d;
-    return 1.0d;
-    return 1.0d;
-    return 1.3d;
+    return 1.01D;
+    return 1.0D;
+    return 1.00D;
+    return 1.30D;
   }
   void doubleLiteral() {
     return 1.1;
     return 1.0;
-    return 1.0;
-    return 1.3;
+    return 1.00;
+    return 1.30;
   }
   void trueLiteral() {
     return true;
