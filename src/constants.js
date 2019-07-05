@@ -202,6 +202,8 @@ const constants = {
       "apex.jorje.data.soql.WhereExpr$WhereDistanceExpr",
     DISTANCE_FUNCTION_EXPRESSION: "apex.jorje.data.soql.DistanceFunctionExpr",
     GEOLOCATION_LITERAL: "apex.jorje.data.soql.Geolocation$GeolocationLiteral",
+    NUMBER_LITERAL: "apex.jorje.data.soql.NumberClause$NumberLiteral",
+    NUMBER_EXPRESSION: "apex.jorje.data.soql.NumberClause$NumberExpr",
     QUERY_LITERAL_EXPRESSION: "apex.jorje.data.soql.QueryExpr$LiteralExpr",
     QUERY_LITERAL: "apex.jorje.data.soql.QueryLiteral",
     QUERY_LITERAL_STRING: "apex.jorje.data.soql.QueryLiteral$QueryString",

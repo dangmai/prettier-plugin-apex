@@ -1865,8 +1865,8 @@ function handleGeolocationLiteral(path, print) {
   const childParts = [];
   parts.push("GEOLOCATION");
   parts.push("(");
-  childParts.push(path.call(print, "latitude", "number", "$"));
-  childParts.push(path.call(print, "longitude", "number", "$"));
+  childParts.push(path.call(print, "latitude"));
+  childParts.push(path.call(print, "longitude"));
   parts.push(join(concat([",", line]), childParts));
   parts.push(dedent(softline));
   parts.push(")");
@@ -2636,6 +2636,8 @@ nodeHandler[
   apexTypes.DISTANCE_FUNCTION_EXPRESSION
 ] = handleDistanceFunctionExpression;
 nodeHandler[apexTypes.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
+nodeHandler[apexTypes.NUMBER_LITERAL] = _handlePassthroughCall("number", "$");
+nodeHandler[apexTypes.NUMBER_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[apexTypes.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall(
   "literal",
 );
