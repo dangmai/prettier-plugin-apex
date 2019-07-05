@@ -304,7 +304,30 @@ function handleLiteralExpression(path, print, options) {
     literalType === "DECIMAL" ||
     literalType === "DOUBLE"
   ) {
-    doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
+    const literal = options.originalText.slice(
+      node.loc.startIndex,
+      node.loc.endIndex,
+    );
+    const lastCharacter = literal[literal.length - 1].toLowerCase();
+    // We handle the letters d and l at the end of Decimal and Long manually:
+    // ```
+    // Decimal a = 1.0D
+    // Long b = 4324234234l
+    // ```
+    // should be formatted to:
+    // ```
+    // Decimal a = 1.0d
+    // Long b = 4324234234L
+    // ```
+    // In general we try to keep keywords lowercase, however uppercase L is better
+    // the lowercase l because lowercase l can be mistaken for number 1
+    if (lastCharacter === "d") {
+      doc = `${literal.substring(0, literal.length - 1)}d`;
+    } else if (lastCharacter === "l") {
+      doc = `${literal.substring(0, literal.length - 1)}L`;
+    } else {
+      doc = literal;
+    }
   }
   if (doc) {
     return doc;

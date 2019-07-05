@@ -52,7 +52,7 @@ public class Java {
   // Test that we properly convert types for java constructors
   public void testNewObject() {
     new java:java.lang.Double(0);
-    new java:java.lang.Double(0l);
+    new java:java.lang.Double(0L);
     new java:java.lang.Double(0.0d);
   }
 }
