@@ -79,6 +79,7 @@ const METADATA_TO_IGNORE = [
   "trailingEmptyLine",
   "isLastNodeInArray",
   "numberOfDottedExpressions",
+  "isNextStatementOnSameLine",
 ];
 
 /**

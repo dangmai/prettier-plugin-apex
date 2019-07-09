@@ -331,8 +331,31 @@ function generateExtraMetadata(
   }
   Object.keys(node).forEach(key => {
     if (typeof node[key] === "object") {
-      if (Array.isArray(node) && parseInt(key, 10) === node.length - 1) {
-        node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
+      if (Array.isArray(node)) {
+        const keyInt = parseInt(key, 10);
+        if (keyInt === node.length - 1) {
+          node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
+        } else {
+          // Here we flag a node if its next sibling is on the same line.
+          // The reasoning is that for a block of code like this:
+          // ```
+          // Integer a = 1; Integer c = 2; Integer c = 3;
+          //
+          // Integer d = 4;
+          // ```
+          // We don't want a trailing empty line after `Integer a = 1;`
+          // so we need to mark it as a special node.
+          const currentChildNode = node[keyInt];
+          const nextChildNode = node[keyInt + 1];
+          if (
+            nextChildNode &&
+            nextChildNode.loc &&
+            currentChildNode.loc &&
+            nextChildNode.loc.startLine === currentChildNode.loc.startLine
+          ) {
+            node[keyInt].isNextStatementOnSameLine = true;
+          }
+        }
       }
       generateExtraMetadata(
         node[key],
@@ -347,7 +370,8 @@ function generateExtraMetadata(
     apexClass &&
     nodeLoc &&
     allowTrailingEmptyLine &&
-    !node.isLastNodeInArray
+    !node.isLastNodeInArray &&
+    !node.isNextStatementOnSameLine
   ) {
     const nextLine = nodeLoc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
