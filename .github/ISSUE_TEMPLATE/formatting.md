@@ -8,19 +8,24 @@ about: Issues for ugly or incorrect code
 ```
 
 **Input:**
+
 ```apex
 // code snippet
 ```
 
-**Output:**
+**Actual output:**
+
 ```apex
 // code snippet
 ```
 
-**Expected behavior:**
+**Expected output:**
+
+```apex
+// code snippet
+```
 
 **Additional information (please fill this out)**:
 
-
 - OS: [e.g. Windows/OS X/Ubuntu]
-- Version: [e.g. 1.0.0-alpha.9]
+- Version: [e.g. 1.0.0]
