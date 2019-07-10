@@ -351,7 +351,7 @@ function generateExtraMetadata(
             nextChildNode &&
             nextChildNode.loc &&
             currentChildNode.loc &&
-            nextChildNode.loc.startLine === currentChildNode.loc.startLine
+            nextChildNode.loc.startLine === currentChildNode.loc.endLine
           ) {
             node[keyInt].isNextStatementOnSameLine = true;
           }
