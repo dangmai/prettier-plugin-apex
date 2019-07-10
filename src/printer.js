@@ -1022,9 +1022,9 @@ function handleNameValueParameter(path, print) {
   parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("=");
-  parts.push(" ");
+  parts.push(line);
   parts.push(path.call(print, "value"));
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleThisMethodCallExpression(path, print) {
