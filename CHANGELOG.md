@@ -4,6 +4,7 @@
 - Add support for Number Expression in SOQL Geolocation Literal ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/90)).
 - Fix duplicated trailing empty lines for multiple expressions on the same line ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/91)).
 - Fix expressions in Name Value Parameters not being indented ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/93)).
+- Fix SOQL queries in binaryish expressions having extraneous indentations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/96)).
 
 # 1.0.0-rc.5
 

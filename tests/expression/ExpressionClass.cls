@@ -13,6 +13,9 @@ class Conditional extends Object {
     if (i <<= j) {}
     if (i >>= j) {}
     if (i >>>= j) {}
+
+    [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Name = 'Hello';
+    [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() - 1;
   }
 
   void ternaryExpression() {
@@ -129,6 +132,8 @@ class Conditional extends Object {
     myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable == anExtremelyVeryLongVariable < anotherVeryLongVariable;
 
     myVeryLongBooleanVariable = (anExtremelyVeryLongVariable > anotherVeryLongVariable) == (anExtremelyVeryLongVariable < anotherVeryLongVariable);
+
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Id != null;
   }
 
   void triggerVariableExpr_inOtherSuite() {}
@@ -235,6 +240,8 @@ class Conditional extends Object {
 
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod();
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod().callAnotherMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
+
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
   }
 
   void javaMethodCallExpression_notNeeded() {}

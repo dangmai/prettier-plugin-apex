@@ -237,11 +237,17 @@ function handleArrayExpressionIndex(path, print, withGroup = true) {
 }
 
 function handleVariableExpression(path, print) {
+  const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
+  const { dottedExpr } = node;
   const parts = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const isDottedExpressionSoqlExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION;
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -276,7 +282,7 @@ function handleVariableExpression(path, print) {
       parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
     });
   }
-  if (isParentDottedExpression) {
+  if (isParentDottedExpression || isDottedExpressionSoqlExpression) {
     return concat(parts);
   }
   return groupIndentConcat(parts);
@@ -1052,9 +1058,15 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
+  const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
+  const { dottedExpr } = node;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const isDottedExpressionSoqlExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
@@ -1102,13 +1114,23 @@ function handleMethodCallExpression(path, print) {
     });
   }
   let resultDoc;
-  if (isParentDottedExpression) {
+  const noGroup =
     // If this is a nested dotted expression, we do not want to group it,
     // since we want it to be part of the method call chain group, e.g:
     // a
     //   .b()  // <- this node here
     //   .c()  // <- this node here
     //   .d()
+    isParentDottedExpression ||
+    // If dotted expression is SOQL and this in inside a binaryish expression,
+    // we shouldn't group it, otherwise there will be extraneous indentations,
+    // for example:
+    // Boolean a =
+    //   [
+    //     SELECT Id FROM Contact
+    //   ].size() > 0
+    (isDottedExpressionSoqlExpression && isBinaryish(parentNode));
+  if (noGroup) {
     resultDoc = concat([
       dottedExpressionDoc,
       methodCallChainDoc,
