@@ -247,7 +247,10 @@ function handleVariableExpression(path, print) {
   const isDottedExpressionSoqlExpression =
     dottedExpr &&
     dottedExpr.value &&
-    dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION;
+    (dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION ||
+      (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
+        dottedExpr.value.expr &&
+        dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -1066,7 +1069,10 @@ function handleMethodCallExpression(path, print) {
   const isDottedExpressionSoqlExpression =
     dottedExpr &&
     dottedExpr.value &&
-    dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION;
+    (dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION ||
+      (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
+        dottedExpr.value.expr &&
+        dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");

@@ -134,6 +134,7 @@ class Conditional extends Object {
     myVeryLongBooleanVariable = (anExtremelyVeryLongVariable > anotherVeryLongVariable) == (anExtremelyVeryLongVariable < anotherVeryLongVariable);
 
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Id != null;
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].Id != null;
   }
 
   void triggerVariableExpr_inOtherSuite() {}
@@ -242,6 +243,7 @@ class Conditional extends Object {
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod().callAnotherMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
 
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
   }
 
   void javaMethodCallExpression_notNeeded() {}
