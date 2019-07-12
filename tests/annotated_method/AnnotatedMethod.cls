@@ -5,6 +5,10 @@ class topLevelClass {
     set;
   }
 
+  @AuraEnabled(cacheable=true continuation=true)
+  public static Account getAccount(Id accountId) {
+  }
+
   @SuppressWarnings('PMD.ApexCRUDViolation')
   void someMethod(){}
 
