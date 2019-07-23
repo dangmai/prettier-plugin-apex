@@ -167,7 +167,7 @@ as well as specifying a special flag when running Prettier:
 # Start the server (if installed globally)
 start-apex-server
 # Or if installed locally
-node /path/to/libary/bin/start-apex-server.js
+node /path/to/library/bin/start-apex-server.js
 
 # In a separate console
 prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigger,cls}"
@@ -175,5 +175,5 @@ prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigg
 # After you are done, stop the server (if installed globally)
 stop-apex-server
 # Or if installed locally
-node /path/to/libary/bin/stop-apex-server.js
+node /path/to/library/bin/stop-apex-server.js
 ```
