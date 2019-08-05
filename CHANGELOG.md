@@ -5,6 +5,7 @@
 - Fix duplicated trailing empty lines for multiple expressions on the same line ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/91)).
 - Fix expressions in Name Value Parameters not being indented ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/93)).
 - Fix SOQL queries in binaryish expressions having extraneous indentations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/96)).
+- Fix SOQL query number being printed as different types (`big-decimal` to `int`) in certain situations.
 
 # 1.0.0-rc.5
 

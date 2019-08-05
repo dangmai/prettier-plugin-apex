@@ -39,4 +39,11 @@ class Literal {
     return FALSE;
     return False;
   }
+  void queryNumber() {
+    a = [
+      SELECT COUNT()
+      FROM Allocation__c
+      WHERE Percent__c = 15.0
+    ];
+  }
 }
