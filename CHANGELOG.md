@@ -1,5 +1,7 @@
 ## Unreleased
 
+- By default, add bracket spacing for maps ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/99)).
+
 # 1.0.0-rc.6
 
 - Fix incorrect format for decimals/doubles ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/88)).

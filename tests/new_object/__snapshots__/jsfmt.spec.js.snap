@@ -130,7 +130,7 @@ class NewObject {
       anotherSuperDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
     );
     Map<String, String> b = new Map<String, String>{};
-    Map<String, String> c = new Map<String, String>{'a' => 'b', 'c' => 'd'};
+    Map<String, String> c = new Map<String, String>{ 'a' => 'b', 'c' => 'd' };
     Map<String, String> c = new Map<String, String>{
       'Long string key' => 'Long string value',
       'Long string key two' => 'Long string value two'
