@@ -204,6 +204,8 @@ class Conditional extends Object {
     Integer c = a + b;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.getSObjectFields().Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.veryLongVariableNameThatShouldNotBeBroken = veryLongVariableName.handleSomeMethod();
+    longVariableName.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable = veryLongVariableName.handleSomeMethod();
   }
 
   void methodCallExpression() {
@@ -263,6 +265,8 @@ class Conditional extends Object {
 
   void thisVariableExpression() {
     this.a = 'Hello World';
+    this.veryLongVariableNameThatShouldNotBeBroken = veryLongVariableName.handleSomeMethod();
+    this.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable = veryLongVariableName.handleSomeMethod();
     System.debug(this.a + this.b);
   }
 

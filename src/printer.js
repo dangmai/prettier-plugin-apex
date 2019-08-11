@@ -193,6 +193,11 @@ function shouldDottedExpressionBreak(path) {
   if (node.dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION) {
     return false;
   }
+  // #98 - Even though `this` can synctactically be followed by whitespaces,
+  // make the formatted output similar to `super` to provide consistency.
+  if (node.dottedExpr.value["@class"] === apexTypes.THIS_VARIABLE_EXPRESSION) {
+    return false;
+  }
   if (node["@class"] !== apexTypes.METHOD_CALL_EXPRESSION) {
     return true;
   }
