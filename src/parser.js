@@ -286,7 +286,7 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
     }
   }
   if (currentLocation) {
-    return Object.assign({}, currentLocation);
+    return { ...currentLocation };
   }
   if (node.loc) {
     return {
