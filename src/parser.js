@@ -458,10 +458,13 @@ function parse(sourceCode, _, options) {
     serializedAst = parseTextWithHttp(
       sourceCode,
       options.apexStandalonePort,
-      options.apexAnonymous,
+      options.parser === "apex-anonymous",
     );
   } else {
-    serializedAst = parseTextWithSpawn(sourceCode, options.apexAnonymous);
+    serializedAst = parseTextWithSpawn(
+      sourceCode,
+      options.parser === "apex-anonymous",
+    );
   }
   let ast = {};
   if (serializedAst) {

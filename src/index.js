@@ -42,6 +42,14 @@ const parsers = {
     hasPragma,
     preprocess: text => text.trim(),
   },
+  "apex-anonymous": {
+    astFormat: "apex",
+    parse,
+    locStart,
+    locEnd,
+    hasPragma,
+    preprocess: text => text.trim(),
+  },
 };
 
 const printers = {
@@ -88,12 +96,6 @@ const options = {
     default: 2117,
     description:
       "The standalone server port to connect to. Only applicable if apexStandaloneParser is true. Default to 2117.",
-  },
-  apexAnonymous: {
-    type: "boolean",
-    category: CATEGORY_APEX,
-    default: false,
-    description: "Treat the code as anonymous Apex",
   },
   apexInsertFinalNewline: {
     type: "boolean",

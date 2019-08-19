@@ -77,12 +77,12 @@ If there are errors, please file a bug report so that they can be fixed.
 #### Anonymous Apex
 
 You can also format anonymous Apex with this program by using the
-`--apex-anonymous` flag.
+`apex-anonymous` parser.
 
 For example:
 
 ```bash
-prettier --write "/path/to/project/anonymous/**/*.cls" --apex-anonymous
+prettier --write "/path/to/project/anonymous/**/*.cls" --parser apex-anonymous
 ```
 
 Note that Prettier will treat any Apex file that it finds using the glob above
@@ -123,7 +123,6 @@ Here is the default configuration that can be overriden:
 | `requirePragma`          | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma))                                                                                                                             |
 | `insertPragma`           | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))                                                                                                                              |
 | `apexInsertFinalNewline` | `true`  | Whether a newline is added as the last thing in the output                                                                                                                                                                     |
-| `apexAnonymous`          | `false` | Whether the Apex files should be parsed in Anonymous mode. See [Anonymous Apex](#anonymous-apex)                                                                                                                               |
 | `apexStandaloneParser`   | `none`  | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Performance Tip](#performance-tips3rd-party-integration).<br>If set to `none`, Prettier invokes the CLI parser for every file. |
 | `apexStandalonePort`     | `2117`  | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                               |
 

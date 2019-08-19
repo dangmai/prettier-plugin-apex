@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Format apex: AnonymousBlock.cls: AnonymousBlock.cls 1`] = `
+exports[`Format apex-anonymous: AnonymousBlock.cls: AnonymousBlock.cls 1`] = `
 
 // Leading Inline Comment in Anonymous Block
 
