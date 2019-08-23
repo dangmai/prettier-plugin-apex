@@ -32,6 +32,9 @@ function parseTextWithSpawn(text, anonymous) {
   if (executionError) {
     throw executionError;
   }
+  if (executionResult.status !== 0) {
+    throw new Error(executionResult.stdout.toString());
+  }
 
   return executionResult.stdout.toString();
 }
