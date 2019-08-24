@@ -130,22 +130,7 @@ Here is the default configuration that can be overriden:
 
 ### VScode
 
-The official plugin `prettier-vscode` doesn't support plugins out of the box yet, see [this issue](https://github.com/prettier/prettier-vscode/issues/395).
-There are 2 workarounds to enable Apex support anyway:
-
-- First way is to install the plugin into the plugin directory:
-
-```bash
-cd ~/.vscode/extensions/esbenp.prettier-vscode-1.8.1/
-npm install prettier-plugin-apex
-```
-
-After restarting VScode the plugin should work as expected.
-The downside is that you will need to do this every time the plugin gets updated.
-
-- Second way is to use a patched version of `prettier-vscode` - there are 2 Pull Requests right now that add support for plugins: https://github.com/prettier/prettier-vscode/pull/817 and https://github.com/prettier/prettier-vscode/pull/757
-
-Once either of them gets merged into the `master` branch, the VSCode plugin will support `prettier-plugin-apex`.
+Follow [this tutorial](https://forcedotcom.github.io/salesforcedx-vscode/articles/getting-started/prettier) from Salesforce in order to use this plugin in VSCode.
 
 ## Performance Tips/3rd party integration
 
