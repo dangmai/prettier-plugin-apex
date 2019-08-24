@@ -22,6 +22,93 @@ class Comments {
     Integer b = 2;
   }
 
+  void longChainComments() {
+    String a;
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      // Method chain inline comment 1
+      .append(' jumps over the lazy dog')
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 2
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      // Method chain inline comment 3
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 4
+      .b
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      // Method chain inline comment 5
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 6
+      .b
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      /* Method chain block comment 1 */
+      .append(' jumps over the lazy dog')
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 2 */
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      /* Method chain block comment 3 */
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 4 */
+      .b
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      /* Method chain block comment 5 */
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 6 */
+      .b
+      .c
+      .toString();
+  }
+
   void loopComments() {
     for (
       // Inline SOQL For 1

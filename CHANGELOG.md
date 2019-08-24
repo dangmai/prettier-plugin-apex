@@ -3,6 +3,7 @@
 - By default, add bracket spacing for maps ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/99)).
 - Fix extraneous linebreaks being added after `this` variable expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/98)).
 - Remove `--apex-anonymous` option, use `apex-anonymous` parser instead ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/106)).
+- Fix wrong comment position in a long method/variable chain ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/116)).
 
 # 1.0.0-rc.6
 
