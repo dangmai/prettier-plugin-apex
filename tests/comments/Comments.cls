@@ -107,6 +107,15 @@ class Comments {
       .b
       .c
       .toString();
+
+    System.assertEquals(
+      /* Negative block comment 1 */ 0,
+      0);
+
+    System.assertEquals(
+      // Negative in line comment 1
+      0,
+      0);
   }
 
   void loopComments() {

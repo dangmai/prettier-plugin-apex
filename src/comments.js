@@ -323,8 +323,14 @@ function handleLongChainComment(comment) {
   ) {
     return false;
   }
-  addTrailingComment(precedingNode, comment);
-  return true;
+  if (
+    enclosingNode.dottedExpr &&
+    enclosingNode.dottedExpr.value === precedingNode
+  ) {
+    addTrailingComment(precedingNode, comment);
+    return true;
+  }
+  return false;
 }
 
 /**
