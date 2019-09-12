@@ -721,10 +721,12 @@ function handleMethodDeclaration(path, print) {
   parts.push(path.call(print, "name"));
   // Params
   parts.push("(");
-  parameterParts.push(softline);
-  parameterParts.push(join(concat([",", line]), parameterDocs));
-  parameterParts.push(dedent(softline));
-  parts.push(groupIndentConcat(parameterParts));
+  if (parameterDocs.length > 0) {
+    parameterParts.push(softline);
+    parameterParts.push(join(concat([",", line]), parameterDocs));
+    parameterParts.push(dedent(softline));
+    parts.push(groupIndentConcat(parameterParts));
+  }
   parts.push(")");
   // Body
   _pushIfExist(parts, statementDoc, null, [" "]);

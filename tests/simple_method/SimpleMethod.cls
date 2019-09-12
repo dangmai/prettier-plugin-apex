@@ -1,4 +1,6 @@
 public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface {
+  public String longMethodNameWithNoParamsShouldNotBreakInEmptyParamListAndYetSomehowDoes() {}
+
   public String sayHello() {
     return this.sayHello('Hello', 'World');
   }

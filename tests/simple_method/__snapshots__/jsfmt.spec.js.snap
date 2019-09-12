@@ -2,6 +2,8 @@
 
 exports[`Format apex: SimpleMethod.cls: SimpleMethod.cls 1`] = `
 public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface {
+  public String longMethodNameWithNoParamsShouldNotBreakInEmptyParamListAndYetSomehowDoes() {}
+
   public String sayHello() {
     return this.sayHello('Hello', 'World');
   }
@@ -68,6 +70,9 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface {
+  public String longMethodNameWithNoParamsShouldNotBreakInEmptyParamListAndYetSomehowDoes() {
+  }
+
   public String sayHello() {
     return this.sayHello('Hello', 'World');
   }
