@@ -33,7 +33,7 @@ public class VariableDeclaration {
     String e = c, d = a;
     HttpRequest request = new HttpRequest();
     String[] stringArray = new List<String>{};
-    String[] anotherStringArray = new List<String>{'a', 'b'};
+    String[] anotherStringArray = new List<String>{ 'a', 'b' };
     List<String> anotherArray = new List<String>(1);
     String[] emptyStrings;
     String[] otherStrings = new List<String>();

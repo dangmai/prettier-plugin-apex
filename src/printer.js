@@ -1238,9 +1238,9 @@ function handleNewSetLiteral(path, print) {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(softline);
+    parts.push(line);
     parts.push(join(concat([",", line]), valueDocs));
-    parts.push(dedent(softline));
+    parts.push(dedent(line));
   }
   parts.push("}");
   return groupIndentConcat(parts);
@@ -1333,9 +1333,9 @@ function handleNewListLiteral(path, print) {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(softline);
+    parts.push(line);
     parts.push(join(concat([",", line]), valueDocs));
-    parts.push(dedent(softline));
+    parts.push(dedent(line));
   }
   parts.push("}");
   return groupIndentConcat(parts);

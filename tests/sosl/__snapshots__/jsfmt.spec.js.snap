@@ -214,7 +214,7 @@ class SOSLClass {
   void returning() {
     List<List<SObject>> searchResult;
     String a = 'World';
-    List<String> multiple = new List<String>{'Hi', 'World'};
+    List<String> multiple = new List<String>{ 'Hi', 'World' };
     searchResult = [FIND 'Hello' RETURNING Contact];
     searchResult = [FIND 'Hello' RETURNING Contact, Lead];
     searchResult = [FIND 'Hello' RETURNING Account(Name)];

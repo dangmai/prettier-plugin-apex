@@ -80,7 +80,7 @@ class NewObject {
     List<String> aCopy = new List<String>(a);
     List<String> b = new List<String>{};
     String[] c = new List<String>{};
-    String[] d = new List<String>{'a', 'b'};
+    String[] d = new List<String>{ 'a', 'b' };
     String[] e = new List<String>{
       'Long string number one',
       'Long string number two'
@@ -106,7 +106,7 @@ class NewObject {
       anotherSuperDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
     );
     Set<String> b = new Set<String>{};
-    Set<String> c = new Set<String>{'a', 'b'};
+    Set<String> c = new Set<String>{ 'a', 'b' };
     Set<String> c = new Set<String>{
       'Long string number one',
       'Long string number two'
@@ -136,8 +136,8 @@ class NewObject {
       'Long string key two' => 'Long string value two'
     };
     Map<String, String[]> d = new Map<String, String[]>{
-      'a' => new List<String>{'a', 'b'},
-      'b' => new List<String>{'c', 'd'}
+      'a' => new List<String>{ 'a', 'b' },
+      'b' => new List<String>{ 'c', 'd' }
     };
     Map<String, Decimal> fmaIntegerParameterNameDefaultValue = new Map<string, decimal>{
       'Parameter1' => 1,
