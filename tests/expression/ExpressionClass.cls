@@ -212,6 +212,9 @@ class Conditional extends Object {
     SomeObject o = new SomeObject();
     String result = o.callMethod().getStringResult();
     String longResult = o.callMethod('first param').callAnotherMethod().getStringResult();
+    String longResult = this.callMethod('first param', 'second param', 'thirdParam', 'forthParam');
+    String longResult = super.callMethod('first param', 'second param', 'thirdParam', 'forthParam');
+    String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'forthParam');
     String longResult = o.callMethod('first param', 'second param', 'thirdParam').callAnotherMethod().getStringResult();
     String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
     String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam').callAnotherMethod().getStringResult();

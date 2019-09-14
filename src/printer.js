@@ -1080,6 +1080,14 @@ function handleMethodCallExpression(path, print) {
       (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
         dottedExpr.value.expr &&
         dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
+  const isDottedExpressionThisVariableExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    dottedExpr.value["@class"] === apexTypes.THIS_VARIABLE_EXPRESSION;
+  const isDottedExpressionSuperVariableExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
@@ -1142,7 +1150,12 @@ function handleMethodCallExpression(path, print) {
     //   [
     //     SELECT Id FROM Contact
     //   ].size() > 0
-    (isDottedExpressionSoqlExpression && isBinaryish(parentNode));
+    (isDottedExpressionSoqlExpression && isBinaryish(parentNode)) ||
+    // If dotted expression is a `super` or `this` variable expression, we
+    // know that this is only one level deep and there's no need to group, e.g:
+    // `this.simpleMethod();` or `super.simpleMethod();`
+    isDottedExpressionThisVariableExpression ||
+    isDottedExpressionSuperVariableExpression;
   if (noGroup) {
     resultDoc = concat([
       dottedExpressionDoc,
