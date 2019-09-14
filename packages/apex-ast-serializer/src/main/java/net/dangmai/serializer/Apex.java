@@ -21,6 +21,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.logging.LogManager;
@@ -74,7 +75,7 @@ public class Apex {
                                     "".toCharArray(),
                                     JsonWriter.Format.SPACE_AFTER_LABEL | JsonWriter.Format.COMPACT_EMPTY_ELEMENT
                             );
-                            return new JsonWriter(writer, format);
+                            return new CustomJsonWriter(writer, format);
                         }
                     },
                     new ClassLoaderReference(new CompositeClassLoader()),
@@ -187,6 +188,26 @@ public class Apex {
 
         protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
             this.itemWriter.writeItem(item, context, writer);
+        }
+    }
+
+    // We use a custom JSON writer in order to modify the behavior of writing
+    // out a BigDecimal. By default a BigDecimal is serialized to a JSON Number
+    // node, like so: `{"number": 1.0}`.
+    // The Javascript consumer, however, will not be able to parse that without
+    // dropping the precision. Because of that, we will serialize it this way
+    // instead: `{"number": "1.0"}`
+    static class CustomJsonWriter extends JsonWriter {
+        public CustomJsonWriter(Writer writer, Format format) {
+            super(writer, format);
+        }
+
+        @Override
+        protected Type getType(Class clazz) {
+            if (clazz == BigDecimal.class) {
+                return Type.STRING;
+            }
+            return super.getType(clazz);
         }
     }
 
