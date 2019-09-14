@@ -5,6 +5,7 @@
 - Remove `--apex-anonymous` option, use `apex-anonymous` parser instead ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/106)).
 - Fix wrong comment position in a long method/variable chain ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/116)).
 - Fix extraneous linebreaks for empty parameter list in long method declarations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/124)).
+- Fix SOQL query numbers losing negative value ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/122)).
 
 # 1.0.0-rc.6
 

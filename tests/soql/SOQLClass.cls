@@ -37,6 +37,7 @@ class SOQLClass {
     User[] notQuery = [SELECT Id FROM Contact WHERE NOT NAME LIKE '%Test%'];
     Account[] wherePlusCalc = [SELECT Id FROM Account WHERE NumberOfEmployees + AnnualRevenue > 27];
     Account[] whereMinusCalc = [SELECT Id FROM Account WHERE NumberOfEmployees - AnnualRevenue > 27];
+    Account[] negativeQueryNum = [SELECT Id FROM Account WHERE NumberOfEmployees > -5];
   }
 
   void limitBinds() {

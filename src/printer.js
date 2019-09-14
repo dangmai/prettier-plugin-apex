@@ -2035,12 +2035,7 @@ function handleWhereQueryLiteral(childClass, path, print, options) {
       doc = "false";
       break;
     case "QueryNumber":
-      // We can't just print what's in the AST, because sometimes the trailing
-      // 0s get deleted, changing the field type. For example, in this query:
-      // [SELECT Count() FROM Allocation__c WHERE Percent__c = 15.0]
-      // The 15.0 gets trimmed to 15 in the AST, and printing it changes the
-      // AST to contain an `int` instead of a `big-decimal`
-      doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
+      doc = path.call(print, "literal", "$");
       break;
     case "QueryDateTime":
       doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
