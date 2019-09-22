@@ -25,6 +25,71 @@ class Comments {
     Integer b = 2;
   }
 
+  void initMultiComments() {
+    List<Integer> dayList;
+    Set<Integer> daySet;
+    Map<Integer, Integer> dayMap;
+    dayList = new list<Integer> {
+      0,  // Sunday
+      1,  // Monday
+      2,  // Tuesday
+      3,  // Wednesday
+      4,  // Thursday
+      5,  // Friday
+      6  // Saturday
+    }; // Final list trailing inline comment
+
+    dayList = new list<Integer> {
+      0,  /* Sunday */
+      1,  /* Monday */
+      2,  /* Tuesday */
+      3,  /* Wednesday */
+      4,  /* Thursday */
+      5,  /* Friday */
+      6  /* Saturday */
+    }; /* Final list trailing block comment */
+
+    daySet = new Set<Integer> {
+      0,  // Sunday
+      1,  // Monday
+      2,  // Tuesday
+      3,  // Wednesday
+      4,  // Thursday
+      5,  // Friday
+      6  // Saturday
+    }; // Final set trailing inline comment
+
+    daySet = new Set<Integer> {
+      0,  /* Sunday */
+      1,  /* Monday */
+      2,  /* Tuesday */
+      3,  /* Wednesday */
+      4,  /* Thursday */
+      5,  /* Friday */
+      6  /* Saturday */
+    }; /* Final set trailing block comment */
+
+    dayMap = new Map<Integer> {
+      0 => 0,  // Sunday
+      1 => 1,  // Monday
+      2 => 2,  // Tuesday
+      3 => 3,  // Wednesday
+      4 => 4,  // Thursday
+      5 => 5,  // Friday
+      6 => 6 // Saturday
+    }; // Final map trailing inline comment
+
+    dayMap = new Map<Integer, Integer> {
+      0 => 0,  /* Sunday */
+      1 => 1,  /* Monday */
+      2 => 2,  /* Tuesday */
+      3 => 3,  /* Wednesday */
+      4 => 4,  /* Thursday */
+      5 => 5,  /* Friday */
+      6 => 6 /* Saturday */
+    }; /* Final map trailing block comment */
+  }
+
   void longChainComments() {
     String a;
     a = new StringBuilder()
@@ -613,6 +678,71 @@ class Comments {
 
     Integer a = 1; // Trailing Comment 1
     Integer b = 2;
+  }
+
+  void initMultiComments() {
+    List<Integer> dayList;
+    Set<Integer> daySet;
+    Map<Integer, Integer> dayMap;
+    dayList = new List<Integer>{
+      0, // Sunday
+      1, // Monday
+      2, // Tuesday
+      3, // Wednesday
+      4, // Thursday
+      5, // Friday
+      6 // Saturday
+    }; // Final list trailing inline comment
+
+    dayList = new List<Integer>{
+      0 /* Sunday */,
+      1 /* Monday */,
+      2 /* Tuesday */,
+      3 /* Wednesday */,
+      4 /* Thursday */,
+      5 /* Friday */,
+      6 /* Saturday */
+    }; /* Final list trailing block comment */
+
+    daySet = new Set<Integer>{
+      0, // Sunday
+      1, // Monday
+      2, // Tuesday
+      3, // Wednesday
+      4, // Thursday
+      5, // Friday
+      6 // Saturday
+    }; // Final set trailing inline comment
+
+    daySet = new Set<Integer>{
+      0 /* Sunday */,
+      1 /* Monday */,
+      2 /* Tuesday */,
+      3 /* Wednesday */,
+      4 /* Thursday */,
+      5 /* Friday */,
+      6 /* Saturday */
+    }; /* Final set trailing block comment */
+
+    dayMap = new Map<Integer>{
+      0 => 0, // Sunday
+      1 => 1, // Monday
+      2 => 2, // Tuesday
+      3 => 3, // Wednesday
+      4 => 4, // Thursday
+      5 => 5, // Friday
+      6 => 6 // Saturday
+    }; // Final map trailing inline comment
+
+    dayMap = new Map<Integer, Integer>{
+      0 => 0 /* Sunday */,
+      1 => 1 /* Monday */,
+      2 => 2 /* Tuesday */,
+      3 => 3 /* Wednesday */,
+      4 => 4 /* Thursday */,
+      5 => 5 /* Friday */,
+      6 => 6 /* Saturday */
+    }; /* Final map trailing block comment */
   }
 
   void longChainComments() {

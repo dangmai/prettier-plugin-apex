@@ -7,6 +7,7 @@
 - Fix extraneous linebreaks for empty parameter list in long method declarations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/124)).
 - Fix SOQL query numbers losing negative value ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/122)).
 - Fix method call expressions containing `this` and `super` having an extra indentation level.
+- Fix trailing comment wrong location after last element in list/set/map init literals ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/126)).
 
 # 1.0.0-rc.6
 

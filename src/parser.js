@@ -211,6 +211,15 @@ locationGenerationHandler[
   apexTypes.SWITCH_STATEMENT
 ] = handleNodeEndedWithCharacter("}");
 locationGenerationHandler[
+  apexTypes.NEW_LIST_LITERAL
+] = handleNodeEndedWithCharacter("}");
+locationGenerationHandler[
+  apexTypes.NEW_SET_LITERAL
+] = handleNodeEndedWithCharacter("}");
+locationGenerationHandler[
+  apexTypes.NEW_MAP_LITERAL
+] = handleNodeEndedWithCharacter("}");
+locationGenerationHandler[
   apexTypes.VARIABLE_DECLARATIONS
 ] = handleNodeEndedWithCharacter(";");
 locationGenerationHandler[
