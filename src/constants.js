@@ -226,7 +226,7 @@ const constants = {
     WITH_DATA_CATEGORIES: "apex.jorje.data.soql.WithClause$WithDataCategories",
     DATA_CATEGORY: "apex.jorje.data.soql.DataCategory",
     DATA_CATEGORY_OPERATOR: "apex.jorje.data.soql.DataCategoryOperator",
-    WITH_IDENTIFIER: "apex.jorje.data.soql.WithIdentifier",
+    WITH_IDENTIFIER: "apex.jorje.data.soql.WithIdentifierClause$WithIdentifier",
   },
   BINARY: {
     ADDITION: "+",
