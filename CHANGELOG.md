@@ -1,5 +1,10 @@
 # Unreleased
 
+## Dependency Changes
+
+- Prettier >= 1.19 is now required to be used with this plugin,
+  in order to support new option type `string`.
+
 ## CLI Changes
 
 - Add option `apexStandaloneHost`, default to `localhost`.
