@@ -84,7 +84,8 @@ const options = {
     type: "string",
     category: "Global",
     default: "localhost",
-    description: "The standalone server host to connect to. Only applicable if apexStandaloneParser is true. Default to localhost."
+    description:
+      "The standalone server host to connect to. Only applicable if apexStandaloneParser is true. Default to localhost.",
   },
   apexStandalonePort: {
     type: "int",
