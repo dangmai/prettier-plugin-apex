@@ -49,6 +49,12 @@ class NewObject {
     Account a = new Account(Name='Account Name');
     Account b = new Account(Name='Account Name', Description='Account Description That Is Very Long');
     Account b = new Account(Name='Account Name', Description='Account Description That Is Very Long' + 'Some Other Description That Is Also Very Long');
+    Account account = new Account(
+      Body__c = JSON.serialize(new Map<String, Object>{'Content' => 'Hello', 'World' => 'There'})
+    );
+    Account account = new Account(
+      Body__c = JSON.serialize(new Map<String, Object>{'Content' => 'Hello', 'World' => 'There', 'Hi' => 'Yes'})
+    );
   }
 
   void newStandardTest() {

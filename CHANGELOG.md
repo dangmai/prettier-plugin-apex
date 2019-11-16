@@ -12,6 +12,7 @@
 ## Formatting Changes
 
 - Fix last comment in Annotations being put in wrong location ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/142)).
+- Fix Name Value Parameters using more newlines than necessary ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/136)).
 
 # 1.0.0
 

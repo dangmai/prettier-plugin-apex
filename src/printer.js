@@ -1034,13 +1034,21 @@ function handleNewKeyValue(path, print) {
 }
 
 function handleNameValueParameter(path, print) {
+  const node = path.getValue();
+
   const parts = [];
   parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("=");
-  parts.push(line);
-  parts.push(path.call(print, "value"));
-  return groupIndentConcat(parts);
+  parts.push(" ");
+  if (isBinaryish(node.value)) {
+    // Binaryish expressions require their parents to the indentation level,
+    // instead of setting it themselves like other expressions.
+    parts.push(group(indent(path.call(print, "value"))));
+  } else {
+    parts.push(path.call(print, "value"));
+  }
+  return concat(parts);
 }
 
 function handleThisMethodCallExpression(path, print) {
