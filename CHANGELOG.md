@@ -1,12 +1,26 @@
 # Unreleased
+
+## Dependency Changes
+
+- Prettier >= 1.19 is now required to be used with this plugin,
+  in order to support new option type `string`.
+
+## CLI Changes
+
+- Add option `apexStandaloneHost`, default to `localhost`.
+
+## Formatting Changes
+
 - Fix last comment in Annotations being put in wrong location ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/142)).
 
 # 1.0.0
 
 ## API Changes
+
 - Remove `--apex-anonymous` option, use `apex-anonymous` parser instead ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/106)).
 
 ## Formatting Changes
+
 - By default, add curly bracket spacing for maps, lists and sets ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/99)).
 - Fix extraneous linebreaks being added after `this` variable expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/98)).
 - Fix wrong comment position in a long method/variable chain ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/116)).

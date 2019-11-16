@@ -90,6 +90,13 @@ const options = {
     description:
       "Use a standalone process to speed up parsing. This process needs to be started and stopped separately from the Prettier process",
   },
+  apexStandaloneHost: {
+    type: "string",
+    category: "Global",
+    default: "localhost",
+    description:
+      "The standalone server host to connect to. Only applicable if apexStandaloneParser is true. Default to localhost.",
+  },
   apexStandalonePort: {
     type: "int",
     category: CATEGORY_APEX,
