@@ -37,6 +37,7 @@ class SOQLClass {
     User[] notQuery = [SELECT Id FROM Contact WHERE NOT NAME LIKE '%Test%'];
     Account[] wherePlusCalc = [SELECT Id FROM Account WHERE NumberOfEmployees + AnnualRevenue > 27];
     Account[] whereMinusCalc = [SELECT Id FROM Account WHERE NumberOfEmployees - AnnualRevenue > 27];
+    Account[] negativeQueryNum = [SELECT Id FROM Account WHERE NumberOfEmployees > -5];
   }
 
   void limitBinds() {
@@ -157,6 +158,13 @@ class SOQLClass {
       ORDER BY DISTANCE(Location__c, GEOLOCATION(37.775,-122.418), 'mi')
       LIMIT 10
     ];
+    Decimal lat;
+    Decimal lon;
+    return [
+      SELECT Id
+      FROM Lead
+      WHERE DISTANCE(Address, GEOLOCATION(:lat, :lon), 'km') < 5
+    ];
     UserProfileFeed[] withUserIds = [SELECT Id FROM UserProfileFeed WITH UserId='005D0000001AamR' ORDER BY CreatedDate DESC, Id DESC LIMIT 20];
     Question[] withSingleDataCategories = [SELECT Title FROM Question WHERE LastReplyDate > 2005-10-08T01:02:03Z WITH DATA CATEGORY Geography__c AT (usa__c, uk__c)];
     Question[] withMultipleDataCategories = [
@@ -222,6 +230,19 @@ class SOQLClass {
         Name = 'Test Account 2'
       )
       AND (Status = 'Active' AND Status != 'Inactive')
+    ];
+  }
+
+  void multipleTypes() {
+    Contact[] a = [
+      SELECT a.Name
+      FROM Contact, Contact.Account a
+    ];
+
+    a = [
+      SELECT count()
+      FROM Contact c, c.Account a
+      WHERE a.name = 'Name'
     ];
   }
 }

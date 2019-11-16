@@ -34,6 +34,16 @@ class EmptyLine {
     Integer a;
 
 
+    Integer g = 1; Integer e = 2; Integer h = 4;
+
+    Integer y, z;
+    Integer x = 1; y = 2; z = 3;
+
+    Integer x =
+      1; y = 2; z = 3;
+
+    Integer i = 1, k = 2, l = 1;
+
     Integer f = 1;
 
   }

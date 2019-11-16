@@ -36,6 +36,9 @@ class LoopClass {
     for (Contact a: [SELECT Id FROM Contact]) {
       System.debug(a);
     }
+    for (Contact a: [SELECT Id FROM Contact WHERE Name = 'Just Barely Out Of Space']) {
+      System.debug(a);
+    }
 
     for (Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']) {
       System.debug(a);
@@ -130,27 +133,32 @@ class LoopClass {
     for (Integer i = 0; i < 10; i++) {
     }
 
-    for (Contact a: [SELECT Id FROM Contact]) {
+    for (Contact a : [SELECT Id FROM Contact]) {
+      System.debug(a);
+    }
+    for (Contact a : [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Just Barely Out Of Space'
+    ]) {
       System.debug(a);
     }
 
-    for (
-      Contact a: [
-        SELECT Id, Name, Description, Birthdate
-        FROM Contact
-        WHERE Id != null AND Name != 'Hello'
-      ]
-    ) {
+    for (Contact a : [
+      SELECT Id, Name, Description, Birthdate
+      FROM Contact
+      WHERE Id != null AND Name != 'Hello'
+    ]) {
       System.debug(a);
     }
 
     Contact[] contacts = new List<Contact>{};
-    for (Contact a: contacts) {
+    for (Contact a : contacts) {
       System.debug(a);
     }
-    for (Contact a: contacts);
+    for (Contact a : contacts);
     for (;; voidCall());
-    for (String s: stringSet);
+    for (String s : stringSet);
   }
 
   void whileLoop() {

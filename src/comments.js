@@ -295,6 +295,45 @@ function handleWhereExpression(comment, sourceCode) {
 }
 
 /**
+ * Turn the leading comment in a long method or variable chain into the preceding
+ * comment of a previous node. Without doing that, we have an awkward position
+ * for the . character like so:
+ * ```
+ * return StringBuilder()
+ *   .// Test Comment
+ *   append('Hello')
+ *   .toString();
+ * ```
+ * Instead, this looks better:
+ * ```
+ * return StringBuilder()
+ *   // Test Comment
+ *   .append('Hello')
+ *   .toString();
+ * ```
+ */
+function handleLongChainComment(comment) {
+  const { enclosingNode, precedingNode, followingNode } = comment;
+  if (
+    !enclosingNode ||
+    !precedingNode ||
+    !followingNode ||
+    (enclosingNode["@class"] !== apexTypes.METHOD_CALL_EXPRESSION &&
+      enclosingNode["@class"] !== apexTypes.VARIABLE_EXPRESSION)
+  ) {
+    return false;
+  }
+  if (
+    enclosingNode.dottedExpr &&
+    enclosingNode.dottedExpr.value === precedingNode
+  ) {
+    addTrailingComment(precedingNode, comment);
+    return true;
+  }
+  return false;
+}
+
+/**
  * This is called by Prettier's comment handling code, in order to handle
  * comments that are on their own line.
  *
@@ -309,7 +348,8 @@ function handleOwnLineComment(comment, sourceCode) {
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
-    handleWhereExpression(comment, sourceCode)
+    handleWhereExpression(comment, sourceCode) ||
+    handleLongChainComment(comment)
   );
 }
 
@@ -328,7 +368,8 @@ function handleEndOfLineComment(comment, sourceCode) {
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
-    handleWhereExpression(comment, sourceCode)
+    handleWhereExpression(comment, sourceCode) ||
+    handleLongChainComment(comment)
   );
 }
 
@@ -346,7 +387,8 @@ function handleRemainingComment(comment, sourceCode) {
   return (
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
-    handleWhereExpression(comment, sourceCode)
+    handleWhereExpression(comment, sourceCode) ||
+    handleLongChainComment(comment)
   );
 }
 

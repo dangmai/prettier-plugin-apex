@@ -9,32 +9,25 @@ function read(filename) {
 }
 
 function prettyPrint(src, filename, options) {
-  return prettier.format(
-    src,
-    Object.assign(
-      {
-        filepath: filename,
-        apexStandaloneParser: "built-in",
-        apexStandalonePort: 2117,
-        apexStandaloneHost: "localhost",
-      },
-      options,
-    ),
-  );
+  return prettier.format(src, {
+    filepath: filename,
+    apexStandaloneParser: "built-in",
+    apexStandalonePort: 2117,
+    apexStandaloneHost: "localhost",
+    ...options,
+  });
 }
 
 function parse(string, opts) {
   // eslint-disable-next-line no-underscore-dangle
   return prettier.__debug.parse(
     string,
-    Object.assign(
-      {
-        apexStandaloneParser: "built-in",
-        apexStandalonePort: 2117,
-        apexStandaloneHost: "localhost",
-      },
-      opts,
-    ),
+    {
+      apexStandaloneParser: "built-in",
+      apexStandalonePort: 2117,
+      apexStandaloneHost: "localhost",
+      ...opts,
+    },
     /* massage */ true,
   ).ast;
 }
@@ -53,12 +46,10 @@ function raw(string) {
 
 function runSpec(dirname, parsers, options) {
   // eslint-disable-next-line no-param-reassign
-  options = Object.assign(
-    {
-      plugins: ["."],
-    },
-    options,
-  );
+  options = {
+    plugins: ["."],
+    ...options,
+  };
 
   /* instabul ignore if */
   if (!parsers || !parsers.length) {
@@ -75,9 +66,7 @@ function runSpec(dirname, parsers, options) {
     ) {
       const source = read(path).replace(/\r\n/g, "\n");
 
-      const mergedOptions = Object.assign({}, options, {
-        parser: parsers[0],
-      });
+      const mergedOptions = { ...options, parser: parsers[0] };
       const output = prettyPrint(source, path, mergedOptions);
       test(`Format ${mergedOptions.parser}: ${filename}`, () => {
         expect(raw(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(

@@ -11,6 +11,8 @@ const constants = {
     ANNOTATION_KEY_VALUE:
       "apex.jorje.data.ast.AnnotationParameter$AnnotationKeyValue",
     ANNOTATION_VALUE: "apex.jorje.data.ast.AnnotationValue",
+    ANNOTATION_STRING:
+      "apex.jorje.data.ast.AnnotationParameter$AnnotationString",
     MODIFIER_PARAMETER_REF:
       "apex.jorje.data.ast.ParameterRefs$ModifierParameterRef",
     EMPTY_MODIFIER_PARAMETER_REF:
@@ -200,6 +202,8 @@ const constants = {
       "apex.jorje.data.soql.WhereExpr$WhereDistanceExpr",
     DISTANCE_FUNCTION_EXPRESSION: "apex.jorje.data.soql.DistanceFunctionExpr",
     GEOLOCATION_LITERAL: "apex.jorje.data.soql.Geolocation$GeolocationLiteral",
+    NUMBER_LITERAL: "apex.jorje.data.soql.NumberClause$NumberLiteral",
+    NUMBER_EXPRESSION: "apex.jorje.data.soql.NumberClause$NumberExpr",
     QUERY_LITERAL_EXPRESSION: "apex.jorje.data.soql.QueryExpr$LiteralExpr",
     QUERY_LITERAL: "apex.jorje.data.soql.QueryLiteral",
     QUERY_LITERAL_STRING: "apex.jorje.data.soql.QueryLiteral$QueryString",
@@ -222,7 +226,7 @@ const constants = {
     WITH_DATA_CATEGORIES: "apex.jorje.data.soql.WithClause$WithDataCategories",
     DATA_CATEGORY: "apex.jorje.data.soql.DataCategory",
     DATA_CATEGORY_OPERATOR: "apex.jorje.data.soql.DataCategoryOperator",
-    WITH_IDENTIFIER: "apex.jorje.data.soql.WithIdentifier",
+    WITH_IDENTIFIER: "apex.jorje.data.soql.WithIdentifierClause$WithIdentifier",
   },
   BINARY: {
     ADDITION: "+",

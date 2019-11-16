@@ -8,6 +8,10 @@ exports[`Format apex: Comments.cls: Comments.cls 1`] = `
 /**
  * ApexDoc for class
  */
+@isTest(
+ seeAllData = true // Class annotation inline comment 1
+ //isParallel = false // Class annotation inline comment 2
+)
 class Comments {
   // Dangling class inline comment
 
@@ -23,6 +27,189 @@ class Comments {
 
     Integer a = 1; // Trailing Comment 1
     Integer b = 2;
+  }
+
+  void initMultiComments() {
+    List<Integer> dayList;
+    Set<Integer> daySet;
+    Map<Integer, Integer> dayMap;
+    dayList = new list<Integer> {
+      0,  // Sunday
+      1,  // Monday
+      2,  // Tuesday
+      3,  // Wednesday
+      4,  // Thursday
+      5,  // Friday
+      6  // Saturday
+    }; // Final list trailing inline comment
+
+    dayList = new list<Integer> {
+      0,  /* Sunday */
+      1,  /* Monday */
+      2,  /* Tuesday */
+      3,  /* Wednesday */
+      4,  /* Thursday */
+      5,  /* Friday */
+      6  /* Saturday */
+    }; /* Final list trailing block comment */
+
+    daySet = new Set<Integer> {
+      0,  // Sunday
+      1,  // Monday
+      2,  // Tuesday
+      3,  // Wednesday
+      4,  // Thursday
+      5,  // Friday
+      6  // Saturday
+    }; // Final set trailing inline comment
+
+    daySet = new Set<Integer> {
+      0,  /* Sunday */
+      1,  /* Monday */
+      2,  /* Tuesday */
+      3,  /* Wednesday */
+      4,  /* Thursday */
+      5,  /* Friday */
+      6  /* Saturday */
+    }; /* Final set trailing block comment */
+
+    dayMap = new Map<Integer> {
+      0 => 0,  // Sunday
+      1 => 1,  // Monday
+      2 => 2,  // Tuesday
+      3 => 3,  // Wednesday
+      4 => 4,  // Thursday
+      5 => 5,  // Friday
+      6 => 6 // Saturday
+    }; // Final map trailing inline comment
+
+    dayMap = new Map<Integer, Integer> {
+      0 => 0,  /* Sunday */
+      1 => 1,  /* Monday */
+      2 => 2,  /* Tuesday */
+      3 => 3,  /* Wednesday */
+      4 => 4,  /* Thursday */
+      5 => 5,  /* Friday */
+      6 => 6 /* Saturday */
+    }; /* Final map trailing block comment */
+  }
+
+  void longChainComments() {
+    String a;
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      // Method chain inline comment 1
+      .append(' jumps over the lazy dog')
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 2
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      // Method chain inline comment 3
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 4
+      .b
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      // Method chain inline comment 5
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 6
+      .b
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      /* Method chain block comment 1 */
+      .append(' jumps over the lazy dog')
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 2 */
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      /* Method chain block comment 3 */
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 4 */
+      .b
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      /* Method chain block comment 5 */
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 6 */
+      .b
+      .c
+      .toString();
+
+    System.assertEquals(
+      /* Negative block comment 1 */ 0,
+      0);
+
+    System.assertEquals(
+      // Negative in line comment 1
+      0,
+      0);
+  }
+
+  void loopComments() {
+    for (
+      // Inline SOQL For 1
+      Contact a: [SELECT Id FROM Contact]
+    ) {
+    }
+    for (
+      // Inline SOQL For 2
+      Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']
+    ) {
+    }
+    for (
+      /* Block SOQL For 1 */
+      Contact a: [SELECT Id FROM Contact]
+    ) {
+    }
+    for (/* Block SOQL For 2 */ Contact a: [SELECT Id FROM Contact]) {
+    }
+    for (/* Block SOQL For 2 */ Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']) {
+    }
   }
 
   void trailingCommentAfterStatement() {
@@ -469,6 +656,20 @@ class Comments {
   void trailingCommentAfterMethodName() {
     System.debug('Hi');
   }
+
+  @isTest(
+    seeAllData = true // Method annotation inline comment 1
+    //isParallel = false // Method annotation inline comment 2
+  )
+  void methodAnnotationInlineComment() {
+  }
+
+  @isTest(
+    seeAllData = true /* Method annotation block comment 1 */
+    /*isParallel = false // Method annotation block comment 2 */
+  )
+  void methodAnnotationBlockComment() {
+  }
 }
 // Trailing Inline Comment
 
@@ -481,6 +682,10 @@ class Comments {
 /**
  * ApexDoc for class
  */
+@isTest(
+  seeAllData=true // Class annotation inline comment 1
+  //isParallel = false // Class annotation inline comment 2
+)
 class Comments {
   // Dangling class inline comment
 
@@ -495,6 +700,196 @@ class Comments {
 
     Integer a = 1; // Trailing Comment 1
     Integer b = 2;
+  }
+
+  void initMultiComments() {
+    List<Integer> dayList;
+    Set<Integer> daySet;
+    Map<Integer, Integer> dayMap;
+    dayList = new List<Integer>{
+      0, // Sunday
+      1, // Monday
+      2, // Tuesday
+      3, // Wednesday
+      4, // Thursday
+      5, // Friday
+      6 // Saturday
+    }; // Final list trailing inline comment
+
+    dayList = new List<Integer>{
+      0 /* Sunday */,
+      1 /* Monday */,
+      2 /* Tuesday */,
+      3 /* Wednesday */,
+      4 /* Thursday */,
+      5 /* Friday */,
+      6 /* Saturday */
+    }; /* Final list trailing block comment */
+
+    daySet = new Set<Integer>{
+      0, // Sunday
+      1, // Monday
+      2, // Tuesday
+      3, // Wednesday
+      4, // Thursday
+      5, // Friday
+      6 // Saturday
+    }; // Final set trailing inline comment
+
+    daySet = new Set<Integer>{
+      0 /* Sunday */,
+      1 /* Monday */,
+      2 /* Tuesday */,
+      3 /* Wednesday */,
+      4 /* Thursday */,
+      5 /* Friday */,
+      6 /* Saturday */
+    }; /* Final set trailing block comment */
+
+    dayMap = new Map<Integer>{
+      0 => 0, // Sunday
+      1 => 1, // Monday
+      2 => 2, // Tuesday
+      3 => 3, // Wednesday
+      4 => 4, // Thursday
+      5 => 5, // Friday
+      6 => 6 // Saturday
+    }; // Final map trailing inline comment
+
+    dayMap = new Map<Integer, Integer>{
+      0 => 0 /* Sunday */,
+      1 => 1 /* Monday */,
+      2 => 2 /* Tuesday */,
+      3 => 3 /* Wednesday */,
+      4 => 4 /* Thursday */,
+      5 => 5 /* Friday */,
+      6 => 6 /* Saturday */
+    }; /* Final map trailing block comment */
+  }
+
+  void longChainComments() {
+    String a;
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      // Method chain inline comment 1
+      .append(' jumps over the lazy dog')
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 2
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      // Method chain inline comment 3
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 4
+      .b
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      // Method chain inline comment 5
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      // Method chain inline comment 6
+      .b
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      /* Method chain block comment 1 */
+      .append(' jumps over the lazy dog')
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 2 */
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      /* Method chain block comment 3 */
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 4 */
+      .b
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      .b
+      /* Method chain block comment 5 */
+      .c
+      .toString();
+
+    a = new StringBuilder()
+      .append('The quick brown fox')
+      .append(' jumps over the lazy dog')
+      /* Method chain block comment 6 */
+      .b
+      .c
+      .toString();
+
+    System.assertEquals(/* Negative block comment 1 */ 0, 0);
+
+    System.assertEquals(
+      // Negative in line comment 1
+      0,
+      0
+    );
+  }
+
+  void loopComments() {
+    for (
+      // Inline SOQL For 1
+      Contact a : [SELECT Id FROM Contact]
+    ) {
+    }
+    for (
+      // Inline SOQL For 2
+      Contact a : [
+        SELECT Id, Name, Description, Birthdate
+        FROM Contact
+        WHERE Id != null AND Name != 'Hello'
+      ]
+    ) {
+    }
+    for (
+      /* Block SOQL For 1 */
+      Contact a : [SELECT Id FROM Contact]
+    ) {
+    }
+    for (/* Block SOQL For 2 */ Contact a : [SELECT Id FROM Contact]) {
+    }
+    for (/* Block SOQL For 2 */ Contact a : [
+      SELECT Id, Name, Description, Birthdate
+      FROM Contact
+      WHERE Id != null AND Name != 'Hello'
+    ]) {
+    }
   }
 
   void trailingCommentAfterStatement() {
@@ -927,6 +1322,20 @@ class Comments {
   /* Decorator Leading Block Comment 1 */ @isTest
   void trailingCommentAfterMethodName() {
     System.debug('Hi');
+  }
+
+  @isTest(
+    seeAllData=true // Method annotation inline comment 1
+    //isParallel = false // Method annotation inline comment 2
+  )
+  void methodAnnotationInlineComment() {
+  }
+
+  @isTest(
+    seeAllData=true /* Method annotation block comment 1 */
+    /*isParallel = false // Method annotation block comment 2 */
+  )
+  void methodAnnotationBlockComment() {
   }
 }
 // Trailing Inline Comment

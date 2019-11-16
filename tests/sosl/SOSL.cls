@@ -20,6 +20,11 @@ class SOSLClass {
     String a = 'Local';
     searchResult = [FIND 'Hello' WITH Division = 'Global'];
     searchResult = [FIND 'Hello' WITH Division = :a];
+    searchResult = [
+      FIND 'foobar'
+      RETURNING Account
+      WITH DIVISION ='global'
+    ];
   }
   void withDataCategory() {
     List<List<SObject>> searchResult;

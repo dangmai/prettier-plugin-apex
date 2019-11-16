@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-apex",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0",
   "description": "Salesforce Apex plugin for Prettier",
   "main": "src/index.js",
   "bin": {
@@ -21,7 +21,7 @@
     "start-server": "node bin/start-apex-server.js",
     "stop-server": "node bin/stop-apex-server.js",
     "lint": "eslint \"{src,tests_config}/**/*.js\"",
-    "prettier": "prettier --write \"{src,tests_config}/**/*.js\"",
+    "prettier": "prettier --write \"{src,tests_config}/**/*.js\" \"./*.md\"",
     "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=."
   },
   "keywords": [
@@ -32,9 +32,9 @@
   "license": "MIT",
   "devDependencies": {
     "codecov": "^3.5.0",
-    "eslint": "^5.15.1",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-config-prettier": "^4.1.0",
+    "eslint": "^6.1.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-config-prettier": "^6.0.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^24.1.0",
@@ -47,6 +47,6 @@
     "axios": "^0.19.0",
     "jest-docblock": "^24.3.0",
     "wait-on": "^3.2.0",
-    "yargs": "^13.2.1"
+    "yargs": "^14.0.0"
   }
 }

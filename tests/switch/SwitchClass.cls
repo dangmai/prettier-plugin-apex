@@ -57,5 +57,25 @@ class SwitchClass {
       }
     }
   }
+
+  void soqlInSwitch() {
+    switch on [SELECT Name FROM Contact LIMIT 1].Name {
+      when 'Test Name' {
+        System.debug('Test Name');
+      }
+      when else {
+        System.debug('Everything Else');
+      }
+    }
+
+    switch on [SELECT Id, Name FROM Contact WHERE Name = 'Super Long Name That Will Break The Line' LIMIT 1].Name {
+      when 'Test Name' {
+        System.debug('Test Name');
+      }
+      when else {
+        System.debug('Everything Else');
+      }
+    }
+  }
 }
 

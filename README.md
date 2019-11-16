@@ -1,4 +1,4 @@
-# Prettier Apex  [![Build Status](https://travis-ci.org/dangmai/prettier-plugin-apex.svg)](https://travis-ci.org/dangmai/prettier-plugin-apex) [![npm](https://img.shields.io/npm/v/prettier-plugin-apex.svg)](https://www.npmjs.com/package/prettier-plugin-apex)  ![NPM](https://img.shields.io/npm/l/prettier-plugin-apex.svg) [![codecov](https://codecov.io/gh/dangmai/prettier-plugin-apex/branch/master/graph/badge.svg)](https://codecov.io/gh/dangmai/prettier-plugin-apex) [![Join the chat at https://gitter.im/prettier-plugin-apex/community](https://badges.gitter.im/prettier-plugin-apex/community.svg)](https://gitter.im/prettier-plugin-apex/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+# Prettier Apex [![Build Status](https://travis-ci.org/dangmai/prettier-plugin-apex.svg)](https://travis-ci.org/dangmai/prettier-plugin-apex) [![npm](https://img.shields.io/npm/v/prettier-plugin-apex.svg)](https://www.npmjs.com/package/prettier-plugin-apex) ![NPM](https://img.shields.io/npm/l/prettier-plugin-apex.svg) [![codecov](https://codecov.io/gh/dangmai/prettier-plugin-apex/branch/master/graph/badge.svg)](https://codecov.io/gh/dangmai/prettier-plugin-apex) [![Join the chat at https://gitter.im/prettier-plugin-apex/community](https://badges.gitter.im/prettier-plugin-apex/community.svg)](https://gitter.im/prettier-plugin-apex/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ![Prettier Banner](https://raw.githubusercontent.com/prettier/prettier-logo/master/images/prettier-banner-light.png)
 
@@ -77,12 +77,12 @@ If there are errors, please file a bug report so that they can be fixed.
 #### Anonymous Apex
 
 You can also format anonymous Apex with this program by using the
-`--apex-anonymous` flag.
+`apex-anonymous` parser.
 
 For example:
 
 ```bash
-prettier --write "/path/to/project/anonymous/**/*.cls" --apex-anonymous
+prettier --write "/path/to/project/anonymous/**/*.cls" --parser apex-anonymous
 ```
 
 Note that Prettier will treat any Apex file that it finds using the glob above
@@ -115,37 +115,22 @@ The amount of configuration is very limited,
 because this is intended to be a very opinionated formatter.
 Here is the default configuration that can be overriden:
 
-```json
-{
-  "tabWidth": 2,
-  "printWidth": 80,
-  "useTab": false
-}
-```
-
-Which means that by default, the formatted code will use 2 spaces for indentation,
-and will try to format every line to contain under 80 characters.
+| Name                     | Default | Description                                                                                                                                                                                                                    |
+| ------------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `printWidth`             | `80`    | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))                                                                                                                                |
+| `tabWidth`               | `2`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))                                                                                                                                  |
+| `useTabs`                | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))                                                                                                                                       |
+| `requirePragma`          | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma))                                                                                                                             |
+| `insertPragma`           | `false` | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))                                                                                                                              |
+| `apexInsertFinalNewline` | `true`  | Whether a newline is added as the last thing in the output                                                                                                                                                                     |
+| `apexStandaloneParser`   | `none`  | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Performance Tip](#performance-tips3rd-party-integration).<br>If set to `none`, Prettier invokes the CLI parser for every file. |
+| `apexStandalonePort`     | `2117`  | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                               |
 
 ## Editor integration
 
 ### VScode
 
-The official plugin `prettier-vscode` doesn't support plugins out of the box yet, see [this issue](https://github.com/prettier/prettier-vscode/issues/395).
-There are 2 workarounds to enable Apex support anyway:
-
-- First way is to install the plugin into the plugin directory:
-
-```bash
-cd ~/.vscode/extensions/esbenp.prettier-vscode-1.8.1/
-npm install prettier-plugin-apex
-```
-
-After restarting VScode the plugin should work as expected.
-The downside is that you will need to do this every time the plugin gets updated.
-
-- Second way is to use a patched version of `prettier-vscode` - there are 2 Pull Requests right now that add support for plugins: https://github.com/prettier/prettier-vscode/pull/817 and https://github.com/prettier/prettier-vscode/pull/757
-
-Once either of them gets merged into the `master` branch, the VSCode plugin will support `prettier-plugin-apex`.
+Follow [this tutorial](https://forcedotcom.github.io/salesforcedx-vscode/articles/getting-started/prettier) from Salesforce in order to use this plugin in VSCode.
 
 ## Performance Tips/3rd party integration
 
@@ -166,7 +151,7 @@ as well as specifying a special flag when running Prettier:
 # Start the server (if installed globally)
 start-apex-server
 # Or if installed locally
-node /path/to/libary/bin/start-apex-server.js
+node /path/to/library/bin/start-apex-server.js
 
 # In a separate console
 prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigger,cls}"
@@ -174,5 +159,5 @@ prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigg
 # After you are done, stop the server (if installed globally)
 stop-apex-server
 # Or if installed locally
-node /path/to/libary/bin/stop-apex-server.js
+node /path/to/library/bin/stop-apex-server.js
 ```

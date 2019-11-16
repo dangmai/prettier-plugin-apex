@@ -13,6 +13,9 @@ class Conditional extends Object {
     if (i <<= j) {}
     if (i >>= j) {}
     if (i >>>= j) {}
+
+    [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Name = 'Hello';
+    [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() - 1;
   }
 
   void ternaryExpression() {
@@ -129,6 +132,9 @@ class Conditional extends Object {
     myVeryLongBooleanVariable = anExtremelyVeryLongVariable > anotherVeryLongVariable == anExtremelyVeryLongVariable < anotherVeryLongVariable;
 
     myVeryLongBooleanVariable = (anExtremelyVeryLongVariable > anotherVeryLongVariable) == (anExtremelyVeryLongVariable < anotherVeryLongVariable);
+
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Id != null;
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].Id != null;
   }
 
   void triggerVariableExpr_inOtherSuite() {}
@@ -198,12 +204,17 @@ class Conditional extends Object {
     Integer c = a + b;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.getSObjectFields().Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.veryLongVariableNameThatShouldNotBeBroken = veryLongVariableName.handleSomeMethod();
+    longVariableName.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable = veryLongVariableName.handleSomeMethod();
   }
 
   void methodCallExpression() {
     SomeObject o = new SomeObject();
     String result = o.callMethod().getStringResult();
     String longResult = o.callMethod('first param').callAnotherMethod().getStringResult();
+    String longResult = this.callMethod('first param', 'second param', 'thirdParam', 'forthParam');
+    String longResult = super.callMethod('first param', 'second param', 'thirdParam', 'forthParam');
+    String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'forthParam');
     String longResult = o.callMethod('first param', 'second param', 'thirdParam').callAnotherMethod().getStringResult();
     String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
     String longResult = o.callMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam').callAnotherMethod().getStringResult();
@@ -235,6 +246,9 @@ class Conditional extends Object {
 
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod();
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod().callAnotherMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
+
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
   }
 
   void javaMethodCallExpression_notNeeded() {}
@@ -254,6 +268,8 @@ class Conditional extends Object {
 
   void thisVariableExpression() {
     this.a = 'Hello World';
+    this.veryLongVariableNameThatShouldNotBeBroken = veryLongVariableName.handleSomeMethod();
+    this.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable = veryLongVariableName.handleSomeMethod();
     System.debug(this.a + this.b);
   }
 

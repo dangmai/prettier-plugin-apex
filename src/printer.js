@@ -15,6 +15,8 @@ const {
   dedent,
 } = docBuilders;
 
+const { willBreak } = prettier.doc.utils;
+
 const {
   getTrailingComments,
   printComment,
@@ -28,15 +30,6 @@ const {
 const constants = require("./constants");
 
 const apexTypes = constants.APEX_TYPES;
-
-// Places we've looked into to make sure we're not forgetting to implement things:
-// Stmnt.class, NewObject.class, Expr.class, BlockMember.class, CompilationUnit.class
-
-// TODO make sure expression inside {} are consistent, right now Enum/List/Map/Set
-// init does not have spaces around them, while everything else does.
-
-// TODO right now there are spaces around field member and property member.
-// Find a way to fix that.
 
 function indentConcat(docs) {
   return indent(concat(docs));
@@ -200,6 +193,11 @@ function shouldDottedExpressionBreak(path) {
   if (node.dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION) {
     return false;
   }
+  // #98 - Even though `this` can synctactically be followed by whitespaces,
+  // make the formatted output similar to `super` to provide consistency.
+  if (node.dottedExpr.value["@class"] === apexTypes.THIS_VARIABLE_EXPRESSION) {
+    return false;
+  }
   if (node["@class"] !== apexTypes.METHOD_CALL_EXPRESSION) {
     return true;
   }
@@ -244,11 +242,20 @@ function handleArrayExpressionIndex(path, print, withGroup = true) {
 }
 
 function handleVariableExpression(path, print) {
+  const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
+  const { dottedExpr } = node;
   const parts = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const isDottedExpressionSoqlExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    (dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION ||
+      (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
+        dottedExpr.value.expr &&
+        dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -283,7 +290,7 @@ function handleVariableExpression(path, print) {
       parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
     });
   }
-  if (isParentDottedExpression) {
+  if (isParentDottedExpression || isDottedExpressionSoqlExpression) {
     return concat(parts);
   }
   return groupIndentConcat(parts);
@@ -296,29 +303,45 @@ function handleJavaVariableExpression(path, print) {
   return concat(parts);
 }
 
-function handleLiteralExpression(path, print) {
+function handleLiteralExpression(path, print, options) {
+  const node = path.getValue();
   const literalType = path.call(print, "type", "$");
   if (literalType === "NULL") {
     return "null";
   }
-  let literalDoc = path.call(print, "literal", "$");
+  const literalDoc = path.call(print, "literal", "$");
   let doc;
   if (literalType === "STRING") {
     doc = concat(["'", literalDoc, "'"]);
-  } else if (literalType === "LONG") {
-    doc = concat([literalDoc, "L"]);
-  } else if (literalType === "DECIMAL" && literalDoc.indexOf(".") === -1) {
-    // The serializer does not preserve trailing 0s for doubles,
-    // however they are needed when printing,
-    literalDoc += ".0";
-  } else if (literalType === "DOUBLE") {
-    if (literalDoc.indexOf(".") === -1) {
-      // The serializer does not preserve trailing 0s for doubles,
-      // however they are needed when printing,
-      // e.g. 1.0D is valid while 1D is invalid
-      literalDoc += ".0";
+  } else if (
+    literalType === "LONG" ||
+    literalType === "DECIMAL" ||
+    literalType === "DOUBLE"
+  ) {
+    const literal = options.originalText.slice(
+      node.loc.startIndex,
+      node.loc.endIndex,
+    );
+    const lastCharacter = literal[literal.length - 1].toLowerCase();
+    // We handle the letters d and l at the end of Decimal and Long manually:
+    // ```
+    // Decimal a = 1.0D
+    // Long b = 4324234234l
+    // ```
+    // should be formatted to:
+    // ```
+    // Decimal a = 1.0d
+    // Long b = 4324234234L
+    // ```
+    // In general we try to keep keywords lowercase, however uppercase L is better
+    // the lowercase l because lowercase l can be mistaken for number 1
+    if (lastCharacter === "d") {
+      doc = `${literal.substring(0, literal.length - 1)}d`;
+    } else if (lastCharacter === "l") {
+      doc = `${literal.substring(0, literal.length - 1)}L`;
+    } else {
+      doc = literal;
     }
-    doc = concat([literalDoc, "d"]);
   }
   if (doc) {
     return doc;
@@ -419,6 +442,8 @@ function handleTriggerDeclarationUnit(path, print, options) {
 }
 
 function handleInterfaceDeclaration(path, print, options) {
+  const node = path.getValue();
+
   const superInterface = path.call(print, "superInterface", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
@@ -438,6 +463,12 @@ function handleInterfaceDeclaration(path, print, options) {
   parts.push("interface");
   parts.push(" ");
   parts.push(path.call(print, "name"));
+  if (node.typeArguments.value) {
+    const typeArgumentParts = path.map(print, "typeArguments", "value");
+    parts.push("<");
+    parts.push(join(", ", typeArgumentParts));
+    parts.push(">");
+  }
   if (superInterface) {
     parts.push(" ");
     parts.push("extends");
@@ -456,6 +487,8 @@ function handleInterfaceDeclaration(path, print, options) {
 }
 
 function handleClassDeclaration(path, print, options) {
+  const node = path.getValue();
+
   const superClass = path.call(print, "superClass", "value");
   const modifierDocs = path.map(print, "modifiers");
   const memberParts = path.map(print, "members").filter(member => member);
@@ -475,6 +508,12 @@ function handleClassDeclaration(path, print, options) {
   parts.push("class");
   parts.push(" ");
   parts.push(path.call(print, "name"));
+  if (node.typeArguments.value) {
+    const typeArgumentParts = path.map(print, "typeArguments", "value");
+    parts.push("<");
+    parts.push(join(", ", typeArgumentParts));
+    parts.push(">");
+  }
   if (superClass !== "") {
     parts.push(" ");
     parts.push("extends");
@@ -567,6 +606,14 @@ function handleAnnotationValue(childClass, path, print) {
         `AnnotationValue ${childClass} is not supported. Please file a bug report.`,
       );
   }
+  return concat(parts);
+}
+
+function handleAnnotationString(path, print) {
+  const parts = [];
+  parts.push("'");
+  parts.push(path.call(print, "value"));
+  parts.push("'");
   return concat(parts);
 }
 
@@ -674,10 +721,12 @@ function handleMethodDeclaration(path, print) {
   parts.push(path.call(print, "name"));
   // Params
   parts.push("(");
-  parameterParts.push(softline);
-  parameterParts.push(join(concat([",", line]), parameterDocs));
-  parameterParts.push(dedent(softline));
-  parts.push(groupIndentConcat(parameterParts));
+  if (parameterDocs.length > 0) {
+    parameterParts.push(softline);
+    parameterParts.push(join(concat([",", line]), parameterDocs));
+    parameterParts.push(dedent(softline));
+    parts.push(groupIndentConcat(parameterParts));
+  }
   parts.push(")");
   // Body
   _pushIfExist(parts, statementDoc, null, [" "]);
@@ -989,9 +1038,9 @@ function handleNameValueParameter(path, print) {
   parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("=");
-  parts.push(" ");
+  parts.push(line);
   parts.push(path.call(print, "value"));
-  return concat(parts);
+  return groupIndentConcat(parts);
 }
 
 function handleThisMethodCallExpression(path, print) {
@@ -1019,9 +1068,26 @@ function handleSuperMethodCallExpression(path, print) {
 }
 
 function handleMethodCallExpression(path, print) {
+  const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
+  const { dottedExpr } = node;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const isDottedExpressionSoqlExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    (dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION ||
+      (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
+        dottedExpr.value.expr &&
+        dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
+  const isDottedExpressionThisVariableExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    dottedExpr.value["@class"] === apexTypes.THIS_VARIABLE_EXPRESSION;
+  const isDottedExpressionSuperVariableExpression =
+    dottedExpr &&
+    dottedExpr.value &&
+    dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs = path.map(print, "names");
@@ -1069,13 +1135,28 @@ function handleMethodCallExpression(path, print) {
     });
   }
   let resultDoc;
-  if (isParentDottedExpression) {
+  const noGroup =
     // If this is a nested dotted expression, we do not want to group it,
     // since we want it to be part of the method call chain group, e.g:
     // a
     //   .b()  // <- this node here
     //   .c()  // <- this node here
     //   .d()
+    isParentDottedExpression ||
+    // If dotted expression is SOQL and this in inside a binaryish expression,
+    // we shouldn't group it, otherwise there will be extraneous indentations,
+    // for example:
+    // Boolean a =
+    //   [
+    //     SELECT Id FROM Contact
+    //   ].size() > 0
+    (isDottedExpressionSoqlExpression && isBinaryish(parentNode)) ||
+    // If dotted expression is a `super` or `this` variable expression, we
+    // know that this is only one level deep and there's no need to group, e.g:
+    // `this.simpleMethod();` or `super.simpleMethod();`
+    isDottedExpressionThisVariableExpression ||
+    isDottedExpressionSuperVariableExpression;
+  if (noGroup) {
     resultDoc = concat([
       dottedExpressionDoc,
       methodCallChainDoc,
@@ -1170,9 +1251,9 @@ function handleNewSetLiteral(path, print) {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(softline);
+    parts.push(line);
     parts.push(join(concat([",", line]), valueDocs));
-    parts.push(dedent(softline));
+    parts.push(dedent(line));
   }
   parts.push("}");
   return groupIndentConcat(parts);
@@ -1236,9 +1317,9 @@ function handleNewMapLiteral(path, print) {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(softline);
+    parts.push(line);
     parts.push(join(concat([",", line]), valueDocs));
-    parts.push(dedent(softline));
+    parts.push(dedent(line));
   }
   parts.push("}");
   return groupIndentConcat(parts);
@@ -1265,9 +1346,9 @@ function handleNewListLiteral(path, print) {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(softline);
+    parts.push(line);
     parts.push(join(concat([",", line]), valueDocs));
-    parts.push(dedent(softline));
+    parts.push(dedent(line));
   }
   parts.push("}");
   return groupIndentConcat(parts);
@@ -1618,9 +1699,9 @@ function handleSearch(path, print) {
   const parts = [];
   parts.push(path.call(print, "find"));
   _pushIfExist(parts, path.call(print, "in", "value"));
+  _pushIfExist(parts, path.call(print, "returning", "value"));
   _pushIfExist(parts, path.call(print, "division", "value"));
   _pushIfExist(parts, path.call(print, "dataCategory", "value"));
-  _pushIfExist(parts, path.call(print, "returning", "value"));
   _pushIfExist(parts, path.call(print, "limit", "value"));
   _pushIfExist(parts, path.call(print, "updateStats", "value"));
   _pushIfExist(parts, path.call(print, "using", "value"));
@@ -1800,7 +1881,9 @@ function handleField(path, print) {
 
 function handleFromClause(path, print) {
   const parts = [];
-  parts.push(indentConcat(["FROM", line, ...path.map(print, "exprs")]));
+  parts.push(
+    indentConcat(["FROM", line, join(", ", path.map(print, "exprs"))]),
+  );
   return groupConcat(parts);
 }
 
@@ -1853,8 +1936,8 @@ function handleGeolocationLiteral(path, print) {
   const childParts = [];
   parts.push("GEOLOCATION");
   parts.push("(");
-  childParts.push(path.call(print, "latitude", "number", "$"));
-  childParts.push(path.call(print, "longitude", "number", "$"));
+  childParts.push(path.call(print, "latitude"));
+  childParts.push(path.call(print, "longitude"));
   parts.push(join(concat([",", line]), childParts));
   parts.push(dedent(softline));
   parts.push(")");
@@ -2339,7 +2422,18 @@ function handleForLoop(path, print) {
   parts.push(" ");
   parts.push("(");
   // For Control
-  parts.push(groupIndentConcat([softline, forControlDoc, dedent(softline)]));
+  if (
+    node.forControl &&
+    node.forControl.init &&
+    node.forControl.init.expr &&
+    node.forControl.init.expr.value &&
+    node.forControl.init.expr.value["@class"] === apexTypes.SOQL_EXPRESSION &&
+    !willBreak(forControlDoc) // if there are breaks, e.g. comments, we need to be conservative and group them
+  ) {
+    parts.push(forControlDoc);
+  } else {
+    parts.push(groupIndentConcat([softline, forControlDoc, dedent(softline)]));
+  }
   parts.push(")");
   if (!node.stmnt.value) {
     parts.push(";");
@@ -2360,7 +2454,7 @@ function handleForLoop(path, print) {
 function handleForEnhancedControl(path, print) {
   // See the note in handleForInit to see why we have to do this
   const initDocParts = path.call(print, "init");
-  const initDoc = join(concat([":", " "]), initDocParts);
+  const initDoc = join(concat([" ", ":", " "]), initDocParts);
 
   const parts = [];
   parts.push(path.call(print, "type", "value"));
@@ -2440,6 +2534,7 @@ nodeHandler[apexTypes.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexTypes.ANNOTATION] = handleAnnotation;
 nodeHandler[apexTypes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
 nodeHandler[apexTypes.ANNOTATION_VALUE] = handleAnnotationValue;
+nodeHandler[apexTypes.ANNOTATION_STRING] = handleAnnotationString;
 nodeHandler[apexTypes.MODIFIER] = handleModifier;
 nodeHandler[apexTypes.RUN_AS_BLOCK] = handleRunAsBlock;
 nodeHandler[apexTypes.DO_LOOP] = handleDoLoop;
@@ -2612,6 +2707,8 @@ nodeHandler[
   apexTypes.DISTANCE_FUNCTION_EXPRESSION
 ] = handleDistanceFunctionExpression;
 nodeHandler[apexTypes.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
+nodeHandler[apexTypes.NUMBER_LITERAL] = _handlePassthroughCall("number", "$");
+nodeHandler[apexTypes.NUMBER_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[apexTypes.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall(
   "literal",
 );
@@ -2691,8 +2788,10 @@ function genericPrint(path, options, print) {
     // Hard code how to handle the root node here
     const docs = [];
     docs.push(path.call(print, apexTypes.PARSER_OUTPUT, "unit"));
-    // Adding a hardline as the last thing in the document
-    docs.push(hardline);
+    // Optionally, adding a hardline as the last thing in the document
+    if (options.apexInsertFinalNewline) {
+      docs.push(hardline);
+    }
 
     return concat(docs);
   }
