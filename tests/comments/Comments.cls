@@ -5,6 +5,10 @@
 /**
  * ApexDoc for class
  */
+@isTest(
+ seeAllData = true // Class annotation inline comment 1
+ //isParallel = false // Class annotation inline comment 2
+)
 class Comments {
   // Dangling class inline comment
 
@@ -648,6 +652,20 @@ class Comments {
   /* Decorator Leading Block Comment 1 */ @isTest
   void trailingCommentAfterMethodName() {
     System.debug('Hi');
+  }
+
+  @isTest(
+    seeAllData = true // Method annotation inline comment 1
+    //isParallel = false // Method annotation inline comment 2
+  )
+  void methodAnnotationInlineComment() {
+  }
+
+  @isTest(
+    seeAllData = true /* Method annotation block comment 1 */
+    /*isParallel = false // Method annotation block comment 2 */
+  )
+  void methodAnnotationBlockComment() {
   }
 }
 // Trailing Inline Comment

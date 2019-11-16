@@ -156,6 +156,17 @@ function handleMethodDeclaration(location, sourceCode, commentNodes, node) {
   return handleNodeEndedWithCharacter(")")(location, sourceCode, commentNodes);
 }
 
+function handleAnnotation(location, sourceCode, commentNodes, node) {
+  // This is an annotation without parameters, so we can use the identity
+  // location
+  if (!node.parameters || node.parameters.length === 0) {
+    return location;
+  }
+  // If not, we need to use the position of the closing parenthesis after the
+  // parameters
+  return handleNodeEndedWithCharacter(")")(location, sourceCode, commentNodes);
+}
+
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler = {};
@@ -228,6 +239,7 @@ locationGenerationHandler[
 locationGenerationHandler[
   apexTypes.METHOD_CALL_EXPRESSION
 ] = handleNodeEndedWithCharacter(")");
+locationGenerationHandler[apexTypes.ANNOTATION] = handleAnnotation;
 locationGenerationHandler[
   apexTypes.METHOD_DECLARATION
 ] = handleMethodDeclaration;

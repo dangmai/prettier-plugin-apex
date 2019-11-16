@@ -1,3 +1,6 @@
+# Unreleased
+- Fix last comment in Annotations being put in wrong location ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/142)).
+
 # 1.0.0
 
 ## API Changes
