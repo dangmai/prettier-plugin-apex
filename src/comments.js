@@ -24,13 +24,21 @@ function printApexDocComment(comment) {
   return concat([
     join(
       hardline,
-      lines.map(
-        (commentLine, index) =>
+      lines.map((commentLine, index) => {
+        const line =
           (index > 0 ? " " : "") +
           (index < lines.length - 1
             ? commentLine.trim()
-            : commentLine.trimLeft()),
-      ),
+            : commentLine.trimLeft());
+        if (
+          index > 0 &&
+          index < lines.length - 1 &&
+          !line.trim().startsWith("*")
+        ) {
+          return ` *${line}`;
+        }
+        return line;
+      }),
     ),
   ]);
 }

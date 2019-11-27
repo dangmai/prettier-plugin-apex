@@ -20,9 +20,8 @@ function isApexDocComment(comment) {
   const lines = comment.value.split("\n");
   return (
     lines.length > 1 &&
-    lines
-      .slice(1, lines.length - 1)
-      .every(commentLine => commentLine.trim()[0] === "*")
+    lines[0].trim().startsWith("/**") &&
+    lines[lines.length - 1].trim().startsWith("*/")
   );
 }
 

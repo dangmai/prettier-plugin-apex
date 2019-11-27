@@ -30,6 +30,7 @@ exports[`Format apex: CommentsBeforeEnumDeclaration.cls: CommentsBeforeEnumDecla
 
 /**
 * First ApexDoc
+  Description
 */
 enum Season {WINTER, SPRING, SUMMER, FALL}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -37,6 +38,7 @@ enum Season {WINTER, SPRING, SUMMER, FALL}
 
 /**
  * First ApexDoc
+ * Description
  */
 enum Season {
   WINTER,
