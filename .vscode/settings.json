@@ -1,0 +1,4 @@
+{
+  "editor.formatOnSave": true,
+  "jestrunner.configPath": "jest.config.standalone.js"
+}
