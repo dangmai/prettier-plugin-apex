@@ -14,5 +14,7 @@ public class Unicode {
   // セッター
   public void setName(String name) {
     this.name = this.name;
+    String mixedCodePoints = '\u0000 \u001f \u007f \uffff 前';
+    String mixedEscapedCodePoints = '\\u0000 \\u001f \\u007f \\uffff 前';
   }
 }

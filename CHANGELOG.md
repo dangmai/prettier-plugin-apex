@@ -1,3 +1,7 @@
+# Unreleased
+
+- Preserve code points from original source code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/165)).
+
 # 1.1.0
 
 ## Dependency Changes

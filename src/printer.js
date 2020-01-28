@@ -312,7 +312,9 @@ function handleLiteralExpression(path, print, options) {
   const literalDoc = path.call(print, "literal", "$");
   let doc;
   if (literalType === "STRING") {
-    doc = concat(["'", literalDoc, "'"]);
+    // #165 - We have to use the original string because it might contain Unicode code points,
+    // which gets converted to displayed characters automatically by Java after being parsed by jorje.
+    doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
   } else if (
     literalType === "LONG" ||
     literalType === "DECIMAL" ||
