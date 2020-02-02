@@ -1,4 +1,4 @@
-# Apex AST Serializer
+# Apex AST Serializer ![Java CI](https://github.com/dangmai/apex-ast-serializer/workflows/Java%20CI/badge.svg)
 
 This program serializes the Abstract Syntax Tree of an Apex Class/Trigger,
 using the jorje Apex parser distributed by Salesforce.
