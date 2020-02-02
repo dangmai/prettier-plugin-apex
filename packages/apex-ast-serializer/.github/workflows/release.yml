@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: Build zip file
+        run: ./gradlew distZip
+      - name: Get current time
+        uses: srfrnk/current-time@master
+        id: current-time
+        with:
+          format: YYYYMMDD
+      - name: Generate build number
+        id: buildnumber
+        uses: einaregilsson/build-number@v2
+        with:
+          token: ${{secrets.github_token}}
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: 'build/distributions/apex-ast-serializer.zip'
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag: '${{ steps.current-time.outputs.formattedTime }}-${{ steps.buildnumber.outputs.build_number }}'
