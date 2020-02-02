@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -17,3 +16,19 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Create zip file
+      if: github.ref == 'refs/heads/master'
+      run: ./gradlew distZip
+    - name: Get current time
+      uses: srfrnk/current-time@master
+      if: github.ref == 'refs/heads/master'
+      id: current-time
+      with:
+        format: YYYYMMDD
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      if: github.ref == 'refs/heads/master'
+      with:
+        artifacts: 'build/distributions/apex-ast-serializer.zip'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: '${{ steps.current-time.outputs.formattedTime }}-${GITHUB_SHA::6}'
