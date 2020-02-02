@@ -79,7 +79,7 @@ public class CliTest {
         ClassLoader classLoader = getClass().getClassLoader();
         assertDoesNotThrow(() -> {
             File file = new File(classLoader.getResource("AnonymousClass.cls").getFile());
-            runCli(null, new String[] { "-f", "json", "-l", file.getAbsolutePath() });
+            runCli(null, new String[] { "-a", "-f", "json", "-l", file.getAbsolutePath() });
 
             String content = byteArrayOutputStream.toString();
             assertNotNull(content, "There should be content");
@@ -92,7 +92,7 @@ public class CliTest {
         ClassLoader classLoader = getClass().getClassLoader();
         assertDoesNotThrow(() -> {
             File file = new File(classLoader.getResource("AnonymousClass.cls").getFile());
-            runCli(new FileInputStream(file), new String[] { "-f", "json" });
+            runCli(new FileInputStream(file), new String[] { "-a", "-f", "json" });
 
             String content = byteArrayOutputStream.toString();
             assertNotNull(content, "There should be content");
@@ -105,7 +105,7 @@ public class CliTest {
         ClassLoader classLoader = getClass().getClassLoader();
         assertDoesNotThrow(() -> {
             File file = new File(classLoader.getResource("AnonymousClass.cls").getFile());
-            runCli(null, new String[] { "-f", "xml", "-l", file.getAbsolutePath() });
+            runCli(null, new String[] { "-a", "-f", "xml", "-l", file.getAbsolutePath() });
 
             String content = byteArrayOutputStream.toString();
             assertNotNull(content, "There should be content");
@@ -118,7 +118,7 @@ public class CliTest {
         ClassLoader classLoader = getClass().getClassLoader();
         assertDoesNotThrow(() -> {
             File file = new File(classLoader.getResource("AnonymousClass.cls").getFile());
-            runCli(new FileInputStream(file), new String[] { "-f", "xml" });
+            runCli(new FileInputStream(file), new String[] { "-a", "-f", "xml" });
 
             String content = byteArrayOutputStream.toString();
             assertNotNull(content, "There should be content");
