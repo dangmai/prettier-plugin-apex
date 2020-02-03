@@ -1,0 +1,28 @@
+name: Update Jorje
+
+on:
+  repository_dispatch:
+    types: jorje-update
+
+jobs:
+  jorje:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install Linux dependencies
+        run: sudo apt install wget unzip
+      - uses: actions/checkout@v2
+      - name: Download zip archive from apex-ast-serializer
+        run: wget -O /tmp/apex-ast-serializer.zip https://github.com/dangmai/apex-ast-serializer/releases/download/${{ github.event.client_payload.release }}/apex-ast-serializer.zip
+      - name: Remove current apex-ast-serializer vendor
+        run: rm -rf vendor/apex-ast-serializer
+      - name: Unzip file to correct directory
+        run: unzip /tmp/apex-ast-serializer.zip -d vendor/apex-ast-serializer
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v2.2.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+        with:
+          commit-message: Updated jorje
+          title: 'Update jorje dependency'
+          branch: updates/jorje
