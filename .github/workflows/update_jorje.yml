@@ -17,7 +17,7 @@ jobs:
       - name: Remove current apex-ast-serializer vendor
         run: rm -rf vendor/apex-ast-serializer
       - name: Unzip file to correct directory
-        run: unzip /tmp/apex-ast-serializer.zip -d vendor/apex-ast-serializer
+        run: unzip /tmp/apex-ast-serializer.zip -d vendor/
       - name: Give execute bit to executables
         run: chmod +x vendor/apex-ast-serializer/bin/apex-ast-serializer vendor/apex-ast-serializer/bin/apex-ast-serializer-http
       - name: Create Pull Request
