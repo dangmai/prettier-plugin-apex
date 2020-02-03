@@ -20,8 +20,9 @@ jobs:
       run: ./tools/create-jorje-jar.sh
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v2.2.0
+      env:
+        GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
         commit-message: Updated jorje
         title: 'Update jorje dependency'
         branch: updates/jorje
