@@ -1,4 +1,4 @@
-# Unreleased
+# 1.2.0
 
 - Preserve code points from original source code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/165)).
 
