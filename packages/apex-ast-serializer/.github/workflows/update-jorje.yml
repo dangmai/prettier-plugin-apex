@@ -1,6 +1,8 @@
 name: Update Jorje
 
 on:
+  repository_dispatch:
+    types: manual-jorje-update
   schedule:
     - cron: '0 1 * * *'
 
