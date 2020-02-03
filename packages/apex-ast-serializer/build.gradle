@@ -35,6 +35,7 @@ run {
 }
 
 distZip {
+    duplicatesStrategy = 'exclude'
     archiveName = "${project.name}.zip"
 }
 ext {
