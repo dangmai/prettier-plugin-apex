@@ -15,7 +15,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Test with Gradle
-      run: ./gradlew check
+      run: ./gradlew clean check
 
   release:
     needs: test
@@ -30,11 +30,9 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Create zip file
-      if: github.ref == 'refs/heads/master'
-      run: ./gradlew distZip
+      run: ./gradlew clean distZip
     - name: Get current time
       uses: srfrnk/current-time@master
-      if: github.ref == 'refs/heads/master'
       id: current-time
       with:
         format: YYYYMMDD
