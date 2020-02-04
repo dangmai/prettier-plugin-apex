@@ -5,8 +5,10 @@ set -euxo pipefail
 URL=https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/packages/salesforcedx-vscode-apex/out/apex-jorje-lsp.jar?raw=true
 FILENAME=apex-jorje-lsp-original.jar
 FILENAME_MINIMIZED=apex-jorje-lsp.jar
+CURRENT_MD5_FILENAME=current-jorje-md5.txt
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+CURRENT_MD5="$(cat "${CURRENT_DIR}/${CURRENT_MD5_FILENAME}")"
 
 function install() {
     mv ${FILENAME_MINIMIZED} "${CURRENT_DIR}/../libs/"
@@ -15,7 +17,6 @@ function install() {
 function download() {
     curl -L -o ${FILENAME} ${URL}
 }
-
 
 function minimize() {
     unzip -d temp ${FILENAME}
@@ -44,6 +45,13 @@ function cleanup() {
 }
 
 download
-minimize
-install
-cleanup
+NEW_MD5="$(md5sum ${FILENAME} | awk '{ print $1 }')"
+if [[ "${NEW_MD5}" == "${CURRENT_MD5}" ]]; then
+  cleanup
+else
+  minimize
+  install
+  cleanup
+  echo "${NEW_MD5}" > "${CURRENT_DIR}/${CURRENT_MD5_FILENAME}"
+fi
+
