@@ -34,6 +34,16 @@ run {
     standardInput = System.in
 }
 
+tasks.withType(AbstractArchiveTask) {
+    // By default, the result ZIP archive is not reproducible,
+    // i.e. running `gradle clean distZip` at different times
+    // leads to ZIP files that have different md5 sums.
+    // This is a workaround to make it reproducible, from:
+    // https://dzone.com/articles/reproducible-builds-in-java
+    preserveFileTimestamps = false
+    reproducibleFileOrder = true
+}
+
 distZip {
     duplicatesStrategy = 'exclude'
     archiveName = "${project.name}.zip"
