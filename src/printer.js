@@ -813,7 +813,7 @@ function handleEnumDeclaration(path, print, options) {
   const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const parts = [];
-  _pushIfExist(parts, join(" ", modifierDocs));
+  _pushIfExist(parts, join("", modifierDocs));
   parts.push("enum");
   parts.push(" ");
   parts.push(path.call(print, "name"));
