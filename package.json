@@ -22,7 +22,9 @@
     "stop-server": "node bin/stop-apex-server.js",
     "lint": "eslint \"{src,tests_config}/**/*.js\"",
     "prettier": "prettier --write \"{src,tests_config}/**/*.js\" \"./*.md\"",
-    "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=."
+    "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=.",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "keywords": [
     "apex",
@@ -47,6 +49,8 @@
     "axios": "^0.19.0",
     "jest-docblock": "^25.1.0",
     "wait-on": "^4.0.0",
-    "yargs": "^15.0.1"
-  }
+    "yargs": "^15.0.1",
+    "snyk": "^1.316.1"
+  },
+  "snyk": true
 }
