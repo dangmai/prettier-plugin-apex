@@ -9,6 +9,10 @@
 
 - Remove extraneous leading empty line in anonymous code blocks.
 
+## Misc
+
+- Sync parser name with Visual Studio Code language Id for Anonymous Apex ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/201)).
+
 # 1.3.0
 
 - Remove extraneous whitespaces between Enum modifiers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/184)).

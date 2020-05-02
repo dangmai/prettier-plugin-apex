@@ -21,6 +21,13 @@ const languages = [
     linguistLanguageId: 17,
     vscodeLanguageIds: ["apex"],
   },
+  {
+    name: "Apex Anonymous",
+    parsers: ["apex-anonymous"],
+    extensions: [".apex"],
+    linguistLanguageId: 17,
+    vscodeLanguageIds: ["apex-anon"],
+  },
 ];
 
 function locStart(node) {
