@@ -1,3 +1,10 @@
+# 1.4.0
+
+## Dependency Changes
+
+- Support Prettier 2.0 ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/211)).
+- NodeJS support limited to version >= 10.13.0 - driven by Prettier 2.0.
+
 # 1.3.0
 
 - Remove extraneous whitespaces between Enum modifiers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/184)).
