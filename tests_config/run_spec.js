@@ -56,7 +56,7 @@ function runSpec(dirname, parsers, options) {
     throw new Error(`No parsers were specified for ${dirname}`);
   }
 
-  fs.readdirSync(dirname).forEach(filename => {
+  fs.readdirSync(dirname).forEach((filename) => {
     const path = `${dirname}/${filename}`;
     if (
       extname(filename) !== ".snap" &&

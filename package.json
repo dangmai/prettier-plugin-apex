@@ -9,6 +9,9 @@
     "apex-ast-serializer": "./vendor/apex-ast-serializer/bin/apex-ast-serializer",
     "apex-ast-serializer-http": "./vendor/apex-ast-serializer/bin/apex-ast-serializer-http"
   },
+  "engines": {
+    "node": ">= 10.13.0"
+  },
   "files": [
     "/bin",
     "/src",
@@ -38,10 +41,10 @@
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-prettier": "^3.0.1",
     "jest": "^25.1.0",
-    "prettier": "^1.19.0"
+    "prettier": "^2.0.5"
   },
   "peerDependencies": {
-    "prettier": "^1.19.0"
+    "prettier": "^2.0.0"
   },
   "dependencies": {
     "axios": "^0.19.0",
