@@ -11,5 +11,5 @@ location="${CLONE_DIR:-`echo $PWD`}"
 
 rm -rf "$location/$name"
 git clone --depth 1 "$1" "$location/$name"
-npm run debug-check -- "$location/$name/**/classes/*.cls" "$location/$name/**/triggers/*.trigger"
+npm run debug-check -- "$location/$name/**/{classes,triggers}/*.{cls,trigger}"
 rm -rf "$location/$name"
