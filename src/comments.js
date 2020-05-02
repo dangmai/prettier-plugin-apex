@@ -123,7 +123,7 @@ function willPrintOwnComments(path) {
 }
 
 function getTrailingComments(node) {
-  return node.comments.filter(comment => comment.trailing);
+  return node.comments.filter((comment) => comment.trailing);
 }
 
 function handleDanglingComment(comment) {
@@ -404,7 +404,7 @@ function hasPrettierIgnore(path) {
     node &&
     node.comments &&
     node.comments.length > 0 &&
-    node.comments.filter(comment => {
+    node.comments.filter((comment) => {
       let content;
       if (!comment.leading) {
         return false;
@@ -417,10 +417,7 @@ function hasPrettierIgnore(path) {
           .substring(2, comment.value.length - 2)
           .trim();
       } else {
-        content = comment.value
-          .trim()
-          .substring(2)
-          .trim();
+        content = comment.value.trim().substring(2).trim();
       }
       return content === "prettier-ignore";
     }).length > 0

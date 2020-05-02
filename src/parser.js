@@ -91,7 +91,7 @@ function resolveAstReferences(node, referenceMap) {
     // If it has a reference attribute, that means it's a leaf node
     return referenceMap[nodeReference];
   }
-  Object.keys(node).forEach(key => {
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       node[key] = resolveAstReferences(node[key], referenceMap);
     }
@@ -170,7 +170,7 @@ function handleAnnotation(location, sourceCode, commentNodes, node) {
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler = {};
-const identityFunction = location => location;
+const identityFunction = (location) => location;
 // Sometimes we need to delete a location node. For example, a WhereCompoundOp
 // location does not make sense since it can appear in multiple places:
 // SELECT Id FROM Account
@@ -258,7 +258,7 @@ locationGenerationHandler[
  */
 function handleNodeLocation(node, sourceCode, commentNodes) {
   let currentLocation;
-  Object.keys(node).forEach(key => {
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       const location = handleNodeLocation(node[key], sourceCode, commentNodes);
       if (location && currentLocation) {
@@ -353,7 +353,7 @@ function generateExtraMetadata(
   } else {
     allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
   }
-  Object.keys(node).forEach(key => {
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
@@ -416,11 +416,11 @@ function resolveLineIndexes(node, lineIndexes) {
     // The location node that we manually generate do not contain startLine
     // information, so we will create them here.
     nodeLoc.startLine =
-      lineIndexes.findIndex(index => index > nodeLoc.startIndex) - 1;
+      lineIndexes.findIndex((index) => index > nodeLoc.startIndex) - 1;
   }
   if (nodeLoc && !("endLine" in nodeLoc)) {
     nodeLoc.endLine =
-      lineIndexes.findIndex(index => index > nodeLoc.endIndex) - 1;
+      lineIndexes.findIndex((index) => index > nodeLoc.endIndex) - 1;
 
     // Edge case: root node
     if (nodeLoc.endLine < 0) {
@@ -431,10 +431,10 @@ function resolveLineIndexes(node, lineIndexes) {
     nodeLoc.column =
       nodeLoc.startIndex -
       lineIndexes[
-        lineIndexes.findIndex(index => index > nodeLoc.startIndex) - 1
+        lineIndexes.findIndex((index) => index > nodeLoc.startIndex) - 1
       ];
   }
-  Object.keys(node).forEach(key => {
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
     }
@@ -466,7 +466,7 @@ function getEmptyLineLocations(sourceCode) {
   const whiteSpaceRegEx = /^\s*$/;
   const lines = sourceCode.split("\n");
   return lines
-    .map(line => whiteSpaceRegEx.test(line))
+    .map((line) => whiteSpaceRegEx.test(line))
     .reduce((accumulator, currentValue, currentIndex) => {
       if (currentValue) {
         accumulator.push(currentIndex + 1);
@@ -499,14 +499,14 @@ function parse(sourceCode, _, options) {
       ast[apexTypes.PARSER_OUTPUT].parseErrors.length > 0
     ) {
       const errors = ast[apexTypes.PARSER_OUTPUT].parseErrors.map(
-        err => `${err.message}. ${err.detailMessage}`,
+        (err) => `${err.message}. ${err.detailMessage}`,
       );
       throw new Error(errors.join("\r\n"));
     }
     const commentNodes = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
-      .map(item => item[1])
+      .map((item) => item[1])
       .filter(
-        node =>
+        (node) =>
           node["@class"] === apexTypes.BLOCK_COMMENT ||
           node["@class"] === apexTypes.INLINE_COMMENT,
       );
@@ -516,9 +516,9 @@ function parse(sourceCode, _, options) {
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
     ast.comments = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
-      .map(token => token[1])
+      .map((token) => token[1])
       .filter(
-        node =>
+        (node) =>
           node["@class"] === apexTypes.INLINE_COMMENT ||
           node["@class"] === apexTypes.BLOCK_COMMENT,
       );

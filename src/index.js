@@ -40,7 +40,7 @@ const parsers = {
     locStart,
     locEnd,
     hasPragma,
-    preprocess: text => text.trim(),
+    preprocess: (text) => text.trim(),
   },
   "apex-anonymous": {
     astFormat: "apex",
@@ -48,7 +48,7 @@ const parsers = {
     locStart,
     locEnd,
     hasPragma,
-    preprocess: text => text.trim(),
+    preprocess: (text) => text.trim(),
   },
 };
 

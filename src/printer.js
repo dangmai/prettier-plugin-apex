@@ -50,11 +50,11 @@ function _handlePassthroughCall(...names) {
 function _pushIfExist(parts, doc, postDocs, preDocs) {
   if (doc) {
     if (preDocs) {
-      preDocs.forEach(preDoc => parts.push(preDoc));
+      preDocs.forEach((preDoc) => parts.push(preDoc));
     }
     parts.push(doc);
     if (postDocs) {
-      postDocs.forEach(postDoc => parts.push(postDoc));
+      postDocs.forEach((postDoc) => parts.push(postDoc));
     }
   }
   return parts;
@@ -284,7 +284,7 @@ function handleVariableExpression(path, print) {
     parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
-    path.callParent(innerPath => {
+    path.callParent((innerPath) => {
       const withGroup = isParentDottedExpression || dottedExpressionDoc;
 
       parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
@@ -372,10 +372,10 @@ function _getDanglingCommentDocs(path, print, options) {
     return [];
   }
   node.danglingComments = node.comments.filter(
-    comment => !comment.leading && !comment.trailing,
+    (comment) => !comment.leading && !comment.trailing,
   );
   const danglingCommentParts = [];
-  path.each(commentPath => {
+  path.each((commentPath) => {
     danglingCommentParts.push(
       printDanglingComment(commentPath, options, print),
     );
@@ -388,7 +388,7 @@ function handleAnonymousBlockUnit(path, print) {
   // Unlike other compilation units, Anonymous Unit cannot have dangling comments,
   // so we don't have to handle them here.
   const parts = [];
-  const memberParts = path.map(print, "members").filter(member => member);
+  const memberParts = path.map(print, "members").filter((member) => member);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
@@ -426,7 +426,7 @@ function handleTriggerDeclarationUnit(path, print, options) {
   parts.push(")");
   parts.push(" ");
   parts.push("{");
-  const memberParts = path.map(print, "members").filter(member => member);
+  const memberParts = path.map(print, "members").filter((member) => member);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
     if (index !== allMemberDocs.length - 1) {
@@ -448,7 +448,7 @@ function handleInterfaceDeclaration(path, print, options) {
 
   const superInterface = path.call(print, "superInterface", "value");
   const modifierDocs = path.map(print, "modifiers");
-  const memberParts = path.map(print, "members").filter(member => member);
+  const memberParts = path.map(print, "members").filter((member) => member);
   const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
@@ -493,7 +493,7 @@ function handleClassDeclaration(path, print, options) {
 
   const superClass = path.call(print, "superClass", "value");
   const modifierDocs = path.map(print, "modifiers");
-  const memberParts = path.map(print, "members").filter(member => member);
+  const memberParts = path.map(print, "members").filter((member) => member);
   const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
 
   const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
@@ -555,7 +555,7 @@ function handleAnnotation(path, print) {
     // // Trailing Comment
     // void method() {}
     // ```
-    path.each(innerPath => {
+    path.each((innerPath) => {
       const commentNode = innerPath.getValue();
       if (commentNode.leading) {
         parts.push(printComment(innerPath));
@@ -1138,7 +1138,7 @@ function handleMethodCallExpression(path, print) {
     parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
-    path.callParent(innerPath => {
+    path.callParent((innerPath) => {
       const withGroup = isParentDottedExpression || dottedExpressionDoc;
 
       arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
@@ -1386,7 +1386,7 @@ function handleIfElseBlock(path, print) {
   //   b = 2;
   // }
   const ifBlockContainsBlockStatement = node.ifBlocks.map(
-    ifBlock => ifBlock.stmnt["@class"] === apexTypes.BLOCK_STATEMENT,
+    (ifBlock) => ifBlock.stmnt["@class"] === apexTypes.BLOCK_STATEMENT,
   );
 
   ifBlockDocs.forEach((ifBlockDoc, index) => {
@@ -1978,7 +1978,7 @@ function handleWithDataCategories(path, print) {
 
 function handleDataCategory(path, print) {
   const parts = [];
-  const categoryDocs = path.map(print, "categories").filter(doc => doc);
+  const categoryDocs = path.map(print, "categories").filter((doc) => doc);
   parts.push(path.call(print, "type"));
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -2492,7 +2492,7 @@ function handleForInits(path, print) {
   const initDocsParts = path.map(print, "inits");
 
   // See the note in handleForInit to see why we have to do this
-  const initDocs = initDocsParts.map(initDocParts =>
+  const initDocs = initDocsParts.map((initDocParts) =>
     join(concat([" ", "=", " "]), initDocParts),
   );
 
@@ -2739,7 +2739,7 @@ nodeHandler[apexTypes.OFFSET_VALUE] = (path, print) =>
   concat(["OFFSET", " ", path.call(print, "i")]);
 nodeHandler[apexTypes.OFFSET_EXPRESSION] = (path, print) =>
   concat(["OFFSET", " ", path.call(print, "expr")]);
-nodeHandler[apexTypes.QUERY_OPERATOR] = childClass =>
+nodeHandler[apexTypes.QUERY_OPERATOR] = (childClass) =>
   constants.QUERY[childClass];
 nodeHandler[apexTypes.SOQL_ORDER] = handleOrderOperation;
 nodeHandler[apexTypes.SOQL_ORDER_NULL] = handleNullOrderOperation;
@@ -2752,7 +2752,7 @@ nodeHandler[apexTypes.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
 nodeHandler[apexTypes.WHERE_CALC_EXPRESSION] = handleWhereCalcExpression;
 nodeHandler[apexTypes.WHERE_CALC_OPERATOR_PLUS] = () => "+";
 nodeHandler[apexTypes.WHERE_CALC_OPERATOR_MINUS] = () => "-";
-nodeHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = childClass =>
+nodeHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = (childClass) =>
   constants.QUERY_WHERE[childClass];
 nodeHandler[apexTypes.SEARCH_USING_CLAUSE] = (path, print) =>
   concat(["USING", " ", path.call(print, "type")]);

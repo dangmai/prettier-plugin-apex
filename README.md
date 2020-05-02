@@ -17,7 +17,7 @@ including a mix of open source/proprietary/Salesforce internal code bases.
 
 ### Requirements
 
-- Node >= 8
+- Node >= 10.13.0
 - Java Runtime Engine >= 1.8.0
 
 ### How to use

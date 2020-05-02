@@ -22,7 +22,7 @@ function isApexDocComment(comment) {
     lines.length > 1 &&
     lines
       .slice(1, lines.length - 1)
-      .every(commentLine => commentLine.trim()[0] === "*")
+      .every((commentLine) => commentLine.trim()[0] === "*")
   );
 }
 
@@ -36,10 +36,10 @@ function checkIfParentIsDottedExpression(path) {
   // parent name.
   let parentNodeName = "";
   let grandParentNodeName = "";
-  path.callParent(innerPath => {
+  path.callParent((innerPath) => {
     parentNodeName = innerPath.getName();
   });
-  path.callParent(innerPath => {
+  path.callParent((innerPath) => {
     grandParentNodeName = innerPath.getName();
   }, 1);
   if (parentNodeName === "dottedExpr") {
@@ -131,7 +131,7 @@ function massageAstNode(ast, newObj) {
       }
     }
   }
-  METADATA_TO_IGNORE.forEach(name => delete newObj[name]);
+  METADATA_TO_IGNORE.forEach((name) => delete newObj[name]);
 }
 
 /**
@@ -155,7 +155,7 @@ function findNextUncommentedCharacter(
     }
     indexFound =
       // eslint-disable-next-line no-loop-func
-      commentNodes.filter(comment => {
+      commentNodes.filter((comment) => {
         return (
           comment.location.startIndex <= index &&
           comment.location.endIndex - 1 >= index
@@ -191,7 +191,7 @@ const PRECEDENCE = {};
   ["+", "-"],
   ["*", "/", "%"],
 ].forEach((tier, i) => {
-  tier.forEach(op => {
+  tier.forEach((op) => {
     PRECEDENCE[op] = i;
   });
 });
