@@ -5,6 +5,10 @@
 - Support Prettier 2.0 ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/211)).
 - NodeJS support limited to version >= 10.13.0 - driven by Prettier 2.0.
 
+## Formatting Changes:
+
+- Remove extraneous leading empty line in anonymous code blocks.
+
 # 1.3.0
 
 - Remove extraneous whitespaces between Enum modifiers ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/184)).

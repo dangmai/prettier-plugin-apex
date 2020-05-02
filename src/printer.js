@@ -397,7 +397,7 @@ function handleAnonymousBlockUnit(path, print) {
     return memberDoc;
   });
   if (memberDocs.length > 0) {
-    parts.push(concat([hardline, ...memberDocs]));
+    parts.push(...memberDocs);
   }
   return concat(parts);
 }
