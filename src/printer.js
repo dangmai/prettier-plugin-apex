@@ -2492,9 +2492,14 @@ function handleForInits(path, print) {
   const initDocsParts = path.map(print, "inits");
 
   // See the note in handleForInit to see why we have to do this
-  const initDocs = initDocsParts.map((initDocParts) =>
-    join(concat([" ", "=", " "]), initDocParts),
-  );
+  const initDocs = initDocsParts.map((initDocParts) => {
+    // In this situation:
+    // for (Integer i; i < 4; i++) {}
+    // the second element of initDocParts is null, and so we do not want to add the initialization in
+    return initDocParts[1]
+      ? join(concat([" ", "=", " "]), initDocParts)
+      : initDocParts[0];
+  });
 
   const parts = [];
   _pushIfExist(parts, typeDoc, [" "]);

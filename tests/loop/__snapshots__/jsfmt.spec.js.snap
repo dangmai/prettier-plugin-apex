@@ -15,6 +15,9 @@ class LoopClass {
     }
     for (;;) {
     }
+    for (Integer i; i < 4; i++) {
+      System.debug(i);
+    }
     for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
       System.debug(j);
       System.debug('Hi');
@@ -116,6 +119,9 @@ class LoopClass {
       System.debug(count);
     }
     for (;;) {
+    }
+    for (Integer i; i < 4; i++) {
+      System.debug(i);
     }
     for (Integer i = 1, j = 10; i < 20 && j > 0; j = j - 1) {
       System.debug(j);
