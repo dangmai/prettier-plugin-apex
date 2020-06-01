@@ -19,7 +19,6 @@ https://github.com/financialforcedev/ffhttp-googlesheets.git
 https://github.com/SalesforceLabs/Milestones-PM.git
 https://github.com/SalesforceFoundation/NPSP.git
 https://github.com/SalesforceFoundation/EDA.git
-https://github.com/SalesforceFoundation/PMM.git
 https://github.com/SalesforceFoundation/Households.git
 https://github.com/SalesforceFoundation/kanban-board-rpt.git
 https://github.com/SalesforceFoundation/Volunteers-for-Salesforce.git
