@@ -13,4 +13,7 @@ async function main() {
   console.log(JSON.stringify(result.data)); // eslint-disable-line no-console
 }
 
-main();
+main().catch(err => {
+  console.error(err.message);
+  process.exit(1);
+})

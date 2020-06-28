@@ -59,7 +59,7 @@ function parseTextWithHttp(text, serverHost, serverPort, anonymous) {
   });
 
   if (executionResult.status) {
-    const executionError = executionResult.stderr.toString();
+    const executionError = `Failed to connect to Apex parsing server\r\n${executionResult.stderr.toString()}`;
     throw new Error(executionError);
   }
 
