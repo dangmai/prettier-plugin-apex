@@ -1,3 +1,7 @@
+# UNRELEASED
+
+- Handle new jorje structure for types in enhanced for loops.
+
 # 1.5.0
 
 - Fix incorrect formatting of for loop inits without initialization ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/221)).
