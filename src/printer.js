@@ -2467,7 +2467,7 @@ function handleForEnhancedControl(path, print) {
   const initDoc = join(concat([" ", ":", " "]), initDocParts);
 
   const parts = [];
-  parts.push(path.call(print, "type", "value"));
+  parts.push(path.call(print, "type"));
   parts.push(" ");
   parts.push(initDoc);
   return concat(parts);
