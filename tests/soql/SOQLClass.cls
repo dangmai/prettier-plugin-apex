@@ -245,5 +245,30 @@ class SOQLClass {
       WHERE a.name = 'Name'
     ];
   }
+
+  void selectDistanceExpression() {
+    Service__c service = [
+      SELECT
+        id,
+        DISTANCE(
+          Location__c,
+          GEOLOCATION(
+            :client.Location__Latitude__s,
+            :client.Location__Longitude__s
+          ),
+          'mi'
+        ) dist
+        FROM Service__c
+        WHERE
+          DISTANCE(
+            Location__c,
+            GEOLOCATION(
+              :client.Location__Latitude__s,
+              :client.Location__Longitude__s
+            ),
+            'mi'
+          ) < :defaultMaxDistance
+    ];
+  }
 }
 

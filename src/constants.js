@@ -198,6 +198,8 @@ const constants = {
     WHERE_COMPOUND_OPERATOR: "apex.jorje.data.soql.WhereCompoundOp",
     WHERE_UNARY_EXPRESSION: "apex.jorje.data.soql.WhereExpr$WhereUnaryExpr",
     WHERE_UNARY_OPERATOR: "apex.jorje.data.soql.WhereUnaryOp",
+    SELECT_DISTANCE_EXPRESSION:
+      "apex.jorje.data.soql.SelectExpr$SelectDistanceExpr",
     WHERE_DISTANCE_EXPRESSION:
       "apex.jorje.data.soql.WhereExpr$WhereDistanceExpr",
     DISTANCE_FUNCTION_EXPRESSION: "apex.jorje.data.soql.DistanceFunctionExpr",

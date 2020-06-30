@@ -1916,6 +1916,14 @@ function handleWhereClause(path, print) {
   return groupConcat(parts);
 }
 
+function handleSelectDistanceExpression(path, print) {
+  const parts = [];
+  parts.push(path.call(print, "expr"));
+  parts.push(" ");
+  parts.push(path.call(print, "alias"));
+  return groupConcat(parts);
+}
+
 function handleWhereDistanceExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "distance"));
@@ -2715,6 +2723,9 @@ nodeHandler[
 ] = handleWhereCompoundExpression;
 nodeHandler[apexTypes.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
 nodeHandler[apexTypes.WHERE_UNARY_OPERATOR] = () => "NOT";
+nodeHandler[
+  apexTypes.SELECT_DISTANCE_EXPRESSION
+] = handleSelectDistanceExpression;
 nodeHandler[
   apexTypes.WHERE_DISTANCE_EXPRESSION
 ] = handleWhereDistanceExpression;
