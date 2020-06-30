@@ -1920,7 +1920,7 @@ function handleSelectDistanceExpression(path, print) {
   const parts = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
-  parts.push(path.call(print, "alias"));
+  parts.push(path.call(print, "alias", "value"));
   return groupConcat(parts);
 }
 
