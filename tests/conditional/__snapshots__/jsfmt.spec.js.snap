@@ -19,6 +19,13 @@ class Conditional {
         ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
         : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod()
     );
+    veryLongVariableNameThatWillSurelyBreak == 'Yes'
+      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
+      : anotherVeryLongVariableNameThatWillSurelyBreak == 'Yes'
+      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod()
+      : yetAnotherVeryLongVariableNameThatWillSurelyBreak == 'Yes'
+      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.yetAnotherMethod()
+      : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.finalAnotherMethod();
 
     Map<String, String> stringMap = new Map<String, String>();
     if (stringMap.contains('a')) {
@@ -72,6 +79,13 @@ class Conditional {
         ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
         : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod()
     );
+    veryLongVariableNameThatWillSurelyBreak == 'Yes'
+      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
+      : anotherVeryLongVariableNameThatWillSurelyBreak == 'Yes'
+          ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod()
+          : yetAnotherVeryLongVariableNameThatWillSurelyBreak == 'Yes'
+              ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.yetAnotherMethod()
+              : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.finalAnotherMethod();
 
     Map<String, String> stringMap = new Map<String, String>();
     if (stringMap.contains('a')) {
