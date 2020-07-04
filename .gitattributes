@@ -1,0 +1,26 @@
+# Source files
+*.xml text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.js text eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.txt text eol=lf
+*.cls text eol=lf
+*.trigger text eol=lf
+*.apex text eol=lf
+*.snap text eol=lf
+vendor/apex-ast-serializer/bin/* text eof=lf # The batch files are overriden later in this file
+
+# Misc config files
+.gitignore text eol=lf
+.prettierrc text eol=lf
+.editorconfig text eol=lf
+.gitattributes text eol=lf
+
+# Windows specific files
+*.bat text eol=crlf
+
+# Binary files
+*.jar binary
