@@ -11,5 +11,7 @@ location="${CLONE_DIR:-`echo $PWD`}"
 
 rm -rf "$location/$name"
 git clone --depth 1 "$1" "$location/$name"
-npm run debug-check -- "$location/$name/**/{classes,triggers}/*.{cls,trigger}"
+# Here we use --no-config so that Prettier does not try to use the test repos
+# Prettier config, as they may interfere with the test runs.
+npm run debug-check -- "$location/$name/**/{classes,triggers}/*.{cls,trigger}" --no-config
 rm -rf "$location/$name"
