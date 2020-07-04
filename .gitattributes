@@ -11,8 +11,8 @@
 *.trigger text eol=lf
 *.apex text eol=lf
 *.snap text eol=lf
-# The batch files are overriden later in this file
-vendor/apex-ast-serializer/bin/* text eof=lf
+vendor/apex-ast-serializer/bin/apex-ast-serializer text eof=lf
+vendor/apex-ast-serializer/bin/apex-ast-serializer-http text eof=lf
 
 # Misc config files
 .gitignore text eol=lf
