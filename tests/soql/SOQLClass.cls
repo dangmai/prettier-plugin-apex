@@ -5,6 +5,9 @@ class SOQLClass {
       SELECT Id, Name, AccountNumber, Site, AccountSource, AnnualRevenue, PersonAssistantName, BillingAddress, Account.Id, Account.CreatedById
       FROM Contact WHERE Id IN :contactIds ORDER BY Name DESC LIMIT 1 OFFSET 5
     ];
+    contacts = [
+      SELECT Id FROM Contact WHERE Boolean_Field__c = TRUE AND Another_Boolean_Field__c = FALSE
+    ];
     Contact[] logicalOperators = [
       SELECT Id
       From Contact

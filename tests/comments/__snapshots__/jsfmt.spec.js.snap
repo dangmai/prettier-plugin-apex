@@ -873,7 +873,7 @@ class Comments {
       Contact a : [
         SELECT Id, Name, Description, Birthdate
         FROM Contact
-        WHERE Id != null AND Name != 'Hello'
+        WHERE Id != NULL AND Name != 'Hello'
       ]
     ) {
     }
@@ -887,7 +887,7 @@ class Comments {
     for (/* Block SOQL For 2 */ Contact a : [
       SELECT Id, Name, Description, Birthdate
       FROM Contact
-      WHERE Id != null AND Name != 'Hello'
+      WHERE Id != NULL AND Name != 'Hello'
     ]) {
     }
   }

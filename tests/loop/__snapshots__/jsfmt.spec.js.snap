@@ -153,7 +153,7 @@ class LoopClass {
     for (Contact a : [
       SELECT Id, Name, Description, Birthdate
       FROM Contact
-      WHERE Id != null AND Name != 'Hello'
+      WHERE Id != NULL AND Name != 'Hello'
     ]) {
       System.debug(a);
     }

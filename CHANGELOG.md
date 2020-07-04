@@ -4,6 +4,7 @@
 - Clearer error message when failing to connect to standalone Apex parser server ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/204)).
 - Handle SOQL Select Distance Expression ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/237)).
 - Use alignment instead of indentation to provide clarity for ternary expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/223)).
+- Use uppercase TRUE, FALSE, NULL in SOQL expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/209)).
 
 # 1.5.0
 

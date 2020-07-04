@@ -8,6 +8,9 @@ class SOQLClass {
       SELECT Id, Name, AccountNumber, Site, AccountSource, AnnualRevenue, PersonAssistantName, BillingAddress, Account.Id, Account.CreatedById
       FROM Contact WHERE Id IN :contactIds ORDER BY Name DESC LIMIT 1 OFFSET 5
     ];
+    contacts = [
+      SELECT Id FROM Contact WHERE Boolean_Field__c = TRUE AND Another_Boolean_Field__c = FALSE
+    ];
     Contact[] logicalOperators = [
       SELECT Id
       From Contact
@@ -297,6 +300,11 @@ class SOQLClass {
       LIMIT 1
       OFFSET 5
     ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      WHERE Boolean_Field__c = TRUE AND Another_Boolean_Field__c = FALSE
+    ];
     Contact[] logicalOperators = [
       SELECT Id
       FROM Contact
@@ -335,7 +343,7 @@ class SOQLClass {
     Contact[] nestedFrom = [
       SELECT Id
       FROM Contact
-      WHERE Id IN (SELECT Id FROM Contact) AND Account.Id != null
+      WHERE Id IN (SELECT Id FROM Contact) AND Account.Id != NULL
     ];
     User[] withAlias = [
       SELECT u.Name, u.Email, u.Id, u.IsPortalEnabled

@@ -2058,13 +2058,13 @@ function handleWhereQueryLiteral(childClass, path, print, options) {
       doc = concat(["'", path.call(print, "literal"), "'"]);
       break;
     case "QueryNull":
-      doc = "null";
+      doc = "NULL";
       break;
     case "QueryTrue":
-      doc = "true";
+      doc = "TRUE";
       break;
     case "QueryFalse":
-      doc = "false";
+      doc = "FALSE";
       break;
     case "QueryNumber":
       doc = path.call(print, "literal", "$");
