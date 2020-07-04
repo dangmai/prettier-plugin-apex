@@ -44,13 +44,7 @@ function raw(string) {
   return { [Symbol.for("raw")]: string };
 }
 
-function runSpec(dirname, parsers, options) {
-  // eslint-disable-next-line no-param-reassign
-  options = {
-    plugins: ["."],
-    ...options,
-  };
-
+function runSpec(dirname, parsers, specOptions) {
   /* instabul ignore if */
   if (!parsers || !parsers.length) {
     throw new Error(`No parsers were specified for ${dirname}`);
@@ -66,28 +60,43 @@ function runSpec(dirname, parsers, options) {
     ) {
       const source = read(path).replace(/\r\n/g, "\n");
 
-      const mergedOptions = { ...options, parser: parsers[0] };
-      const output = prettyPrint(source, path, mergedOptions);
-      test(`Format ${mergedOptions.parser}: ${filename}`, () => {
-        expect(raw(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
-          filename,
-        );
+      let options;
+      if (!Array.isArray(specOptions)) {
+        options = [specOptions];
+      } else {
+        options = specOptions;
+      }
+      const mergedOptions = options.map((opts) => {
+        return {
+          plugins: ["."],
+          ...opts,
+          parser: parsers[0],
+        };
       });
 
-      if (AST_COMPARE) {
-        const ast = parse(source, mergedOptions);
-        const ppast = parse(output, mergedOptions);
-        const secondOutput = prettyPrint(output, path, mergedOptions);
-
-        test(`Verify AST: ${filename}`, () => {
-          expect(ppast).toBeDefined();
-          expect(ast).toEqual(ppast);
+      mergedOptions.forEach((mergedOpts) => {
+        const output = prettyPrint(source, path, mergedOpts);
+        test(`Format ${mergedOpts.parser}: ${filename}`, () => {
+          expect(raw(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
+            filename,
+          );
         });
 
-        test(`Stable format: ${filename}`, () => {
-          expect(secondOutput).toEqual(output);
-        });
-      }
+        if (AST_COMPARE) {
+          const ast = parse(source, mergedOpts);
+          const ppast = parse(output, mergedOpts);
+          const secondOutput = prettyPrint(output, path, mergedOpts);
+
+          test(`Verify AST: ${filename}`, () => {
+            expect(ppast).toBeDefined();
+            expect(ast).toEqual(ppast);
+          });
+
+          test(`Stable format: ${filename}`, () => {
+            expect(secondOutput).toEqual(output);
+          });
+        }
+      });
     }
   });
 }

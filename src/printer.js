@@ -5,6 +5,7 @@ const prettier = require("prettier");
 const docBuilders = prettier.doc.builders;
 
 const {
+  align,
   concat,
   join,
   hardline,
@@ -1459,10 +1460,10 @@ function handleTernaryExpression(path, print) {
   parts.push(line);
   parts.push("?");
   parts.push(" ");
-  // Here we indent the true and false expressions twice, because the ? and :
-  // characters already take up some space, and without adding another level
-  // of indentation it is difficult to tell the correct nesting level, for
-  // example:
+  // Here we align the true and false expressions by 2 characters,
+  // because the ? and : characters already take up some space,
+  // and without adding the alignment, it is difficult to tell
+  // the correct nesting level, for example:
   // a == 1
   //   ? someVariable
   //     .callMethod()
@@ -1474,11 +1475,11 @@ function handleTernaryExpression(path, print) {
   //       .callMethod()
   //   : anotherVariable
   //       .anotherMethod()
-  parts.push(group(indent(path.call(print, "trueExpr"))));
+  parts.push(group(align(2, path.call(print, "trueExpr"))));
   parts.push(line);
   parts.push(":");
   parts.push(" ");
-  parts.push(group(indent(path.call(print, "falseExpr"))));
+  parts.push(group(align(2, path.call(print, "falseExpr"))));
   return groupIndentConcat(parts);
 }
 

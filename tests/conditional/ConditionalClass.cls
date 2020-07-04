@@ -8,21 +8,6 @@ class Conditional {
     }
     Integer c = a > b ? a : b;
     a < b ? System.debug('Hi') : System.debug('Hello');
-    veryLongVariableNameThatWillSurelyBreak == 'Yes'
-      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
-      : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod();
-    longFunctionCallThatShouldBreakTheStatement(
-      veryLongVariableNameThatWillSurelyBreak == 'Yes'
-        ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
-        : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod()
-    );
-    veryLongVariableNameThatWillSurelyBreak == 'Yes'
-      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.someMethod()
-      : anotherVeryLongVariableNameThatWillSurelyBreak == 'Yes'
-      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.anotherMethod()
-      : yetAnotherVeryLongVariableNameThatWillSurelyBreak == 'Yes'
-      ? VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.yetAnotherMethod()
-      : VeryLongClassNameThatWillForSureBeTooLongForThisMethodToNotBreak.finalAnotherMethod();
 
     Map<String, String> stringMap = new Map<String, String>();
     if (stringMap.contains('a')) {
