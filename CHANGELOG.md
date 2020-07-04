@@ -1,4 +1,4 @@
-# UNRELEASED
+# 1.6.0
 
 - Handle new jorje structure for types in enhanced for loops.
 - Clearer error message when failing to connect to standalone Apex parser server ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/204)).
