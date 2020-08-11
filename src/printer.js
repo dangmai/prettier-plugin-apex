@@ -1808,10 +1808,12 @@ function handleCaseExpression(path, print) {
   parts.push("TYPEOF");
   parts.push(" ");
   parts.push(path.call(print, "op"));
-  parts.push(line);
+  parts.push(hardline);
   parts.push(join(line, whenBranchDocs));
-  parts.push(line);
-  parts.push(elseBranchDoc);
+  if (elseBranchDoc) {
+    parts.push(line);
+    parts.push(elseBranchDoc);
+  }
   parts.push(dedent(softline));
   parts.push("END");
   return groupIndentConcat(parts);

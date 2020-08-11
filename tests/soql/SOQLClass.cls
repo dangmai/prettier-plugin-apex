@@ -179,6 +179,14 @@ class SOQLClass {
   }
 
   void typeOfSoql() {
+    List<Foo_User__c> smallTypeOf = [
+      SELECT Id,
+          TYPEOF Owner
+            WHEN User THEN Id
+            WHEN Group THEN Id
+          END
+      FROM Foo_User__c
+    ];
     Event[] typeOf = [
       SELECT
         TYPEOF What

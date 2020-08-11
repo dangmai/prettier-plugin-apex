@@ -1,3 +1,7 @@
+# Unreleased
+
+- Always break up TYPEOF SOQL queries ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/244)).
+
 # 1.6.0
 
 - Handle new jorje structure for types in enhanced for loops.
