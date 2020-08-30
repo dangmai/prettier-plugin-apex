@@ -13,7 +13,14 @@ public class VariableDeclaration {
     String[] anotherStringArray = new String[]{'a', 'b'};
     List<String> anotherArray = new String[1];
     String[] emptyStrings;
-    String[] otherStrings = new List<String>();
+    Integer maxNums = 5;
+    stringArrays = new List<String>();
+    stringArrays = new List<String>(0);
+    stringArray = new String[maxNums];
+
+    List<String> anotherArray = new List<String>(maxNums);
     List<List<String>> listOfList = new List<List<String>>();
+    listOfList = new List<List<String>>(0);
+    listOfList = new List<List<String>>(maxNums);
   }
 }
