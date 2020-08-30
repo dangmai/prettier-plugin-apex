@@ -10,7 +10,8 @@ class NewObject {
     String[] d = new String[]{'a', 'b'};
     String[] e = new String[]{'Long string number one', 'Long string number two'};
     String[] f = new String[1];
-    String[] g = new String[f];
+    String[] g = new List<String>(f);
+    String[] h = new String[0];
   }
 
   void newSetTest() {
@@ -61,6 +62,26 @@ class NewObject {
     JWS a = new JWS('payload', 'certDevName');
     JWS b = new JWS('Very long payload but still fit in one line', 'very long cert dev name');
     JWS c = new JWS('Very long payload that is definitely too long so that all the parent groups must break', 'very long cert dev name');
+  }
+
+  void newComplicatedTypesTest() {
+    Map<String, Map<String, String>> a = new Map<String, Map<String, String>> {
+      'a' => new Map<String, String> {
+        'b' => 'c'
+      },
+      'd' => new Map<String, String> {
+        'e' => 'f'
+      }
+    };
+    Map<String, List<String>> b = new Map<String, List<String>> {
+      'a' => new List<String>(5),
+      'b' => new List<String> {'c','d','e'}
+    };
+    Map<List<String>, List<String>> c = new Map<List<String>, List<String>> {
+      new List<String>{'a'} => new List<String>{'b','c'},
+      new List<String>{'d'} => new List<String>{'e','f'}
+    };
+    List<List<String>> d = new List<List<String>>(5);
   }
 }
 
