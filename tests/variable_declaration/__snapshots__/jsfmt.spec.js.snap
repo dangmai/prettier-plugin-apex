@@ -45,7 +45,7 @@ public class VariableDeclaration {
     String[] emptyStrings;
     Integer maxNums = 5;
     stringArrays = new List<String>();
-    stringArrays = new List<String>(0);
+    stringArrays = new String[0];
     stringArray = new List<String>(maxNums);
 
     List<String> anotherArray = new List<String>(maxNums);
