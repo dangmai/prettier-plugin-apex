@@ -8,15 +8,18 @@ const waitOn = require("wait-on");
 
 const waitOnPromise = util.promisify(waitOn);
 
-async function start(address, port) {
+function launch() {
   let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http.bat");
   } else {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http");
   }
-  const command = spawn(serializerBin, ["-s", "-a", "secret"]);
+  return spawn(serializerBin, ["-s", "-a", "secret"], { stdio: "ignore" });
+}
 
+async function start(address, port) {
+  const command = launch();
   await waitOnPromise({
     resources: [`http://${address}:${port}/api/ast`],
   });
@@ -31,4 +34,5 @@ async function stop(address, port) {
 module.exports = {
   start,
   stop,
+  launch,
 };
