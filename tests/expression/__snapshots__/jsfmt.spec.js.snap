@@ -124,6 +124,10 @@ class Conditional extends Object {
           i > 5000000 && i < 34034034 && i != 384294723 && i != 47289347 &&
           i != 43249034;
 
+    Boolean c;
+    c = myObj.Lead__r != null && myObj.Lead__r.IsConverted && someOtherCheck && yetAnotherVeryVeryVeryVeryLongCheckThatWillBreak;
+    c = myObj.Lead__r != null && !myObj.Lead__r.IsConverted && someOtherCheck && yetAnotherVeryVeryVeryVeryLongCheckThatWillBreak;
+
     // This is different than what you'd expect. jorje does not automatically
     // group this as left(anExtremelyVeryLongVariable > anotherVeryLongVariable)
     // and right (anExtremelyVeryLongVariable < anotherVeryLongVariable).
@@ -512,6 +516,18 @@ class Conditional extends Object {
       i != 384294723 &&
       i != 47289347 &&
       i != 43249034;
+
+    Boolean c;
+    c =
+      myObj.Lead__r != null &&
+      myObj.Lead__r.IsConverted &&
+      someOtherCheck &&
+      yetAnotherVeryVeryVeryVeryLongCheckThatWillBreak;
+    c =
+      myObj.Lead__r != null &&
+      !myObj.Lead__r.IsConverted &&
+      someOtherCheck &&
+      yetAnotherVeryVeryVeryVeryLongCheckThatWillBreak;
 
     // This is different than what you'd expect. jorje does not automatically
     // group this as left(anExtremelyVeryLongVariable > anotherVeryLongVariable)
