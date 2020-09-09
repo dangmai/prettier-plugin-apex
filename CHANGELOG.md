@@ -1,6 +1,7 @@
 # Unreleased
 
 - Always break up TYPEOF SOQL queries ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/244)).
+- Remove extraneous grouping in certain binary-ish expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/265)).
 
 # 1.6.0
 
