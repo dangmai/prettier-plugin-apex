@@ -232,6 +232,7 @@ function shouldDottedExpressionBreak(path) {
 }
 
 function handleDottedExpression(path, print) {
+  const node = path.getValue();
   const dottedExpressionParts = [];
   const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
 
@@ -239,6 +240,9 @@ function handleDottedExpression(path, print) {
     dottedExpressionParts.push(dottedExpressionDoc);
     if (shouldDottedExpressionBreak(path)) {
       dottedExpressionParts.push(softline);
+    }
+    if (node.isSafeNav) {
+      dottedExpressionParts.push("?");
     }
     dottedExpressionParts.push(".");
     return concat(dottedExpressionParts);
