@@ -12,6 +12,8 @@ const apexTypes = constants.APEX_TYPES;
 
 const MAX_BUFFER = 8192 * 8192;
 
+const CONNECT_ERROR = "Failed to connect to Apex parsing server";
+
 let serverAutoLaunched = false;
 
 function parseTextWithSpawn(text, anonymous) {
@@ -62,7 +64,7 @@ function parseTextWithHttp(text, serverHost, serverPort, anonymous) {
   });
 
   if (executionResult.status) {
-    const executionError = `Failed to connect to Apex parsing server\r\n${executionResult.stderr.toString()}`;
+    const executionError = `${CONNECT_ERROR}\r\n${executionResult.stderr.toString()}`;
     throw new Error(executionError);
   }
 
@@ -490,7 +492,10 @@ function parse(sourceCode, _, options) {
         options.parser === "apex-anonymous",
       );
     } catch (error) {
-      if (options.apexStandaloneParser === "built-in-autolaunched") {
+      if (
+        error.message.startsWith(CONNECT_ERROR) &&
+        options.apexStandaloneParser === "built-in-autolaunched"
+      ) {
         // If in autolaunch mode, start the server for next time
         if (!serverAutoLaunched) {
           serverAutoLaunched = true;
