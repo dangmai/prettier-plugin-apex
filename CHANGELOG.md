@@ -1,6 +1,7 @@
 # Unreleased
 
 - Always break up TYPEOF SOQL queries ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/244)).
+- Add 'built-in-autolaunched' option for '--apex-standalone-parser' to auto start server if needed
 
 # 1.6.0
 
