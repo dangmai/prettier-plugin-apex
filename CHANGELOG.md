@@ -1,5 +1,7 @@
 # Unreleased
 
+- Remove extraneous indentation and blank line for HAVING clauses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/286)).
+
 # 1.7.0
 
 - Add support for Safe Navigation Operator ([doc](https://releasenotes.docs.salesforce.com/en-us/winter21/release-notes/rn_apex_SafeNavigationOperator.htm)).

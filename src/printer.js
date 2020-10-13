@@ -2231,8 +2231,11 @@ function handleGroupByClause(path, print) {
   if (typeDoc) {
     parts.push(")");
   }
+  // #286 - HAVING is part of the GROUP BY node, however we want them to behave
+  // like part a query node, because it makes sense to have it on the same
+  // indentation as the GROUP BY node.
   if (havingDoc) {
-    parts.push(concat([line, havingDoc]));
+    return concat([groupIndentConcat(parts), line, group(havingDoc)]);
   }
   return groupIndentConcat(parts);
 }
