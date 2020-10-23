@@ -47,7 +47,7 @@
     "prettier": "^2.0.0"
   },
   "dependencies": {
-    "axios": "^0.20.0",
+    "axios": "^0.21.0",
     "jest-docblock": "^26.0.0",
     "wait-on": "^5.0.0",
     "yargs": "^16.0.2"
