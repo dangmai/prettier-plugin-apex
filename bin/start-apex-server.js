@@ -3,6 +3,7 @@ const httpServer = require("../src/http-server");
 
 async function setup() {
   await httpServer.start("localhost", 2117);
+  process.exit(0);
 }
 
 if (require.main === module) {
