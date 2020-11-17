@@ -38,7 +38,7 @@ jobs:
         format: YYYYMMDD
     - name: Generate build number
       id: buildnumber
-      uses: einaregilsson/build-number@v2 
+      uses: einaregilsson/build-number@v3 
       with:
         token: ${{secrets.github_token}}
     - name: Create Release
