@@ -22,9 +22,8 @@ jobs:
         run: chmod +x vendor/apex-ast-serializer/bin/apex-ast-serializer vendor/apex-ast-serializer/bin/apex-ast-serializer-http
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.4.1
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         with:
           commit-message: Updated jorje
           title: 'Update jorje dependency'
           branch: updates/jorje
+          token: ${{ secrets.PERSONAL_TOKEN }}
