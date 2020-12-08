@@ -20,6 +20,7 @@ jobs:
         include:
           - node: "14"
             ENABLE_CODE_COVERAGE: true
+            INTEGRATION_TESTS: true
     env:
       ENABLE_CODE_COVERAGE: ${{ matrix.ENABLE_CODE_COVERAGE }}
 
@@ -47,6 +48,13 @@ jobs:
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
         uses: codecov/codecov-action@v1
+
+      - name: Install integration test suite depencies
+        if: matrix.INTEGRATION_TESTS
+        run: sudo apt-get install -y -qq parallel
+
+      - name: Run integration tests
+        run: ./tests_integration/run-integration-tests.sh
 
       - name: Stop Apex parsing server
         if: ${{ always() }}
