@@ -147,19 +147,17 @@ function findNextUncommentedCharacter(
 ) {
   let indexFound = false;
   let index;
+
+  const findIndex = (comment) =>
+    comment.location.startIndex <= index &&
+    comment.location.endIndex - 1 >= index;
   while (!indexFound) {
     if (backwards) {
       index = sourceCode.lastIndexOf(character, fromIndex);
     } else {
       index = sourceCode.indexOf(character, fromIndex);
     }
-    indexFound =
-      // eslint-disable-next-line no-loop-func
-      commentNodes.filter(
-        (comment) =>
-          comment.location.startIndex <= index &&
-          comment.location.endIndex - 1 >= index,
-      ).length === 0;
+    indexFound = commentNodes.filter(findIndex).length === 0;
     if (backwards) {
       fromIndex = index - 1;
     } else {
