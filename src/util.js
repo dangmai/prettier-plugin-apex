@@ -155,12 +155,11 @@ function findNextUncommentedCharacter(
     }
     indexFound =
       // eslint-disable-next-line no-loop-func
-      commentNodes.filter((comment) => {
-        return (
+      commentNodes.filter(
+        (comment) =>
           comment.location.startIndex <= index &&
-          comment.location.endIndex - 1 >= index
-        );
-      }).length === 0;
+          comment.location.endIndex - 1 >= index,
+      ).length === 0;
     if (backwards) {
       fromIndex = index - 1;
     } else {

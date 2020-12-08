@@ -66,13 +66,11 @@ function runSpec(dirname, parsers, specOptions) {
       } else {
         options = specOptions;
       }
-      const mergedOptions = options.map((opts) => {
-        return {
-          plugins: ["."],
-          ...opts,
-          parser: parsers[0],
-        };
-      });
+      const mergedOptions = options.map((opts) => ({
+        plugins: ["."],
+        ...opts,
+        parser: parsers[0],
+      }));
 
       mergedOptions.forEach((mergedOpts) => {
         const output = prettyPrint(source, path, mergedOpts);
