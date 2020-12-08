@@ -50,14 +50,14 @@ distZip {
 }
 ext {
     slf4jVersion = '1.7.30'
-    jettyVersion = '9.4.35.v20201120'
-    jerseyVersion = '2.32'
+    jettyVersion = '11.0.0'
+    jerseyVersion = '3.0.0'
 }
 
 dependencies {
     implementation name: 'apex-jorje-lsp'
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.13'
+    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.14'
 
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
