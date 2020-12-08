@@ -38,6 +38,9 @@ jobs:
       - name: Run Apex parsing server
         run: nohup npm run start-server &
 
+      - name: Wait for Apex parsing server to be up
+        run: npm run wait-server
+
       - name: Run functional tests
         run: npm test -- -c jest.config.standalone.js
 

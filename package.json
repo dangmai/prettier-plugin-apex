@@ -22,6 +22,7 @@
     "pretest": "npm run lint",
     "test": "jest",
     "start-server": "node bin/start-apex-server.js",
+    "wait-server": "wait-on http://localhost:2117/api/ast/",
     "stop-server": "node bin/stop-apex-server.js",
     "lint": "eslint \"{src,tests_config}/**/*.js\"",
     "prettier": "prettier --write \"{src,tests_config}/**/*.js\" \"./*.md\"",
