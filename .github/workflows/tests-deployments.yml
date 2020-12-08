@@ -13,12 +13,12 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - "latest"
+          - "15"
           - "14"
           - "12"
           - "10"
         include:
-          - node: "latest"
+          - node: "14"
             ENABLE_CODE_COVERAGE: true
     env:
       ENABLE_CODE_COVERAGE: ${{ matrix.ENABLE_CODE_COVERAGE }}
