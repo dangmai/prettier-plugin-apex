@@ -35,6 +35,9 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Debug step
+        run: echo ${{ github.event_name }} && echo ${{ github.ref }} && echo ${{ matrix.ENABLE_INTEGRATION_TESTS }} && echo ${{ env.RUN_INTEGRATION_TESTS }}
+
       - name: Install NPM dependencies
         run: npm ci
 
