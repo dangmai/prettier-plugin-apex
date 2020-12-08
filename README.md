@@ -162,3 +162,20 @@ stop-apex-server
 # Or if installed locally
 node /path/to/library/bin/stop-apex-server.js
 ```
+
+## Continuous Integration
+
+Prettier Apex can be used to automatically check correct formatting for Apex code
+in the context of CI/CD, for example:
+
+```bash
+# Start the language server for improved parsing performance,
+# and put it in the background (*nix only) so that next commands can be run.
+nohup start-apex-server &
+# Wait until the server is up before sending requests
+npx wait-on http://localhost:2117/api/ast/
+# Check that Apex files are formatted according to Prettier Apex style
+prettier --check 'project/**/*.{trigger,cls}' --apex-standalone-parser built-in
+# Clean up the language server
+stop-apex-server
+```
