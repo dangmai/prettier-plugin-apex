@@ -1,0 +1,50 @@
+name: Tests and Deployments
+
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 8 * * *'
+
+jobs:
+  functional-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node:
+          - "latest"
+          - "14"
+          - "12"
+          - "10"
+        include:
+          - node: "latest"
+            ENABLE_CODE_COVERAGE: true
+    env:
+      ENABLE_CODE_COVERAGE: ${{ matrix.ENABLE_CODE_COVERAGE }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2.1.2
+        with:
+          node-version: ${{ matrix.node }}
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Run Apex parsing server
+        run: nohup npm run start-server &
+
+      - name: Run functional tests
+        run: npm test -- -c jest.config.standalone.js
+
+      - name: Upload code coverage
+        if: matrix.ENABLE_CODE_COVERAGE
+        uses: codecov/codecov-action@v1
+
+      - name: Stop Apex parsing server
+        if: ${{ always() }}
+        run: npm run stop-server
