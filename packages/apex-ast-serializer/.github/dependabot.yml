@@ -7,7 +7,7 @@ updates:
     open-pull-requests-limit: 10
     ignore:
       # Newer versions of Jetty and Jersey require Java 1.11
-      - dependency-name: "org.eclipse.jetty:*"
+      - dependency-name: "jettyVersion"
         versions: ["10.+"]
-      - dependency-name: "org.glassfish.jersey.*:*"
+      - dependency-name: "jerseyVersion"
         versions: ["3.+"]
