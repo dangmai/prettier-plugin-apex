@@ -8,6 +8,6 @@ updates:
     ignore:
       # Newer versions of Jetty and Jersey require Java 1.11
       - dependency-name: "org.eclipse.jetty:*"
-        version: "10.+"
+        versions: ["10.+"]
       - dependency-name: "org.glassfish.jersey.*:*"
-        version: "3.+"
+        versions: ["3.+"]
