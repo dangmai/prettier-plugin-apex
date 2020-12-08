@@ -24,6 +24,7 @@ jobs:
     env:
       ENABLE_CODE_COVERAGE: ${{ matrix.ENABLE_CODE_COVERAGE }}
       RUN_INTEGRATION_TESTS: ${{ matrix.ENABLE_INTEGRATION_TESTS && (github.event_name == 'schedule' || github.event_name == 'pull_request' || startsWith(github.ref, 'refs/tags')) }}
+      RUN_DEPLOYMENT: ${{ startsWith(github.ref, 'refs/tags')) }}
     name: Run tests on NodeJS ${{ matrix.node }}
 
     steps:
@@ -34,9 +35,6 @@ jobs:
         uses: actions/setup-node@v2.1.2
         with:
           node-version: ${{ matrix.node }}
-
-      - name: Debug step
-        run: echo ${{ github.event_name }} && echo ${{ github.ref }} && echo ${{ matrix.ENABLE_INTEGRATION_TESTS }} && echo ${{ env.RUN_INTEGRATION_TESTS }}
 
       - name: Install NPM dependencies
         run: npm ci
@@ -55,12 +53,18 @@ jobs:
         uses: codecov/codecov-action@v1
 
       - name: Install integration test suite depencies
-        if: env.RUN_INTEGRATION_TESTS
+        if: env.RUN_INTEGRATION_TESTS == 'true'
         run: sudo apt-get install -y -qq parallel
 
       - name: Run integration tests
-        if: env.RUN_INTEGRATION_TESTS
+        if: env.RUN_INTEGRATION_TESTS == 'true'
         run: ./tests_integration/run-integration-tests.sh
+
+      - name: Deploy to NPM
+        if: env.RUN_DEPLOYMENT == 'true'
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
 
       - name: Stop Apex parsing server
         if: ${{ always() }}
