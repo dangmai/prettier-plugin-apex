@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 # This script checkouts a git repository and runs Prettier debug-check on it.
 # It takes 1 argument: the git repository location
@@ -8,6 +8,12 @@ set -euo pipefail
 # to that directory. If not, it will be cloned to the current directory.
 name=$(basename -s .git "$1")
 location="${CLONE_DIR:-`echo $PWD`}"
+
+pwd
+echo "Location: $location"
+ls -alh $location
+echo "Full path: $location/$name"
+ls -alh $location/$name
 
 rm -rf "$location/$name"
 git clone --depth 1 "$1" "$location/$name"
