@@ -5,6 +5,4 @@
 set -euxo pipefail
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
-df -h
-whoami
 parallel -j0 --line-buffer --no-run-if-empty --link -a "$CURRENT_DIR/test-repos.txt" "$CURRENT_DIR/debug-check-repo.sh"

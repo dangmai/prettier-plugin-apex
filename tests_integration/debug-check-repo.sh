@@ -9,15 +9,8 @@ set -euxo pipefail
 name=$(basename -s .git "$1")
 location="${CLONE_DIR:-`echo $PWD`}"
 
-pwd
-echo "Location: $location"
-ls -alh $location
-echo "Full path: $location/$name"
-
 rm -rf "$location/$name"
 git clone --depth 1 "$1" "$location/$name"
-ls -alh $location/$name
-ls -alh $location
 # Here we use --no-config so that Prettier does not try to use the test repos
 # Prettier config, as they may interfere with the test runs.
 npm run debug-check -- "$location/$name/**/{classes,triggers}/*.{cls,trigger}" --no-config --ignore-path=./tests_integration/ignore-list.txt
