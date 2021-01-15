@@ -286,5 +286,20 @@ class SOQLClass {
           ) < :defaultMaxDistance
     ];
   }
+
+  void fieldGroupings() {
+    Contact[] contacts = [
+      SELECT FIELDS(ALL)
+      FROM Contact
+    ];
+    contacts = [
+      SELECT FIELDS(STANDARD)
+      FROM Contact
+    ];
+    contacts = [
+      SELECT FIELDS(CUSTOM)
+      FROM Contact
+    ];
+  }
 }
 
