@@ -1,6 +1,11 @@
-# Unreleased
+# 1.8.0
 
 - Remove extraneous indentation and blank line for HAVING clauses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/286)).
+
+## Internal changes
+
+- Upgrade dependencies to fix security issues.
+- Move CI/CD pipeline from Travis to Github Actions.
 
 # 1.7.0
 
