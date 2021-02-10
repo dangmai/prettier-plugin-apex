@@ -1271,7 +1271,7 @@ function handleNewSetLiteral(path, print) {
 }
 
 function handleNewListInit(path, print) {
-  // We can delcare lists in the following ways:
+  // We can declare lists in the following ways:
   // new Object[size];
   // new Object[] { value, ... };
   // new List<Object>(); // Provides AST consistency.
