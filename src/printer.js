@@ -1286,8 +1286,7 @@ function handleNewListInit(path, print) {
   const parts = [];
   const node = path.getValue();
   const hasLiteralNumberInitializer =
-    (typePart.group || (node.types.length && node.types[0].parts.length < 4)) &&
-    !Number.isNaN(parseInt(expressionDoc, 10));
+    node.expr && node.expr.type && node.expr.type['$'] === 'INTEGER';
 
   // Type
   if (!hasLiteralNumberInitializer) {
