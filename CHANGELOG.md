@@ -2,7 +2,7 @@
 
 - Always break up TYPEOF SOQL queries ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/244)).
 
-- Fixes weird `new List<Object>(0)` constructor with the more usual `new Object[0]` syntax when possible. Also adds new tests that cover edge cases. 
+- Fixes weird `new List<Object>(0)` constructor with the more usual `new Object[0]` syntax when possible. Also adds new tests that cover edge cases. (credit to @brianmfear)
 
 # 1.6.0
 
