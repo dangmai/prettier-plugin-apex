@@ -1293,7 +1293,7 @@ function handleNewListInit(path, print) {
   if (!hasLiteralNumberInitializer) {
     parts.push("List<");
   }
-  parts.push(join(".", typePart));
+  parts.push(join(".", node.types));
   if (!hasLiteralNumberInitializer) {
     parts.push(">");
   }
