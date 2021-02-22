@@ -2095,16 +2095,15 @@ function handleWhereQueryLiteral(childClass, path, print, options) {
   const grandParentNode = path.getParentNode(1);
 
   let doc;
+  const isInLikeExpression =
+    grandParentNode &&
+    grandParentNode.op &&
+    grandParentNode.op["@class"] === constants.APEX_TYPES.QUERY_OPERATOR_LIKE;
   switch (childClass) {
     case "QueryString":
       // #340 - Query Strings have different properties than normal Apex strings,
       // so we have to handle them separately. They also behave differently
       // depending on whether they are in a LIKE expression vs other expressions.
-      const isInLikeExpression =
-        grandParentNode &&
-        grandParentNode.op &&
-        grandParentNode.op["@class"] ===
-          constants.APEX_TYPES.QUERY_OPERATOR_LIKE;
       doc = concat([
         "'",
         escapeSoqlString(node.literal, isInLikeExpression),
