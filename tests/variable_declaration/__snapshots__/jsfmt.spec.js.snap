@@ -41,11 +41,11 @@ public class VariableDeclaration {
     HttpRequest request = new HttpRequest();
     String[] stringArray = new List<String>{};
     String[] anotherStringArray = new List<String>{ 'a', 'b' };
-    List<String> anotherArray = new List<String>(1);
+    List<String> anotherArray = new String[1];
     String[] emptyStrings;
     Integer maxNums = 5;
     stringArrays = new List<String>();
-    stringArrays = new List<String>(0);
+    stringArrays = new String[0];
     stringArray = new List<String>(maxNums);
 
     List<String> anotherArray = new List<String>(maxNums);

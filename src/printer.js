@@ -1292,32 +1292,36 @@ function handleNewSetLiteral(path, print) {
 }
 
 function handleNewListInit(path, print) {
-  // Technically there are 2 ways to declare new list:
-  // - new String[]{};
-  // - new List<String>{};
-  // We use the 2nd format because it can handle any type of new list, e.g.
-  // This is correct:
-  // List<List<String>> data = new List<List<String>>{};
-  // But this is not:
-  // List<List<String>> data = new List<String>[]{};
+  // We can declare lists in the following ways:
+  // new Object[size];
+  // new Object[] { value, ... };
+  // new List<Object>(); // Provides AST consistency.
+  // new List<Object>(size);
 
-  // Other quirks:
-  // All of these are correct:
-  // Id[] ids = new Id[]{};
-  // Id[] ids = new Id[1];
-  // Id[] ids = new Id[anotherIds];
-  // But this is not correct:
-  // Id[] ids = new Id[1]{};
+  // #262 - We use Object[size] if a literal number is provided.
+  // We use List<Object>(param) otherwise.
+  // This should provide compatibility for all known types without knowing
+  // if the parameter is a variable (copy constructor) or literal size.
+
   const expressionDoc = path.call(print, "expr", "value");
   const parts = [];
+  const typePart = path.map(print, "types");
+  const hasLiteralNumberInitializer =
+    (typePart.group || (typePart.length && typePart[0].parts.length < 4)) &&
+    !Number.isNaN(parseInt(expressionDoc, 10));
+
   // Type
-  parts.push("List<");
-  parts.push(join(".", path.map(print, "types")));
-  parts.push(">");
+  if (!hasLiteralNumberInitializer) {
+    parts.push("List<");
+  }
+  parts.push(join(".", typePart));
+  if (!hasLiteralNumberInitializer) {
+    parts.push(">");
+  }
   // Param
-  parts.push("(");
+  parts.push(hasLiteralNumberInitializer ? "[" : "(");
   _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
-  parts.push(")");
+  parts.push(hasLiteralNumberInitializer ? "]" : ")");
   return groupIndentConcat(parts);
 }
 

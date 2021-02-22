@@ -1,6 +1,7 @@
 # Unreleased
 
 - Fix SOQL query string getting quoted incorrectly in LIKE expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/340)).
+- Prefer list init syntax `new Object[0]` in certain situations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/262)) - thanks to @brianmfear.
 
 # 1.8.0
 
