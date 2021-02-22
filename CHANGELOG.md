@@ -1,3 +1,7 @@
+# Unreleased
+
+- Fix SOQL query string getting quoted incorrectly in LIKE expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/340)).
+
 # 1.8.0
 
 - Remove extraneous indentation and blank line for HAVING clauses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/286)).

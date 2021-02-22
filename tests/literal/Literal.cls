@@ -46,4 +46,16 @@ class Literal {
       WHERE Percent__c = 15.0
     ];
   }
+  void queryEscapedString() {
+    return [SELECT Name FROM Account WHERE Name LIKE '\_'];
+    return [SELECT Name FROM Account WHERE Name LIKE '\%'];
+    return [SELECT Name FROM Account WHERE Name LIKE '\n'];
+    return [SELECT Name FROM Account WHERE Name LIKE '\r\n'];
+    return [SELECT Name FROM Account WHERE Name LIKE '\\Hi'];
+    return [SELECT Name FROM Account WHERE Name = '_'];
+    return [SELECT Name FROM Account WHERE Name = '%'];
+    return [SELECT Name FROM Account WHERE Name = '\n'];
+    return [SELECT Name FROM Account WHERE Name = '\r\n'];
+    return [SELECT Name FROM Account WHERE Name = '\\Hi'];
+  }
 }

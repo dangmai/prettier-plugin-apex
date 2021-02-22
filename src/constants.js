@@ -216,6 +216,7 @@ const constants = {
     QUERY_LITERAL_DATE_FORMULA:
       "apex.jorje.data.soql.QueryLiteral$QueryDateFormula",
     QUERY_OPERATOR: "apex.jorje.data.soql.QueryOp",
+    QUERY_OPERATOR_LIKE: "apex.jorje.data.soql.QueryOp$QueryLike",
     SOQL_ORDER: "apex.jorje.data.soql.Order",
     SOQL_ORDER_NULL: "apex.jorje.data.soql.OrderNull",
     TRACKING_TYPE: "apex.jorje.data.soql.TrackingType",
