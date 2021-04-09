@@ -1,4 +1,10 @@
-# Unreleased
+# 1.9.0
+
+## Dependency Changes
+
+- Drop support for Java < 11.
+
+## Formatting Changes
 
 - Fix SOQL query string getting quoted incorrectly in LIKE expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/340)).
 - Prefer list init syntax `new Object[0]` in certain situations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/262)) - thanks to @brianmfear.
