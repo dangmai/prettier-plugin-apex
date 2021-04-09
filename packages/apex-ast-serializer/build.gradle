@@ -97,7 +97,7 @@ dependencies {
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.1'
 
     // https://mvnrepository.com/artifact/org.json/json
-    testImplementation group: 'org.json', name: 'json', version: '20201115'
+    testImplementation group: 'org.json', name: 'json', version: '20210307'
 }
 
 test {
