@@ -3,6 +3,7 @@
 ## Dependency Changes
 
 - Drop support for Java < 11.
+- Add support for Java 16.
 
 ## Formatting Changes
 
