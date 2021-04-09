@@ -48,8 +48,6 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
 
-      - run: java -cp java HelloWorldApp
-
       - name: Install NPM dependencies
         run: npm ci
 
