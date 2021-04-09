@@ -33,21 +33,21 @@ jobs:
       run: chmod +x gradlew
     - name: Create zip file
       run: ./gradlew clean distZip
-#    - name: Get current time
-#      uses: srfrnk/current-time@master
-#      id: current-time
-#      with:
-#        format: YYYYMMDD
-#    - name: Generate build number
-#      id: buildnumber
-#      uses: einaregilsson/build-number@v3
-#      with:
-#        token: ${{secrets.github_token}}
-#    - name: Create Release
-#      uses: ncipollo/release-action@v1
-#      with:
-#        artifacts: 'build/distributions/apex-ast-serializer.zip'
-#        token: ${{ secrets.GITHUB_TOKEN }}
-#        tag: '${{ steps.current-time.outputs.formattedTime }}-${{ steps.buildnumber.outputs.build_number }}'
-#    - name: Send event to prettier-plugin-apex
-#      run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ steps.current-time.outputs.formattedTime }}-${{ steps.buildnumber.outputs.build_number }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
+    - name: Get current time
+      uses: srfrnk/current-time@master
+      id: current-time
+      with:
+        format: YYYYMMDD
+    - name: Generate build number
+      id: buildnumber
+      uses: einaregilsson/build-number@v3
+      with:
+        token: ${{secrets.github_token}}
+    - name: Create Release
+      uses: ncipollo/release-action@v1
+      with:
+        artifacts: 'build/distributions/apex-ast-serializer.zip'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: '${{ steps.current-time.outputs.formattedTime }}-${{ steps.buildnumber.outputs.build_number }}'
+    - name: Send event to prettier-plugin-apex
+      run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ steps.current-time.outputs.formattedTime }}-${{ steps.buildnumber.outputs.build_number }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
