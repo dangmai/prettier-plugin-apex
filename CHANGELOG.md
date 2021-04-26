@@ -1,3 +1,7 @@
+# 1.9.1
+
+- Fix Enum cases using wrong separator in `switch` statements ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/360)).
+
 # 1.9.0
 
 ## Dependency Changes

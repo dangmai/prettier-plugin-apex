@@ -31,6 +31,12 @@ class SwitchClass {
     }
 
     switch on randomObject {
+      when EmumVariable.CaseOne {
+        System.debug('Object');
+      }
+      when EmumVariable.CaseTwo, EnumVariable.CaseTwo {
+        System.debug('Object');
+      }
       when Account a {
         System.debug('Account ' + a);
       }

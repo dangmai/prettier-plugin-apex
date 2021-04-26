@@ -908,7 +908,7 @@ function handleTypeWhen(path, print) {
 }
 
 function handleEnumCase(path, print) {
-  return join(",", path.map(print, "identifiers"));
+  return join(".", path.map(print, "identifiers"));
 }
 
 function handleRunAsBlock(path, print) {
