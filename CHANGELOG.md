@@ -1,3 +1,9 @@
+# Unreleased
+
+# Dependency Changes
+
+- Drop support for NodeJS < 12.
+
 # 1.9.1
 
 - Fix Enum cases using wrong separator in `switch` statements ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/360)).
