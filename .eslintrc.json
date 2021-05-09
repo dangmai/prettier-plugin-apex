@@ -5,6 +5,9 @@
     "prettier/prettier": ["error"],
     "linebreak-style": 0
   },
+  "globals": {
+    "runSpec": true
+  },
   "env": {
     "jest": true
   }
