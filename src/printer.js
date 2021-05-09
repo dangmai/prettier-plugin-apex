@@ -579,10 +579,9 @@ function handleAnnotation(path, print) {
     // ```
     path.each((innerPath) => {
       const commentNode = innerPath.getValue();
-      if (commentNode.leading) {
-        parts.push(printComment(innerPath));
-        parts.push(" ");
-      } else if (commentNode.trailing) {
+      // This can only be a trailing comment, because if it is a leading one,
+      // it will be attached to the Annotation's parent node (e.g. MethodDecl)
+      if (commentNode.trailing) {
         trailingParts.push(" ");
         trailingParts.push(printComment(innerPath));
       }

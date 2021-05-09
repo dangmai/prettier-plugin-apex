@@ -638,6 +638,11 @@ class Comments {
     System.debug('Hi');
   }
 
+  /* Decorator Leading Block Comment 1 */ @isTest
+  void leadingCommentBeforeAnnotation() {
+    System.debug('Hi');
+  }
+
   @isTest // Decorator Trailing Inline Comment 2
   @AuraEnabled // Decorater Trailing Inline Comment 3
   void trailingCommentAfterMethodName() {
