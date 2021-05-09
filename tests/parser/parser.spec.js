@@ -3,13 +3,23 @@ const path = require("path");
 const prettier = require("prettier");
 
 describe("Parser Tests", () => {
-  it("runs synchronous parser correctly", () => {
+  it("runs synchronous parser on valid class correctly", () => {
     const fileName = path.join(__dirname, "ValidClass.cls");
     const source = fs.readFileSync(fileName, "utf8").replace(/\r\n/g, "\n");
     const output = prettier.format(source, {
       plugins: ["."],
       filepath: fileName,
       parser: "apex",
+    });
+    expect(output).toBeDefined();
+  });
+  it("runs synchronous parser on valid anonymous block correctly", () => {
+    const fileName = path.join(__dirname, "ValidAnonymousBlock.apex");
+    const source = fs.readFileSync(fileName, "utf8").replace(/\r\n/g, "\n");
+    const output = prettier.format(source, {
+      plugins: ["."],
+      filepath: fileName,
+      parser: "apex-anonymous",
     });
     expect(output).toBeDefined();
   });
