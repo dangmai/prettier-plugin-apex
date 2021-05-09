@@ -58,7 +58,7 @@ jobs:
         run: npm run wait-server
 
       - name: Run functional tests
-        run: npm test -- -c jest.config.standalone.js
+        run: AST_COMPARE=true npm test -- -c jest.config.standalone.js
 
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
