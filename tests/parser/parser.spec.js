@@ -50,7 +50,18 @@ describe("Parser Tests", () => {
       }),
     ).toThrow("Failed to connect to Apex parsing server");
   });
-  it("throws error when input file is invalid", () => {
+  it("throws error when synchronous parser runs into invalid input file", () => {
+    const fileName = path.join(__dirname, "InvalidClass.cls");
+    const source = fs.readFileSync(fileName, "utf8").replace(/\r\n/g, "\n");
+    expect(() =>
+      prettier.format(source, {
+        plugins: ["."],
+        filepath: fileName,
+        parser: "apex",
+      }),
+    ).toThrow("Unexpected token");
+  });
+  it("throws error when asynchronous parser runs into invalid input file", () => {
     const fileName = path.join(__dirname, "InvalidClass.cls");
     const source = fs.readFileSync(fileName, "utf8").replace(/\r\n/g, "\n");
     expect(() =>
