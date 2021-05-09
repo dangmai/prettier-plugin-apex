@@ -1,0 +1,3 @@
+invalid class InvalidClass {
+
+}
