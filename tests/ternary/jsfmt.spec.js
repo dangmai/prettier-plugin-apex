@@ -1,4 +1,4 @@
-run_spec(
+runSpec(
   __dirname,
   ["apex"],
   [

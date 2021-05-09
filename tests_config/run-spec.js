@@ -98,4 +98,4 @@ function runSpec(dirname, parsers, specOptions) {
     }
   });
 }
-global.run_spec = runSpec;
+global.runSpec = runSpec;

@@ -1,1 +1,1 @@
-run_spec(__dirname, ["apex"], { insertPragma: true });
+runSpec(__dirname, ["apex"], { insertPragma: true });

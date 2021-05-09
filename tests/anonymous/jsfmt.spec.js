@@ -1,1 +1,1 @@
-run_spec(__dirname, ["apex-anonymous"]);
+runSpec(__dirname, ["apex-anonymous"]);

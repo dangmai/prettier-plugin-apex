@@ -1,1 +1,1 @@
-run_spec(__dirname, ["apex"], { requirePragma: true });
+runSpec(__dirname, ["apex"], { requirePragma: true });
