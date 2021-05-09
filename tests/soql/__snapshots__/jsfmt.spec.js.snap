@@ -72,7 +72,7 @@ class SOQLClass {
 
   void dateSoql() {
     AggregateResult[] literals = [
-      SELECT Id
+      SELECT Id, UPPER(CALENDAR_YEAR(CreatedDate))
       FROM Contact
       WHERE CreatedDate > 2018-01-01T00:00:00Z
       OR CreatedDate < 2017-01-01T05:00:00+01:00
@@ -432,7 +432,7 @@ class SOQLClass {
 
   void dateSoql() {
     AggregateResult[] literals = [
-      SELECT Id
+      SELECT Id, UPPER(CALENDAR_YEAR(CreatedDate))
       FROM Contact
       WHERE
         CreatedDate > 2018-01-01T00:00:00Z
