@@ -4,17 +4,8 @@ const prettier = require("prettier");
 
 const docBuilders = prettier.doc.builders;
 
-const {
-  align,
-  concat,
-  join,
-  hardline,
-  line,
-  softline,
-  group,
-  indent,
-  dedent,
-} = docBuilders;
+const { align, concat, join, hardline, line, softline, group, indent, dedent } =
+  docBuilders;
 
 const { willBreak } = prettier.doc.utils;
 
@@ -2605,13 +2596,11 @@ nodeHandler[apexTypes.CLASS_TYPE_REF] = handleClassTypeRef;
 nodeHandler[apexTypes.ARRAY_TYPE_REF] = handleArrayTypeRef;
 nodeHandler[apexTypes.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
 nodeHandler[apexTypes.MODIFIER_PARAMETER_REF] = handleModifierParameterRef;
-nodeHandler[
-  apexTypes.EMPTY_MODIFIER_PARAMETER_REF
-] = handleEmptyModifierParameterRef;
+nodeHandler[apexTypes.EMPTY_MODIFIER_PARAMETER_REF] =
+  handleEmptyModifierParameterRef;
 nodeHandler[apexTypes.BLOCK_STATEMENT] = handleBlockStatement;
-nodeHandler[apexTypes.VARIABLE_DECLARATION_STATEMENT] = _handlePassthroughCall(
-  "variableDecls",
-);
+nodeHandler[apexTypes.VARIABLE_DECLARATION_STATEMENT] =
+  _handlePassthroughCall("variableDecls");
 nodeHandler[apexTypes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
 nodeHandler[apexTypes.NAME_VALUE_PARAMETER] = handleNameValueParameter;
 nodeHandler[apexTypes.ANNOTATION] = handleAnnotation;
@@ -2668,18 +2657,16 @@ nodeHandler[apexTypes.ENUM_DECLARATION] = handleEnumDeclaration;
 nodeHandler[apexTypes.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
 nodeHandler[apexTypes.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
 nodeHandler[apexTypes.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
-nodeHandler[apexTypes.INTERFACE_DECLARATION_UNIT] = _handlePassthroughCall(
-  "body",
-);
+nodeHandler[apexTypes.INTERFACE_DECLARATION_UNIT] =
+  _handlePassthroughCall("body");
 nodeHandler[apexTypes.ANONYMOUS_BLOCK_UNIT] = handleAnonymousBlockUnit;
 
 // Block Member
 nodeHandler[apexTypes.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");
 nodeHandler[apexTypes.FIELD_MEMBER] = _handlePassthroughCall("variableDecls");
 nodeHandler[apexTypes.STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMember();
-nodeHandler[
-  apexTypes.STATIC_STATEMENT_BLOCK_MEMBER
-] = _handleStatementBlockMember("static");
+nodeHandler[apexTypes.STATIC_STATEMENT_BLOCK_MEMBER] =
+  _handleStatementBlockMember("static");
 nodeHandler[apexTypes.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
 nodeHandler[apexTypes.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
 nodeHandler[apexTypes.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
@@ -2698,27 +2685,23 @@ nodeHandler[apexTypes.TRIGGER_VARIABLE_EXPRESSION] = (path, print) =>
   concat(["Trigger", ".", path.call(print, "variable")]);
 nodeHandler[apexTypes.NEW_EXPRESSION] = handleNewExpression;
 nodeHandler[apexTypes.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
-nodeHandler[
-  apexTypes.JAVA_METHOD_CALL_EXPRESSION
-] = handleJavaMethodCallExpression;
+nodeHandler[apexTypes.JAVA_METHOD_CALL_EXPRESSION] =
+  handleJavaMethodCallExpression;
 nodeHandler[apexTypes.THIS_VARIABLE_EXPRESSION] = () => "this";
 nodeHandler[apexTypes.SUPER_VARIABLE_EXPRESSION] = () => "super";
 nodeHandler[apexTypes.POSTFIX_EXPRESSION] = handlePostfixExpression;
 nodeHandler[apexTypes.PREFIX_EXPRESSION] = handlePrefixExpression;
 nodeHandler[apexTypes.CAST_EXPRESSION] = handleCastExpression;
 nodeHandler[apexTypes.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
-nodeHandler[
-  apexTypes.PACKAGE_VERSION_EXPRESSION
-] = handlePackageVersionExpression;
+nodeHandler[apexTypes.PACKAGE_VERSION_EXPRESSION] =
+  handlePackageVersionExpression;
 nodeHandler[apexTypes.ARRAY_EXPRESSION] = handleArrayExpression;
 nodeHandler[apexTypes.CLASS_REF_EXPRESSION] = (path, print) =>
   concat([path.call(print, "type"), ".", "class"]);
-nodeHandler[
-  apexTypes.THIS_METHOD_CALL_EXPRESSION
-] = handleThisMethodCallExpression;
-nodeHandler[
-  apexTypes.SUPER_METHOD_CALL_EXPRESSION
-] = handleSuperMethodCallExpression;
+nodeHandler[apexTypes.THIS_METHOD_CALL_EXPRESSION] =
+  handleThisMethodCallExpression;
+nodeHandler[apexTypes.SUPER_METHOD_CALL_EXPRESSION] =
+  handleSuperMethodCallExpression;
 nodeHandler[apexTypes.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[apexTypes.SOSL_EXPRESSION] = handleSoslExpression;
 
@@ -2745,9 +2728,8 @@ nodeHandler[apexTypes.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
 nodeHandler[apexTypes.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
 nodeHandler[apexTypes.RETURNING_CLAUSE] = handleReturningClause;
 nodeHandler[apexTypes.RETURNING_EXPRESSION] = handleReturningExpression;
-nodeHandler[
-  apexTypes.RETURNING_SELECT_EXPRESSION
-] = handleReturningSelectExpression;
+nodeHandler[apexTypes.RETURNING_SELECT_EXPRESSION] =
+  handleReturningSelectExpression;
 
 // SOQL
 nodeHandler[apexTypes.QUERY] = handleQuery;
@@ -2772,32 +2754,25 @@ nodeHandler[apexTypes.GROUP_BY_TYPE] = handleGroupByType;
 nodeHandler[apexTypes.HAVING_CLAUSE] = handleHavingClause;
 nodeHandler[apexTypes.WHERE_CLAUSE] = handleWhereClause;
 nodeHandler[apexTypes.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
-nodeHandler[
-  apexTypes.WHERE_OPERATION_EXPRESSION
-] = handleWhereOperationExpression;
-nodeHandler[
-  apexTypes.WHERE_OPERATION_EXPRESSIONS
-] = handleWhereOperationExpressions;
-nodeHandler[
-  apexTypes.WHERE_COMPOUND_EXPRESSION
-] = handleWhereCompoundExpression;
+nodeHandler[apexTypes.WHERE_OPERATION_EXPRESSION] =
+  handleWhereOperationExpression;
+nodeHandler[apexTypes.WHERE_OPERATION_EXPRESSIONS] =
+  handleWhereOperationExpressions;
+nodeHandler[apexTypes.WHERE_COMPOUND_EXPRESSION] =
+  handleWhereCompoundExpression;
 nodeHandler[apexTypes.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
 nodeHandler[apexTypes.WHERE_UNARY_OPERATOR] = () => "NOT";
-nodeHandler[
-  apexTypes.SELECT_DISTANCE_EXPRESSION
-] = handleSelectDistanceExpression;
-nodeHandler[
-  apexTypes.WHERE_DISTANCE_EXPRESSION
-] = handleWhereDistanceExpression;
-nodeHandler[
-  apexTypes.DISTANCE_FUNCTION_EXPRESSION
-] = handleDistanceFunctionExpression;
+nodeHandler[apexTypes.SELECT_DISTANCE_EXPRESSION] =
+  handleSelectDistanceExpression;
+nodeHandler[apexTypes.WHERE_DISTANCE_EXPRESSION] =
+  handleWhereDistanceExpression;
+nodeHandler[apexTypes.DISTANCE_FUNCTION_EXPRESSION] =
+  handleDistanceFunctionExpression;
 nodeHandler[apexTypes.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
 nodeHandler[apexTypes.NUMBER_LITERAL] = _handlePassthroughCall("number", "$");
 nodeHandler[apexTypes.NUMBER_EXPRESSION] = _handlePassthroughCall("expr");
-nodeHandler[apexTypes.QUERY_LITERAL_EXPRESSION] = _handlePassthroughCall(
-  "literal",
-);
+nodeHandler[apexTypes.QUERY_LITERAL_EXPRESSION] =
+  _handlePassthroughCall("literal");
 nodeHandler[apexTypes.QUERY_LITERAL] = handleWhereQueryLiteral;
 nodeHandler[apexTypes.APEX_EXPRESSION] = _handlePassthroughCall("expr");
 nodeHandler[apexTypes.COLON_EXPRESSION] = handleColonExpression;

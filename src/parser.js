@@ -197,52 +197,37 @@ locationGenerationHandler[apexTypes.VALUE_WHEN] = identityFunction;
 locationGenerationHandler[apexTypes.ELSE_WHEN] = identityFunction;
 locationGenerationHandler[apexTypes.QUERY] = identityFunction;
 locationGenerationHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = removeFunction;
-locationGenerationHandler[
-  apexTypes.VARIABLE_DECLARATION_STATEMENT
-] = identityFunction;
-locationGenerationHandler[
-  apexTypes.WHERE_COMPOUND_EXPRESSION
-] = identityFunction;
-locationGenerationHandler[
-  apexTypes.WHERE_OPERATION_EXPRESSION
-] = identityFunction;
-locationGenerationHandler[
-  apexTypes.SELECT_INNER_QUERY
-] = handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[
-  apexTypes.ANONYMOUS_BLOCK_UNIT
-] = handleAnonymousUnitLocation;
-locationGenerationHandler[
-  apexTypes.NESTED_EXPRESSION
-] = handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[
-  apexTypes.PROPERTY_MEMBER
-] = handleNodeEndedWithCharacter("}");
-locationGenerationHandler[
-  apexTypes.SWITCH_STATEMENT
-] = handleNodeEndedWithCharacter("}");
-locationGenerationHandler[
-  apexTypes.NEW_LIST_LITERAL
-] = handleNodeEndedWithCharacter("}");
-locationGenerationHandler[
-  apexTypes.NEW_SET_LITERAL
-] = handleNodeEndedWithCharacter("}");
-locationGenerationHandler[
-  apexTypes.NEW_MAP_LITERAL
-] = handleNodeEndedWithCharacter("}");
-locationGenerationHandler[
-  apexTypes.VARIABLE_DECLARATIONS
-] = handleNodeEndedWithCharacter(";");
-locationGenerationHandler[
-  apexTypes.NEW_KEY_VALUE
-] = handleNodeEndedWithCharacter(")");
-locationGenerationHandler[
-  apexTypes.METHOD_CALL_EXPRESSION
-] = handleNodeEndedWithCharacter(")");
+locationGenerationHandler[apexTypes.VARIABLE_DECLARATION_STATEMENT] =
+  identityFunction;
+locationGenerationHandler[apexTypes.WHERE_COMPOUND_EXPRESSION] =
+  identityFunction;
+locationGenerationHandler[apexTypes.WHERE_OPERATION_EXPRESSION] =
+  identityFunction;
+locationGenerationHandler[apexTypes.SELECT_INNER_QUERY] =
+  handleNodeSurroundedByCharacters("(", ")");
+locationGenerationHandler[apexTypes.ANONYMOUS_BLOCK_UNIT] =
+  handleAnonymousUnitLocation;
+locationGenerationHandler[apexTypes.NESTED_EXPRESSION] =
+  handleNodeSurroundedByCharacters("(", ")");
+locationGenerationHandler[apexTypes.PROPERTY_MEMBER] =
+  handleNodeEndedWithCharacter("}");
+locationGenerationHandler[apexTypes.SWITCH_STATEMENT] =
+  handleNodeEndedWithCharacter("}");
+locationGenerationHandler[apexTypes.NEW_LIST_LITERAL] =
+  handleNodeEndedWithCharacter("}");
+locationGenerationHandler[apexTypes.NEW_SET_LITERAL] =
+  handleNodeEndedWithCharacter("}");
+locationGenerationHandler[apexTypes.NEW_MAP_LITERAL] =
+  handleNodeEndedWithCharacter("}");
+locationGenerationHandler[apexTypes.VARIABLE_DECLARATIONS] =
+  handleNodeEndedWithCharacter(";");
+locationGenerationHandler[apexTypes.NEW_KEY_VALUE] =
+  handleNodeEndedWithCharacter(")");
+locationGenerationHandler[apexTypes.METHOD_CALL_EXPRESSION] =
+  handleNodeEndedWithCharacter(")");
 locationGenerationHandler[apexTypes.ANNOTATION] = handleAnnotation;
-locationGenerationHandler[
-  apexTypes.METHOD_DECLARATION
-] = handleMethodDeclaration;
+locationGenerationHandler[apexTypes.METHOD_DECLARATION] =
+  handleMethodDeclaration;
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -340,12 +325,10 @@ function generateExtraMetadata(
 ) {
   const apexClass = node["@class"];
   let allowTrailingEmptyLineWithin;
-  const isSpecialClass = constants.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(
-    apexClass,
-  );
-  const trailingEmptyLineAllowed = constants.ALLOW_TRAILING_EMPTY_LINE.includes(
-    apexClass,
-  );
+  const isSpecialClass =
+    constants.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+  const trailingEmptyLineAllowed =
+    constants.ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
   if (isSpecialClass) {
     allowTrailingEmptyLineWithin = false;
   } else if (trailingEmptyLineAllowed) {
