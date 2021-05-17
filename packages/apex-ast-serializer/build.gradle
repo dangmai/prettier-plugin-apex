@@ -73,7 +73,7 @@ ext {
 dependencies {
     implementation name: 'apex-jorje-lsp'
     // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.16'
+    implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.17'
 
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
