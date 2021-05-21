@@ -92,6 +92,13 @@ class Comments {
       5 => 5,  /* Friday */
       6 => 6 /* Saturday */
     }; /* Final map trailing block comment */
+
+    TestBatch batch = new TestBatch(
+      TestBatch.UPDATE_OPP_REC_TYPE_QUERY, // test 1
+      TestBatch.UPDATE_OPP_REC_TYPE, // test 2
+      ids, // test 3
+      lastVariable // test 4
+    );
   }
 
   void longChainComments() {
@@ -770,6 +777,13 @@ class Comments {
       5 => 5 /* Friday */,
       6 => 6 /* Saturday */
     }; /* Final map trailing block comment */
+
+    TestBatch batch = new TestBatch(
+      TestBatch.UPDATE_OPP_REC_TYPE_QUERY, // test 1
+      TestBatch.UPDATE_OPP_REC_TYPE, // test 2
+      ids, // test 3
+      lastVariable // test 4
+    );
   }
 
   void longChainComments() {

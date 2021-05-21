@@ -219,6 +219,8 @@ locationGenerationHandler[apexTypes.NEW_SET_LITERAL] =
   handleNodeEndedWithCharacter("}");
 locationGenerationHandler[apexTypes.NEW_MAP_LITERAL] =
   handleNodeEndedWithCharacter("}");
+locationGenerationHandler[apexTypes.NEW_STANDARD] =
+  handleNodeEndedWithCharacter(")");
 locationGenerationHandler[apexTypes.VARIABLE_DECLARATIONS] =
   handleNodeEndedWithCharacter(";");
 locationGenerationHandler[apexTypes.NEW_KEY_VALUE] =

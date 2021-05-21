@@ -1,8 +1,12 @@
 # Unreleased
 
-# Dependency Changes
+## Dependency Changes
 
 - Drop support for NodeJS < 12.
+
+## Formatting Changes
+
+- Fix last comment inside New Expression turning into trailing comment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/371)).
 
 # 1.9.1
 
