@@ -41,7 +41,7 @@
     "eslint-config-prettier": "^8.0.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-prettier": "^3.0.1",
-    "jest": "^26.0.0",
+    "jest": "^27.0.1",
     "prettier": "^2.0.5"
   },
   "peerDependencies": {
