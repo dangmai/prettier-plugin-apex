@@ -66,7 +66,7 @@ distZip {
 }
 ext {
     slf4jVersion = '1.7.30'
-    jettyVersion = '11.0.3'
+    jettyVersion = '11.0.4'
     jerseyVersion = '3.0.2'
 }
 
