@@ -1,0 +1,66 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Format apex: CommentsWithModifiers.cls: CommentsWithModifiers.cls 1`] = `
+class CommentsWithModifiers {
+  @TestVisible
+  // Normal comment 1
+  private enum AllOrAny { ALL, ANY }
+
+  @TestVisible
+  // Normal comment 2
+  private enum AllOrAny { ALL, ANY }
+
+  // prettier-ignore
+  @TestVisible
+  private enum AllOrAny { ALL, ANY }
+
+  @TestVisible
+  // prettier-ignore
+  private enum AllOrAny { ALL, ANY }
+
+  /* prettier-ignore */
+  @TestVisible
+  private enum AllOrAny { ALL, ANY }
+
+  @TestVisible
+  /* prettier-ignore */
+  private enum AllOrAny { ALL, ANY }
+
+  @TestVisible
+  /* prettier-ignore */ private enum AllOrAny { ALL, ANY }
+}
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+class CommentsWithModifiers {
+  @TestVisible
+  // Normal comment 1
+  private enum AllOrAny {
+    ALL,
+    ANY
+  }
+
+  @TestVisible
+  // Normal comment 2
+  private enum AllOrAny {
+    ALL,
+    ANY
+  }
+
+  // prettier-ignore
+  @TestVisible
+  private enum AllOrAny { ALL, ANY }
+  @TestVisible
+  // prettier-ignore
+  private enum AllOrAny { ALL, ANY }
+
+  /* prettier-ignore */
+  @TestVisible
+  private enum AllOrAny { ALL, ANY }
+  @TestVisible
+  /* prettier-ignore */
+  private enum AllOrAny { ALL, ANY }
+
+  @TestVisible
+  /* prettier-ignore */ private enum AllOrAny { ALL, ANY }
+}
+
+`;

@@ -121,6 +121,21 @@ function handleNodeSurroundedByCharacters(startCharacter, endCharacter) {
   };
 }
 
+function handleNodeStartedWithCharacter(startCharacter) {
+  return (location, sourceCode, commentNodes) => {
+    const resultLocation = {};
+    resultLocation.startIndex = findNextUncommentedCharacter(
+      sourceCode,
+      startCharacter,
+      location.startIndex,
+      commentNodes,
+      /* backwards */ true,
+    );
+    resultLocation.endIndex = location.endIndex;
+    return resultLocation;
+  };
+}
+
 function handleNodeEndedWithCharacter(endCharacter) {
   return (location, sourceCode, commentNodes) => {
     const resultLocation = {};
@@ -157,14 +172,22 @@ function handleMethodDeclaration(location, sourceCode, commentNodes, node) {
 }
 
 function handleAnnotation(location, sourceCode, commentNodes, node) {
-  // This is an annotation without parameters, so we can use the identity
-  // location
+  // This is an annotation without parameters, so we only need to worry about
+  // the starting character
   if (!node.parameters || node.parameters.length === 0) {
-    return location;
+    return handleNodeStartedWithCharacter("@")(
+      location,
+      sourceCode,
+      commentNodes,
+    );
   }
   // If not, we need to use the position of the closing parenthesis after the
-  // parameters
-  return handleNodeEndedWithCharacter(")")(location, sourceCode, commentNodes);
+  // parameters as well
+  return handleNodeSurroundedByCharacters("@", ")")(
+    location,
+    sourceCode,
+    commentNodes,
+  );
 }
 
 // We need to generate the location for a node differently based on the node

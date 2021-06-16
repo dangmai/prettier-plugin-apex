@@ -7,6 +7,7 @@
 ## Formatting Changes
 
 - Fix last comment inside New Expression turning into trailing comment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/371)).
+- Fix prettier-ignore comment getting attached to modifier node instead of surrounding expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/383)).
 
 # 1.9.1
 

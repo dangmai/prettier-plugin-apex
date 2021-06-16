@@ -142,7 +142,7 @@ function handleDanglingComment(comment) {
 
 /**
  * Brings the comments between if-else blocks into the trailing if/else block.
- * For example, formating the next block:
+ * For example, formatting the next block:
  * ```
  * if (true) {
  * }
@@ -204,7 +204,7 @@ function handleInBetweenConditionalComment(comment, sourceCode) {
 
 /**
  * Brings the comments between try/catch/finally blocks into the following block.
- * For example, formating the next block:
+ * For example, formatting the next block:
  * ```
  * try {
  * }
@@ -333,6 +333,45 @@ function handleLongChainComment(comment) {
   return false;
 }
 
+function isPrettierIgnore(comment) {
+  let content;
+  if (comment.leading === false) {
+    return false;
+  }
+  if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
+    // For simplicity sake we only support this format
+    // /* prettier-ignore */
+    content = comment.value
+      .trim()
+      .substring(2, comment.value.length - 2)
+      .trim();
+  } else {
+    content = comment.value.trim().substring(2).trim();
+  }
+  return content === "prettier-ignore";
+}
+
+/**
+ * #383 (bug number 2) - If a prettier-ignore comment is attached to a modifier,
+ * we need to bring it up a level, otherwise the only thing that's getting
+ * ignored is the modifier itself, not the expression surrounding it (which is
+ * more likely what the user wants).
+ */
+function handleModifierPrettierIgnoreComment(comment) {
+  const { enclosingNode, followingNode } = comment;
+  if (
+    !isPrettierIgnore(comment) ||
+    !enclosingNode ||
+    !followingNode ||
+    !followingNode["@class"] ||
+    !followingNode["@class"].startsWith(apexTypes.MODIFIER)
+  ) {
+    return false;
+  }
+  addLeadingComment(enclosingNode, comment);
+  return true;
+}
+
 /**
  * This is called by Prettier's comment handling code, in order to handle
  * comments that are on their own line.
@@ -349,6 +388,7 @@ function handleOwnLineComment(comment, sourceCode) {
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
+    handleModifierPrettierIgnoreComment(comment) ||
     handleLongChainComment(comment)
   );
 }
@@ -369,6 +409,7 @@ function handleEndOfLineComment(comment, sourceCode) {
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
+    handleModifierPrettierIgnoreComment(comment) ||
     handleLongChainComment(comment)
   );
 }
@@ -388,6 +429,7 @@ function handleRemainingComment(comment, sourceCode) {
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
+    handleModifierPrettierIgnoreComment(comment) ||
     handleLongChainComment(comment)
   );
 }
@@ -404,23 +446,7 @@ function hasPrettierIgnore(path) {
     node &&
     node.comments &&
     node.comments.length > 0 &&
-    node.comments.filter((comment) => {
-      let content;
-      if (!comment.leading) {
-        return false;
-      }
-      if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
-        // For simplicity sake we only support this format
-        // /* prettier-ignore */
-        content = comment.value
-          .trim()
-          .substring(2, comment.value.length - 2)
-          .trim();
-      } else {
-        content = comment.value.trim().substring(2).trim();
-      }
-      return content === "prettier-ignore";
-    }).length > 0
+    node.comments.filter(isPrettierIgnore).length > 0
   );
 }
 
