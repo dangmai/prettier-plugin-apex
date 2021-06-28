@@ -50,7 +50,7 @@
   "dependencies": {
     "axios": "^0.21.0",
     "jest-docblock": "^27.0.1",
-    "wait-on": "^5.2.1",
+    "wait-on": "^6.0.0",
     "yargs": "^17.0.0"
   }
 }
