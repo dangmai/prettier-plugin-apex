@@ -67,7 +67,7 @@ public class Apex {
                         @Override
                         public HierarchicalStreamWriter createWriter(Writer writer) {
                             if (prettyPrint) {
-                                // By default JSON is pretty printed
+                                // By default, JSON is pretty printed
                                 return super.createWriter(writer);
                             }
                             JsonWriter.Format format = new JsonWriter.Format(
@@ -156,7 +156,7 @@ public class Apex {
         }
     }
 
-    private class FakeDefaultImplementation {
+    private static class FakeDefaultImplementation {
     }
 
     // Custom Collection Converter to inject the class attribute on the collection elements
@@ -173,7 +173,7 @@ public class Apex {
             return Collection.class.isAssignableFrom(type) || super.canConvert(type);
         }
 
-        protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
+        protected void writeCompleteItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
             this.itemWriter.writeItem(item, context, writer);
         }
     }
@@ -186,13 +186,13 @@ public class Apex {
             this.itemWriter = new CustomItemWriter(mapper());
         }
 
-        protected void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
+        protected void writeCompleteItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
             this.itemWriter.writeItem(item, context, writer);
         }
     }
 
     // We use a custom JSON writer in order to modify the behavior of writing
-    // out a BigDecimal. By default a BigDecimal is serialized to a JSON Number
+    // out a BigDecimal. By default, a BigDecimal is serialized to a JSON Number
     // node, like so: `{"number": 1.0}`.
     // The Javascript consumer, however, will not be able to parse that without
     // dropping the precision. Because of that, we will serialize it this way
@@ -212,23 +212,23 @@ public class Apex {
     }
 
     static class CustomItemWriter {
-        private Mapper mapper;
+        private final Mapper mapper;
         public CustomItemWriter(Mapper mapper) {
             this.mapper = mapper;
         }
         public void writeItem(Object item, MarshallingContext context, HierarchicalStreamWriter writer) {
             // Copied from AbstractCollectionConverter
+            String name;
             if (item == null) {
-                String name = mapper.serializedClass(null);
+                name = mapper.serializedClass(null);
                 ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, Mapper.Null.class);
-                writer.endNode();
             } else {
-                String name = mapper.serializedClass(item.getClass());
+                name = mapper.serializedClass(item.getClass());
                 ExtendedHierarchicalStreamWriterHelper.startNode(writer, name, item.getClass());
                 writer.addAttribute("class", name);
                 context.convertAnother(item);
-                writer.endNode();
             }
+            writer.endNode();
         }
     }
 }
