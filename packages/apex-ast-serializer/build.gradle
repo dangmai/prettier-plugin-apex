@@ -65,7 +65,7 @@ distZip {
     archiveFileName = "${project.name}.zip"
 }
 ext {
-    slf4jVersion = '1.7.32'
+    slf4jVersion = '2.0.0-alpha4'
     jettyVersion = '11.0.6'
     jerseyVersion = '3.0.2'
 }
@@ -85,6 +85,12 @@ dependencies {
     implementation "org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}"
     implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
     implementation "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
+
+    // https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api
+    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.0.1'
+
+    // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
