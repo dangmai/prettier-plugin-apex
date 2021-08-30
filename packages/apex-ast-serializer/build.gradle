@@ -13,7 +13,7 @@ applicationDefaultJvmArgs = [
     "--add-opens=java.base/java.text=ALL-UNNAMED"
 ]
 task httpStartScripts(type: CreateStartScripts) {
-    mainClassName = 'net.dangmai.serializer.server.HttpServer'
+    mainClass.set('net.dangmai.serializer.server.HttpServer')
     applicationName = 'apex-ast-serializer-http'
     defaultJvmOpts = [
         "--add-opens=java.base/java.lang=ALL-UNNAMED",
