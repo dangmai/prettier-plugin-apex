@@ -65,7 +65,7 @@ distZip {
     archiveFileName = "${project.name}.zip"
 }
 ext {
-    slf4jVersion = '2.0.0-alpha4'
+    slf4jVersion = '2.0.0-alpha5'
     jettyVersion = '11.0.6'
     jerseyVersion = '3.0.2'
 }
