@@ -93,7 +93,7 @@ dependencies {
     implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '3.0.2'
 
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
-    implementation group: 'commons-cli', name: 'commons-cli', version: '1.4'
+    implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
