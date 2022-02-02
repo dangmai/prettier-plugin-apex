@@ -27,3 +27,4 @@ jobs:
         title: 'Update jorje dependency'
         branch: updates/jorje
         token: ${{ secrets.PERSONAL_TOKEN }}
+        labels: automerge

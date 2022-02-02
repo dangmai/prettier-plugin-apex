@@ -16,4 +16,4 @@ jobs:
           MERGE_METHOD: rebase
           MERGE_FILTER_AUTHOR: dangmai
           MERGE_FORKS: "false"
-          MERGE_LABELS: ""
+          MERGE_LABELS: auto
