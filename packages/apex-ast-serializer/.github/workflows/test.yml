@@ -1,4 +1,4 @@
-name: CI/CD
+name: Test and Release
 
 on:
   push:
@@ -23,20 +23,6 @@ jobs:
         run: chmod +x gradlew
       - name: Test with Gradle
         run: ./gradlew clean check
-
-  auto-merge-jorje:
-    needs: test
-    if: github.ref_name == 'updates/jorje'
-    runs-on: ubuntu-latest
-    steps:
-      - name: automerge
-        uses: "pascalgn/automerge-action@v0.14.3"
-        env:
-          GITHUB_TOKEN: "${{ secrets.PERSONAL_TOKEN }}"
-          MERGE_METHOD: rebase
-          MERGE_FILTER_AUTHOR: dangmai
-          MERGE_FORKS: "false"
-          MERGE_LABELS: ""
 
   release:
     needs: test
