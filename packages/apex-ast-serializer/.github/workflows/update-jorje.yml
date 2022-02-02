@@ -3,6 +3,7 @@ name: Update Jorje
 on:
   repository_dispatch:
     types: manual-jorje-update
+  workflow_dispatch:
   schedule:
     - cron: '0 1 * * *'
 
