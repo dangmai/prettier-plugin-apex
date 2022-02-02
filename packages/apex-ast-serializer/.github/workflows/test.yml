@@ -37,7 +37,7 @@ jobs:
 
   release:
     needs: test
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name != 'pull_request_target' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
