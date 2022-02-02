@@ -5,7 +5,6 @@ on:
 
 jobs:
   auto-merge-jorje:
-    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: automerge
@@ -15,4 +14,4 @@ jobs:
           MERGE_METHOD: rebase
           MERGE_FILTER_AUTHOR: dangmai
           MERGE_FORKS: "false"
-          MERGE_LABELS: auto
+          MERGE_LABELS: automerge
