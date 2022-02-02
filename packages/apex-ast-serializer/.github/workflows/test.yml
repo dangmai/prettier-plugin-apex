@@ -25,9 +25,9 @@ jobs:
       - name: Test with Gradle
         run: ./gradlew clean check
 
-  auto-merge-jorge:
+  auto-merge-jorje:
     needs: test
-    if: github.event.pull_request.head.repo.full_name == github.repository && github.ref_name == 'updates/jorge'
+    if: github.event.pull_request.head.repo.full_name == github.repository && github.ref_name == 'updates/jorje'
     runs-on: ubuntu-latest
     steps:
       - uses: reitermarkus/automerge@v1
