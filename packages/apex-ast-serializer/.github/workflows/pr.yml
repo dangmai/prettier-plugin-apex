@@ -15,3 +15,4 @@ jobs:
           MERGE_FILTER_AUTHOR: dangmai
           MERGE_FORKS: "false"
           MERGE_LABELS: automerge
+          UPDATE_RETRY_SLEEP: 30000 # 30 seconds
