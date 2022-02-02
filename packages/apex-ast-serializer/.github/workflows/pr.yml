@@ -6,7 +6,6 @@ on:
 jobs:
   auto-merge-jorje:
     needs: test
-    if: github.ref_name == 'updates/jorje'
     runs-on: ubuntu-latest
     steps:
       - name: automerge
