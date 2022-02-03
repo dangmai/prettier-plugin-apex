@@ -48,6 +48,13 @@ jobs:
           distribution: 'adopt'
           java-version: ${{ matrix.java }}
 
+      # Starting with Node 17, DNS is resolved by order that the resolver
+      # returns it. In Github Actions environment, there is a loopback IP
+      # for ::1 to localhost, which means our tests try to connect to the ipv6
+      # interface, which the Java program does not listen on.
+      - name: Remove ipv6 loopback
+        run: sudo sed -Ei '/(^::1)/d' /etc/hosts
+
       - name: Install NPM dependencies
         run: npm ci
 
