@@ -163,5 +163,6 @@ generateTypeScript {
     'net.dangmai.types.GenericNodeExtension',
   ]
   sortDeclarations = true
+  noFileComment = true
 }
 
