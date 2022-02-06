@@ -14,9 +14,6 @@ name: "CodeQL"
 on:
   push:
     branches: [ master ]
-    paths-ignore:  # CodeQL has permission issue when used together with Dependabot, so we only run these if some changes other than dependencies take place
-      - "package.json"
-      - "package-lock.json"
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ master ]
