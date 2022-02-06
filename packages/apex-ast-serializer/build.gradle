@@ -77,6 +77,11 @@ distZip {
   archiveFileName = "${project.name}.zip"
 }
 distZip.dependsOn generateTypeScript
+
+jar {
+  exclude('net/dangmai/types/**')
+}
+
 ext {
   slf4jVersion = '2.0.0-alpha6'
   jettyVersion = '11.0.7'
