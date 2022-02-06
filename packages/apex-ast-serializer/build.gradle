@@ -112,7 +112,7 @@ dependencies {
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 
     // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
-    implementation group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '2.32.889'
+    compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '2.32.889'
 
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
