@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.32.889 on 2022-02-06 17:12:46.
 
 export interface AbstractModifier extends Modifier {
     "@class": "apex.jorje.data.ast.Modifier$AbstractModifier";
