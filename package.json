@@ -35,14 +35,14 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
-    "codecov": "^3.5.0",
-    "eslint": "^8.2.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-config-prettier": "^8.0.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "jest": "^27.0.1",
-    "prettier": "^2.0.5"
+    "codecov": "3.8.3",
+    "eslint": "8.8.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.25.4",
+    "eslint-plugin-prettier": "4.0.0",
+    "jest": "27.4.7",
+    "prettier": "2.5.1"
   },
   "peerDependencies": {
     "prettier": "^2.0.0"
