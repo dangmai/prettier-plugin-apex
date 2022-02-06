@@ -1,7 +1,15 @@
+buildscript {
+  dependencies {
+    // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
+    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '2.32.889'
+  }
+}
+
 plugins {
     id 'java'
     id 'application'
 }
+apply plugin: 'cz.habarta.typescript-generator'
 
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
@@ -28,6 +36,10 @@ task httpStartScripts(type: CreateStartScripts) {
 applicationDistribution.into("bin") {
     from(httpStartScripts)
     fileMode = 0755
+}
+
+applicationDistribution.from("build/typings") {
+  into "typings"
 }
 
 mainClassName = 'net.dangmai.serializer.Apex'
@@ -64,6 +76,7 @@ distZip {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveFileName = "${project.name}.zip"
 }
+distZip.dependsOn generateTypeScript
 ext {
     slf4jVersion = '2.0.0-alpha6'
     jettyVersion = '11.0.7'
@@ -98,6 +111,9 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 
+    // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
+    implementation group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '2.32.889'
+
     // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.8.2'
     testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.8.2'
@@ -109,3 +125,38 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
+generateTypeScript {
+  jsonLibrary = 'jackson2'
+  classes = [
+    'apex.jorje.semantic.compiler.parser.ParserOutput',
+  ]
+  classPatterns = [
+    'apex.jorje.data.**',
+    'apex.jorje.parser.impl.HiddenToken**',
+  ]
+  excludeClassPatterns = [
+    'apex.jorje.**$MatchBlock',
+    'apex.jorje.**$MatchBlockWithDefault',
+    'apex.jorje.**$SwitchBlock',
+    'apex.jorje.**$SwitchBlockWithDefault',
+    'apex.jorje.**$Visitor',
+    'apex.jorje.**Factory',
+    'apex.jorje.**Decorator',
+  ]
+  customTypeNaming = [
+    'apex.jorje.data.ast.Expr$LiteralExpr:ExprLiteralExpr',
+    'apex.jorje.data.soql.QueryExpr$LiteralExpr:QueryExprLiteralExpr',
+  ]
+  customTypeProcessor = 'net.dangmai.types.CustomTypeProcessor'
+  outputFile = 'build/typings/jorje.d.ts'
+  outputKind = 'module'
+  extensionClasses = [
+    'net.dangmai.types.CustomEnumExtension',
+    'net.dangmai.types.CustomFieldExtension',
+    'net.dangmai.types.UnionTypeExtension',
+    'net.dangmai.types.GenericNodeExtension',
+  ]
+  sortDeclarations = true
+}
+
