@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Install Linux dependencies
         run: sudo apt install wget unzip
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Download zip archive from apex-ast-serializer
         run: wget -O /tmp/apex-ast-serializer.zip https://github.com/dangmai/apex-ast-serializer/releases/download/${{ github.event.client_payload.release }}/apex-ast-serializer.zip
       - name: Remove current apex-ast-serializer vendor
