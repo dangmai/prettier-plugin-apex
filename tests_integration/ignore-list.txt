@@ -2,4 +2,4 @@
 # Add directories here that should be ignored as part of the integration test
 # run.
 
-../EDA/unpackaged/test_managed_only
+../EDA/unpackaged
