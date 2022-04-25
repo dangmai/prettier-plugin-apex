@@ -39,7 +39,7 @@
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-prettier": "4.0.0",
-    "jest": "27.5.1",
+    "jest": "28.0.0",
     "prettier": "2.6.2"
   },
   "peerDependencies": {
@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "axios": "^0.26.0",
-    "jest-docblock": "^27.0.1",
+    "jest-docblock": "^28.0.0",
     "wait-on": "^6.0.0",
     "yargs": "^17.0.0"
   }
