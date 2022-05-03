@@ -133,7 +133,7 @@ Here is the default configuration that can be overriden:
 
 ### VScode
 
-Follow [this tutorial](https://forcedotcom.github.io/salesforcedx-vscode/articles/getting-started/prettier) from Salesforce in order to use this plugin in VSCode.
+Follow [this tutorial](https://developer.salesforce.com/tools/vscode/en/user-guide/prettier) from Salesforce in order to use this plugin in VSCode.
 
 ## Performance Tips/3rd party integration
 
