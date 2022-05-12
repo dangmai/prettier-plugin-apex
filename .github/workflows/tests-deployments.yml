@@ -15,10 +15,10 @@ jobs:
       fail-fast: false
       matrix:
         node:
+          - "18"
           - "17"
           - "16"
           - "14"
-          - "12"
         java:
           - "17"
           - "11"

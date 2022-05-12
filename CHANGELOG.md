@@ -1,5 +1,9 @@
 # Unreleased
 
+## Dependency Changes
+
+- Drop support for NodeJS < 14
+
 ## Internal Changes
 
 - Prettier Apex has been converted to Typescript, enabling faster response time to internal jorje changes from Salesforce.
