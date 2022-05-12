@@ -1,10 +1,43 @@
 /* eslint no-param-reassign: 0 */
+import { AstPath } from "prettier";
+import { join } from "path";
+import { accessSync } from "fs";
 
-const constants = require("./constants");
+import jorje from "../vendor/apex-ast-serializer/typings/jorje";
+import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants";
 
-const apexTypes = constants.APEX_TYPES;
+export type SerializedAst = {
+  [APEX_TYPES.PARSER_OUTPUT]: jorje.ParserOutput;
+};
 
-function isBinaryish(node) {
+export type GenericComment = jorje.HiddenToken;
+
+type AstNode = {
+  "@class": string;
+  "@id": string;
+};
+type ReferenceNode = {
+  "@reference": string;
+};
+export type Node = AstNode | ReferenceNode;
+
+export type AnnotatedAstNode = AstNode & {
+  trailingEmptyLine?: boolean;
+  isNextStatementOnSameLine?: boolean;
+  isLastNodeInArray?: boolean;
+};
+
+export type AnnotatedComment = AnnotatedAstNode &
+  GenericComment & {
+    trailing?: boolean;
+    leading?: boolean;
+    printed?: boolean;
+    enclosingNode?: any;
+    followingNode?: any;
+    precedingNode?: any;
+  };
+
+export function isBinaryish(node: jorje.Expr): boolean {
   return (
     node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
     node["@class"] === apexTypes.BINARY_EXPRESSION
@@ -16,7 +49,7 @@ function isBinaryish(node) {
  * This code is straight from prettier JSDoc detection.
  * @param comment the comment to check.
  */
-function isApexDocComment(comment) {
+export function isApexDocComment(comment: jorje.BlockComment): boolean {
   const lines = comment.value.split("\n");
   return (
     lines.length > 1 &&
@@ -26,7 +59,7 @@ function isApexDocComment(comment) {
   );
 }
 
-function checkIfParentIsDottedExpression(path) {
+export function checkIfParentIsDottedExpression(path: AstPath): boolean {
   const node = path.getValue();
   const parentNode = path.getParentNode();
 
@@ -34,8 +67,8 @@ function checkIfParentIsDottedExpression(path) {
   // We're making an assumption here that `callParent` is always synchronous.
   // We're doing it because FastPath does not expose other ways to find the
   // parent name.
-  let parentNodeName = "";
-  let grandParentNodeName = "";
+  let parentNodeName;
+  let grandParentNodeName;
   path.callParent((innerPath) => {
     parentNodeName = innerPath.getName();
   });
@@ -88,7 +121,7 @@ const METADATA_TO_IGNORE = [
  * @param ast the Abstract Syntax Tree to compare
  * @param newObj the newly created object
  */
-function massageAstNode(ast, newObj) {
+export function massageAstNode(ast: any, newObj: any): any {
   // Handling ApexDoc
   if (
     ast["@class"] &&
@@ -98,7 +131,7 @@ function massageAstNode(ast, newObj) {
     newObj.value = ast.value.replace(/\s/g, "");
   }
   if (ast.scope && typeof ast.scope === "string") {
-    // Apex is case insensitivity, but in sone case we're forcing the strings
+    // Apex is case insensitivity, but in some case we're forcing the strings
     // to be uppercase for consistency so the ASTs may be different between
     // the original and parsed strings.
     newObj.scope = ast.scope.toUpperCase();
@@ -138,17 +171,20 @@ function massageAstNode(ast, newObj) {
  * Helper function to find a character in a string, starting at an index.
  * It will ignore characters that are part of comments.
  */
-function findNextUncommentedCharacter(
-  sourceCode,
-  character,
-  fromIndex,
-  commentNodes,
+export function findNextUncommentedCharacter(
+  sourceCode: string,
+  character: string,
+  fromIndex: number,
+  commentNodes: GenericComment[],
   backwards = false,
-) {
+): number {
   let indexFound = false;
-  let index;
+  let index = -1;
 
-  const findIndex = (comment) =>
+  const findIndex = (comment: GenericComment) =>
+    comment.location &&
+    comment.location.startIndex &&
+    comment.location.endIndex &&
     comment.location.startIndex <= index &&
     comment.location.endIndex - 1 >= index;
   while (!indexFound) {
@@ -176,7 +212,7 @@ function findNextUncommentedCharacter(
 // left (a > b == c), op (>), right (d)
 // The consequence is that formatted code does not look as nice as Prettier's core,
 // but we can't change it because it will change the code's behavior.
-const PRECEDENCE = {};
+const PRECEDENCE: { [key: string]: number } = {};
 [
   ["||"],
   ["&&"],
@@ -193,15 +229,30 @@ const PRECEDENCE = {};
   });
 });
 
-function getPrecedence(op) {
-  return PRECEDENCE[op];
+export function getPrecedence(op: string): number {
+  const precedence = PRECEDENCE[op];
+  if (precedence === undefined) {
+    throw new Error(`Failed to get precedence for operator ${op}`);
+  }
+  return precedence;
 }
 
-module.exports = {
-  checkIfParentIsDottedExpression,
-  findNextUncommentedCharacter,
-  getPrecedence,
-  isApexDocComment,
-  isBinaryish,
-  massageAstNode,
-};
+function doesFileExist(file: string): boolean {
+  try {
+    accessSync(file);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+// The relative path to the binary can be different based on how the script
+// is being run - running using ts-node vs running after code has been compiled
+// to `dist` directory. We use this method to abstract out that difference.
+export function getSerializerBinDirectory(): string {
+  let serializerBin = join(__dirname, "../vendor/apex-ast-serializer/bin");
+  if (!doesFileExist(serializerBin)) {
+    serializerBin = join(__dirname, "../../vendor/apex-ast-serializer/bin");
+  }
+  return serializerBin;
+}

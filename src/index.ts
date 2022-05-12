@@ -1,4 +1,6 @@
-const {
+import jorje from "../vendor/apex-ast-serializer/typings/jorje";
+
+import {
   canAttachComment,
   handleEndOfLineComment,
   handleOwnLineComment,
@@ -7,13 +9,13 @@ const {
   isBlockComment,
   printComment,
   willPrintOwnComments,
-} = require("./comments");
-const parse = require("./parser");
-const { hasPragma, insertPragma } = require("./pragma");
-const print = require("./printer");
-const { massageAstNode } = require("./util");
+} from "./comments";
+import parse from "./parser";
+import { hasPragma, insertPragma } from "./pragma";
+import printFn from "./printer";
+import { massageAstNode } from "./util";
 
-const languages = [
+export const languages = [
   {
     name: "Apex",
     parsers: ["apex"],
@@ -30,24 +32,29 @@ const languages = [
   },
 ];
 
-function locStart(node) {
+interface WithLocation {
+  location: jorje.Location;
+}
+type Locatable = jorje.Locatable & WithLocation;
+
+function locStart(node: Locatable): number {
   const location = node.loc ? node.loc : node.location;
   return location.startIndex;
 }
 
-function locEnd(node) {
+function locEnd(node: Locatable): number {
   const location = node.loc ? node.loc : node.location;
   return location.endIndex;
 }
 
-const parsers = {
+export const parsers = {
   apex: {
     astFormat: "apex",
     parse,
     locStart,
     locEnd,
     hasPragma,
-    preprocess: (text) => text.trim(),
+    preprocess: (text: string): string => text.trim(),
   },
   "apex-anonymous": {
     astFormat: "apex",
@@ -55,13 +62,13 @@ const parsers = {
     locStart,
     locEnd,
     hasPragma,
-    preprocess: (text) => text.trim(),
+    preprocess: (text: string): string => text.trim(),
   },
 };
 
-const printers = {
+export const printers = {
   apex: {
-    print,
+    print: printFn,
     massageAstNode,
     hasPrettierIgnore,
     insertPragma,
@@ -79,7 +86,7 @@ const printers = {
 
 const CATEGORY_APEX = "apex";
 
-const options = {
+export const options = {
   apexStandaloneParser: {
     type: "choice",
     category: CATEGORY_APEX,
@@ -120,12 +127,4 @@ const options = {
   },
 };
 
-const defaultOptions = {};
-
-module.exports = {
-  languages,
-  printers,
-  parsers,
-  options,
-  defaultOptions,
-};
+export const defaultOptions = {};

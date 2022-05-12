@@ -1,58 +1,78 @@
-/* eslint no-underscore-dangle: 0 */
-
-const prettier = require("prettier");
-
-const docBuilders = prettier.doc.builders;
-
-const { align, concat, join, hardline, line, softline, group, indent, dedent } =
-  docBuilders;
-
-const { willBreak } = prettier.doc.utils;
-
-const {
+import prettier, { AstPath, Doc } from "prettier";
+import { builders } from "prettier/doc";
+import {
   getTrailingComments,
   printComment,
   printDanglingComment,
-} = require("./comments");
-const {
+} from "./comments";
+import {
+  AnnotatedComment,
   checkIfParentIsDottedExpression,
   getPrecedence,
   isBinaryish,
-} = require("./util");
-const constants = require("./constants");
+} from "./util";
+import {
+  ASSIGNMENT,
+  APEX_TYPES,
+  BINARY,
+  BOOLEAN,
+  DATA_CATEGORY,
+  MODIFIER,
+  ORDER,
+  ORDER_NULL,
+  POSTFIX,
+  PREFIX,
+  TRIGGER_USAGE,
+  QUERY,
+  QUERY_WHERE,
+} from "./constants";
+import jorje from "../vendor/apex-ast-serializer/typings/jorje";
+import Concat = builders.Concat;
 
-const apexTypes = constants.APEX_TYPES;
+const docBuilders = prettier.doc.builders;
+const { align, concat, join, hardline, line, softline, group, indent, dedent } =
+  docBuilders;
+const { willBreak } = prettier.doc.utils;
 
-function indentConcat(docs) {
+type printFn = (path: AstPath) => Doc;
+
+function indentConcat(docs: Doc[]): Doc {
   return indent(concat(docs));
 }
 
-function groupConcat(docs) {
+function groupConcat(docs: Doc[]): Doc {
   return group(concat(docs));
 }
 
-function groupIndentConcat(docs) {
+function groupIndentConcat(docs: Doc[]): Doc {
   return group(indent(concat(docs)));
 }
 
-function _handlePassthroughCall(...names) {
-  return (path, print) => path.call(print, ...names);
+function handlePassthroughCall(
+  ...names: string[]
+): (path: AstPath, print: printFn) => Doc {
+  return (path: AstPath, print: printFn) => path.call(print, ...names);
 }
 
-function _pushIfExist(parts, doc, postDocs, preDocs) {
+function pushIfExist(
+  parts: Doc[],
+  doc: Doc,
+  postDocs?: Doc[] | null,
+  preDocs?: Doc[] | null,
+): Doc[] {
   if (doc) {
     if (preDocs) {
-      preDocs.forEach((preDoc) => parts.push(preDoc));
+      preDocs.forEach((preDoc: Doc) => parts.push(preDoc));
     }
     parts.push(doc);
     if (postDocs) {
-      postDocs.forEach((postDoc) => parts.push(postDoc));
+      postDocs.forEach((postDoc: Doc) => parts.push(postDoc));
     }
   }
   return parts;
 }
 
-function _escapeString(text) {
+function escapeString(text: string): string {
   // Code from https://stackoverflow.com/a/11716317/477761
   return text
     .replace(/\\/g, "\\\\")
@@ -64,11 +84,11 @@ function _escapeString(text) {
     .replace(/'/g, "\\'");
 }
 
-function handleReturnStatement(path, print) {
+function handleReturnStatement(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const docs = [];
+  const docs: Doc[] = [];
   docs.push("return");
-  const childDocs = path.call(print, "expr", "value");
+  const childDocs: Doc = path.call(print, "expr", "value");
   if (childDocs) {
     docs.push(" ");
     docs.push(childDocs);
@@ -80,14 +100,19 @@ function handleReturnStatement(path, print) {
   return groupConcat(docs);
 }
 
-function getOperator(node) {
-  if (node.op["@class"] === apexTypes.BOOLEAN_OPERATOR) {
-    return constants.BOOLEAN[node.op.$];
-  }
-  return constants.BINARY[node.op.$];
+function handleTriggerUsage(path: AstPath): Doc {
+  const node: jorje.TriggerDeclUnit["usages"][number] = path.getValue();
+  return TRIGGER_USAGE[node.$];
 }
 
-function handleBinaryishExpression(path, print) {
+function getOperator(node: jorje.BinaryExpr | jorje.BooleanExpr): string {
+  if (node.op["@class"] === APEX_TYPES.BOOLEAN_OPERATOR) {
+    return BOOLEAN[node.op.$];
+  }
+  return BINARY[node.op.$];
+}
+
+function handleBinaryishExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
   const nodeOp = getOperator(node);
   const nodePrecedence = getPrecedence(nodeOp);
@@ -106,10 +131,10 @@ function handleBinaryishExpression(path, print) {
     isBinaryish(parentNode) &&
     nodePrecedence === getPrecedence(getOperator(parentNode));
 
-  const docs = [];
-  const leftDoc = path.call(print, "left");
-  const operationDoc = path.call(print, "op");
-  const rightDoc = path.call(print, "right");
+  const docs: Doc[] = [];
+  const leftDoc: Doc = path.call(print, "left");
+  const operationDoc: Doc = path.call(print, "op");
+  const rightDoc: Doc = path.call(print, "right");
 
   // This variable signifies that this node is a left child with the same
   // precedence as its parent, and thus should be laid out on the same indent
@@ -176,13 +201,13 @@ function handleBinaryishExpression(path, print) {
   return groupConcat(docs);
 }
 
-function handleAssignmentExpression(path, print) {
+function handleAssignmentExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const docs = [];
+  const docs: Doc[] = [];
 
-  const leftDoc = path.call(print, "left");
-  const operationDoc = path.call(print, "op");
-  const rightDoc = path.call(print, "right");
+  const leftDoc: Doc = path.call(print, "left");
+  const operationDoc: Doc = path.call(print, "op");
+  const rightDoc: Doc = path.call(print, "right");
   docs.push(leftDoc);
   docs.push(" ");
   docs.push(operationDoc);
@@ -196,18 +221,20 @@ function handleAssignmentExpression(path, print) {
   return groupConcat(docs);
 }
 
-function shouldDottedExpressionBreak(path) {
+function shouldDottedExpressionBreak(path: AstPath): boolean {
   const node = path.getValue();
   // #62 - `super` cannot  be followed any white spaces
-  if (node.dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION) {
+  if (
+    node.dottedExpr.value["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION
+  ) {
     return false;
   }
   // #98 - Even though `this` can synctactically be followed by whitespaces,
   // make the formatted output similar to `super` to provide consistency.
-  if (node.dottedExpr.value["@class"] === apexTypes.THIS_VARIABLE_EXPRESSION) {
+  if (node.dottedExpr.value["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION) {
     return false;
   }
-  if (node["@class"] !== apexTypes.METHOD_CALL_EXPRESSION) {
+  if (node["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION) {
     return true;
   }
   if (checkIfParentIsDottedExpression(path)) {
@@ -215,17 +242,17 @@ function shouldDottedExpressionBreak(path) {
   }
   if (
     node.dottedExpr.value &&
-    node.dottedExpr.value["@class"] === apexTypes.METHOD_CALL_EXPRESSION
+    node.dottedExpr.value["@class"] === APEX_TYPES.METHOD_CALL_EXPRESSION
   ) {
     return true;
   }
   return node.dottedExpr.value;
 }
 
-function handleDottedExpression(path, print) {
+function handleDottedExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const dottedExpressionParts = [];
-  const dottedExpressionDoc = path.call(print, "dottedExpr", "value");
+  const dottedExpressionParts: Doc[] = [];
+  const dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
 
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
@@ -241,10 +268,14 @@ function handleDottedExpression(path, print) {
   return "";
 }
 
-function handleArrayExpressionIndex(path, print, withGroup = true) {
+function handleArrayExpressionIndex(
+  path: AstPath,
+  print: printFn,
+  withGroup = true,
+): Doc {
   const node = path.getValue();
   let parts;
-  if (node.index["@class"] === apexTypes.LITERAL_EXPRESSION) {
+  if (node.index["@class"] === APEX_TYPES.LITERAL_EXPRESSION) {
     // For literal index, we will make sure it's always attached to the [],
     // because it's usually short and will look bad being broken up.
     parts = ["[", path.call(print, "index"), "]"];
@@ -254,25 +285,25 @@ function handleArrayExpressionIndex(path, print, withGroup = true) {
   return withGroup ? groupIndentConcat(parts) : concat(parts);
 }
 
-function handleVariableExpression(path, print) {
+function handleVariableExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
   const { dottedExpr } = node;
-  const parts = [];
+  const parts: Doc[] = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
     dottedExpr &&
     dottedExpr.value &&
-    (dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION ||
-      (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    (dottedExpr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+      (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
         dottedExpr.value.expr &&
-        dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
+        dottedExpr.value.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION));
 
   parts.push(dottedExpressionDoc);
   // Name chain
-  const nameDocs = path.map(print, "names");
+  const nameDocs: Doc[] = path.map(print, "names");
   parts.push(join(".", nameDocs));
 
   // Technically, in a typical array expression (e.g: a[b]),
@@ -294,11 +325,11 @@ function handleVariableExpression(path, print) {
   // Hence why we are deferring the printing of the [] part from handleArrayExpression
   // to here.
   if (
-    parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
-    path.callParent((innerPath) => {
-      const withGroup = isParentDottedExpression || dottedExpressionDoc;
+    path.callParent((innerPath: AstPath) => {
+      const withGroup = isParentDottedExpression || !!dottedExpressionDoc;
 
       parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
     });
@@ -309,20 +340,24 @@ function handleVariableExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleJavaVariableExpression(path, print) {
-  const parts = [];
+function handleJavaVariableExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
   return concat(parts);
 }
 
-function handleLiteralExpression(path, print, options) {
+function handleLiteralExpression(
+  path: AstPath,
+  print: printFn,
+  options: prettier.ParserOptions,
+): Doc {
   const node = path.getValue();
-  const literalType = path.call(print, "type", "$");
+  const literalType: Doc = path.call(print, "type", "$");
   if (literalType === "NULL") {
     return "null";
   }
-  const literalDoc = path.call(print, "literal", "$");
+  const literalDoc: Doc = path.call(print, "literal", "$");
   let doc;
   if (literalType === "STRING") {
     // #165 - We have to use the original string because it might contain Unicode code points,
@@ -337,7 +372,7 @@ function handleLiteralExpression(path, print, options) {
       node.loc.startIndex,
       node.loc.endIndex,
     );
-    const lastCharacter = literal[literal.length - 1].toLowerCase();
+    const lastCharacter = literal[literal.length - 1]!.toLowerCase();
     // We handle the letters d and l at the end of Decimal and Long manually:
     // ```
     // Decimal a = 1.0D
@@ -364,63 +399,73 @@ function handleLiteralExpression(path, print, options) {
   return literalDoc;
 }
 
-function handleBinaryOperation(path) {
-  const node = path.getValue();
-  return constants.BINARY[node.$];
+function handleBinaryOperation(path: AstPath): Doc {
+  const node: jorje.BinaryExpr["op"] = path.getValue();
+  return BINARY[node.$];
 }
 
-function handleBooleanOperation(path) {
-  const node = path.getValue();
-  return constants.BOOLEAN[node.$];
+function handleBooleanOperation(path: AstPath): Doc {
+  const node: jorje.BooleanExpr["op"] = path.getValue();
+  return BOOLEAN[node.$];
 }
 
-function handleAssignmentOperation(path) {
-  const node = path.getValue();
-  return constants.ASSIGNMENT[node.$];
+function handleAssignmentOperation(path: AstPath): Doc {
+  const node: jorje.AssignmentExpr["op"] = path.getValue();
+  return ASSIGNMENT[node.$];
 }
 
-function _getDanglingCommentDocs(path, print, options) {
+function getDanglingCommentDocs(path: AstPath, _print: printFn, options: any) {
   const node = path.getValue();
   if (!node.comments) {
     return [];
   }
   node.danglingComments = node.comments.filter(
-    (comment) => !comment.leading && !comment.trailing,
+    (comment: AnnotatedComment) => !comment.leading && !comment.trailing,
   );
-  const danglingCommentParts = [];
-  path.each((commentPath) => {
-    danglingCommentParts.push(
-      printDanglingComment(commentPath, options, print),
-    );
+  const danglingCommentParts: Doc[] = [];
+  path.each((commentPath: AstPath) => {
+    danglingCommentParts.push(printDanglingComment(commentPath, options));
   }, "danglingComments");
   delete node.danglingComments;
   return danglingCommentParts;
 }
 
-function handleAnonymousBlockUnit(path, print) {
+function handleAnonymousBlockUnit(path: AstPath, print: printFn): Doc {
   // Unlike other compilation units, Anonymous Unit cannot have dangling comments,
   // so we don't have to handle them here.
-  const parts = [];
-  const memberParts = path.map(print, "members").filter((member) => member);
+  const parts: Doc[] = [];
+  const memberParts = path
+    .map(print, "members")
+    .filter((member: Doc) => member);
 
-  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
-    if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline]);
-    }
-    return memberDoc;
-  });
+  const memberDocs: Doc[] = memberParts.map(
+    (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
+      if (index !== allMemberDocs.length - 1) {
+        return concat([memberDoc, hardline]);
+      }
+      return memberDoc;
+    },
+  );
   if (memberDocs.length > 0) {
     parts.push(...memberDocs);
   }
   return concat(parts);
 }
 
-function handleTriggerDeclarationUnit(path, print, options) {
-  const usageDocs = path.map(print, "usages");
-  const targetDocs = path.map(print, "target");
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
+function handleTriggerDeclarationUnit(
+  path: AstPath,
+  print: printFn,
+  options: any,
+) {
+  const usageDocs: Doc[] = path.map(print, "usages");
+  const targetDocs: Doc[] = path.map(print, "target");
+  const danglingCommentDocs: Doc[] = getDanglingCommentDocs(
+    path,
+    print,
+    options,
+  );
 
-  const parts = [];
+  const parts: Doc[] = [];
   const usageParts = [];
   parts.push("trigger");
   parts.push(" ");
@@ -439,14 +484,18 @@ function handleTriggerDeclarationUnit(path, print, options) {
   parts.push(")");
   parts.push(" ");
   parts.push("{");
-  const memberParts = path.map(print, "members").filter((member) => member);
+  const memberParts = path
+    .map(print, "members")
+    .filter((member: Doc) => member);
 
-  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
-    if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline]);
-    }
-    return memberDoc;
-  });
+  const memberDocs: Doc[] = memberParts.map(
+    (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
+      if (index !== allMemberDocs.length - 1) {
+        return concat([memberDoc, hardline]);
+      }
+      return memberDoc;
+    },
+  );
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
   } else if (memberDocs.length > 0) {
@@ -456,22 +505,34 @@ function handleTriggerDeclarationUnit(path, print, options) {
   return concat(parts);
 }
 
-function handleInterfaceDeclaration(path, print, options) {
+function handleInterfaceDeclaration(
+  path: AstPath,
+  print: printFn,
+  options: any,
+) {
   const node = path.getValue();
 
-  const superInterface = path.call(print, "superInterface", "value");
-  const modifierDocs = path.map(print, "modifiers");
-  const memberParts = path.map(print, "members").filter((member) => member);
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
+  const superInterface: Doc = path.call(print, "superInterface", "value");
+  const modifierDocs: Doc[] = path.map(print, "modifiers");
+  const memberParts = path
+    .map(print, "members")
+    .filter((member: Doc) => member);
+  const danglingCommentDocs: Doc[] = getDanglingCommentDocs(
+    path,
+    print,
+    options,
+  );
 
-  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
-    if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline]);
-    }
-    return memberDoc;
-  });
+  const memberDocs: Doc[] = memberParts.map(
+    (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
+      if (index !== allMemberDocs.length - 1) {
+        return concat([memberDoc, hardline]);
+      }
+      return memberDoc;
+    },
+  );
 
-  const parts = [];
+  const parts: Doc[] = [];
   if (modifierDocs.length > 0) {
     parts.push(concat(modifierDocs));
   }
@@ -479,7 +540,7 @@ function handleInterfaceDeclaration(path, print, options) {
   parts.push(" ");
   parts.push(path.call(print, "name"));
   if (node.typeArguments.value) {
-    const typeArgumentParts = path.map(print, "typeArguments", "value");
+    const typeArgumentParts: Doc[] = path.map(print, "typeArguments", "value");
     parts.push("<");
     parts.push(join(", ", typeArgumentParts));
     parts.push(">");
@@ -501,22 +562,34 @@ function handleInterfaceDeclaration(path, print, options) {
   return concat(parts);
 }
 
-function handleClassDeclaration(path, print, options) {
+function handleClassDeclaration(
+  path: AstPath,
+  print: printFn,
+  options: any,
+): Doc {
   const node = path.getValue();
 
-  const superClass = path.call(print, "superClass", "value");
-  const modifierDocs = path.map(print, "modifiers");
-  const memberParts = path.map(print, "members").filter((member) => member);
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
+  const superClass: Doc = path.call(print, "superClass", "value");
+  const modifierDocs: Doc[] = path.map(print, "modifiers");
+  const memberParts = path
+    .map(print, "members")
+    .filter((member: Doc) => member);
+  const danglingCommentDocs: Doc[] = getDanglingCommentDocs(
+    path,
+    print,
+    options,
+  );
 
-  const memberDocs = memberParts.map((memberDoc, index, allMemberDocs) => {
-    if (index !== allMemberDocs.length - 1) {
-      return concat([memberDoc, hardline]);
-    }
-    return memberDoc;
-  });
+  const memberDocs: Doc[] = memberParts.map(
+    (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
+      if (index !== allMemberDocs.length - 1) {
+        return concat([memberDoc, hardline]);
+      }
+      return memberDoc;
+    },
+  );
 
-  const parts = [];
+  const parts: Doc[] = [];
   if (modifierDocs.length > 0) {
     parts.push(concat(modifierDocs));
   }
@@ -524,7 +597,7 @@ function handleClassDeclaration(path, print, options) {
   parts.push(" ");
   parts.push(path.call(print, "name"));
   if (node.typeArguments.value) {
-    const typeArgumentParts = path.map(print, "typeArguments", "value");
+    const typeArgumentParts: Doc[] = path.map(print, "typeArguments", "value");
     parts.push("<");
     parts.push(join(", ", typeArgumentParts));
     parts.push(">");
@@ -535,7 +608,7 @@ function handleClassDeclaration(path, print, options) {
     parts.push(" ");
     parts.push(superClass);
   }
-  const interfaces = path.map(print, "interfaces");
+  const interfaces: Doc[] = path.map(print, "interfaces");
   if (interfaces.length > 0) {
     parts.push(" ");
     parts.push("implements");
@@ -553,12 +626,12 @@ function handleClassDeclaration(path, print, options) {
   return concat(parts);
 }
 
-function handleAnnotation(path, print) {
+function handleAnnotation(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const parts = [];
-  const trailingParts = [];
+  const parts: Doc[] = [];
+  const trailingParts: Doc[] = [];
   const parameterParts = [];
-  const parameterDocs = path.map(print, "parameters");
+  const parameterDocs: Doc[] = path.map(print, "parameters");
   if (node.comments) {
     // We print the comments manually because this method adds a hardline
     // at the end of the annotation. If we left it to Prettier to print trailing
@@ -568,7 +641,7 @@ function handleAnnotation(path, print) {
     // // Trailing Comment
     // void method() {}
     // ```
-    path.each((innerPath) => {
+    path.each((innerPath: AstPath) => {
       const commentNode = innerPath.getValue();
       // This can only be a trailing comment, because if it is a leading one,
       // it will be attached to the Annotation's parent node (e.g. MethodDecl)
@@ -593,48 +666,48 @@ function handleAnnotation(path, print) {
   return concat(parts);
 }
 
-function handleAnnotationKeyValue(path, print) {
-  const parts = [];
+function handleAnnotationKeyValue(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "key", "value"));
   parts.push("=");
   parts.push(path.call(print, "value"));
   return concat(parts);
 }
 
-function handleAnnotationValue(childClass, path, print) {
-  const parts = [];
-  switch (childClass) {
-    case "TrueAnnotationValue":
+function handleAnnotationValue(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
+  const parts: Doc[] = [];
+  switch (childClass as jorje.AnnotationValue["@class"]) {
+    case "apex.jorje.data.ast.AnnotationValue$TrueAnnotationValue":
       parts.push("true");
       break;
-    case "FalseAnnotationValue":
+    case "apex.jorje.data.ast.AnnotationValue$FalseAnnotationValue":
       parts.push("false");
       break;
-    case "StringAnnotationValue":
+    case "apex.jorje.data.ast.AnnotationValue$StringAnnotationValue":
       parts.push("'");
       parts.push(path.call(print, "value"));
       parts.push("'");
       break;
-    default:
-      throw new Error(
-        `AnnotationValue ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return concat(parts);
 }
 
-function handleAnnotationString(path, print) {
-  const parts = [];
+function handleAnnotationString(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("'");
   parts.push(path.call(print, "value"));
   parts.push("'");
   return concat(parts);
 }
 
-function handleClassTypeRef(path, print) {
-  const parts = [];
+function handleClassTypeRef(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(join(".", path.map(print, "names")));
-  const typeArgumentDocs = path.map(print, "typeArguments");
+  const typeArgumentDocs: Doc[] = path.map(print, "typeArguments");
   if (typeArgumentDocs.length > 0) {
     parts.push("<");
     parts.push(join(", ", typeArgumentDocs));
@@ -643,40 +716,42 @@ function handleClassTypeRef(path, print) {
   return concat(parts);
 }
 
-function handleArrayTypeRef(path, print) {
-  const parts = [];
+function handleArrayTypeRef(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "heldType"));
   parts.push("[]");
   return concat(parts);
 }
 
-function handleJavaTypeRef(path, print) {
-  const parts = [];
+function handleJavaTypeRef(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
   return concat(parts);
 }
 
-function _handleStatementBlockMember(modifier) {
-  return (path, print) => {
-    const statementDoc = path.call(print, "stmnt");
+function handleStatementBlockMember(
+  modifier?: string,
+): (path: AstPath, print: printFn) => Doc {
+  return (path: AstPath, print: printFn) => {
+    const statementDoc: Doc = path.call(print, "stmnt");
 
-    const parts = [];
+    const parts: Doc[] = [];
     if (modifier) {
       parts.push(modifier);
       parts.push(" ");
     }
-    _pushIfExist(parts, statementDoc);
+    pushIfExist(parts, statementDoc);
     return concat(parts);
   };
 }
 
-function handlePropertyDeclaration(path, print) {
-  const modifierDocs = path.map(print, "modifiers");
-  const getterDoc = path.call(print, "getter", "value");
-  const setterDoc = path.call(print, "setter", "value");
+function handlePropertyDeclaration(path: AstPath, print: printFn): Doc {
+  const modifierDocs: Doc[] = path.map(print, "modifiers");
+  const getterDoc: Doc = path.call(print, "getter", "value");
+  const setterDoc: Doc = path.call(print, "setter", "value");
 
-  const parts = [];
+  const parts: Doc[] = [];
   const innerParts = [];
   parts.push(join("", modifierDocs));
   parts.push(path.call(print, "type"));
@@ -695,17 +770,19 @@ function handlePropertyDeclaration(path, print) {
       innerParts.push(dedent(line));
     }
   }
-  _pushIfExist(innerParts, setterDoc, [dedent(line)]);
+  pushIfExist(innerParts, setterDoc, [dedent(line)]);
   parts.push(groupIndentConcat(innerParts));
   parts.push("}");
   return groupConcat(parts);
 }
 
-function _handlePropertyGetterSetter(action) {
-  return (path, print) => {
-    const statementDoc = path.call(print, "stmnt", "value");
+function handlePropertyGetterSetter(
+  action: "get" | "set",
+): (path: AstPath, print: printFn) => Doc {
+  return (path: AstPath, print: printFn) => {
+    const statementDoc: Doc = path.call(print, "stmnt", "value");
 
-    const parts = [];
+    const parts: Doc[] = [];
     parts.push(path.call(print, "modifier", "value"));
     parts.push(action);
     if (statementDoc) {
@@ -718,19 +795,19 @@ function _handlePropertyGetterSetter(action) {
   };
 }
 
-function handleMethodDeclaration(path, print) {
-  const statementDoc = path.call(print, "stmnt", "value");
-  const modifierDocs = path.map(print, "modifiers");
-  const parameterDocs = path.map(print, "parameters");
+function handleMethodDeclaration(path: AstPath, print: printFn): Doc {
+  const statementDoc: Doc = path.call(print, "stmnt", "value");
+  const modifierDocs: Doc[] = path.map(print, "modifiers");
+  const parameterDocs: Doc[] = path.map(print, "parameters");
 
-  const parts = [];
+  const parts: Doc[] = [];
   const parameterParts = [];
   // Modifiers
   if (modifierDocs.length > 0) {
     parts.push(concat(modifierDocs));
   }
   // Return type
-  _pushIfExist(parts, path.call(print, "type", "value"), [" "]);
+  pushIfExist(parts, path.call(print, "type", "value"), [" "]);
   // Method name
   parts.push(path.call(print, "name"));
   // Params
@@ -743,15 +820,15 @@ function handleMethodDeclaration(path, print) {
   }
   parts.push(")");
   // Body
-  _pushIfExist(parts, statementDoc, null, [" "]);
+  pushIfExist(parts, statementDoc, null, [" "]);
   if (!statementDoc) {
     parts.push(";");
   }
   return concat(parts);
 }
 
-function handleModifierParameterRef(path, print) {
-  const parts = [];
+function handleModifierParameterRef(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   // Modifiers
   parts.push(join("", path.map(print, "modifiers")));
   // Type
@@ -762,8 +839,8 @@ function handleModifierParameterRef(path, print) {
   return concat(parts);
 }
 
-function handleEmptyModifierParameterRef(path, print) {
-  const parts = [];
+function handleEmptyModifierParameterRef(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   // Type
   parts.push(path.call(print, "typeRef"));
   parts.push(" ");
@@ -772,22 +849,26 @@ function handleEmptyModifierParameterRef(path, print) {
   return concat(parts);
 }
 
-function handleStatement(childClass, path, print) {
+function handleStatement(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
   let doc;
-  switch (childClass) {
-    case "DmlInsertStmnt":
+  switch (childClass as jorje.Stmnt["@class"]) {
+    case "apex.jorje.data.ast.Stmnt$DmlInsertStmnt":
       doc = "insert";
       break;
-    case "DmlUpdateStmnt":
+    case "apex.jorje.data.ast.Stmnt$DmlUpdateStmnt":
       doc = "update";
       break;
-    case "DmlUpsertStmnt":
+    case "apex.jorje.data.ast.Stmnt$DmlUpsertStmnt":
       doc = "upsert";
       break;
-    case "DmlDeleteStmnt":
+    case "apex.jorje.data.ast.Stmnt$DmlDeleteStmnt":
       doc = "delete";
       break;
-    case "DmlUndeleteStmnt":
+    case "apex.jorje.data.ast.Stmnt$DmlUndeleteStmnt":
       doc = "undelete";
       break;
     default:
@@ -796,20 +877,20 @@ function handleStatement(childClass, path, print) {
       );
   }
   const node = path.getValue();
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(doc);
   parts.push(" ");
   parts.push(path.call(print, "expr"));
   // upsert statement has an extra param that can be tacked on at the end
   if (node.id) {
-    _pushIfExist(parts, path.call(print, "id", "value"), null, [indent(line)]);
+    pushIfExist(parts, path.call(print, "id", "value"), null, [indent(line)]);
   }
   parts.push(";");
   return groupConcat(parts);
 }
 
-function handleDmlMergeStatement(path, print) {
-  const parts = [];
+function handleDmlMergeStatement(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("merge");
   parts.push(" ");
   parts.push(path.call(print, "expr1"));
@@ -819,13 +900,17 @@ function handleDmlMergeStatement(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleEnumDeclaration(path, print, options) {
-  const modifierDocs = path.map(print, "modifiers");
-  const memberDocs = path.map(print, "members");
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
+function handleEnumDeclaration(
+  path: AstPath,
+  print: printFn,
+  options: any,
+): Doc {
+  const modifierDocs: Doc[] = path.map(print, "modifiers");
+  const memberDocs: Doc[] = path.map(print, "members");
+  const danglingCommentDocs = getDanglingCommentDocs(path, print, options);
 
-  const parts = [];
-  _pushIfExist(parts, join("", modifierDocs));
+  const parts: Doc[] = [];
+  pushIfExist(parts, join("", modifierDocs));
   parts.push("enum");
   parts.push(" ");
   parts.push(path.call(print, "name"));
@@ -842,10 +927,10 @@ function handleEnumDeclaration(path, print, options) {
   return concat(parts);
 }
 
-function handleSwitchStatement(path, print) {
-  const whenBlocks = path.map(print, "whenBlocks");
+function handleSwitchStatement(path: AstPath, print: printFn): Doc {
+  const whenBlocks: Doc[] = path.map(print, "whenBlocks");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("switch on");
   parts.push(groupConcat([line, path.call(print, "expr")]));
   parts.push(" ");
@@ -857,68 +942,72 @@ function handleSwitchStatement(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleValueWhen(path, print) {
-  const whenCaseDocs = path.map(print, "whenCases");
-  const statementDoc = path.call(print, "stmnt");
+function handleValueWhen(path: AstPath, print: printFn): Doc {
+  const whenCaseDocs: Doc[] = path.map(print, "whenCases");
+  const statementDoc: Doc = path.call(print, "stmnt");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("when");
   parts.push(" ");
   const whenCaseGroup = group(indent(join(concat([",", line]), whenCaseDocs)));
   parts.push(whenCaseGroup);
   parts.push(" ");
-  _pushIfExist(parts, statementDoc);
+  pushIfExist(parts, statementDoc);
   return concat(parts);
 }
 
-function handleElseWhen(path, print) {
-  const statementDoc = path.call(print, "stmnt");
+function handleElseWhen(path: AstPath, print: printFn): Doc {
+  const statementDoc: Doc = path.call(print, "stmnt");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("when");
   parts.push(" ");
   parts.push("else");
   parts.push(" ");
-  _pushIfExist(parts, statementDoc);
+  pushIfExist(parts, statementDoc);
   return concat(parts);
 }
 
-function handleTypeWhen(path, print) {
-  const statementDoc = path.call(print, "stmnt");
+function handleTypeWhen(path: AstPath, print: printFn): Doc {
+  const statementDoc: Doc = path.call(print, "stmnt");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("when");
   parts.push(" ");
   parts.push(path.call(print, "typeRef"));
   parts.push(" ");
   parts.push(path.call(print, "name"));
   parts.push(" ");
-  _pushIfExist(parts, statementDoc);
+  pushIfExist(parts, statementDoc);
   return concat(parts);
 }
 
-function handleEnumCase(path, print) {
+function handleEnumCase(path: AstPath, print: printFn): Doc {
   return join(".", path.map(print, "identifiers"));
 }
 
-function handleRunAsBlock(path, print) {
-  const paramDocs = path.map(print, "inputParameters");
-  const statementDoc = path.call(print, "stmnt");
+function handleRunAsBlock(path: AstPath, print: printFn): Doc {
+  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const statementDoc: Doc = path.call(print, "stmnt");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("System.runAs");
   parts.push("(");
   parts.push(join(concat([",", line]), paramDocs));
   parts.push(")");
   parts.push(" ");
-  _pushIfExist(parts, statementDoc);
+  pushIfExist(parts, statementDoc);
   return concat(parts);
 }
 
-function handleBlockStatement(path, print, options) {
-  const parts = [];
-  const danglingCommentDocs = _getDanglingCommentDocs(path, print, options);
-  const statementDocs = path.map(print, "stmnts");
+function handleBlockStatement(
+  path: AstPath,
+  print: printFn,
+  options: any,
+): Doc {
+  const parts: Doc[] = [];
+  const danglingCommentDocs = getDanglingCommentDocs(path, print, options);
+  const statementDocs: Doc[] = path.map(print, "stmnts");
 
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
@@ -932,48 +1021,48 @@ function handleBlockStatement(path, print, options) {
   return groupIndentConcat(parts);
 }
 
-function handleTryCatchFinallyBlock(path, print) {
-  const tryStatementDoc = path.call(print, "tryBlock");
-  const catchBlockDocs = path.map(print, "catchBlocks");
-  const finallyBlockDoc = path.call(print, "finallyBlock", "value");
+function handleTryCatchFinallyBlock(path: AstPath, print: printFn): Doc {
+  const tryStatementDoc: Doc = path.call(print, "tryBlock");
+  const catchBlockDocs: Doc[] = path.map(print, "catchBlocks");
+  const finallyBlockDoc: Doc = path.call(print, "finallyBlock", "value");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("try");
   parts.push(" ");
-  _pushIfExist(parts, tryStatementDoc);
+  pushIfExist(parts, tryStatementDoc);
   if (catchBlockDocs.length > 0) {
-    // Can't use _pushIfExist here because it doesn't check for Array type
+    // Can't use pushIfExist here because it doesn't check for Array type
     parts.push(" ");
     parts.push(join(" ", catchBlockDocs));
   }
-  _pushIfExist(parts, finallyBlockDoc, null, [" "]);
+  pushIfExist(parts, finallyBlockDoc, null, [" "]);
   return concat(parts);
 }
 
-function handleCatchBlock(path, print) {
-  const parts = [];
+function handleCatchBlock(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("catch");
   parts.push(" ");
   parts.push("(");
   parts.push(path.call(print, "parameter"));
   parts.push(")");
   parts.push(" ");
-  _pushIfExist(parts, path.call(print, "stmnt"));
+  pushIfExist(parts, path.call(print, "stmnt"));
   return concat(parts);
 }
 
-function handleFinallyBlock(path, print) {
-  const parts = [];
+function handleFinallyBlock(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("finally");
   parts.push(" ");
-  _pushIfExist(parts, path.call(print, "stmnt"));
+  pushIfExist(parts, path.call(print, "stmnt"));
   return concat(parts);
 }
 
-function handleVariableDeclarations(path, print) {
-  const modifierDocs = path.map(print, "modifiers");
+function handleVariableDeclarations(path: AstPath, print: printFn): Doc {
+  const modifierDocs: Doc[] = path.map(print, "modifiers");
 
-  const parts = [];
+  const parts: Doc[] = [];
   // Modifiers
   parts.push(join("", modifierDocs));
 
@@ -981,23 +1070,23 @@ function handleVariableDeclarations(path, print) {
   parts.push(path.call(print, "type"));
   parts.push(" ");
   // Variable declarations
-  const declarationDocs = path.map(print, "decls");
+  const declarationDocs: Doc[] = path.map(print, "decls");
   if (declarationDocs.length > 1) {
     parts.push(indentConcat([join(concat([",", line]), declarationDocs)]));
     parts.push(";");
-  } else if (declarationDocs.length === 1) {
+  } else if (declarationDocs.length === 1 && declarationDocs[0] !== undefined) {
     parts.push(concat([declarationDocs[0], ";"]));
   }
   return groupConcat(parts);
 }
 
-function handleVariableDeclaration(path, print) {
+function handleVariableDeclaration(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const parts = [];
+  const parts: Doc[] = [];
   let resultDoc;
 
   parts.push(path.call(print, "name"));
-  const assignmentDocs = path.call(print, "assignment", "value");
+  const assignmentDocs: Doc = path.call(print, "assignment", "value");
   if (assignmentDocs && isBinaryish(node.assignment.value)) {
     parts.push(" ");
     parts.push("=");
@@ -1016,9 +1105,9 @@ function handleVariableDeclaration(path, print) {
   return resultDoc;
 }
 
-function handleNewStandard(path, print) {
-  const paramDocs = path.map(print, "inputParameters");
-  const parts = [];
+function handleNewStandard(path: AstPath, print: printFn): Doc {
+  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const parts: Doc[] = [];
   // Type
   parts.push(path.call(print, "type"));
   // Params
@@ -1032,10 +1121,10 @@ function handleNewStandard(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleNewKeyValue(path, print) {
-  const keyValueDocs = path.map(print, "keyValues");
+function handleNewKeyValue(path: AstPath, print: printFn): Doc {
+  const keyValueDocs: Doc[] = path.map(print, "keyValues");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(path.call(print, "type"));
   parts.push("(");
   if (keyValueDocs.length > 0) {
@@ -1047,10 +1136,10 @@ function handleNewKeyValue(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleNameValueParameter(path, print) {
+function handleNameValueParameter(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(path.call(print, "name"));
   parts.push(" ");
   parts.push("=");
@@ -1065,31 +1154,31 @@ function handleNameValueParameter(path, print) {
   return concat(parts);
 }
 
-function handleThisMethodCallExpression(path, print) {
-  const parts = [];
+function handleThisMethodCallExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("this");
   parts.push("(");
   parts.push(softline);
-  const paramDocs = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = path.map(print, "inputParameters");
   parts.push(join(concat([",", line]), paramDocs));
   parts.push(dedent(softline));
   parts.push(")");
   return groupIndentConcat(parts);
 }
 
-function handleSuperMethodCallExpression(path, print) {
-  const parts = [];
+function handleSuperMethodCallExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("super");
   parts.push("(");
   parts.push(softline);
-  const paramDocs = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = path.map(print, "inputParameters");
   parts.push(join(concat([",", line]), paramDocs));
   parts.push(dedent(softline));
   parts.push(")");
   return groupIndentConcat(parts);
 }
 
-function handleMethodCallExpression(path, print) {
+function handleMethodCallExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
@@ -1098,22 +1187,22 @@ function handleMethodCallExpression(path, print) {
   const isDottedExpressionSoqlExpression =
     dottedExpr &&
     dottedExpr.value &&
-    (dottedExpr.value["@class"] === apexTypes.SOQL_EXPRESSION ||
-      (dottedExpr.value["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    (dottedExpr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+      (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
         dottedExpr.value.expr &&
-        dottedExpr.value.expr["@class"] === apexTypes.SOQL_EXPRESSION));
+        dottedExpr.value.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION));
   const isDottedExpressionThisVariableExpression =
     dottedExpr &&
     dottedExpr.value &&
-    dottedExpr.value["@class"] === apexTypes.THIS_VARIABLE_EXPRESSION;
+    dottedExpr.value["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
   const isDottedExpressionSuperVariableExpression =
     dottedExpr &&
     dottedExpr.value &&
-    dottedExpr.value["@class"] === apexTypes.SUPER_VARIABLE_EXPRESSION;
+    dottedExpr.value["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
-  const nameDocs = path.map(print, "names");
-  const paramDocs = path.map(print, "inputParameters");
+  const nameDocs: Doc[] = path.map(print, "names");
+  const paramDocs: Doc[] = path.map(print, "inputParameters");
 
   const resultParamDoc =
     paramDocs.length > 0
@@ -1145,13 +1234,13 @@ function handleMethodCallExpression(path, print) {
   // ]
   // Hence why we are deferring the printing of the [] part from handleArrayExpression
   // to here.
-  let arrayIndexDoc = "";
+  let arrayIndexDoc: Doc = "";
   if (
-    parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
-    path.callParent((innerPath) => {
-      const withGroup = isParentDottedExpression || dottedExpressionDoc;
+    path.callParent((innerPath: AstPath) => {
+      const withGroup = isParentDottedExpression || !!dottedExpressionDoc;
 
       arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
     });
@@ -1225,8 +1314,8 @@ function handleMethodCallExpression(path, print) {
   return resultDoc;
 }
 
-function handleJavaMethodCallExpression(path, print) {
-  const parts = [];
+function handleJavaMethodCallExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
   parts.push("(");
@@ -1237,17 +1326,17 @@ function handleJavaMethodCallExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleNestedExpression(path, print) {
-  const parts = [];
+function handleNestedExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("(");
   parts.push(path.call(print, "expr"));
   parts.push(")");
   return concat(parts);
 }
 
-function handleNewSetInit(path, print) {
-  const parts = [];
-  const expressionDoc = path.call(print, "expr", "value");
+function handleNewSetInit(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const expressionDoc: Doc = path.call(print, "expr", "value");
 
   // Type
   parts.push("Set");
@@ -1256,15 +1345,15 @@ function handleNewSetInit(path, print) {
   parts.push(">");
   // Param
   parts.push("(");
-  _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
+  pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
   parts.push(")");
   return groupIndentConcat(parts);
 }
 
-function handleNewSetLiteral(path, print) {
-  const valueDocs = path.map(print, "values");
+function handleNewSetLiteral(path: AstPath, print: printFn): Doc {
+  const valueDocs: Doc[] = path.map(print, "values");
 
-  const parts = [];
+  const parts: Doc[] = [];
   // Type
   parts.push("Set");
   parts.push("<");
@@ -1281,7 +1370,7 @@ function handleNewSetLiteral(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleNewListInit(path, print) {
+function handleNewListInit(path: AstPath, print: printFn): Doc {
   // We can declare lists in the following ways:
   // new Object[size];
   // new Object[] { value, ... };
@@ -1292,49 +1381,51 @@ function handleNewListInit(path, print) {
   // We use List<Object>(param) otherwise.
   // This should provide compatibility for all known types without knowing
   // if the parameter is a variable (copy constructor) or literal size.
-
-  const expressionDoc = path.call(print, "expr", "value");
-  const parts = [];
-  const typePart = path.map(print, "types");
+  const node = path.getValue();
+  const expressionDoc: Doc = path.call(print, "expr", "value");
+  const parts: Doc[] = [];
+  const typeParts = path.map(print, "types") as Concat[];
   const hasLiteralNumberInitializer =
-    (typePart.group || (typePart.length && typePart[0].parts.length < 4)) &&
-    !Number.isNaN(parseInt(expressionDoc, 10));
+    typeParts.length &&
+    typeParts[0] !== undefined &&
+    typeParts[0].parts.length < 4 &&
+    node.expr?.value?.type?.$ === "INTEGER";
 
   // Type
   if (!hasLiteralNumberInitializer) {
     parts.push("List<");
   }
-  parts.push(join(".", typePart));
+  parts.push(join(".", typeParts));
   if (!hasLiteralNumberInitializer) {
     parts.push(">");
   }
   // Param
   parts.push(hasLiteralNumberInitializer ? "[" : "(");
-  _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
+  pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
   parts.push(hasLiteralNumberInitializer ? "]" : ")");
   return groupIndentConcat(parts);
 }
 
-function handleNewMapInit(path, print) {
-  const parts = [];
-  const expressionDoc = path.call(print, "expr", "value");
+function handleNewMapInit(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const expressionDoc: Doc = path.call(print, "expr", "value");
 
   parts.push("Map");
   // Type
   parts.push("<");
-  const typeDocs = path.map(print, "types");
+  const typeDocs: Doc[] = path.map(print, "types");
   parts.push(join(", ", typeDocs));
   parts.push(">");
   parts.push("(");
-  _pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
+  pushIfExist(parts, expressionDoc, [dedent(softline)], [softline]);
   parts.push(")");
   return groupIndentConcat(parts);
 }
 
-function handleNewMapLiteral(path, print) {
-  const valueDocs = path.map(print, "pairs");
+function handleNewMapLiteral(path: AstPath, print: printFn): Doc {
+  const valueDocs: Doc[] = path.map(print, "pairs");
 
-  const parts = [];
+  const parts: Doc[] = [];
   // Type
   parts.push("Map");
   parts.push("<");
@@ -1351,8 +1442,8 @@ function handleNewMapLiteral(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleMapLiteralKeyValue(path, print) {
-  const parts = [];
+function handleMapLiteralKeyValue(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "key"));
   parts.push(" ");
   parts.push("=>");
@@ -1361,10 +1452,10 @@ function handleMapLiteralKeyValue(path, print) {
   return concat(parts);
 }
 
-function handleNewListLiteral(path, print) {
-  const valueDocs = path.map(print, "values");
+function handleNewListLiteral(path: AstPath, print: printFn): Doc {
+  const valueDocs: Doc[] = path.map(print, "values");
 
-  const parts = [];
+  const parts: Doc[] = [];
   // Type
   parts.push("List<");
   parts.push(join(".", path.map(print, "types")));
@@ -1380,19 +1471,19 @@ function handleNewListLiteral(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleNewExpression(path, print) {
-  const parts = [];
+function handleNewExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("new");
   parts.push(" ");
   parts.push(path.call(print, "creator"));
   return concat(parts);
 }
 
-function handleIfElseBlock(path, print) {
+function handleIfElseBlock(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const parts = [];
-  const ifBlockDocs = path.map(print, "ifBlocks");
-  const elseBlockDoc = path.call(print, "elseBlock", "value");
+  const parts: Doc[] = [];
+  const ifBlockDocs: Doc[] = path.map(print, "ifBlocks");
+  const elseBlockDoc: Doc = path.call(print, "elseBlock", "value");
   // There are differences when we handle block vs expression statements in
   // if bodies and else body. For expression statement, we need to add a
   // hardline after a statement vs a space for block statement. For example:
@@ -1402,10 +1493,11 @@ function handleIfElseBlock(path, print) {
   //   b = 2;
   // }
   const ifBlockContainsBlockStatement = node.ifBlocks.map(
-    (ifBlock) => ifBlock.stmnt["@class"] === apexTypes.BLOCK_STATEMENT,
+    (ifBlock: jorje.IfBlock) =>
+      ifBlock.stmnt["@class"] === APEX_TYPES.BLOCK_STATEMENT,
   );
 
-  ifBlockDocs.forEach((ifBlockDoc, index) => {
+  ifBlockDocs.forEach((ifBlockDoc: Doc, index: number) => {
     if (index > 0) {
       parts.push(
         concat([
@@ -1427,11 +1519,11 @@ function handleIfElseBlock(path, print) {
   return groupConcat(parts);
 }
 
-function handleIfBlock(path, print) {
-  const statementType = path.call(print, "stmnt", "@class");
-  const statementDoc = path.call(print, "stmnt");
+function handleIfBlock(path: AstPath, print: printFn): Doc {
+  const statementType: Doc = path.call(print, "stmnt", "@class");
+  const statementDoc: Doc = path.call(print, "stmnt");
 
-  const parts = [];
+  const parts: Doc[] = [];
   const conditionParts = [];
   parts.push("if");
   parts.push(" ");
@@ -1443,33 +1535,33 @@ function handleIfBlock(path, print) {
   conditionParts.push(")");
   parts.push(groupIndentConcat(conditionParts));
   // Body block
-  if (statementType === apexTypes.BLOCK_STATEMENT) {
+  if (statementType === APEX_TYPES.BLOCK_STATEMENT) {
     parts.push(" ");
-    _pushIfExist(parts, statementDoc);
+    pushIfExist(parts, statementDoc);
   } else {
-    _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
+    pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
   }
   return concat(parts);
 }
 
-function handleElseBlock(path, print) {
-  const statementType = path.call(print, "stmnt", "@class");
-  const statementDoc = path.call(print, "stmnt");
+function handleElseBlock(path: AstPath, print: printFn): Doc {
+  const statementType: Doc = path.call(print, "stmnt", "@class");
+  const statementDoc: Doc = path.call(print, "stmnt");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("else");
   // Body block
-  if (statementType === apexTypes.BLOCK_STATEMENT) {
+  if (statementType === APEX_TYPES.BLOCK_STATEMENT) {
     parts.push(" ");
-    _pushIfExist(parts, statementDoc);
+    pushIfExist(parts, statementDoc);
   } else {
-    _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
+    pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
   }
   return concat(parts);
 }
 
-function handleTernaryExpression(path, print) {
-  const parts = [];
+function handleTernaryExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "condition"));
 
   parts.push(line);
@@ -1498,8 +1590,8 @@ function handleTernaryExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleInstanceOfExpression(path, print) {
-  const parts = [];
+function handleInstanceOfExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
   parts.push("instanceof");
@@ -1508,32 +1600,32 @@ function handleInstanceOfExpression(path, print) {
   return concat(parts);
 }
 
-function handlePackageVersionExpression(path, print) {
-  const parts = [];
+function handlePackageVersionExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("Package.Version.");
   parts.push(path.call(print, "version"));
   return concat(parts);
 }
 
-function handleStructuredVersion(path, print) {
-  const parts = [];
+function handleStructuredVersion(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "major"));
   parts.push(".");
   parts.push(path.call(print, "minor"));
   return concat(parts);
 }
 
-function handleArrayExpression(path, print) {
+function handleArrayExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const parts = [];
-  const expressionDoc = path.call(print, "expr");
+  const parts: Doc[] = [];
+  const expressionDoc: Doc = path.call(print, "expr");
   // In certain situations we need to defer printing the [] part to be part of
   // the `expr` printing. Take a look at handleVariableExpression or
   // handleMethodCallExpression for example.
   if (
     node.expr &&
-    (node.expr["@class"] === apexTypes.VARIABLE_EXPRESSION ||
-      node.expr["@class"] === apexTypes.METHOD_CALL_EXPRESSION)
+    (node.expr["@class"] === APEX_TYPES.VARIABLE_EXPRESSION ||
+      node.expr["@class"] === APEX_TYPES.METHOD_CALL_EXPRESSION)
   ) {
     return expressionDoc;
   }
@@ -1544,8 +1636,8 @@ function handleArrayExpression(path, print) {
   return groupConcat(parts);
 }
 
-function handleCastExpression(path, print) {
-  const parts = [];
+function handleCastExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("(");
   parts.push(path.call(print, "type"));
   parts.push(")");
@@ -1554,16 +1646,16 @@ function handleCastExpression(path, print) {
   return concat(parts);
 }
 
-function handleExpressionStatement(path, print) {
-  const parts = [];
+function handleExpressionStatement(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(";");
   return concat(parts);
 }
 
 // SOSL
-function handleSoslExpression(path, print) {
-  const parts = [];
+function handleSoslExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("[");
   parts.push(softline);
   parts.push(path.call(print, "search"));
@@ -1572,65 +1664,65 @@ function handleSoslExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleFindClause(path, print) {
-  const parts = [];
+function handleFindClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(indentConcat(["FIND", line, path.call(print, "search")]));
   return groupConcat(parts);
 }
 
-function handleFindValue(childClass, path, print) {
-  let doc;
-  switch (childClass) {
-    case "FindString":
+function handleFindValue(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
+  let doc: Doc;
+  switch (childClass as jorje.FindValue["@class"]) {
+    case "apex.jorje.data.sosl.FindValue$FindString":
       doc = concat(["'", path.call(print, "value"), "'"]);
       break;
-    case "FindExpr":
+    case "apex.jorje.data.sosl.FindValue$FindExpr":
       doc = path.call(print, "expr");
       break;
-    default:
-      throw new Error(
-        `FindValue ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleInClause(path, print) {
-  const parts = [];
+function handleInClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("IN");
   parts.push(" ");
-  parts.push(path.call(print, "scope").toUpperCase());
+  parts.push((path.call(print, "scope") as string).toUpperCase());
   parts.push(" ");
   parts.push("FIELDS");
   return concat(parts);
 }
 
-function handleDivisionClause(path, print) {
-  const parts = [];
+function handleDivisionClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("WITH DIVISION = ");
   parts.push(path.call(print, "value"));
   return concat(parts);
 }
 
-function handleDivisionValue(childClass, path, print) {
-  let doc;
-  switch (childClass) {
-    case "DivisionLiteral":
+function handleDivisionValue(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
+  let doc: Doc;
+  switch (childClass as jorje.DivisionValue["@class"]) {
+    case "apex.jorje.data.sosl.DivisionValue$DivisionLiteral":
       doc = concat(["'", path.call(print, "literal"), "'"]);
       break;
-    case "DivisionExpr":
+    case "apex.jorje.data.sosl.DivisionValue$DivisionExpr":
       doc = path.call(print, "expr");
       break;
-    default:
-      throw new Error(
-        `DivisionValue ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleSearchWithClause(path, print) {
-  const parts = [];
+function handleSearchWithClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("WITH");
   parts.push(" ");
   parts.push(path.call(print, "name"));
@@ -1638,13 +1730,17 @@ function handleSearchWithClause(path, print) {
   return concat(parts);
 }
 
-function handleSearchWithClauseValue(childClass, path, print) {
-  const parts = [];
-  let valueDocs;
-  switch (childClass) {
-    case "SearchWithStringValue":
+function handleSearchWithClauseValue(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
+  const parts: Doc[] = [];
+  let valueDocs: Doc[];
+  switch (childClass as jorje.SearchWithClauseValue["@class"]) {
+    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithStringValue":
       valueDocs = path.map(print, "values");
-      if (valueDocs.length === 1) {
+      if (valueDocs.length === 1 && valueDocs[0] !== undefined) {
         parts.push(" = ");
         parts.push(valueDocs[0]);
       } else {
@@ -1656,31 +1752,27 @@ function handleSearchWithClauseValue(childClass, path, print) {
         parts.push(")");
       }
       break;
-    case "SearchWithTargetValue":
+    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithTargetValue":
       parts.push("(");
       parts.push(path.call(print, "target"));
       parts.push(" = ");
       parts.push(path.call(print, "value"));
       parts.push(")");
       break;
-    case "SearchWithTrueValue":
+    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithTrueValue":
       parts.push(" = ");
       parts.push("true");
       break;
-    case "SearchWithFalseValue":
+    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithFalseValue":
       parts.push(" = ");
       parts.push("false");
       break;
-    default:
-      throw new Error(
-        `SearchWithClauseValue ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return groupIndentConcat(parts);
 }
 
-function handleReturningClause(path, print) {
-  const parts = [];
+function handleReturningClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(
     indentConcat([
       "RETURNING",
@@ -1691,10 +1783,10 @@ function handleReturningClause(path, print) {
   return groupConcat(parts);
 }
 
-function handleReturningExpression(path, print) {
-  const selectDoc = path.call(print, "select", "value");
+function handleReturningExpression(path: AstPath, print: printFn): Doc {
+  const selectDoc: Doc = path.call(print, "select", "value");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(path.call(print, "name"));
   if (selectDoc) {
     parts.push("(");
@@ -1704,33 +1796,33 @@ function handleReturningExpression(path, print) {
   return groupConcat(parts);
 }
 
-function handleReturningSelectExpression(path, print) {
-  const fieldDocs = path.map(print, "fields");
+function handleReturningSelectExpression(path: AstPath, print: printFn): Doc {
+  const fieldDocs: Doc[] = path.map(print, "fields");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(join(concat([",", line]), fieldDocs));
 
-  _pushIfExist(parts, path.call(print, "where", "value"));
-  _pushIfExist(parts, path.call(print, "using", "value"));
-  _pushIfExist(parts, path.call(print, "orderBy", "value"));
-  _pushIfExist(parts, path.call(print, "limit", "value"));
-  _pushIfExist(parts, path.call(print, "offset", "value"));
-  _pushIfExist(parts, path.call(print, "bind", "value"));
+  pushIfExist(parts, path.call(print, "where", "value"));
+  pushIfExist(parts, path.call(print, "using", "value"));
+  pushIfExist(parts, path.call(print, "orderBy", "value"));
+  pushIfExist(parts, path.call(print, "limit", "value"));
+  pushIfExist(parts, path.call(print, "offset", "value"));
+  pushIfExist(parts, path.call(print, "bind", "value"));
   return groupIndentConcat([softline, join(line, parts)]);
 }
 
-function handleSearch(path, print) {
-  const withDocs = path.map(print, "withs");
+function handleSearch(path: AstPath, print: printFn): Doc {
+  const withDocs: Doc[] = path.map(print, "withs");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(path.call(print, "find"));
-  _pushIfExist(parts, path.call(print, "in", "value"));
-  _pushIfExist(parts, path.call(print, "returning", "value"));
-  _pushIfExist(parts, path.call(print, "division", "value"));
-  _pushIfExist(parts, path.call(print, "dataCategory", "value"));
-  _pushIfExist(parts, path.call(print, "limit", "value"));
-  _pushIfExist(parts, path.call(print, "updateStats", "value"));
-  _pushIfExist(parts, path.call(print, "using", "value"));
+  pushIfExist(parts, path.call(print, "in", "value"));
+  pushIfExist(parts, path.call(print, "returning", "value"));
+  pushIfExist(parts, path.call(print, "division", "value"));
+  pushIfExist(parts, path.call(print, "dataCategory", "value"));
+  pushIfExist(parts, path.call(print, "limit", "value"));
+  pushIfExist(parts, path.call(print, "updateStats", "value"));
+  pushIfExist(parts, path.call(print, "using", "value"));
   if (withDocs.length > 0) {
     parts.push(join(line, withDocs));
   }
@@ -1739,8 +1831,8 @@ function handleSearch(path, print) {
 }
 
 // SOQL
-function handleSoqlExpression(path, print) {
-  const parts = [];
+function handleSoqlExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("[");
   parts.push(softline);
   parts.push(path.call(print, "query"));
@@ -1749,21 +1841,21 @@ function handleSoqlExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleSelectInnerQuery(path, print) {
-  const parts = [];
+function handleSelectInnerQuery(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("(");
   parts.push(softline);
   parts.push(path.call(print, "query"));
   parts.push(dedent(softline));
   parts.push(")");
-  const aliasDoc = path.call(print, "alias", "value");
-  _pushIfExist(parts, aliasDoc, null, [" "]);
+  const aliasDoc: Doc = path.call(print, "alias", "value");
+  pushIfExist(parts, aliasDoc, null, [" "]);
 
   return groupIndentConcat(parts);
 }
 
-function handleWhereInnerExpression(path, print) {
-  const parts = [];
+function handleWhereInnerExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -1776,38 +1868,38 @@ function handleWhereInnerExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleQuery(path, print) {
-  const withIdentifierDocs = path.map(print, "withIdentifiers");
-  const parts = [];
+function handleQuery(path: AstPath, print: printFn): Doc {
+  const withIdentifierDocs: Doc[] = path.map(print, "withIdentifiers");
+  const parts: Doc[] = [];
   parts.push(path.call(print, "select"));
   parts.push(path.call(print, "from"));
-  _pushIfExist(parts, path.call(print, "where", "value"));
-  _pushIfExist(parts, path.call(print, "with", "value"));
+  pushIfExist(parts, path.call(print, "where", "value"));
+  pushIfExist(parts, path.call(print, "with", "value"));
   if (withIdentifierDocs.length > 0) {
     parts.push(join(" ", withIdentifierDocs));
   }
-  _pushIfExist(parts, path.call(print, "groupBy", "value"));
-  _pushIfExist(parts, path.call(print, "orderBy", "value"));
-  _pushIfExist(parts, path.call(print, "limit", "value"));
-  _pushIfExist(parts, path.call(print, "offset", "value"));
-  _pushIfExist(parts, path.call(print, "bind", "value"));
-  _pushIfExist(parts, path.call(print, "tracking", "value"));
-  _pushIfExist(parts, path.call(print, "updateStats", "value"));
-  _pushIfExist(parts, path.call(print, "options", "value"));
+  pushIfExist(parts, path.call(print, "groupBy", "value"));
+  pushIfExist(parts, path.call(print, "orderBy", "value"));
+  pushIfExist(parts, path.call(print, "limit", "value"));
+  pushIfExist(parts, path.call(print, "offset", "value"));
+  pushIfExist(parts, path.call(print, "bind", "value"));
+  pushIfExist(parts, path.call(print, "tracking", "value"));
+  pushIfExist(parts, path.call(print, "updateStats", "value"));
+  pushIfExist(parts, path.call(print, "options", "value"));
   return join(line, parts);
 }
 
-function handleBindClause(path, print) {
-  const expressionDocs = path.map(print, "exprs");
-  const parts = [];
+function handleBindClause(path: AstPath, print: printFn): Doc {
+  const expressionDocs: Doc[] = path.map(print, "exprs");
+  const parts: Doc[] = [];
   parts.push("BIND");
   parts.push(" ");
   parts.push(join(", ", expressionDocs));
   return concat(parts);
 }
 
-function handleBindExpression(path, print) {
-  const parts = [];
+function handleBindExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
   parts.push("=");
@@ -1816,10 +1908,10 @@ function handleBindExpression(path, print) {
   return concat(parts);
 }
 
-function handleCaseExpression(path, print) {
-  const parts = [];
-  const whenBranchDocs = path.map(print, "whenBranches");
-  const elseBranchDoc = path.call(print, "elseBranch", "value");
+function handleCaseExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const whenBranchDocs: Doc[] = path.map(print, "whenBranches");
+  const elseBranchDoc: Doc = path.call(print, "elseBranch", "value");
   parts.push("TYPEOF");
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -1834,32 +1926,32 @@ function handleCaseExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleWhenExpression(path, print) {
-  const parts = [];
+function handleWhenExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("WHEN");
   parts.push(" ");
   parts.push(path.call(print, "op"));
   parts.push(" ");
   parts.push("THEN");
   parts.push(line);
-  const identifierDocs = path.map(print, "identifiers");
+  const identifierDocs: Doc[] = path.map(print, "identifiers");
   parts.push(join(concat([",", line]), identifierDocs));
   parts.push(dedent(softline));
   return groupIndentConcat(parts);
 }
 
-function handleElseExpression(path, print) {
-  const parts = [];
+function handleElseExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("ELSE");
   parts.push(" ");
-  const identifierDocs = path.map(print, "identifiers");
+  const identifierDocs: Doc[] = path.map(print, "identifiers");
   parts.push(join(concat([",", line]), identifierDocs));
   parts.push(dedent(softline));
   return groupIndentConcat(parts);
 }
 
-function handleColumnClause(path, print) {
-  const parts = [];
+function handleColumnClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(
     indentConcat([
       "SELECT",
@@ -1870,16 +1962,16 @@ function handleColumnClause(path, print) {
   return groupConcat(parts);
 }
 
-function handleColumnExpression(path, print) {
-  const parts = [];
+function handleColumnExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
-  _pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
+  pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
   return groupConcat(parts);
 }
 
-function handleFieldIdentifier(path, print) {
-  const parts = [];
-  const entity = path.call(print, "entity", "value");
+function handleFieldIdentifier(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const entity: Doc = path.call(print, "entity", "value");
   if (entity) {
     parts.push(entity);
     parts.push(".");
@@ -1888,13 +1980,13 @@ function handleFieldIdentifier(path, print) {
   return concat(parts);
 }
 
-function handleField(path, print) {
-  const functionOneDoc = path.call(print, "function1", "value");
-  const functionTwoDoc = path.call(print, "function2", "value");
+function handleField(path: AstPath, print: printFn): Doc {
+  const functionOneDoc: Doc = path.call(print, "function1", "value");
+  const functionTwoDoc: Doc = path.call(print, "function2", "value");
 
-  const parts = [];
-  _pushIfExist(parts, functionOneDoc, ["(", softline]);
-  _pushIfExist(parts, functionTwoDoc, ["(", softline]);
+  const parts: Doc[] = [];
+  pushIfExist(parts, functionOneDoc, ["(", softline]);
+  pushIfExist(parts, functionTwoDoc, ["(", softline]);
   parts.push(path.call(print, "field"));
   if (functionOneDoc) {
     parts.push(dedent(softline));
@@ -1907,19 +1999,19 @@ function handleField(path, print) {
   return groupConcat(parts);
 }
 
-function handleFromClause(path, print) {
-  const parts = [];
+function handleFromClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(
     indentConcat(["FROM", line, join(", ", path.map(print, "exprs"))]),
   );
   return groupConcat(parts);
 }
 
-function handleFromExpression(path, print) {
-  const parts = [];
+function handleFromExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "table"));
-  _pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
-  _pushIfExist(
+  pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
+  pushIfExist(
     parts,
     path.call(print, "using", "value"),
     [dedent(softline)],
@@ -1928,22 +2020,22 @@ function handleFromExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleWhereClause(path, print) {
-  const parts = [];
+function handleWhereClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(indentConcat(["WHERE", line, path.call(print, "expr")]));
   return groupConcat(parts);
 }
 
-function handleSelectDistanceExpression(path, print) {
-  const parts = [];
+function handleSelectDistanceExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
   parts.push(path.call(print, "alias", "value"));
   return groupConcat(parts);
 }
 
-function handleWhereDistanceExpression(path, print) {
-  const parts = [];
+function handleWhereDistanceExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "distance"));
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -1952,9 +2044,9 @@ function handleWhereDistanceExpression(path, print) {
   return groupConcat(parts);
 }
 
-function handleDistanceFunctionExpression(path, print) {
-  const parts = [];
-  const distanceDocs = [];
+function handleDistanceFunctionExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const distanceDocs: Doc[] = [];
   parts.push("DISTANCE");
   parts.push("(");
   parts.push(softline);
@@ -1967,9 +2059,9 @@ function handleDistanceFunctionExpression(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleGeolocationLiteral(path, print) {
-  const parts = [];
-  const childParts = [];
+function handleGeolocationLiteral(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const childParts: Doc[] = [];
   parts.push("GEOLOCATION");
   parts.push("(");
   childParts.push(path.call(print, "latitude"));
@@ -1980,8 +2072,8 @@ function handleGeolocationLiteral(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleWithValue(path, print) {
-  const parts = [];
+function handleWithValue(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("WITH");
   parts.push(" ");
   parts.push(path.call(print, "name"));
@@ -1992,9 +2084,9 @@ function handleWithValue(path, print) {
   return concat(parts);
 }
 
-function handleWithDataCategories(path, print) {
-  const parts = [];
-  const categoryDocs = path.map(print, "categories");
+function handleWithDataCategories(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  const categoryDocs: Doc[] = path.map(print, "categories");
   parts.push("WITH DATA CATEGORY");
   parts.push(line);
   parts.push(join(concat([line, "AND", " "]), categoryDocs));
@@ -2002,9 +2094,10 @@ function handleWithDataCategories(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleDataCategory(path, print) {
-  const parts = [];
-  const categoryDocs = path.map(print, "categories").filter((doc) => doc);
+function handleDataCategory(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  let categoryDocs: Doc[] = path.map(print, "categories");
+  categoryDocs = categoryDocs.filter((doc: Doc) => doc);
   parts.push(path.call(print, "type"));
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -2021,12 +2114,12 @@ function handleDataCategory(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleDataCategoryOperator(childClass) {
-  return constants.DATA_CATEGORY[childClass];
+function handleDataCategoryOperator(childClass: string): Doc {
+  return DATA_CATEGORY[childClass as jorje.DataCategoryOperator["@class"]];
 }
 
-function handleWhereCalcExpression(path, print) {
-  const parts = [];
+function handleWhereCalcExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "field1"));
   parts.push(" ");
   parts.push(path.call(print, "calc"));
@@ -2039,8 +2132,8 @@ function handleWhereCalcExpression(path, print) {
   return groupConcat(parts);
 }
 
-function handleWhereOperationExpression(path, print) {
-  const parts = [];
+function handleWhereOperationExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -2049,8 +2142,8 @@ function handleWhereOperationExpression(path, print) {
   return groupConcat(parts);
 }
 
-function handleWhereOperationExpressions(path, print) {
-  const parts = [];
+function handleWhereOperationExpressions(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
   parts.push(path.call(print, "op"));
@@ -2067,7 +2160,7 @@ function handleWhereOperationExpressions(path, print) {
   return groupConcat(parts);
 }
 
-function escapeSoqlString(text, isInLikeExpression) {
+function escapeSoqlString(text: string, isInLikeExpression: boolean) {
   let escapedText = text;
   if (!isInLikeExpression) {
     // #340 - In a LIKE expression, the string emitted by jorje is already quoted,
@@ -2084,17 +2177,22 @@ function escapeSoqlString(text, isInLikeExpression) {
   return escapedText;
 }
 
-function handleWhereQueryLiteral(childClass, path, print, options) {
+function handleWhereQueryLiteral(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+  options: any,
+): Doc {
   const node = path.getValue();
   const grandParentNode = path.getParentNode(1);
 
-  let doc;
+  let doc: Doc;
   const isInLikeExpression =
     grandParentNode &&
     grandParentNode.op &&
-    grandParentNode.op["@class"] === constants.APEX_TYPES.QUERY_OPERATOR_LIKE;
-  switch (childClass) {
-    case "QueryString":
+    grandParentNode.op["@class"] === APEX_TYPES.QUERY_OPERATOR_LIKE;
+  switch (childClass as jorje.QueryLiteral["@class"]) {
+    case "apex.jorje.data.soql.QueryLiteral$QueryString":
       // #340 - Query Strings have different properties than normal Apex strings,
       // so we have to handle them separately. They also behave differently
       // depending on whether they are in a LIKE expression vs other expressions.
@@ -2104,26 +2202,29 @@ function handleWhereQueryLiteral(childClass, path, print, options) {
         "'",
       ]);
       break;
-    case "QueryNull":
+    case "apex.jorje.data.soql.QueryLiteral$QueryNull":
       doc = "NULL";
       break;
-    case "QueryTrue":
+    case "apex.jorje.data.soql.QueryLiteral$QueryTrue":
       doc = "TRUE";
       break;
-    case "QueryFalse":
+    case "apex.jorje.data.soql.QueryLiteral$QueryFalse":
       doc = "FALSE";
       break;
-    case "QueryNumber":
+    case "apex.jorje.data.soql.QueryLiteral$QueryNumber":
       doc = path.call(print, "literal", "$");
       break;
-    case "QueryDateTime":
+    case "apex.jorje.data.soql.QueryLiteral$QueryDateTime":
+    case "apex.jorje.data.soql.QueryLiteral$QueryTime":
       doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
       break;
-    case "QueryDateFormula":
+    case "apex.jorje.data.soql.QueryLiteral$QueryDateFormula":
       doc = path.call(print, "dateFormula");
       break;
-    default:
+    case "apex.jorje.data.soql.QueryLiteral$QueryDate":
+    case "apex.jorje.data.soql.QueryLiteral$QueryMultiCurrency":
       doc = path.call(print, "literal");
+      break;
   }
   if (doc) {
     return doc;
@@ -2131,23 +2232,23 @@ function handleWhereQueryLiteral(childClass, path, print, options) {
   return "";
 }
 
-function handleWhereCompoundExpression(path, print) {
+function handleWhereCompoundExpression(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
   const parentNode = path.getParentNode();
   const isNestedExpression =
-    parentNode["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION ||
-    parentNode["@class"] === apexTypes.WHERE_UNARY_EXPRESSION;
+    parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
+    parentNode["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
   const nodeOp = node.op["@class"];
   const isSamePrecedenceWithParent =
     parentNode.op && nodeOp === parentNode.op["@class"];
 
-  const parts = [];
+  const parts: Doc[] = [];
 
   if (isNestedExpression && !isSamePrecedenceWithParent) {
     parts.push("(");
   }
-  const operatorDoc = path.call(print, "op");
-  const expressionDocs = path.map(print, "expr");
+  const operatorDoc: Doc = path.call(print, "op");
+  const expressionDocs: Doc[] = path.map(print, "expr");
   parts.push(join(concat([line, operatorDoc, " "]), expressionDocs));
   if (isNestedExpression && !isSamePrecedenceWithParent) {
     parts.push(")");
@@ -2155,12 +2256,12 @@ function handleWhereCompoundExpression(path, print) {
   return concat(parts);
 }
 
-function handleWhereUnaryExpression(path, print) {
+function handleWhereUnaryExpression(path: AstPath, print: printFn): Doc {
   const parentNode = path.getParentNode();
   const isNestedExpression =
-    parentNode["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION ||
-    parentNode["@class"] === apexTypes.WHERE_UNARY_EXPRESSION;
-  const parts = [];
+    parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
+    parentNode["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
+  const parts: Doc[] = [];
   if (isNestedExpression) {
     parts.push("(");
   }
@@ -2173,15 +2274,15 @@ function handleWhereUnaryExpression(path, print) {
   return concat(parts);
 }
 
-function handleColonExpression(path, print) {
-  const parts = [];
+function handleColonExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(":");
   parts.push(path.call(print, "expr"));
   return concat(parts);
 }
 
-function handleOrderByClause(path, print) {
-  const parts = [];
+function handleOrderByClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("ORDER BY");
   parts.push(
     indentConcat([line, join(concat([",", line]), path.map(print, "exprs"))]),
@@ -2189,29 +2290,29 @@ function handleOrderByClause(path, print) {
   return groupConcat(parts);
 }
 
-function handleOrderByExpression(childClass, path, print) {
-  const parts = [];
+function handleOrderByExpression(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
+  const parts: Doc[] = [];
   let expressionField;
-  switch (childClass) {
-    case "OrderByDistance":
+  switch (childClass as jorje.OrderByExpr["@class"]) {
+    case "apex.jorje.data.soql.OrderByExpr$OrderByDistance":
       expressionField = "distance";
       break;
-    case "OrderByValue":
+    case "apex.jorje.data.soql.OrderByExpr$OrderByValue":
       expressionField = "field";
       break;
-    default:
-      throw new Error(
-        `OrderBy ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   parts.push(path.call(print, expressionField));
 
-  const orderDoc = path.call(print, "order");
+  const orderDoc: Doc = path.call(print, "order");
   if (orderDoc) {
     parts.push(" ");
     parts.push(orderDoc);
   }
-  const nullOrderDoc = path.call(print, "nullOrder");
+  const nullOrderDoc: Doc = path.call(print, "nullOrder");
   if (nullOrderDoc) {
     parts.push(" ");
     parts.push(nullOrderDoc);
@@ -2219,28 +2320,38 @@ function handleOrderByExpression(childClass, path, print) {
   return concat(parts);
 }
 
-function handleOrderOperation(childClass, path, print, opts) {
+function handleOrderOperation(
+  childClass: string,
+  path: AstPath,
+  _print: printFn,
+  opts: prettier.ParserOptions,
+): Doc {
   const loc = opts.locStart(path.getValue());
   if (loc) {
-    return constants.ORDER[childClass];
+    return ORDER[childClass as jorje.Order["@class"]];
   }
   return "";
 }
 
-function handleNullOrderOperation(childClass, path, print, opts) {
+function handleNullOrderOperation(
+  childClass: string,
+  path: AstPath,
+  _print: printFn,
+  opts: prettier.ParserOptions,
+): Doc {
   const loc = opts.locStart(path.getValue());
   if (loc) {
-    return constants.ORDER_NULL[childClass];
+    return ORDER_NULL[childClass as jorje.OrderNull["@class"]];
   }
   return "";
 }
 
-function handleGroupByClause(path, print) {
-  const expressionDocs = path.map(print, "exprs");
-  const typeDoc = path.call(print, "type", "value");
-  const havingDoc = path.call(print, "having", "value");
+function handleGroupByClause(path: AstPath, print: printFn): Doc {
+  const expressionDocs: Doc[] = path.map(print, "exprs");
+  const typeDoc: Doc = path.call(print, "type", "value");
+  const havingDoc: Doc = path.call(print, "having", "value");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("GROUP BY");
   if (typeDoc) {
     parts.push(" ");
@@ -2264,34 +2375,30 @@ function handleGroupByClause(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleGroupByType(childClass) {
+function handleGroupByType(childClass: string): Doc {
   let doc;
-  switch (childClass) {
-    case "GroupByRollUp":
+  switch (childClass as jorje.GroupByType["@class"]) {
+    case "apex.jorje.data.soql.GroupByType$GroupByRollUp":
       doc = "ROLLUP";
       break;
-    case "GroupByCube":
+    case "apex.jorje.data.soql.GroupByType$GroupByCube":
       doc = "CUBE";
       break;
-    default:
-      throw new Error(
-        `GroupByType ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleHavingClause(path, print) {
-  const parts = [];
+function handleHavingClause(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push("HAVING");
   parts.push(line);
   parts.push(path.call(print, "expr"));
   return groupIndentConcat(parts);
 }
 
-function handleQueryUsingClause(path, print) {
-  const expressionDocs = path.map(print, "exprs");
-  const parts = [];
+function handleQueryUsingClause(path: AstPath, print: printFn): Doc {
+  const expressionDocs: Doc[] = path.map(print, "exprs");
+  const parts: Doc[] = [];
   parts.push("USING");
   parts.push(line);
   parts.push(join(concat([",", line]), expressionDocs));
@@ -2299,24 +2406,28 @@ function handleQueryUsingClause(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleUsingExpression(childClass, path, print) {
+function handleUsingExpression(
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+): Doc {
   let doc;
-  switch (childClass) {
-    case "Using":
+  switch (childClass as jorje.UsingExpr["@class"]) {
+    case "apex.jorje.data.soql.UsingExpr$Using":
       doc = concat([
         path.call(print, "name", "value"),
         " ",
         path.call(print, "field", "value"),
       ]);
       break;
-    case "UsingEquals":
+    case "apex.jorje.data.soql.UsingExpr$UsingEquals":
       doc = concat([
         path.call(print, "name", "value"),
         " = ",
         path.call(print, "field", "value"),
       ]);
       break;
-    case "UsingId":
+    case "apex.jorje.data.soql.UsingExpr$UsingId":
       doc = concat([
         path.call(print, "name"),
         "(",
@@ -2326,51 +2437,39 @@ function handleUsingExpression(childClass, path, print) {
         ")",
       ]);
       break;
-    default:
-      throw new Error(
-        `UsingExpr ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleTrackingType(childClass) {
+function handleTrackingType(childClass: string): Doc {
   let doc;
-  switch (childClass) {
-    case "ForView":
+  switch (childClass as jorje.TrackingType["@class"]) {
+    case "apex.jorje.data.soql.TrackingType$ForView":
       doc = "FOR VIEW";
       break;
-    case "ForReference":
+    case "apex.jorje.data.soql.TrackingType$ForReference":
       doc = "FOR REFERENCE";
       break;
-    default:
-      throw new Error(
-        `TrackingType ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleQueryOption(childClass) {
+function handleQueryOption(childClass: string): Doc {
   let doc;
-  switch (childClass) {
-    case "LockRows":
+  switch (childClass as jorje.QueryOption["@class"]) {
+    case "apex.jorje.data.soql.QueryOption$LockRows":
       doc = "FOR UPDATE";
       break;
-    case "IncludeDeleted":
+    case "apex.jorje.data.soql.QueryOption$IncludeDeleted":
       doc = "ALL ROWS";
       break;
-    default:
-      throw new Error(
-        `QueryOption ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleUpdateStatsClause(path, print) {
-  const optionDocs = path.map(print, "options");
-  const parts = [];
+function handleUpdateStatsClause(path: AstPath, print: printFn): Doc {
+  const optionDocs: Doc[] = path.map(print, "options");
+  const parts: Doc[] = [];
   parts.push("UPDATE");
   parts.push(line);
   parts.push(join(concat([",", line]), optionDocs));
@@ -2378,33 +2477,29 @@ function handleUpdateStatsClause(path, print) {
   return groupIndentConcat(parts);
 }
 
-function handleUpdateStatsOption(childClass) {
+function handleUpdateStatsOption(childClass: string): Doc {
   let doc;
-  switch (childClass) {
-    case "UpdateTracking":
+  switch (childClass as jorje.UpdateStatsOption["@class"]) {
+    case "apex.jorje.data.soql.UpdateStatsOption$UpdateTracking":
       doc = "TRACKING";
       break;
-    case "UpdateViewStat":
+    case "apex.jorje.data.soql.UpdateStatsOption$UpdateViewStat":
       doc = "VIEWSTAT";
       break;
-    default:
-      throw new Error(
-        `UpdateStatsOption ${childClass} is not supported. Please file a bug report.`,
-      );
   }
   return doc;
 }
 
-function handleUsingType(path, print) {
-  const parts = [];
+function handleUsingType(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "filter"));
   parts.push(" ");
   parts.push(path.call(print, "value"));
   return concat(parts);
 }
 
-function handleModifier(childClass) {
-  const modifierValue = constants.MODIFIER[childClass] || "";
+function handleModifier(childClass: string): Doc {
+  const modifierValue = MODIFIER[childClass as jorje.Modifier["@class"]] || "";
   if (!modifierValue) {
     throw new Error(
       `Modifier ${childClass} is not supported. Please file a bug report.`,
@@ -2413,33 +2508,35 @@ function handleModifier(childClass) {
   return concat([modifierValue, " "]);
 }
 
-function handlePostfixExpression(path, print) {
-  const parts = [];
+function handlePostfixExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(path.call(print, "op"));
   return concat(parts);
 }
 
-function handlePrefixExpression(path, print) {
-  const parts = [];
+function handlePrefixExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
   parts.push(path.call(print, "op"));
   parts.push(path.call(print, "expr"));
   return concat(parts);
 }
 
-function handlePostfixOperator(path, print) {
-  return constants.POSTFIX[path.call(print, "$")];
+function handlePostfixOperator(path: AstPath): Doc {
+  const node: jorje.PostfixExpr["op"] = path.getValue();
+  return POSTFIX[node.$];
 }
 
-function handlePrefixOperator(path, print) {
-  return constants.PREFIX[path.call(print, "$")];
+function handlePrefixOperator(path: AstPath): Doc {
+  const node: jorje.PrefixExpr["op"] = path.getValue();
+  return PREFIX[node.$];
 }
 
-function handleWhileLoop(path, print) {
+function handleWhileLoop(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const conditionDoc = path.call(print, "condition");
+  const conditionDoc: Doc = path.call(print, "condition");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("while");
   parts.push(" ");
   parts.push("(");
@@ -2451,26 +2548,26 @@ function handleWhileLoop(path, print) {
     return concat(parts);
   }
   // Body
-  const statementDoc = path.call(print, "stmnt", "value");
-  const statementType = path.call(print, "stmnt", "value", "@class");
-  if (statementType === apexTypes.BLOCK_STATEMENT) {
+  const statementDoc: Doc = path.call(print, "stmnt", "value");
+  const statementType: Doc = path.call(print, "stmnt", "value", "@class");
+  if (statementType === APEX_TYPES.BLOCK_STATEMENT) {
     parts.push(" ");
-    _pushIfExist(parts, statementDoc);
+    pushIfExist(parts, statementDoc);
   } else {
-    _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
+    pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
   }
   return concat(parts);
 }
 
-function handleDoLoop(path, print) {
-  const statementDoc = path.call(print, "stmnt");
-  const conditionDoc = path.call(print, "condition");
+function handleDoLoop(path: AstPath, print: printFn): Doc {
+  const statementDoc: Doc = path.call(print, "stmnt");
+  const conditionDoc: Doc = path.call(print, "condition");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("do");
   parts.push(" ");
   // Body
-  _pushIfExist(parts, statementDoc);
+  pushIfExist(parts, statementDoc);
   parts.push(" ");
   parts.push("while");
   parts.push(" ");
@@ -2482,11 +2579,11 @@ function handleDoLoop(path, print) {
   return concat(parts);
 }
 
-function handleForLoop(path, print) {
+function handleForLoop(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
-  const forControlDoc = path.call(print, "forControl");
+  const forControlDoc: Doc = path.call(print, "forControl");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push("for");
   parts.push(" ");
   parts.push("(");
@@ -2496,7 +2593,7 @@ function handleForLoop(path, print) {
     node.forControl.init &&
     node.forControl.init.expr &&
     node.forControl.init.expr.value &&
-    node.forControl.init.expr.value["@class"] === apexTypes.SOQL_EXPRESSION &&
+    node.forControl.init.expr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION &&
     !willBreak(forControlDoc) // if there are breaks, e.g. comments, we need to be conservative and group them
   ) {
     parts.push(forControlDoc);
@@ -2509,64 +2606,64 @@ function handleForLoop(path, print) {
     return concat(parts);
   }
   // Body
-  const statementType = path.call(print, "stmnt", "value", "@class");
-  const statementDoc = path.call(print, "stmnt", "value");
-  if (statementType === apexTypes.BLOCK_STATEMENT) {
+  const statementType: Doc = path.call(print, "stmnt", "value", "@class");
+  const statementDoc: Doc = path.call(print, "stmnt", "value");
+  if (statementType === APEX_TYPES.BLOCK_STATEMENT) {
     parts.push(" ");
-    _pushIfExist(parts, statementDoc);
+    pushIfExist(parts, statementDoc);
   } else {
-    _pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
+    pushIfExist(parts, group(indent(concat([hardline, statementDoc]))));
   }
   return concat(parts);
 }
 
-function handleForEnhancedControl(path, print) {
+function handleForEnhancedControl(path: AstPath, print: printFn): Doc {
   // See the note in handleForInit to see why we have to do this
-  const initDocParts = path.call(print, "init");
-  const initDoc = join(concat([" ", ":", " "]), initDocParts);
+  const initDocParts: Doc = path.call(print, "init");
+  const initDoc = join(concat([" ", ":", " "]), initDocParts as Doc[]);
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(path.call(print, "type"));
   parts.push(" ");
   parts.push(initDoc);
   return concat(parts);
 }
 
-function handleForCStyleControl(path, print) {
-  const initsDoc = path.call(print, "inits", "value");
-  const conditionDoc = path.call(print, "condition", "value");
-  const controlDoc = path.call(print, "control", "value");
+function handleForCStyleControl(path: AstPath, print: printFn): Doc {
+  const initsDoc: Doc = path.call(print, "inits", "value");
+  const conditionDoc: Doc = path.call(print, "condition", "value");
+  const controlDoc: Doc = path.call(print, "control", "value");
 
-  const parts = [];
-  _pushIfExist(parts, initsDoc);
+  const parts: Doc[] = [];
+  pushIfExist(parts, initsDoc);
   parts.push(";");
-  _pushIfExist(parts, conditionDoc, null, [line]);
+  pushIfExist(parts, conditionDoc, null, [line]);
   parts.push(";");
-  _pushIfExist(parts, controlDoc, null, [line]);
+  pushIfExist(parts, controlDoc, null, [line]);
   return groupConcat(parts);
 }
 
-function handleForInits(path, print) {
-  const typeDoc = path.call(print, "type", "value");
-  const initDocsParts = path.map(print, "inits");
+function handleForInits(path: AstPath, print: printFn): Doc {
+  const typeDoc: Doc = path.call(print, "type", "value");
+  const initDocsParts = path.map(print, "inits") as [Doc, Doc][];
 
   // See the note in handleForInit to see why we have to do this
   // In this situation:
   // for (Integer i; i < 4; i++) {}
   // the second element of initDocParts is null, and so we do not want to add the initialization in
-  const initDocs = initDocsParts.map((initDocParts) =>
-    initDocParts[1]
-      ? join(concat([" ", "=", " "]), initDocParts)
-      : initDocParts[0],
+  const initDocs = initDocsParts.map((initDocPart: [Doc, Doc]) =>
+    initDocPart[1]
+      ? join(concat([" ", "=", " "]), initDocPart)
+      : initDocPart[0],
   );
 
-  const parts = [];
-  _pushIfExist(parts, typeDoc, [" "]);
+  const parts: Doc[] = [];
+  pushIfExist(parts, typeDoc, [" "]);
   parts.push(join(concat([",", line]), initDocs));
   return groupIndentConcat(parts);
 }
 
-function handleForInit(path, print) {
+function handleForInit(path: AstPath, print: printFn): Doc[] {
   // This is one of the weird cases that does not really match the way that we print things.
   // ForInit is used by both C style for loop and enhanced for loop, and there's no way to tell
   // which operator we should use for init in this context, for example:
@@ -2575,245 +2672,261 @@ function handleForInit(path, print) {
   // for (Contact a: [SELECT Id FROM Contact])
   // have very little differentiation from the POV of the ForInit handler.
   // Therefore, we'll return 2 docs here so the parent can decide what operator to insert between them.
-  const nameDocs = path.map(print, "name");
+  const nameDocs: Doc[] = path.map(print, "name");
 
-  const parts = [];
+  const parts: Doc[] = [];
   parts.push(join(".", nameDocs));
   parts.push(path.call(print, "expr", "value"));
   return parts;
 }
 
-const nodeHandler = {};
-nodeHandler[apexTypes.IF_ELSE_BLOCK] = handleIfElseBlock;
-nodeHandler[apexTypes.IF_BLOCK] = handleIfBlock;
-nodeHandler[apexTypes.ELSE_BLOCK] = handleElseBlock;
-nodeHandler[apexTypes.EXPRESSION_STATEMENT] = handleExpressionStatement;
-nodeHandler[apexTypes.RETURN_STATEMENT] = handleReturnStatement;
-nodeHandler[apexTypes.TRIGGER_USAGE] = (path, print) =>
-  constants.TRIGGER_USAGE[path.call(print, "$")];
-nodeHandler[apexTypes.JAVA_TYPE_REF] = handleJavaTypeRef;
-nodeHandler[apexTypes.CLASS_TYPE_REF] = handleClassTypeRef;
-nodeHandler[apexTypes.ARRAY_TYPE_REF] = handleArrayTypeRef;
-nodeHandler[apexTypes.LOCATION_IDENTIFIER] = _handlePassthroughCall("value");
-nodeHandler[apexTypes.MODIFIER_PARAMETER_REF] = handleModifierParameterRef;
-nodeHandler[apexTypes.EMPTY_MODIFIER_PARAMETER_REF] =
+type singleNodeHandler = (
+  path: AstPath,
+  print: printFn,
+  options: prettier.ParserOptions,
+) => Doc;
+type childNodeHandler = (
+  childClass: string,
+  path: AstPath,
+  print: printFn,
+  options: prettier.ParserOptions,
+) => Doc;
+
+const nodeHandler: { [key: string]: childNodeHandler | singleNodeHandler } = {};
+nodeHandler[APEX_TYPES.IF_ELSE_BLOCK] = handleIfElseBlock;
+nodeHandler[APEX_TYPES.IF_BLOCK] = handleIfBlock;
+nodeHandler[APEX_TYPES.ELSE_BLOCK] = handleElseBlock;
+nodeHandler[APEX_TYPES.EXPRESSION_STATEMENT] = handleExpressionStatement;
+nodeHandler[APEX_TYPES.RETURN_STATEMENT] = handleReturnStatement;
+nodeHandler[APEX_TYPES.TRIGGER_USAGE] = handleTriggerUsage;
+nodeHandler[APEX_TYPES.JAVA_TYPE_REF] = handleJavaTypeRef;
+nodeHandler[APEX_TYPES.CLASS_TYPE_REF] = handleClassTypeRef;
+nodeHandler[APEX_TYPES.ARRAY_TYPE_REF] = handleArrayTypeRef;
+nodeHandler[APEX_TYPES.LOCATION_IDENTIFIER] = handlePassthroughCall("value");
+nodeHandler[APEX_TYPES.MODIFIER_PARAMETER_REF] = handleModifierParameterRef;
+nodeHandler[APEX_TYPES.EMPTY_MODIFIER_PARAMETER_REF] =
   handleEmptyModifierParameterRef;
-nodeHandler[apexTypes.BLOCK_STATEMENT] = handleBlockStatement;
-nodeHandler[apexTypes.VARIABLE_DECLARATION_STATEMENT] =
-  _handlePassthroughCall("variableDecls");
-nodeHandler[apexTypes.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
-nodeHandler[apexTypes.NAME_VALUE_PARAMETER] = handleNameValueParameter;
-nodeHandler[apexTypes.ANNOTATION] = handleAnnotation;
-nodeHandler[apexTypes.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
-nodeHandler[apexTypes.ANNOTATION_VALUE] = handleAnnotationValue;
-nodeHandler[apexTypes.ANNOTATION_STRING] = handleAnnotationString;
-nodeHandler[apexTypes.MODIFIER] = handleModifier;
-nodeHandler[apexTypes.RUN_AS_BLOCK] = handleRunAsBlock;
-nodeHandler[apexTypes.DO_LOOP] = handleDoLoop;
-nodeHandler[apexTypes.WHILE_LOOP] = handleWhileLoop;
-nodeHandler[apexTypes.FOR_LOOP] = handleForLoop;
-nodeHandler[apexTypes.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
-nodeHandler[apexTypes.FOR_ENHANCED_CONTROL] = handleForEnhancedControl;
-nodeHandler[apexTypes.FOR_INITS] = handleForInits;
-nodeHandler[apexTypes.FOR_INIT] = handleForInit;
-nodeHandler[apexTypes.BREAK_STATEMENT] = () => "break;";
-nodeHandler[apexTypes.CONTINUE_STATEMENT] = () => "continue;";
-nodeHandler[apexTypes.THROW_STATEMENT] = (path, print) =>
+nodeHandler[APEX_TYPES.BLOCK_STATEMENT] = handleBlockStatement;
+nodeHandler[APEX_TYPES.VARIABLE_DECLARATION_STATEMENT] =
+  handlePassthroughCall("variableDecls");
+nodeHandler[APEX_TYPES.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
+nodeHandler[APEX_TYPES.NAME_VALUE_PARAMETER] = handleNameValueParameter;
+nodeHandler[APEX_TYPES.ANNOTATION] = handleAnnotation;
+nodeHandler[APEX_TYPES.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
+nodeHandler[APEX_TYPES.ANNOTATION_VALUE] = handleAnnotationValue;
+nodeHandler[APEX_TYPES.ANNOTATION_STRING] = handleAnnotationString;
+nodeHandler[APEX_TYPES.MODIFIER] = handleModifier;
+nodeHandler[APEX_TYPES.RUN_AS_BLOCK] = handleRunAsBlock;
+nodeHandler[APEX_TYPES.DO_LOOP] = handleDoLoop;
+nodeHandler[APEX_TYPES.WHILE_LOOP] = handleWhileLoop;
+nodeHandler[APEX_TYPES.FOR_LOOP] = handleForLoop;
+nodeHandler[APEX_TYPES.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
+nodeHandler[APEX_TYPES.FOR_ENHANCED_CONTROL] = handleForEnhancedControl;
+nodeHandler[APEX_TYPES.FOR_INITS] = handleForInits;
+nodeHandler[APEX_TYPES.FOR_INIT] = handleForInit;
+nodeHandler[APEX_TYPES.BREAK_STATEMENT] = () => "break;";
+nodeHandler[APEX_TYPES.CONTINUE_STATEMENT] = () => "continue;";
+nodeHandler[APEX_TYPES.THROW_STATEMENT] = (path: AstPath, print: printFn) =>
   concat(["throw", " ", path.call(print, "expr"), ";"]);
-nodeHandler[apexTypes.TRY_CATCH_FINALLY_BLOCK] = handleTryCatchFinallyBlock;
-nodeHandler[apexTypes.CATCH_BLOCK] = handleCatchBlock;
-nodeHandler[apexTypes.FINALLY_BLOCK] = handleFinallyBlock;
-nodeHandler[apexTypes.STATEMENT] = handleStatement;
-nodeHandler[apexTypes.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
-nodeHandler[apexTypes.SWITCH_STATEMENT] = handleSwitchStatement;
-nodeHandler[apexTypes.VALUE_WHEN] = handleValueWhen;
-nodeHandler[apexTypes.ELSE_WHEN] = handleElseWhen;
-nodeHandler[apexTypes.TYPE_WHEN] = handleTypeWhen;
-nodeHandler[apexTypes.ENUM_CASE] = handleEnumCase;
-nodeHandler[apexTypes.LITERAL_CASE] = _handlePassthroughCall("expr");
-nodeHandler[apexTypes.PROPERTY_DECLATION] = handlePropertyDeclaration;
-nodeHandler[apexTypes.PROPERTY_GETTER] = _handlePropertyGetterSetter("get");
-nodeHandler[apexTypes.PROPERTY_SETTER] = _handlePropertyGetterSetter("set");
-nodeHandler[apexTypes.STRUCTURED_VERSION] = handleStructuredVersion;
-nodeHandler[apexTypes.REQUEST_VERSION] = () => "Request";
-nodeHandler.int = (path, print) => path.call(print, "$");
-nodeHandler.string = (path, print) => concat(["'", path.call(print, "$"), "'"]);
+nodeHandler[APEX_TYPES.TRY_CATCH_FINALLY_BLOCK] = handleTryCatchFinallyBlock;
+nodeHandler[APEX_TYPES.CATCH_BLOCK] = handleCatchBlock;
+nodeHandler[APEX_TYPES.FINALLY_BLOCK] = handleFinallyBlock;
+nodeHandler[APEX_TYPES.STATEMENT] = handleStatement;
+nodeHandler[APEX_TYPES.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
+nodeHandler[APEX_TYPES.SWITCH_STATEMENT] = handleSwitchStatement;
+nodeHandler[APEX_TYPES.VALUE_WHEN] = handleValueWhen;
+nodeHandler[APEX_TYPES.ELSE_WHEN] = handleElseWhen;
+nodeHandler[APEX_TYPES.TYPE_WHEN] = handleTypeWhen;
+nodeHandler[APEX_TYPES.ENUM_CASE] = handleEnumCase;
+nodeHandler[APEX_TYPES.LITERAL_CASE] = handlePassthroughCall("expr");
+nodeHandler[APEX_TYPES.PROPERTY_DECLATION] = handlePropertyDeclaration;
+nodeHandler[APEX_TYPES.PROPERTY_GETTER] = handlePropertyGetterSetter("get");
+nodeHandler[APEX_TYPES.PROPERTY_SETTER] = handlePropertyGetterSetter("set");
+nodeHandler[APEX_TYPES.STRUCTURED_VERSION] = handleStructuredVersion;
+nodeHandler[APEX_TYPES.REQUEST_VERSION] = () => "Request";
+nodeHandler["int"] = (path: AstPath, print: printFn) => path.call(print, "$");
+nodeHandler["string"] = (path: AstPath, print: printFn) =>
+  concat(["'", path.call(print, "$"), "'"]);
 
 // Operator
-nodeHandler[apexTypes.ASSIGNMENT_OPERATOR] = handleAssignmentOperation;
-nodeHandler[apexTypes.BINARY_OPERATOR] = handleBinaryOperation;
-nodeHandler[apexTypes.BOOLEAN_OPERATOR] = handleBooleanOperation;
-nodeHandler[apexTypes.POSTFIX_OPERATOR] = handlePostfixOperator;
-nodeHandler[apexTypes.PREFIX_OPERATOR] = handlePrefixOperator;
+nodeHandler[APEX_TYPES.ASSIGNMENT_OPERATOR] = handleAssignmentOperation;
+nodeHandler[APEX_TYPES.BINARY_OPERATOR] = handleBinaryOperation;
+nodeHandler[APEX_TYPES.BOOLEAN_OPERATOR] = handleBooleanOperation;
+nodeHandler[APEX_TYPES.POSTFIX_OPERATOR] = handlePostfixOperator;
+nodeHandler[APEX_TYPES.PREFIX_OPERATOR] = handlePrefixOperator;
 
 // Declaration
-nodeHandler[apexTypes.CLASS_DECLARATION] = handleClassDeclaration;
-nodeHandler[apexTypes.INTERFACE_DECLARATION] = handleInterfaceDeclaration;
-nodeHandler[apexTypes.METHOD_DECLARATION] = handleMethodDeclaration;
-nodeHandler[apexTypes.VARIABLE_DECLARATION] = handleVariableDeclaration;
-nodeHandler[apexTypes.ENUM_DECLARATION] = handleEnumDeclaration;
+nodeHandler[APEX_TYPES.CLASS_DECLARATION] = handleClassDeclaration;
+nodeHandler[APEX_TYPES.INTERFACE_DECLARATION] = handleInterfaceDeclaration;
+nodeHandler[APEX_TYPES.METHOD_DECLARATION] = handleMethodDeclaration;
+nodeHandler[APEX_TYPES.VARIABLE_DECLARATION] = handleVariableDeclaration;
+nodeHandler[APEX_TYPES.ENUM_DECLARATION] = handleEnumDeclaration;
 
 // Compilation Unit: we're not handling  InvalidDeclUnit
-nodeHandler[apexTypes.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
-nodeHandler[apexTypes.CLASS_DECLARATION_UNIT] = _handlePassthroughCall("body");
-nodeHandler[apexTypes.ENUM_DECLARATION_UNIT] = _handlePassthroughCall("body");
-nodeHandler[apexTypes.INTERFACE_DECLARATION_UNIT] =
-  _handlePassthroughCall("body");
-nodeHandler[apexTypes.ANONYMOUS_BLOCK_UNIT] = handleAnonymousBlockUnit;
+nodeHandler[APEX_TYPES.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
+nodeHandler[APEX_TYPES.CLASS_DECLARATION_UNIT] = handlePassthroughCall("body");
+nodeHandler[APEX_TYPES.ENUM_DECLARATION_UNIT] = handlePassthroughCall("body");
+nodeHandler[APEX_TYPES.INTERFACE_DECLARATION_UNIT] =
+  handlePassthroughCall("body");
+nodeHandler[APEX_TYPES.ANONYMOUS_BLOCK_UNIT] = handleAnonymousBlockUnit;
 
 // Block Member
-nodeHandler[apexTypes.PROPERTY_MEMBER] = _handlePassthroughCall("propertyDecl");
-nodeHandler[apexTypes.FIELD_MEMBER] = _handlePassthroughCall("variableDecls");
-nodeHandler[apexTypes.STATEMENT_BLOCK_MEMBER] = _handleStatementBlockMember();
-nodeHandler[apexTypes.STATIC_STATEMENT_BLOCK_MEMBER] =
-  _handleStatementBlockMember("static");
-nodeHandler[apexTypes.METHOD_MEMBER] = _handlePassthroughCall("methodDecl");
-nodeHandler[apexTypes.INNER_CLASS_MEMBER] = _handlePassthroughCall("body");
-nodeHandler[apexTypes.INNER_ENUM_MEMBER] = _handlePassthroughCall("body");
-nodeHandler[apexTypes.INNER_INTERFACE_MEMBER] = _handlePassthroughCall("body");
+nodeHandler[APEX_TYPES.PROPERTY_MEMBER] = handlePassthroughCall("propertyDecl");
+nodeHandler[APEX_TYPES.FIELD_MEMBER] = handlePassthroughCall("variableDecls");
+nodeHandler[APEX_TYPES.STATEMENT_BLOCK_MEMBER] = handleStatementBlockMember();
+nodeHandler[APEX_TYPES.STATIC_STATEMENT_BLOCK_MEMBER] =
+  handleStatementBlockMember("static");
+nodeHandler[APEX_TYPES.METHOD_MEMBER] = handlePassthroughCall("methodDecl");
+nodeHandler[APEX_TYPES.INNER_CLASS_MEMBER] = handlePassthroughCall("body");
+nodeHandler[APEX_TYPES.INNER_ENUM_MEMBER] = handlePassthroughCall("body");
+nodeHandler[APEX_TYPES.INNER_INTERFACE_MEMBER] = handlePassthroughCall("body");
 
 // Expression
-nodeHandler[apexTypes.TERNARY_EXPRESSION] = handleTernaryExpression;
-nodeHandler[apexTypes.BOOLEAN_EXPRESSION] = handleBinaryishExpression;
-nodeHandler[apexTypes.ASSIGNMENT_EXPRESSION] = handleAssignmentExpression;
-nodeHandler[apexTypes.NESTED_EXPRESSION] = handleNestedExpression;
-nodeHandler[apexTypes.VARIABLE_EXPRESSION] = handleVariableExpression;
-nodeHandler[apexTypes.JAVA_VARIABLE_EXPRESSION] = handleJavaVariableExpression;
-nodeHandler[apexTypes.LITERAL_EXPRESSION] = handleLiteralExpression;
-nodeHandler[apexTypes.BINARY_EXPRESSION] = handleBinaryishExpression;
-nodeHandler[apexTypes.TRIGGER_VARIABLE_EXPRESSION] = (path, print) =>
-  concat(["Trigger", ".", path.call(print, "variable")]);
-nodeHandler[apexTypes.NEW_EXPRESSION] = handleNewExpression;
-nodeHandler[apexTypes.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
-nodeHandler[apexTypes.JAVA_METHOD_CALL_EXPRESSION] =
+nodeHandler[APEX_TYPES.TERNARY_EXPRESSION] = handleTernaryExpression;
+nodeHandler[APEX_TYPES.BOOLEAN_EXPRESSION] = handleBinaryishExpression;
+nodeHandler[APEX_TYPES.ASSIGNMENT_EXPRESSION] = handleAssignmentExpression;
+nodeHandler[APEX_TYPES.NESTED_EXPRESSION] = handleNestedExpression;
+nodeHandler[APEX_TYPES.VARIABLE_EXPRESSION] = handleVariableExpression;
+nodeHandler[APEX_TYPES.JAVA_VARIABLE_EXPRESSION] = handleJavaVariableExpression;
+nodeHandler[APEX_TYPES.LITERAL_EXPRESSION] = handleLiteralExpression;
+nodeHandler[APEX_TYPES.BINARY_EXPRESSION] = handleBinaryishExpression;
+nodeHandler[APEX_TYPES.TRIGGER_VARIABLE_EXPRESSION] = (
+  path: AstPath,
+  print: printFn,
+) => concat(["Trigger", ".", path.call(print, "variable")]);
+nodeHandler[APEX_TYPES.NEW_EXPRESSION] = handleNewExpression;
+nodeHandler[APEX_TYPES.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
+nodeHandler[APEX_TYPES.JAVA_METHOD_CALL_EXPRESSION] =
   handleJavaMethodCallExpression;
-nodeHandler[apexTypes.THIS_VARIABLE_EXPRESSION] = () => "this";
-nodeHandler[apexTypes.SUPER_VARIABLE_EXPRESSION] = () => "super";
-nodeHandler[apexTypes.POSTFIX_EXPRESSION] = handlePostfixExpression;
-nodeHandler[apexTypes.PREFIX_EXPRESSION] = handlePrefixExpression;
-nodeHandler[apexTypes.CAST_EXPRESSION] = handleCastExpression;
-nodeHandler[apexTypes.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
-nodeHandler[apexTypes.PACKAGE_VERSION_EXPRESSION] =
+nodeHandler[APEX_TYPES.THIS_VARIABLE_EXPRESSION] = () => "this";
+nodeHandler[APEX_TYPES.SUPER_VARIABLE_EXPRESSION] = () => "super";
+nodeHandler[APEX_TYPES.POSTFIX_EXPRESSION] = handlePostfixExpression;
+nodeHandler[APEX_TYPES.PREFIX_EXPRESSION] = handlePrefixExpression;
+nodeHandler[APEX_TYPES.CAST_EXPRESSION] = handleCastExpression;
+nodeHandler[APEX_TYPES.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
+nodeHandler[APEX_TYPES.PACKAGE_VERSION_EXPRESSION] =
   handlePackageVersionExpression;
-nodeHandler[apexTypes.ARRAY_EXPRESSION] = handleArrayExpression;
-nodeHandler[apexTypes.CLASS_REF_EXPRESSION] = (path, print) =>
-  concat([path.call(print, "type"), ".", "class"]);
-nodeHandler[apexTypes.THIS_METHOD_CALL_EXPRESSION] =
+nodeHandler[APEX_TYPES.ARRAY_EXPRESSION] = handleArrayExpression;
+nodeHandler[APEX_TYPES.CLASS_REF_EXPRESSION] = (
+  path: AstPath,
+  print: printFn,
+) => concat([path.call(print, "type"), ".", "class"]);
+nodeHandler[APEX_TYPES.THIS_METHOD_CALL_EXPRESSION] =
   handleThisMethodCallExpression;
-nodeHandler[apexTypes.SUPER_METHOD_CALL_EXPRESSION] =
+nodeHandler[APEX_TYPES.SUPER_METHOD_CALL_EXPRESSION] =
   handleSuperMethodCallExpression;
-nodeHandler[apexTypes.SOQL_EXPRESSION] = handleSoqlExpression;
-nodeHandler[apexTypes.SOSL_EXPRESSION] = handleSoslExpression;
+nodeHandler[APEX_TYPES.SOQL_EXPRESSION] = handleSoqlExpression;
+nodeHandler[APEX_TYPES.SOSL_EXPRESSION] = handleSoslExpression;
 
 // New Object Init
-nodeHandler[apexTypes.NEW_SET_INIT] = handleNewSetInit;
-nodeHandler[apexTypes.NEW_SET_LITERAL] = handleNewSetLiteral;
-nodeHandler[apexTypes.NEW_LIST_INIT] = handleNewListInit;
-nodeHandler[apexTypes.NEW_MAP_INIT] = handleNewMapInit;
-nodeHandler[apexTypes.NEW_MAP_LITERAL] = handleNewMapLiteral;
-nodeHandler[apexTypes.MAP_LITERAL_KEY_VALUE] = handleMapLiteralKeyValue;
-nodeHandler[apexTypes.NEW_LIST_LITERAL] = handleNewListLiteral;
-nodeHandler[apexTypes.NEW_STANDARD] = handleNewStandard;
-nodeHandler[apexTypes.NEW_KEY_VALUE] = handleNewKeyValue;
+nodeHandler[APEX_TYPES.NEW_SET_INIT] = handleNewSetInit;
+nodeHandler[APEX_TYPES.NEW_SET_LITERAL] = handleNewSetLiteral;
+nodeHandler[APEX_TYPES.NEW_LIST_INIT] = handleNewListInit;
+nodeHandler[APEX_TYPES.NEW_MAP_INIT] = handleNewMapInit;
+nodeHandler[APEX_TYPES.NEW_MAP_LITERAL] = handleNewMapLiteral;
+nodeHandler[APEX_TYPES.MAP_LITERAL_KEY_VALUE] = handleMapLiteralKeyValue;
+nodeHandler[APEX_TYPES.NEW_LIST_LITERAL] = handleNewListLiteral;
+nodeHandler[APEX_TYPES.NEW_STANDARD] = handleNewStandard;
+nodeHandler[APEX_TYPES.NEW_KEY_VALUE] = handleNewKeyValue;
 
 // SOSL
-nodeHandler[apexTypes.SEARCH] = handleSearch;
-nodeHandler[apexTypes.FIND_CLAUSE] = handleFindClause;
-nodeHandler[apexTypes.FIND_VALUE] = handleFindValue;
-nodeHandler[apexTypes.IN_CLAUSE] = handleInClause;
-nodeHandler[apexTypes.WITH_DIVISION_CLAUSE] = handleDivisionClause;
-nodeHandler[apexTypes.DIVISION_VALUE] = handleDivisionValue;
-nodeHandler[apexTypes.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
-nodeHandler[apexTypes.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
-nodeHandler[apexTypes.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
-nodeHandler[apexTypes.RETURNING_CLAUSE] = handleReturningClause;
-nodeHandler[apexTypes.RETURNING_EXPRESSION] = handleReturningExpression;
-nodeHandler[apexTypes.RETURNING_SELECT_EXPRESSION] =
+nodeHandler[APEX_TYPES.SEARCH] = handleSearch;
+nodeHandler[APEX_TYPES.FIND_CLAUSE] = handleFindClause;
+nodeHandler[APEX_TYPES.FIND_VALUE] = handleFindValue;
+nodeHandler[APEX_TYPES.IN_CLAUSE] = handleInClause;
+nodeHandler[APEX_TYPES.WITH_DIVISION_CLAUSE] = handleDivisionClause;
+nodeHandler[APEX_TYPES.DIVISION_VALUE] = handleDivisionValue;
+nodeHandler[APEX_TYPES.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
+nodeHandler[APEX_TYPES.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
+nodeHandler[APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
+nodeHandler[APEX_TYPES.RETURNING_CLAUSE] = handleReturningClause;
+nodeHandler[APEX_TYPES.RETURNING_EXPRESSION] = handleReturningExpression;
+nodeHandler[APEX_TYPES.RETURNING_SELECT_EXPRESSION] =
   handleReturningSelectExpression;
 
 // SOQL
-nodeHandler[apexTypes.QUERY] = handleQuery;
-nodeHandler[apexTypes.SELECT_COLUMN_CLAUSE] = handleColumnClause;
-nodeHandler[apexTypes.SELECT_COUNT_CLAUSE] = () =>
+nodeHandler[APEX_TYPES.QUERY] = handleQuery;
+nodeHandler[APEX_TYPES.SELECT_COLUMN_CLAUSE] = handleColumnClause;
+nodeHandler[APEX_TYPES.SELECT_COUNT_CLAUSE] = () =>
   concat(["SELECT", " ", "COUNT()"]);
-nodeHandler[apexTypes.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
-nodeHandler[apexTypes.SELECT_INNER_QUERY] = handleSelectInnerQuery;
-nodeHandler[apexTypes.SELECT_CASE_EXPRESSION] = _handlePassthroughCall("expr");
-nodeHandler[apexTypes.CASE_EXPRESSION] = handleCaseExpression;
-nodeHandler[apexTypes.WHEN_OPERATOR] = _handlePassthroughCall("identifier");
-nodeHandler[apexTypes.WHEN_EXPRESSION] = handleWhenExpression;
-nodeHandler[apexTypes.CASE_OPERATOR] = _handlePassthroughCall("identifier");
-nodeHandler[apexTypes.ELSE_EXPRESSION] = handleElseExpression;
-nodeHandler[apexTypes.FIELD] = handleField;
-nodeHandler[apexTypes.FIELD_IDENTIFIER] = handleFieldIdentifier;
-nodeHandler[apexTypes.FROM_CLAUSE] = handleFromClause;
-nodeHandler[apexTypes.FROM_EXPRESSION] = handleFromExpression;
-nodeHandler[apexTypes.GROUP_BY_CLAUSE] = handleGroupByClause;
-nodeHandler[apexTypes.GROUP_BY_EXPRESSION] = _handlePassthroughCall("field");
-nodeHandler[apexTypes.GROUP_BY_TYPE] = handleGroupByType;
-nodeHandler[apexTypes.HAVING_CLAUSE] = handleHavingClause;
-nodeHandler[apexTypes.WHERE_CLAUSE] = handleWhereClause;
-nodeHandler[apexTypes.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
-nodeHandler[apexTypes.WHERE_OPERATION_EXPRESSION] =
+nodeHandler[APEX_TYPES.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
+nodeHandler[APEX_TYPES.SELECT_INNER_QUERY] = handleSelectInnerQuery;
+nodeHandler[APEX_TYPES.SELECT_CASE_EXPRESSION] = handlePassthroughCall("expr");
+nodeHandler[APEX_TYPES.CASE_EXPRESSION] = handleCaseExpression;
+nodeHandler[APEX_TYPES.WHEN_OPERATOR] = handlePassthroughCall("identifier");
+nodeHandler[APEX_TYPES.WHEN_EXPRESSION] = handleWhenExpression;
+nodeHandler[APEX_TYPES.CASE_OPERATOR] = handlePassthroughCall("identifier");
+nodeHandler[APEX_TYPES.ELSE_EXPRESSION] = handleElseExpression;
+nodeHandler[APEX_TYPES.FIELD] = handleField;
+nodeHandler[APEX_TYPES.FIELD_IDENTIFIER] = handleFieldIdentifier;
+nodeHandler[APEX_TYPES.FROM_CLAUSE] = handleFromClause;
+nodeHandler[APEX_TYPES.FROM_EXPRESSION] = handleFromExpression;
+nodeHandler[APEX_TYPES.GROUP_BY_CLAUSE] = handleGroupByClause;
+nodeHandler[APEX_TYPES.GROUP_BY_EXPRESSION] = handlePassthroughCall("field");
+nodeHandler[APEX_TYPES.GROUP_BY_TYPE] = handleGroupByType;
+nodeHandler[APEX_TYPES.HAVING_CLAUSE] = handleHavingClause;
+nodeHandler[APEX_TYPES.WHERE_CLAUSE] = handleWhereClause;
+nodeHandler[APEX_TYPES.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
+nodeHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSION] =
   handleWhereOperationExpression;
-nodeHandler[apexTypes.WHERE_OPERATION_EXPRESSIONS] =
+nodeHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSIONS] =
   handleWhereOperationExpressions;
-nodeHandler[apexTypes.WHERE_COMPOUND_EXPRESSION] =
+nodeHandler[APEX_TYPES.WHERE_COMPOUND_EXPRESSION] =
   handleWhereCompoundExpression;
-nodeHandler[apexTypes.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
-nodeHandler[apexTypes.WHERE_UNARY_OPERATOR] = () => "NOT";
-nodeHandler[apexTypes.SELECT_DISTANCE_EXPRESSION] =
+nodeHandler[APEX_TYPES.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
+nodeHandler[APEX_TYPES.WHERE_UNARY_OPERATOR] = () => "NOT";
+nodeHandler[APEX_TYPES.SELECT_DISTANCE_EXPRESSION] =
   handleSelectDistanceExpression;
-nodeHandler[apexTypes.WHERE_DISTANCE_EXPRESSION] =
+nodeHandler[APEX_TYPES.WHERE_DISTANCE_EXPRESSION] =
   handleWhereDistanceExpression;
-nodeHandler[apexTypes.DISTANCE_FUNCTION_EXPRESSION] =
+nodeHandler[APEX_TYPES.DISTANCE_FUNCTION_EXPRESSION] =
   handleDistanceFunctionExpression;
-nodeHandler[apexTypes.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
-nodeHandler[apexTypes.NUMBER_LITERAL] = _handlePassthroughCall("number", "$");
-nodeHandler[apexTypes.NUMBER_EXPRESSION] = _handlePassthroughCall("expr");
-nodeHandler[apexTypes.QUERY_LITERAL_EXPRESSION] =
-  _handlePassthroughCall("literal");
-nodeHandler[apexTypes.QUERY_LITERAL] = handleWhereQueryLiteral;
-nodeHandler[apexTypes.APEX_EXPRESSION] = _handlePassthroughCall("expr");
-nodeHandler[apexTypes.COLON_EXPRESSION] = handleColonExpression;
-nodeHandler[apexTypes.ORDER_BY_CLAUSE] = handleOrderByClause;
-nodeHandler[apexTypes.ORDER_BY_EXPRESSION] = handleOrderByExpression;
-nodeHandler[apexTypes.WITH_VALUE] = handleWithValue;
-nodeHandler[apexTypes.WITH_DATA_CATEGORIES] = handleWithDataCategories;
-nodeHandler[apexTypes.DATA_CATEGORY] = handleDataCategory;
-nodeHandler[apexTypes.DATA_CATEGORY_OPERATOR] = handleDataCategoryOperator;
-nodeHandler[apexTypes.LIMIT_VALUE] = (path, print) =>
+nodeHandler[APEX_TYPES.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
+nodeHandler[APEX_TYPES.NUMBER_LITERAL] = handlePassthroughCall("number", "$");
+nodeHandler[APEX_TYPES.NUMBER_EXPRESSION] = handlePassthroughCall("expr");
+nodeHandler[APEX_TYPES.QUERY_LITERAL_EXPRESSION] =
+  handlePassthroughCall("literal");
+nodeHandler[APEX_TYPES.QUERY_LITERAL] = handleWhereQueryLiteral;
+nodeHandler[APEX_TYPES.APEX_EXPRESSION] = handlePassthroughCall("expr");
+nodeHandler[APEX_TYPES.COLON_EXPRESSION] = handleColonExpression;
+nodeHandler[APEX_TYPES.ORDER_BY_CLAUSE] = handleOrderByClause;
+nodeHandler[APEX_TYPES.ORDER_BY_EXPRESSION] = handleOrderByExpression;
+nodeHandler[APEX_TYPES.WITH_VALUE] = handleWithValue;
+nodeHandler[APEX_TYPES.WITH_DATA_CATEGORIES] = handleWithDataCategories;
+nodeHandler[APEX_TYPES.DATA_CATEGORY] = handleDataCategory;
+nodeHandler[APEX_TYPES.DATA_CATEGORY_OPERATOR] = handleDataCategoryOperator;
+nodeHandler[APEX_TYPES.LIMIT_VALUE] = (path: AstPath, print: printFn) =>
   concat(["LIMIT", " ", path.call(print, "i")]);
-nodeHandler[apexTypes.LIMIT_EXPRESSION] = (path, print) =>
+nodeHandler[APEX_TYPES.LIMIT_EXPRESSION] = (path: AstPath, print: printFn) =>
   concat(["LIMIT", " ", path.call(print, "expr")]);
-nodeHandler[apexTypes.OFFSET_VALUE] = (path, print) =>
+nodeHandler[APEX_TYPES.OFFSET_VALUE] = (path: AstPath, print: printFn) =>
   concat(["OFFSET", " ", path.call(print, "i")]);
-nodeHandler[apexTypes.OFFSET_EXPRESSION] = (path, print) =>
+nodeHandler[APEX_TYPES.OFFSET_EXPRESSION] = (path: AstPath, print: printFn) =>
   concat(["OFFSET", " ", path.call(print, "expr")]);
-nodeHandler[apexTypes.QUERY_OPERATOR] = (childClass) =>
-  constants.QUERY[childClass];
-nodeHandler[apexTypes.SOQL_ORDER] = handleOrderOperation;
-nodeHandler[apexTypes.SOQL_ORDER_NULL] = handleNullOrderOperation;
-nodeHandler[apexTypes.TRACKING_TYPE] = handleTrackingType;
-nodeHandler[apexTypes.QUERY_OPTION] = handleQueryOption;
-nodeHandler[apexTypes.QUERY_USING_CLAUSE] = handleQueryUsingClause;
-nodeHandler[apexTypes.USING_EXPRESSION] = handleUsingExpression;
-nodeHandler[apexTypes.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
-nodeHandler[apexTypes.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
-nodeHandler[apexTypes.WHERE_CALC_EXPRESSION] = handleWhereCalcExpression;
-nodeHandler[apexTypes.WHERE_CALC_OPERATOR_PLUS] = () => "+";
-nodeHandler[apexTypes.WHERE_CALC_OPERATOR_MINUS] = () => "-";
-nodeHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = (childClass) =>
-  constants.QUERY_WHERE[childClass];
-nodeHandler[apexTypes.SEARCH_USING_CLAUSE] = (path, print) =>
+nodeHandler[APEX_TYPES.QUERY_OPERATOR] = (childClass: string) =>
+  QUERY[childClass as jorje.QueryOp["@class"]];
+nodeHandler[APEX_TYPES.SOQL_ORDER] = handleOrderOperation;
+nodeHandler[APEX_TYPES.SOQL_ORDER_NULL] = handleNullOrderOperation;
+nodeHandler[APEX_TYPES.TRACKING_TYPE] = handleTrackingType;
+nodeHandler[APEX_TYPES.QUERY_OPTION] = handleQueryOption;
+nodeHandler[APEX_TYPES.QUERY_USING_CLAUSE] = handleQueryUsingClause;
+nodeHandler[APEX_TYPES.USING_EXPRESSION] = handleUsingExpression;
+nodeHandler[APEX_TYPES.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
+nodeHandler[APEX_TYPES.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
+nodeHandler[APEX_TYPES.WHERE_CALC_EXPRESSION] = handleWhereCalcExpression;
+nodeHandler[APEX_TYPES.WHERE_CALC_OPERATOR_PLUS] = () => "+";
+nodeHandler[APEX_TYPES.WHERE_CALC_OPERATOR_MINUS] = () => "-";
+nodeHandler[APEX_TYPES.WHERE_COMPOUND_OPERATOR] = (childClass: string) =>
+  QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]];
+nodeHandler[APEX_TYPES.SEARCH_USING_CLAUSE] = (path: AstPath, print: printFn) =>
   concat(["USING", " ", path.call(print, "type")]);
-nodeHandler[apexTypes.USING_TYPE] = handleUsingType;
-nodeHandler[apexTypes.BIND_CLAUSE] = handleBindClause;
-nodeHandler[apexTypes.BIND_EXPRESSION] = handleBindExpression;
-nodeHandler[apexTypes.WITH_IDENTIFIER] = (path, print) =>
+nodeHandler[APEX_TYPES.USING_TYPE] = handleUsingType;
+nodeHandler[APEX_TYPES.BIND_CLAUSE] = handleBindClause;
+nodeHandler[APEX_TYPES.BIND_EXPRESSION] = handleBindExpression;
+nodeHandler[APEX_TYPES.WITH_IDENTIFIER] = (path: AstPath, print: printFn) =>
   concat(["WITH", " ", path.call(print, "identifier")]);
 
-function handleTrailingEmptyLines(doc, node) {
+function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
   let insertNewLine = false;
   if (node && node.trailingEmptyLine) {
     if (node.comments) {
@@ -2821,7 +2934,10 @@ function handleTrailingEmptyLines(doc, node) {
       if (trailingComments.length === 0) {
         insertNewLine = true;
       } else {
-        trailingComments[trailingComments.length - 1].trailingEmptyLine = true;
+        const lastComment = trailingComments[trailingComments.length - 1];
+        if (lastComment) {
+          lastComment.trailingEmptyLine = true;
+        }
       }
     } else {
       insertNewLine = true;
@@ -2833,13 +2949,17 @@ function handleTrailingEmptyLines(doc, node) {
   return doc;
 }
 
-function genericPrint(path, options, print) {
+function genericPrint(
+  path: AstPath,
+  options: prettier.ParserOptions,
+  print: printFn,
+) {
   const n = path.getValue();
   if (typeof n === "number" || typeof n === "boolean") {
     return n.toString();
   }
   if (typeof n === "string") {
-    return _escapeString(n);
+    return escapeString(n);
   }
   if (!n) {
     return "";
@@ -2847,8 +2967,8 @@ function genericPrint(path, options, print) {
   const apexClass = n["@class"];
   if (path.stack.length === 1) {
     // Hard code how to handle the root node here
-    const docs = [];
-    docs.push(path.call(print, apexTypes.PARSER_OUTPUT, "unit"));
+    const docs: Doc[] = [];
+    docs.push(path.call(print, APEX_TYPES.PARSER_OUTPUT, "unit"));
     // Optionally, adding a hardline as the last thing in the document
     if (options.apexInsertFinalNewline) {
       docs.push(hardline);
@@ -2860,14 +2980,18 @@ function genericPrint(path, options, print) {
     return "";
   }
   if (apexClass in nodeHandler) {
-    return nodeHandler[apexClass](path, print, options);
+    return (nodeHandler[apexClass] as singleNodeHandler)(path, print, options);
   }
   const separatorIndex = apexClass.indexOf("$");
   if (separatorIndex !== -1) {
     const parentClass = apexClass.substring(0, separatorIndex);
-    const childClass = apexClass.substring(separatorIndex + 1);
     if (parentClass in nodeHandler) {
-      return nodeHandler[parentClass](childClass, path, print, options);
+      return (nodeHandler[parentClass] as childNodeHandler)(
+        apexClass,
+        path,
+        print,
+        options,
+      );
     }
   }
   throw new Error(
@@ -2875,12 +2999,16 @@ function genericPrint(path, options, print) {
   );
 }
 
-let options;
-module.exports = function printGenerically(path, opts, print) {
+let options: prettier.ParserOptions;
+export default function printGenerically(
+  path: AstPath,
+  opts: prettier.ParserOptions,
+  print: printFn,
+): Doc {
   if (typeof opts === "object") {
     options = opts;
   }
   const node = path.getValue();
   const doc = genericPrint(path, options, print);
   return handleTrailingEmptyLines(doc, node);
-};
+}

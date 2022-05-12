@@ -4,3 +4,4 @@ node_modules
 coverage
 tests/local_only
 repo
+dist

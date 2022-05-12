@@ -1,15 +1,17 @@
-const { spawn } = require("child_process");
-const path = require("path");
-const util = require("util");
-
-const axios = require("axios");
-
-const waitOn = require("wait-on");
+import { spawn, ChildProcess } from "child_process";
+import path from "path";
+import util from "util";
+import axios, { AxiosResponse } from "axios";
+import waitOn from "wait-on";
+import { getSerializerBinDirectory } from "./util";
 
 const waitOnPromise = util.promisify(waitOn);
 
-async function start(address, port) {
-  let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
+export async function start(
+  address: string,
+  port: number,
+): Promise<ChildProcess> {
+  let serializerBin = getSerializerBinDirectory();
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http.bat");
   } else {
@@ -24,11 +26,9 @@ async function start(address, port) {
   return command;
 }
 
-async function stop(address, port) {
+export async function stop(
+  address: string,
+  port: number,
+): Promise<AxiosResponse> {
   return axios.post(`http://${address}:${port}/shutdown?token=secret`);
 }
-
-module.exports = {
-  start,
-  stop,
-};

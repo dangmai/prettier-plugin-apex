@@ -2,10 +2,10 @@
   "name": "prettier-plugin-apex",
   "version": "1.10.0",
   "description": "Salesforce Apex plugin for Prettier",
-  "main": "src/index.js",
+  "main": "dist/src/index.js",
   "bin": {
-    "start-apex-server": "./bin/start-apex-server.js",
-    "stop-apex-server": "./bin/stop-apex-server.js",
+    "start-apex-server": "./dist/bin/start-apex-server.js",
+    "stop-apex-server": "./dist/bin/stop-apex-server.js",
     "apex-ast-serializer": "./vendor/apex-ast-serializer/bin/apex-ast-serializer",
     "apex-ast-serializer-http": "./vendor/apex-ast-serializer/bin/apex-ast-serializer-http"
   },
@@ -13,18 +13,20 @@
     "node": ">= 12.0.0"
   },
   "files": [
-    "/bin",
-    "/src",
+    "/dist",
     "/vendor"
   ],
   "scripts": {
-    "pretest": "npm run lint",
+    "build": "tsc",
+    "build:prod": "tsc --project tsconfig.prod.json",
+    "dev": "tsc --watch",
+    "pretest": "npm run lint && npm run build",
     "test": "jest",
-    "start-server": "node bin/start-apex-server.js",
+    "start-server": "ts-node bin/start-apex-server.ts",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
-    "stop-server": "node bin/stop-apex-server.js",
-    "lint": "eslint \"{src,tests_config}/**/*.js\"",
-    "prettier": "prettier --write \"{src,tests_config}/**/*.js\" \"./*.md\"",
+    "stop-server": "ts-node bin/stop-apex-server.ts",
+    "lint": "eslint \"{src,tests_config}/**/*.{js,ts}\"",
+    "prettier": "prettier --write \"{src,tests_config}/**/*.{js,ts}\" \"./*.md\"",
     "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=."
   },
   "keywords": [
@@ -34,13 +36,25 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
+    "@tsconfig/node12": "1.0.9",
+    "@types/jest": "27.4.0",
+    "@types/node": "17.0.15",
+    "@types/wait-on": "5.3.1",
+    "@typescript-eslint/eslint-plugin": "5.10.2",
+    "@typescript-eslint/parser": "5.10.2",
     "eslint": "8.15.0",
     "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-airbnb-typescript": "16.1.0",
     "eslint-config-prettier": "8.5.0",
     "eslint-plugin-import": "2.26.0",
     "eslint-plugin-prettier": "4.0.0",
     "jest": "28.1.0",
-    "prettier": "2.6.2"
+    "jest-snapshot-serializer-raw": "1.2.0",
+    "prettier": "2.6.2",
+    "ts-jest": "27.1.3",
+    "ts-migrate": "0.1.27",
+    "ts-node": "10.4.0",
+    "typescript": "4.5.5"
   },
   "peerDependencies": {
     "prettier": "^2.0.0"

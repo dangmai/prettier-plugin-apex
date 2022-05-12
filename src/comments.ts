@@ -1,6 +1,9 @@
 /* eslint no-param-reassign: 0, no-plusplus: 0, no-else-return: 0, consistent-return: 0 */
 
-const prettier = require("prettier");
+import prettier, { AstPath, Doc, ParserOptions } from "prettier";
+
+import { AnnotatedComment, GenericComment, isApexDocComment } from "./util";
+import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 
 const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
 const {
@@ -11,7 +14,6 @@ const {
   skipWhitespace,
 } = prettier.util;
 const constants = require("./constants");
-const { isApexDocComment } = require("./util");
 
 const apexTypes = constants.APEX_TYPES;
 
@@ -19,7 +21,7 @@ const apexTypes = constants.APEX_TYPES;
  * Print ApexDoc comment. This is straight from prettier handling of JSDoc
  * @param comment the comment to print.
  */
-function printApexDocComment(comment) {
+function printApexDocComment(comment: jorje.BlockComment): Doc {
   const lines = comment.value.split("\n");
   return concat([
     join(
@@ -35,7 +37,7 @@ function printApexDocComment(comment) {
   ]);
 }
 
-function printComment(path) {
+export function printComment(path: AstPath): Doc {
   // This handles both Inline and Block Comments.
   // We don't just pass through the value because unlike other string literals,
   // this should not be escaped
@@ -54,17 +56,23 @@ function printComment(path) {
   return result;
 }
 
-function printDanglingComment(commentPath, options) {
+export function printDanglingComment(
+  commentPath: AstPath,
+  options: ParserOptions,
+): Doc {
   const sourceCode = options.originalText;
-  const comment = commentPath.getValue(commentPath);
+  const comment = commentPath.getValue();
   const loc = comment.location;
   const isFirstComment = commentPath.getName() === 0;
   const parts = [];
 
-  const fromPos =
-    skipWhitespace(sourceCode, loc.startIndex - 1, {
-      backwards: true,
-    }) + 1;
+  let fromPos = skipWhitespace(sourceCode, loc.startIndex - 1, {
+    backwards: true,
+  });
+  if (fromPos === false) {
+    return "";
+  }
+  fromPos += 1;
   const leadingSpace = sourceCode.slice(fromPos, loc.startIndex);
   const numberOfNewLines = isFirstComment
     ? 0
@@ -91,7 +99,7 @@ function printDanglingComment(commentPath, options) {
  * @param node The current node
  * @returns {boolean} whether a comment can be attached to this node or not.
  */
-function canAttachComment(node) {
+export function canAttachComment(node: any): boolean {
   return (
     node.loc &&
     node["@class"] &&
@@ -107,7 +115,7 @@ function canAttachComment(node) {
  * @param comment The current comment node.
  * @returns {boolean} whether it is a block comment.
  */
-function isBlockComment(comment) {
+export function isBlockComment(comment: GenericComment): boolean {
   return comment["@class"] === apexTypes.BLOCK_COMMENT;
 }
 
@@ -117,16 +125,16 @@ function isBlockComment(comment) {
  * certain nodes.
  * @returns {boolean} whether or not we will print the comment on this node manually.
  */
-function willPrintOwnComments(path) {
+export function willPrintOwnComments(path: AstPath): boolean {
   const node = path.getValue();
   return !node || !node["@class"] || node["@class"] === apexTypes.ANNOTATION;
 }
 
-function getTrailingComments(node) {
-  return node.comments.filter((comment) => comment.trailing);
+export function getTrailingComments(node: any): AnnotatedComment[] {
+  return node.comments.filter((comment: AnnotatedComment) => comment.trailing);
 }
 
-function handleDanglingComment(comment) {
+function handleDanglingComment(comment: AnnotatedComment): boolean {
   const { enclosingNode } = comment;
   if (
     enclosingNode &&
@@ -134,7 +142,7 @@ function handleDanglingComment(comment) {
     ((enclosingNode.stmnts && enclosingNode.stmnts.length === 0) ||
       (enclosingNode.members && enclosingNode.members.length === 0))
   ) {
-    addDanglingComment(enclosingNode, comment);
+    addDanglingComment(enclosingNode, comment, null);
     return true;
   }
   return false;
@@ -160,7 +168,10 @@ function handleDanglingComment(comment) {
  * }
  * ```
  */
-function handleInBetweenConditionalComment(comment, sourceCode) {
+function handleInBetweenConditionalComment(
+  comment: AnnotatedComment,
+  sourceCode: string,
+) {
   const { enclosingNode, precedingNode, followingNode } = comment;
   if (
     enclosingNode &&
@@ -192,7 +203,7 @@ function handleInBetweenConditionalComment(comment, sourceCode) {
       if (followingNode.stmnt.stmnts.length > 0) {
         addLeadingComment(followingNode.stmnt.stmnts[0], comment);
       } else {
-        addDanglingComment(followingNode.stmnt, comment);
+        addDanglingComment(followingNode.stmnt, comment, null);
       }
     } else {
       addLeadingComment(followingNode.stmnt, comment);
@@ -222,7 +233,9 @@ function handleInBetweenConditionalComment(comment, sourceCode) {
  * }
  * ```
  */
-function handleInBetweenTryCatchFinallyComment(comment) {
+function handleInBetweenTryCatchFinallyComment(
+  comment: AnnotatedComment,
+): boolean {
   const { enclosingNode, precedingNode, followingNode } = comment;
   if (
     !enclosingNode ||
@@ -239,7 +252,7 @@ function handleInBetweenTryCatchFinallyComment(comment) {
   if (followingNode.stmnt.stmnts.length > 0) {
     addLeadingComment(followingNode.stmnt.stmnts[0], comment);
   } else {
-    addDanglingComment(followingNode.stmnt, comment);
+    addDanglingComment(followingNode.stmnt, comment, null);
   }
   return true;
 }
@@ -269,7 +282,10 @@ function handleInBetweenTryCatchFinallyComment(comment) {
  *   AND Name = 'Another Name'
  * ```
  */
-function handleWhereExpression(comment, sourceCode) {
+function handleWhereExpression(
+  comment: AnnotatedComment,
+  sourceCode: string,
+): boolean {
   const { enclosingNode, precedingNode, followingNode } = comment;
   if (
     !enclosingNode ||
@@ -277,7 +293,9 @@ function handleWhereExpression(comment, sourceCode) {
     !followingNode ||
     !precedingNode["@class"] ||
     !followingNode["@class"] ||
-    enclosingNode["@class"] !== apexTypes.WHERE_COMPOUND_EXPRESSION
+    enclosingNode["@class"] !== apexTypes.WHERE_COMPOUND_EXPRESSION ||
+    comment.location === undefined ||
+    comment.location.startIndex === undefined
   ) {
     return false;
   }
@@ -312,7 +330,7 @@ function handleWhereExpression(comment, sourceCode) {
  *   .toString();
  * ```
  */
-function handleLongChainComment(comment) {
+function handleLongChainComment(comment: AnnotatedComment): boolean {
   const { enclosingNode, precedingNode, followingNode } = comment;
   if (
     !enclosingNode ||
@@ -333,7 +351,7 @@ function handleLongChainComment(comment) {
   return false;
 }
 
-function isPrettierIgnore(comment) {
+function isPrettierIgnore(comment: AnnotatedComment): boolean {
   let content;
   if (comment.leading === false) {
     return false;
@@ -357,7 +375,9 @@ function isPrettierIgnore(comment) {
  * ignored is the modifier itself, not the expression surrounding it (which is
  * more likely what the user wants).
  */
-function handleModifierPrettierIgnoreComment(comment) {
+function handleModifierPrettierIgnoreComment(
+  comment: AnnotatedComment,
+): boolean {
   const { enclosingNode, followingNode } = comment;
   if (
     !isPrettierIgnore(comment) ||
@@ -382,7 +402,10 @@ function handleModifierPrettierIgnoreComment(comment) {
  * node. If `true` is returned, Prettier will no longer try to attach this
  * comment based on its internal heuristic.
  */
-function handleOwnLineComment(comment, sourceCode) {
+export function handleOwnLineComment(
+  comment: AnnotatedComment,
+  sourceCode: string,
+): boolean {
   return (
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
@@ -403,7 +426,10 @@ function handleOwnLineComment(comment, sourceCode) {
  * node. If `true` is returned, Prettier will no longer try to attach this
  * comment based on its internal heuristic.
  */
-function handleEndOfLineComment(comment, sourceCode) {
+export function handleEndOfLineComment(
+  comment: AnnotatedComment,
+  sourceCode: string,
+): boolean {
   return (
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
@@ -424,7 +450,10 @@ function handleEndOfLineComment(comment, sourceCode) {
  * node. If `true` is returned, Prettier will no longer try to attach this
  * comment based on its internal heuristic.
  */
-function handleRemainingComment(comment, sourceCode) {
+export function handleRemainingComment(
+  comment: AnnotatedComment,
+  sourceCode: string,
+): boolean {
   return (
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
@@ -440,7 +469,7 @@ function handleRemainingComment(comment, sourceCode) {
  * @param path The FastPath object.
  * @returns {boolean} Whether the path should be formatted.
  */
-function hasPrettierIgnore(path) {
+export function hasPrettierIgnore(path: AstPath): boolean {
   const node = path.getValue();
   return (
     node &&
@@ -449,17 +478,3 @@ function hasPrettierIgnore(path) {
     node.comments.filter(isPrettierIgnore).length > 0
   );
 }
-
-module.exports = {
-  canAttachComment,
-  getTrailingComments,
-  handleOwnLineComment,
-  handleEndOfLineComment,
-  handleRemainingComment,
-  hasPrettierIgnore,
-  isApexDocComment,
-  isBlockComment,
-  printComment,
-  printDanglingComment,
-  willPrintOwnComments,
-};

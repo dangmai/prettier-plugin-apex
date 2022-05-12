@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const httpServer = require("../src/http-server");
+import { stop } from "../src/http-server";
 
 async function teardown() {
-  await httpServer.stop("localhost", 2117);
+  await stop("localhost", 2117);
 }
 
 if (require.main === module) {

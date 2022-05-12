@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-const httpServer = require("../src/http-server");
+import { start } from "../src/http-server";
 
 async function setup() {
-  await httpServer.start("localhost", 2117);
+  await start("localhost", 2117);
 }
 
 if (require.main === module) {

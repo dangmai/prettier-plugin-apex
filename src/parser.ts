@@ -1,18 +1,30 @@
-/* eslint no-param-reassign: 0 no-underscore-dangle: 0 */
+/* eslint no-param-reassign: 0 */
+import childProcess, { spawnSync } from "child_process";
+import path from "path";
+import prettier from "prettier";
 
-const childProcess = require("child_process");
-const path = require("path");
-
-const { spawnSync } = childProcess;
-const constants = require("./constants");
-const { findNextUncommentedCharacter } = require("./util");
-
-const apexTypes = constants.APEX_TYPES;
+import {
+  findNextUncommentedCharacter,
+  GenericComment,
+  getSerializerBinDirectory,
+  SerializedAst,
+} from "./util";
+import {
+  APEX_TYPES,
+  ALLOW_TRAILING_EMPTY_LINE,
+  TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
+} from "./constants";
+import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 
 const MAX_BUFFER = 8192 * 8192;
 
-function parseTextWithSpawn(text, anonymous) {
-  let serializerBin = path.join(__dirname, "../vendor/apex-ast-serializer/bin");
+type MinimalLocation = {
+  startIndex: number;
+  endIndex: number;
+};
+
+function parseTextWithSpawn(text: string, anonymous: boolean): string {
+  let serializerBin = getSerializerBinDirectory();
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
   } else {
@@ -39,7 +51,12 @@ function parseTextWithSpawn(text, anonymous) {
   return executionResult.stdout.toString();
 }
 
-function parseTextWithHttp(text, serverHost, serverPort, anonymous) {
+function parseTextWithHttp(
+  text: string,
+  serverHost: string,
+  serverPort: number,
+  anonymous: boolean,
+): string {
   const httpClientLocation = path.join(__dirname, "http-client.js");
   const args = [
     httpClientLocation,
@@ -48,10 +65,13 @@ function parseTextWithHttp(text, serverHost, serverPort, anonymous) {
     "-f",
     "json",
     "-p",
-    serverPort,
+    serverPort.toString(),
   ];
   if (anonymous) {
     args.push("-n");
+  }
+  if (!process.argv[0]) {
+    throw new Error("Failed to call http client");
   }
   const executionResult = childProcess.spawnSync(process.argv[0], args, {
     input: text,
@@ -68,7 +88,7 @@ function parseTextWithHttp(text, serverHost, serverPort, anonymous) {
 
 // jorje calls the location node differently for different types of nodes,
 // so we use this method to abstract away that difference
-function _getNodeLocation(node) {
+function getNodeLocation(node: any) {
   if (node.loc) {
     return node.loc;
   }
@@ -81,7 +101,7 @@ function _getNodeLocation(node) {
 // The serialized string given back contains references (to avoid circular references),
 // which need to be resolved. This method recursively walks through the
 // deserialized object and resolve those references.
-function resolveAstReferences(node, referenceMap) {
+function resolveAstReferences(node: any, referenceMap: { [key: string]: any }) {
   const nodeId = node["@id"];
   const nodeReference = node["@reference"];
   if (nodeId) {
@@ -99,67 +119,84 @@ function resolveAstReferences(node, referenceMap) {
   return node;
 }
 
-function handleNodeSurroundedByCharacters(startCharacter, endCharacter) {
-  return (location, sourceCode, commentNodes) => {
-    const resultLocation = {};
-    resultLocation.startIndex = findNextUncommentedCharacter(
+function handleNodeSurroundedByCharacters(
+  startCharacter: string,
+  endCharacter: string,
+) {
+  return (
+    location: MinimalLocation,
+    sourceCode: string,
+    commentNodes: GenericComment[],
+  ): MinimalLocation => ({
+    startIndex: findNextUncommentedCharacter(
       sourceCode,
       startCharacter,
       location.startIndex,
       commentNodes,
       /* backwards */ true,
-    );
-    resultLocation.endIndex =
+    ),
+    endIndex:
       findNextUncommentedCharacter(
         sourceCode,
         endCharacter,
         location.startIndex,
         commentNodes,
         /* backwards */ false,
-      ) + 1;
-    return resultLocation;
-  };
+      ) + 1,
+  });
 }
 
-function handleNodeStartedWithCharacter(startCharacter) {
-  return (location, sourceCode, commentNodes) => {
-    const resultLocation = {};
-    resultLocation.startIndex = findNextUncommentedCharacter(
+function handleNodeStartedWithCharacter(startCharacter: string) {
+  return (
+    location: MinimalLocation,
+    sourceCode: string,
+    commentNodes: GenericComment[],
+  ): MinimalLocation => ({
+    startIndex: findNextUncommentedCharacter(
       sourceCode,
       startCharacter,
       location.startIndex,
       commentNodes,
       /* backwards */ true,
-    );
-    resultLocation.endIndex = location.endIndex;
-    return resultLocation;
-  };
+    ),
+    endIndex: location.endIndex,
+  });
 }
 
-function handleNodeEndedWithCharacter(endCharacter) {
-  return (location, sourceCode, commentNodes) => {
-    const resultLocation = {};
-    resultLocation.startIndex = location.startIndex;
-    resultLocation.endIndex =
+function handleNodeEndedWithCharacter(endCharacter: string) {
+  return (
+    location: MinimalLocation,
+    sourceCode: string,
+    commentNodes: GenericComment[],
+  ): MinimalLocation => ({
+    startIndex: location.startIndex,
+    endIndex:
       findNextUncommentedCharacter(
         sourceCode,
         endCharacter,
         location.endIndex,
         commentNodes,
         /* backwards */ false,
-      ) + 1;
-    return resultLocation;
-  };
+      ) + 1,
+  });
 }
 
-function handleAnonymousUnitLocation(location, sourceCode) {
+function handleAnonymousUnitLocation(
+  _location: MinimalLocation,
+  sourceCode: string,
+): MinimalLocation {
   return {
     startIndex: 0,
     endIndex: sourceCode.length,
   };
 }
 
-function handleMethodDeclaration(location, sourceCode, commentNodes, node) {
+function handleMethodDeclarationLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+  node: any,
+): MinimalLocation {
   // This is a method declaration with a body, so we can safely use the identity
   // location.
   if (node.stmnt.value) {
@@ -171,7 +208,12 @@ function handleMethodDeclaration(location, sourceCode, commentNodes, node) {
   return handleNodeEndedWithCharacter(")")(location, sourceCode, commentNodes);
 }
 
-function handleAnnotation(location, sourceCode, commentNodes, node) {
+function handleAnnotationLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+  node: any,
+): MinimalLocation {
   // This is an annotation without parameters, so we only need to worry about
   // the starting character
   if (!node.parameters || node.parameters.length === 0) {
@@ -192,8 +234,16 @@ function handleAnnotation(location, sourceCode, commentNodes, node) {
 
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
-const locationGenerationHandler = {};
-const identityFunction = (location) => location;
+const locationGenerationHandler: {
+  [key: string]: (
+    location: MinimalLocation,
+    sourceCode: string,
+    commentNodes: GenericComment[],
+    node: any,
+  ) => MinimalLocation | null;
+} = {};
+const identityFunction = (location: MinimalLocation): MinimalLocation =>
+  location;
 // Sometimes we need to delete a location node. For example, a WhereCompoundOp
 // location does not make sense since it can appear in multiple places:
 // SELECT Id FROM Account
@@ -203,56 +253,56 @@ const identityFunction = (location) => location;
 // If we keep those locations, a comment might be duplicated since it is
 // attached to one WhereCompoundOp, and that operator is printed multiple times.
 const removeFunction = () => null;
-locationGenerationHandler[apexTypes.QUERY] = identityFunction;
-locationGenerationHandler[apexTypes.VARIABLE_EXPRESSION] = identityFunction;
-locationGenerationHandler[apexTypes.INNER_CLASS_MEMBER] = identityFunction;
-locationGenerationHandler[apexTypes.INNER_INTERFACE_MEMBER] = identityFunction;
-locationGenerationHandler[apexTypes.INNER_ENUM_MEMBER] = identityFunction;
-locationGenerationHandler[apexTypes.METHOD_MEMBER] = identityFunction;
-locationGenerationHandler[apexTypes.IF_ELSE_BLOCK] = identityFunction;
-locationGenerationHandler[apexTypes.NAME_VALUE_PARAMETER] = identityFunction;
-locationGenerationHandler[apexTypes.VARIABLE_DECLARATION] = identityFunction;
-locationGenerationHandler[apexTypes.BINARY_EXPRESSION] = identityFunction;
-locationGenerationHandler[apexTypes.BOOLEAN_EXPRESSION] = identityFunction;
-locationGenerationHandler[apexTypes.ASSIGNMENT_EXPRESSION] = identityFunction;
-locationGenerationHandler[apexTypes.FIELD_MEMBER] = identityFunction;
-locationGenerationHandler[apexTypes.VALUE_WHEN] = identityFunction;
-locationGenerationHandler[apexTypes.ELSE_WHEN] = identityFunction;
-locationGenerationHandler[apexTypes.QUERY] = identityFunction;
-locationGenerationHandler[apexTypes.WHERE_COMPOUND_OPERATOR] = removeFunction;
-locationGenerationHandler[apexTypes.VARIABLE_DECLARATION_STATEMENT] =
+locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
+locationGenerationHandler[APEX_TYPES.VARIABLE_EXPRESSION] = identityFunction;
+locationGenerationHandler[APEX_TYPES.INNER_CLASS_MEMBER] = identityFunction;
+locationGenerationHandler[APEX_TYPES.INNER_INTERFACE_MEMBER] = identityFunction;
+locationGenerationHandler[APEX_TYPES.INNER_ENUM_MEMBER] = identityFunction;
+locationGenerationHandler[APEX_TYPES.METHOD_MEMBER] = identityFunction;
+locationGenerationHandler[APEX_TYPES.IF_ELSE_BLOCK] = identityFunction;
+locationGenerationHandler[APEX_TYPES.NAME_VALUE_PARAMETER] = identityFunction;
+locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION] = identityFunction;
+locationGenerationHandler[APEX_TYPES.BINARY_EXPRESSION] = identityFunction;
+locationGenerationHandler[APEX_TYPES.BOOLEAN_EXPRESSION] = identityFunction;
+locationGenerationHandler[APEX_TYPES.ASSIGNMENT_EXPRESSION] = identityFunction;
+locationGenerationHandler[APEX_TYPES.FIELD_MEMBER] = identityFunction;
+locationGenerationHandler[APEX_TYPES.VALUE_WHEN] = identityFunction;
+locationGenerationHandler[APEX_TYPES.ELSE_WHEN] = identityFunction;
+locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
+locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_OPERATOR] = removeFunction;
+locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION_STATEMENT] =
   identityFunction;
-locationGenerationHandler[apexTypes.WHERE_COMPOUND_EXPRESSION] =
+locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_EXPRESSION] =
   identityFunction;
-locationGenerationHandler[apexTypes.WHERE_OPERATION_EXPRESSION] =
+locationGenerationHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSION] =
   identityFunction;
-locationGenerationHandler[apexTypes.SELECT_INNER_QUERY] =
+locationGenerationHandler[APEX_TYPES.SELECT_INNER_QUERY] =
   handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[apexTypes.ANONYMOUS_BLOCK_UNIT] =
+locationGenerationHandler[APEX_TYPES.ANONYMOUS_BLOCK_UNIT] =
   handleAnonymousUnitLocation;
-locationGenerationHandler[apexTypes.NESTED_EXPRESSION] =
+locationGenerationHandler[APEX_TYPES.NESTED_EXPRESSION] =
   handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[apexTypes.PROPERTY_MEMBER] =
+locationGenerationHandler[APEX_TYPES.PROPERTY_MEMBER] =
   handleNodeEndedWithCharacter("}");
-locationGenerationHandler[apexTypes.SWITCH_STATEMENT] =
+locationGenerationHandler[APEX_TYPES.SWITCH_STATEMENT] =
   handleNodeEndedWithCharacter("}");
-locationGenerationHandler[apexTypes.NEW_LIST_LITERAL] =
+locationGenerationHandler[APEX_TYPES.NEW_LIST_LITERAL] =
   handleNodeEndedWithCharacter("}");
-locationGenerationHandler[apexTypes.NEW_SET_LITERAL] =
+locationGenerationHandler[APEX_TYPES.NEW_SET_LITERAL] =
   handleNodeEndedWithCharacter("}");
-locationGenerationHandler[apexTypes.NEW_MAP_LITERAL] =
+locationGenerationHandler[APEX_TYPES.NEW_MAP_LITERAL] =
   handleNodeEndedWithCharacter("}");
-locationGenerationHandler[apexTypes.NEW_STANDARD] =
+locationGenerationHandler[APEX_TYPES.NEW_STANDARD] =
   handleNodeEndedWithCharacter(")");
-locationGenerationHandler[apexTypes.VARIABLE_DECLARATIONS] =
+locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATIONS] =
   handleNodeEndedWithCharacter(";");
-locationGenerationHandler[apexTypes.NEW_KEY_VALUE] =
+locationGenerationHandler[APEX_TYPES.NEW_KEY_VALUE] =
   handleNodeEndedWithCharacter(")");
-locationGenerationHandler[apexTypes.METHOD_CALL_EXPRESSION] =
+locationGenerationHandler[APEX_TYPES.METHOD_CALL_EXPRESSION] =
   handleNodeEndedWithCharacter(")");
-locationGenerationHandler[apexTypes.ANNOTATION] = handleAnnotation;
-locationGenerationHandler[apexTypes.METHOD_DECLARATION] =
-  handleMethodDeclaration;
+locationGenerationHandler[APEX_TYPES.ANNOTATION] = handleAnnotationLocation;
+locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
+  handleMethodDeclarationLocation;
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -266,8 +316,12 @@ locationGenerationHandler[apexTypes.METHOD_DECLARATION] =
  * @param commentNodes all the comment nodes.
  * @return the corrected node.
  */
-function handleNodeLocation(node, sourceCode, commentNodes) {
-  let currentLocation;
+function handleNodeLocation(
+  node: any,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+) {
+  let currentLocation: MinimalLocation | undefined;
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       const location = handleNodeLocation(node[key], sourceCode, commentNodes);
@@ -344,16 +398,16 @@ function handleNodeLocation(node, sourceCode, commentNodes) {
  *
  */
 function generateExtraMetadata(
-  node,
-  emptyLineLocations,
-  allowTrailingEmptyLine,
+  node: any,
+  emptyLineLocations: number[],
+  allowTrailingEmptyLine: boolean,
 ) {
   const apexClass = node["@class"];
-  let allowTrailingEmptyLineWithin;
+  let allowTrailingEmptyLineWithin: boolean;
   const isSpecialClass =
-    constants.TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+    TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
   const trailingEmptyLineAllowed =
-    constants.ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+    ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
   if (isSpecialClass) {
     allowTrailingEmptyLineWithin = false;
   } else if (trailingEmptyLineAllowed) {
@@ -366,6 +420,7 @@ function generateExtraMetadata(
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
         if (keyInt === node.length - 1) {
+          // @ts-expect-error ts-migrate(7015) FIXME: Element implicitly has an 'any' type because index... Remove this comment to see the full error message
           node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
         } else {
           // Here we flag a node if its next sibling is on the same line.
@@ -397,7 +452,7 @@ function generateExtraMetadata(
     }
   });
 
-  const nodeLoc = _getNodeLocation(node);
+  const nodeLoc = getNodeLocation(node);
   if (
     apexClass &&
     nodeLoc &&
@@ -418,17 +473,17 @@ function generateExtraMetadata(
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
 // utility methods.
-function resolveLineIndexes(node, lineIndexes) {
-  const nodeLoc = _getNodeLocation(node);
+function resolveLineIndexes(node: any, lineIndexes: number[]) {
+  const nodeLoc = getNodeLocation(node);
   if (nodeLoc && !("startLine" in nodeLoc)) {
     // The location node that we manually generate do not contain startLine
     // information, so we will create them here.
     nodeLoc.startLine =
-      lineIndexes.findIndex((index) => index > nodeLoc.startIndex) - 1;
+      lineIndexes.findIndex((index: number) => index > nodeLoc.startIndex) - 1;
   }
   if (nodeLoc && !("endLine" in nodeLoc)) {
     nodeLoc.endLine =
-      lineIndexes.findIndex((index) => index > nodeLoc.endIndex) - 1;
+      lineIndexes.findIndex((index: number) => index > nodeLoc.endIndex) - 1;
 
     // Edge case: root node
     if (nodeLoc.endLine < 0) {
@@ -436,11 +491,13 @@ function resolveLineIndexes(node, lineIndexes) {
     }
   }
   if (nodeLoc && !("column" in nodeLoc)) {
-    nodeLoc.column =
-      nodeLoc.startIndex -
+    const nodeStartLineIndex =
       lineIndexes[
-        lineIndexes.findIndex((index) => index > nodeLoc.startIndex) - 1
+        lineIndexes.findIndex((index: number) => index > nodeLoc.startIndex) - 1
       ];
+    if (nodeStartLineIndex !== undefined) {
+      nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
+    }
   }
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
@@ -450,7 +507,7 @@ function resolveLineIndexes(node, lineIndexes) {
   return node;
 }
 // Get a map of line number to the index of its first character
-function getLineIndexes(sourceCode) {
+function getLineIndexes(sourceCode: string) {
   // First line always start with index 0
   const lineIndexes = [0, 0];
   let characterIndex = 0;
@@ -461,7 +518,7 @@ function getLineIndexes(sourceCode) {
       break;
     }
     lineIndexes[lineIndex] =
-      lineIndexes[lineIndex - 1] +
+      lineIndexes[lineIndex - 1]! +
       sourceCode.substring(characterIndex, eolIndex).length +
       1;
     characterIndex = eolIndex + 1;
@@ -470,20 +527,27 @@ function getLineIndexes(sourceCode) {
   return lineIndexes;
 }
 
-function getEmptyLineLocations(sourceCode) {
+function getEmptyLineLocations(sourceCode: string): number[] {
   const whiteSpaceRegEx = /^\s*$/;
   const lines = sourceCode.split("\n");
   return lines
-    .map((line) => whiteSpaceRegEx.test(line))
-    .reduce((accumulator, currentValue, currentIndex) => {
-      if (currentValue) {
-        accumulator.push(currentIndex + 1);
-      }
-      return accumulator;
-    }, []);
+    .map((line: string) => whiteSpaceRegEx.test(line))
+    .reduce(
+      (accumulator: number[], currentValue: boolean, currentIndex: number) => {
+        if (currentValue) {
+          accumulator.push(currentIndex + 1);
+        }
+        return accumulator;
+      },
+      [],
+    );
 }
 
-function parse(sourceCode, _, options) {
+export default function parse(
+  sourceCode: string,
+  _: any,
+  options: prettier.RequiredOptions,
+): SerializedAst | Record<string, never> {
   const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst;
   if (options.apexStandaloneParser === "built-in") {
@@ -499,39 +563,37 @@ function parse(sourceCode, _, options) {
       options.parser === "apex-anonymous",
     );
   }
-  let ast = {};
   if (serializedAst) {
-    ast = JSON.parse(serializedAst);
+    let ast: SerializedAst = JSON.parse(serializedAst);
     if (
-      ast[apexTypes.PARSER_OUTPUT] &&
-      ast[apexTypes.PARSER_OUTPUT].parseErrors.length > 0
+      ast[APEX_TYPES.PARSER_OUTPUT] &&
+      ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
     ) {
-      const errors = ast[apexTypes.PARSER_OUTPUT].parseErrors.map(
-        (err) => `${err.message}. ${err.detailMessage}`,
+      const errors = ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.map(
+        (err: jorje.ParseException) => `${err.message}.`,
       );
       throw new Error(errors.join("\r\n"));
     }
-    const commentNodes = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
+    const commentNodes = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
       .map((item) => item[1])
       .filter(
         (node) =>
-          node["@class"] === apexTypes.BLOCK_COMMENT ||
-          node["@class"] === apexTypes.INLINE_COMMENT,
+          node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
+          node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
     ast = resolveAstReferences(ast, {});
     handleNodeLocation(ast, sourceCode, commentNodes);
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
-    ast.comments = ast[apexTypes.PARSER_OUTPUT].hiddenTokenMap
-      .map((token) => token[1])
+    (ast as any).comments = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
+      .map((token: any) => token[1])
       .filter(
-        (node) =>
-          node["@class"] === apexTypes.INLINE_COMMENT ||
-          node["@class"] === apexTypes.BLOCK_COMMENT,
+        (node: any) =>
+          node["@class"] === APEX_TYPES.INLINE_COMMENT ||
+          node["@class"] === APEX_TYPES.BLOCK_COMMENT,
       );
+    return ast;
   }
-  return ast;
+  return {};
 }
-
-module.exports = parse;

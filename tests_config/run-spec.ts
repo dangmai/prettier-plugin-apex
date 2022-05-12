@@ -1,14 +1,19 @@
-const fs = require("fs");
-const { extname } = require("path");
-const prettier = require("prettier");
+import fs from "fs";
+import { extname } from "path";
+import prettier from "prettier";
+import { wrap } from "jest-snapshot-serializer-raw";
 
 const { AST_COMPARE } = process.env;
 
-function read(filename) {
+function read(filename: string): string {
   return fs.readFileSync(filename, "utf8");
 }
 
-function prettyPrint(src, filename, options) {
+function prettyPrint(
+  src: string,
+  filename: string,
+  options: prettier.Options,
+): string {
   return prettier.format(src, {
     filepath: filename,
     apexStandaloneParser: "built-in",
@@ -18,7 +23,7 @@ function prettyPrint(src, filename, options) {
   });
 }
 
-function parse(string, opts) {
+function parse(string: string, opts: prettier.Options): any {
   // eslint-disable-next-line no-underscore-dangle
   return prettier.__debug.parse(
     string,
@@ -32,41 +37,37 @@ function parse(string, opts) {
   ).ast;
 }
 
-/**
- * Wraps a string in a marker object that is used by `./raw-serializer.js` to
- * directly print that string in a snapshot without escaping all double quotes.
- * Backticks will still be escaped.
- */
-function raw(string) {
-  if (typeof string !== "string") {
-    throw new Error("Raw snapshots have to be strings.");
-  }
-  return { [Symbol.for("raw")]: string };
-}
-
-function runSpec(dirname, parsers, specOptions) {
+function runSpec(
+  dirname: string,
+  parsers: string[],
+  specOptions?: prettier.Options,
+): void {
   /* instabul ignore if */
   if (!parsers || !parsers.length) {
     throw new Error(`No parsers were specified for ${dirname}`);
   }
 
-  fs.readdirSync(dirname).forEach((filename) => {
+  fs.readdirSync(dirname).forEach((filename: string) => {
     const path = `${dirname}/${filename}`;
     if (
       extname(filename) !== ".snap" &&
       fs.lstatSync(path).isFile() &&
       filename[0] !== "." &&
-      filename !== "jsfmt.spec.js"
+      filename !== "jsfmt.spec.ts"
     ) {
       const source = read(path).replace(/\r\n/g, "\n");
 
-      let options;
-      if (!Array.isArray(specOptions)) {
-        options = [specOptions];
+      let options: prettier.Options[] = [];
+      if (specOptions !== undefined) {
+        if (!Array.isArray(specOptions)) {
+          options = [specOptions];
+        } else {
+          options = specOptions;
+        }
       } else {
-        options = specOptions;
+        options.push({});
       }
-      const mergedOptions = options.map((opts) => ({
+      const mergedOptions = options.map((opts: prettier.Options) => ({
         plugins: ["."],
         ...opts,
         parser: parsers[0],
@@ -75,7 +76,7 @@ function runSpec(dirname, parsers, specOptions) {
       mergedOptions.forEach((mergedOpts) => {
         const output = prettyPrint(source, path, mergedOpts);
         test(`Format ${mergedOpts.parser}: ${filename}`, () => {
-          expect(raw(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
+          expect(wrap(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
             filename,
           );
         });
