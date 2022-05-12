@@ -11,6 +11,7 @@
 ## Formatting Changes
 
 - Fix SOQL Time literals always getting printed in UTC timezone.
+- Fix wrong indentations inside long SELECT functions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/495)).
 
 # 1.10.0
 

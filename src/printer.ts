@@ -1983,20 +1983,32 @@ function handleFieldIdentifier(path: AstPath, print: printFn): Doc {
 function handleField(path: AstPath, print: printFn): Doc {
   const functionOneDoc: Doc = path.call(print, "function1", "value");
   const functionTwoDoc: Doc = path.call(print, "function2", "value");
+  const fieldDoc = path.call(print, "field");
 
-  const parts: Doc[] = [];
-  pushIfExist(parts, functionOneDoc, ["(", softline]);
-  pushIfExist(parts, functionTwoDoc, ["(", softline]);
-  parts.push(path.call(print, "field"));
-  if (functionOneDoc) {
-    parts.push(dedent(softline));
-    parts.push(")");
+  if (functionOneDoc && functionTwoDoc) {
+    return concat([
+      functionOneDoc,
+      "(",
+      groupIndentConcat([
+        softline,
+        functionTwoDoc,
+        "(",
+        groupIndentConcat([softline, fieldDoc, dedent(softline)]),
+        ")",
+        dedent(softline),
+      ]),
+      ")",
+    ]);
   }
-  if (functionTwoDoc) {
-    parts.push(dedent(softline));
-    parts.push(")");
+  if (functionOneDoc && !functionTwoDoc) {
+    return concat([
+      functionOneDoc,
+      "(",
+      groupIndentConcat([softline, fieldDoc, dedent(softline)]),
+      ")",
+    ]);
   }
-  return groupConcat(parts);
+  return fieldDoc;
 }
 
 function handleFromClause(path: AstPath, print: printFn): Doc {

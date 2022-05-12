@@ -33,6 +33,26 @@ class SOQLClass {
       OR Employees <= 120)
     ];
 
+    Test__Contract__c[] longFunction = [
+      SELECT
+        COUNT(ID) numProducts,
+        Test_Contract__c,
+        SUM(Test__Contract__r.Product_Entitlement_Subscription_Count__c) subscriptionCount
+      FROM Test__Subscription__c
+      WHERE Id IN :subscription AND Product_Entitlement_Processing_Status__c = :EntitlementConstants.PROCESSING_STATUS_READY
+      GROUP BY Test__Contract__c
+    ];
+    Test__Contract__c[] longFunctionWithPrecedingComments = [
+      SELECT
+        COUNT(ID) numProducts,
+        Test_Contract__c,
+        // preceding comment
+        SUM(Test__Contract__r.Product_Entitlement_Subscription_Count__c) subscriptionCount
+      FROM Test__Subscription__c
+      WHERE Id IN :subscription AND Product_Entitlement_Processing_Status__c = :EntitlementConstants.PROCESSING_STATUS_READY
+      GROUP BY Test__Contract__c
+    ];
+
     Integer i = [SELECT Count() FROM Contact];
     Contact[] subquery = [SELECT Id, (SELECT Id FROM Contacts LIMIT 5 OFFSET 5) sampleAlias FROM Account ORDER BY Name DESC LIMIT 1];
     Contact[] nestedFrom = [SELECT Id FROM Contact WHERE Id IN (SELECT Id FROM Contact) AND Account.Id <> NULL];
@@ -75,6 +95,21 @@ class SOQLClass {
       OR CreatedDate < 2017-01-01T05:00:00+01:00
       OR CreatedDate < 2016-01-01T01:00:00-02:00
       GROUP BY CALENDAR_YEAR(CreatedDate)
+    ];
+    AggregateResult[] longMultiFunctions = [
+      SELECT
+        Id,
+        UPPER(CALENDAR_YEAR(Very_Long_Date_Time_Field_That_Will_Surely_Break__c))
+      FROM Contact
+      GROUP BY CALENDAR_YEAR(Very_Long_Date_Time_Field_That_Will_Surely_Break__c)
+    ];
+    AggregateResult[] longMultiFunctionsWithPrecedingComments = [
+      SELECT
+        Id,
+        // preceding comments
+        UPPER(CALENDAR_YEAR(Very_Long_Date_Time_Field_That_Will_Surely_Break__c))
+      FROM Contact
+      GROUP BY CALENDAR_YEAR(Very_Long_Date_Time_Field_That_Will_Surely_Break__c)
     ];
     Contact[] contacts = [SELECT Id FROM Contact WHERE CreatedDate < 2018-01-01 OR CreatedDate > TOMORROW OR CreatedDate = LAST_N_DAYS:365];
   }
