@@ -49,9 +49,11 @@ function groupIndentConcat(docs: Doc[]): Doc {
 }
 
 function handlePassthroughCall(
-  ...names: string[]
+  prop1: string,
+  prop2?: string,
 ): (path: AstPath, print: printFn) => Doc {
-  return (path: AstPath, print: printFn) => path.call(print, ...names);
+  return (path: AstPath, print: printFn) =>
+    prop2 ? path.call(print, prop1, prop2) : path.call(print, prop1);
 }
 
 function pushIfExist(
