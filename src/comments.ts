@@ -37,6 +37,24 @@ function printApexDocComment(comment: jorje.BlockComment): Doc {
   ]);
 }
 
+export function isPrettierIgnore(comment: AnnotatedComment): boolean {
+  let content;
+  if (comment.leading === false) {
+    return false;
+  }
+  if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
+    // For simplicity sake we only support this format
+    // /* prettier-ignore */
+    content = comment.value
+      .trim()
+      .substring(2, comment.value.length - 2)
+      .trim();
+  } else {
+    content = comment.value.trim().substring(2).trim();
+  }
+  return content === "prettier-ignore";
+}
+
 export function printComment(path: AstPath): Doc {
   // This handles both Inline and Block Comments.
   // We don't just pass through the value because unlike other string literals,
@@ -350,24 +368,6 @@ function handleLongChainComment(comment: AnnotatedComment): boolean {
     return true;
   }
   return false;
-}
-
-export function isPrettierIgnore(comment: AnnotatedComment): boolean {
-  let content;
-  if (comment.leading === false) {
-    return false;
-  }
-  if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
-    // For simplicity sake we only support this format
-    // /* prettier-ignore */
-    content = comment.value
-      .trim()
-      .substring(2, comment.value.length - 2)
-      .trim();
-  } else {
-    content = comment.value.trim().substring(2).trim();
-  }
-  return content === "prettier-ignore";
 }
 
 /**
