@@ -254,6 +254,7 @@ const identityFunction = (location: MinimalLocation): MinimalLocation =>
 // attached to one WhereCompoundOp, and that operator is printed multiple times.
 const removeFunction = () => null;
 locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
+locationGenerationHandler[APEX_TYPES.TERNARY_EXPRESSION] = identityFunction;
 locationGenerationHandler[APEX_TYPES.VARIABLE_EXPRESSION] = identityFunction;
 locationGenerationHandler[APEX_TYPES.INNER_CLASS_MEMBER] = identityFunction;
 locationGenerationHandler[APEX_TYPES.INNER_INTERFACE_MEMBER] = identityFunction;

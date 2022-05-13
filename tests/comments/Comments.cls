@@ -545,6 +545,44 @@ class Comments {
     }
   }
 
+  void ternaryComments() {
+    Integer initPrecedingCommentSingleLine =
+      // Leading Inline Comment 1 for Ternary Expressions
+      condition ? 1 : 0;
+
+    Integer initPrecedingCommentMultiLine =
+      /*
+       * Leading Block Comment 1 for Ternary Expressions
+       */
+      condition ? 1 : 0;
+
+    Integer blockComment = /* Leading single 1 */ condition ? 1 : 0;
+
+    initPrecedingCommentSingleLine =
+      // Leading Inline Comment 2 for Ternary Expressions
+      condition ? 1 : 0;
+
+    initPrecedingCommentMultiLine =
+      /*
+       * Leading Block Comment 2 for Ternary Expressions
+       */
+      condition ? 1 : 0;
+
+    blockComment = /* Leading single 2 */ condition ? 1 : 0;
+
+    System.debug(
+      // Leading Inline Comment 3 for Ternary Expressions
+      condition ? 1 : 0
+    );
+
+    System.debug(
+      /*
+       * Leading Block Comment 3 for Ternary Expressions
+       */
+      condition ? 1 : 0
+    );
+  }
+
   void newObjectComments() {
     SObject a = new SObject(
       Field__c = 'Test',

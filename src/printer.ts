@@ -213,7 +213,13 @@ function handleAssignmentExpression(path: AstPath, print: printFn): Doc {
   docs.push(leftDoc);
   docs.push(" ");
   docs.push(operationDoc);
-  if (isBinaryish(node.right)) {
+
+  const rightDocComments = node.right.comments;
+  const rightDocHasLeadingComments =
+    Array.isArray(rightDocComments) &&
+    rightDocComments.some((comment) => comment.leading);
+
+  if (isBinaryish(node.right) || rightDocHasLeadingComments) {
     docs.push(line);
     docs.push(rightDoc);
     return groupIndentConcat(docs);
@@ -1089,7 +1095,15 @@ function handleVariableDeclaration(path: AstPath, print: printFn): Doc {
 
   parts.push(path.call(print, "name"));
   const assignmentDocs: Doc = path.call(print, "assignment", "value");
-  if (assignmentDocs && isBinaryish(node.assignment.value)) {
+  const assignmentComments = node.assignment?.value?.comments;
+  const assignmentHasLeadingComment =
+    Array.isArray(assignmentComments) &&
+    assignmentComments.some((comment) => comment.leading);
+
+  if (
+    assignmentDocs &&
+    (isBinaryish(node.assignment.value) || assignmentHasLeadingComment)
+  ) {
     parts.push(" ");
     parts.push("=");
     parts.push(line);

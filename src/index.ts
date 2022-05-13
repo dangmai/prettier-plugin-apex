@@ -77,8 +77,8 @@ export const printers = {
     printComment,
     willPrintOwnComments,
     handleComments: {
-      ownLine: handleEndOfLineComment,
-      endOfLine: handleOwnLineComment,
+      ownLine: handleOwnLineComment,
+      endOfLine: handleEndOfLineComment,
       remaining: handleRemainingComment,
     },
   },
