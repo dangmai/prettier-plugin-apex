@@ -180,7 +180,8 @@ function handleInBetweenConditionalComment(
     enclosingNode["@class"] === apexTypes.IF_ELSE_BLOCK &&
     precedingNode["@class"] === apexTypes.IF_BLOCK &&
     (followingNode["@class"] === apexTypes.IF_BLOCK ||
-      followingNode["@class"] === apexTypes.ELSE_BLOCK)
+      followingNode["@class"] === apexTypes.ELSE_BLOCK) &&
+    !isPrettierIgnore(comment)
   ) {
     if (
       precedingNode.stmnt["@class"] !== apexTypes.BLOCK_STATEMENT &&
@@ -351,7 +352,7 @@ function handleLongChainComment(comment: AnnotatedComment): boolean {
   return false;
 }
 
-function isPrettierIgnore(comment: AnnotatedComment): boolean {
+export function isPrettierIgnore(comment: AnnotatedComment): boolean {
   let content;
   if (comment.leading === false) {
     return false;

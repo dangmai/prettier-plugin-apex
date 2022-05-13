@@ -2,6 +2,7 @@ import prettier, { AstPath, Doc } from "prettier";
 import { builders } from "prettier/doc";
 import {
   getTrailingComments,
+  isPrettierIgnore,
   printComment,
   printDanglingComment,
 } from "./comments";
@@ -1512,24 +1513,53 @@ function handleIfElseBlock(path: AstPath, print: printFn): Doc {
     (ifBlock: jorje.IfBlock) =>
       ifBlock.stmnt["@class"] === APEX_TYPES.BLOCK_STATEMENT,
   );
+  // #464 - Since we allow prettier-ignore comment in the middle of if/else
+  // blocks, we need to make sure that the blocks (both IfBlock and ElseBlock)
+  // trailing this comment is printed correctly.
+  // One major difference is that if a block is ignored, Prettier automatically
+  // prints everything as-is from the user code, which means we don't need to
+  // add `else` literal in between IfBlocks in the final output.
+  const ifBlockContainsPrettierIgnore = node.ifBlocks.map(
+    (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
+      ifBlock.comments?.some(
+        (comment) => comment.leading && isPrettierIgnore(comment),
+      ),
+  );
 
+  let lastIfBlockHardLineInserted = false;
   ifBlockDocs.forEach((ifBlockDoc: Doc, index: number) => {
     if (index > 0) {
       parts.push(
-        concat([
-          ifBlockContainsBlockStatement[index - 1] ? " " : hardline,
-          "else ",
-        ]),
+        ifBlockContainsPrettierIgnore[index]
+          ? hardline
+          : concat([
+              ifBlockContainsBlockStatement[index - 1] ? " " : hardline,
+              "else ",
+            ]),
       );
     }
     parts.push(ifBlockDoc);
     // We also need to handle the last if block, since it might need to add
     // either a space or a hardline before the else block
     if (index === ifBlockDocs.length - 1 && elseBlockDoc) {
-      parts.push(ifBlockContainsBlockStatement[index] ? " " : hardline);
+      if (ifBlockContainsBlockStatement[index]) {
+        parts.push(" ");
+      } else {
+        parts.push(hardline);
+        lastIfBlockHardLineInserted = true;
+      }
     }
   });
   if (elseBlockDoc) {
+    // #464 - see previous note above IfBlock handling
+    const elseBlockContainsPrettierIgnore =
+      node.elseBlock?.value?.comments?.some(
+        (comment: AnnotatedComment) =>
+          comment.leading && isPrettierIgnore(comment),
+      );
+    if (elseBlockContainsPrettierIgnore && !lastIfBlockHardLineInserted) {
+      parts.push(hardline);
+    }
     parts.push(elseBlockDoc);
   }
   return groupConcat(parts);

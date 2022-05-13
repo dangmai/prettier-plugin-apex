@@ -14,6 +14,7 @@
 - Fix wrong indentations inside long SELECT functions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/495)).
 - Remove extraneous newline at the end of long GROUP BY and WITH DATA CATEGORY clauses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/533)).
 - Fix unstable leading comment formatting for ternary expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/458)).
+- Add support for prettier-ignore comments in the middle of IfElseBlock ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/464)).
 
 # 1.10.0
 

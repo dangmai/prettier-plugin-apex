@@ -25,4 +25,31 @@ class PrettierIgnore {
 
     Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
   }
+
+  public conditionalElseIgnore() {
+    if (someCondition) {
+      System.debug('foo');
+    }
+
+    // prettier-ignore
+    else if (someOtherCondition) {
+      System.debug('bar');
+    }
+
+    // prettier-ignore
+    else {
+      System.debug('no');
+    }
+
+    if (someCondition)
+      System.debug('foo');
+
+    // prettier-ignore
+    else if (someOtherCondition)
+      System.debug('bar');
+
+    // prettier-ignore
+    else
+      System.debug('no');
+  }
 }
