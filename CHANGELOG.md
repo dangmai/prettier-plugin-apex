@@ -12,6 +12,7 @@
 
 - Fix SOQL Time literals always getting printed in UTC timezone.
 - Fix wrong indentations inside long SELECT functions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/495)).
+- Remove extraneous newline at the end of long GROUP BY and WITH DATA CATEGORY clauses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/533)).
 
 # 1.10.0
 

@@ -117,10 +117,16 @@ class SOQLClass {
   void groupSoql() {
     AggregateResult[] currencies = [SELECT Name, MAX(Amount) FROM Opportunity GROUP BY Name HAVING MAX(Amount) > USD10000];
     AggregateResult[] groupedResults = [select avg(amount) aver from opportunity];
-    AggregateResult[] longGroupedResults = [
+    AggregateResult[] longGroupedResultsWithHaving = [
       SELECT COUNT(Foo_Customer__c) countOfFooCustomers, Login_Really_Long_Field__c, Bar__c
       FROM Foo_User__c
       GROUP BY Login_Really_Long_Field__c, Bar__c HAVING COUNT(Foo_Customer__c) > 1 AND Login_Really_Long_Field__c IN :allEmailAddresses
+    ];
+    AggregateResult[] longGroupedResultsWithOrderBy = [
+      SELECT COUNT(Foo_Customer__c) countOfFooCustomers, Login_Really_Long_Field__c, Bar__c
+      FROM Foo_User__c
+      GROUP BY Login_Really_Long_Field__c, Bar__c, Another_Login_Really_Long_Field_That_Will_Break__c
+      ORDER BY Login_Really_Long_Field__c, Bar__c, Another_Login_Really_Long_Field_That_Will_Break__c
     ];
     AggregateResult[] anotherGroupedResults = [
       SELECT CampaignId, AVG(Amount)
@@ -137,6 +143,14 @@ class SOQLClass {
         COUNT(id) accts
       FROM Account
       GROUP BY CUBE(Type, BillingCountry)
+      ORDER BY GROUPING(Type), GROUPING(BillingCountry)
+    ];
+    AggregateResult[] groupByCubesLong = [
+      SELECT Type, BillingCountry,
+        GROUPING(Type) grpType, GROUPING(BillingCountry) grpCty,
+        COUNT(id) accts
+      FROM Account
+      GROUP BY CUBE(Type, BillingCountry, Site, Owner, Name, Description, PersonEmail, PersonDoNotCall, Industry)
       ORDER BY GROUPING(Type), GROUPING(BillingCountry)
     ];
     AggregateResult[] groupByCubeWithHavings = [

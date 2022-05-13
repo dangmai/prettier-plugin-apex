@@ -2099,13 +2099,15 @@ function handleWithValue(path: AstPath, print: printFn): Doc {
 }
 
 function handleWithDataCategories(path: AstPath, print: printFn): Doc {
-  const parts: Doc[] = [];
   const categoryDocs: Doc[] = path.map(print, "categories");
-  parts.push("WITH DATA CATEGORY");
-  parts.push(line);
-  parts.push(join(concat([line, "AND", " "]), categoryDocs));
-  parts.push(dedent(softline));
-  return groupIndentConcat(parts);
+
+  // Only AND logical operator is supported
+  // https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_with_datacategory.htm
+  return groupIndentConcat([
+    "WITH DATA CATEGORY",
+    line,
+    join(concat([line, "AND", " "]), categoryDocs),
+  ]);
 }
 
 function handleDataCategory(path: AstPath, print: printFn): Doc {
@@ -2376,8 +2378,8 @@ function handleGroupByClause(path: AstPath, print: printFn): Doc {
     parts.push(line);
   }
   parts.push(join(concat([",", line]), expressionDocs));
-  parts.push(dedent(softline));
   if (typeDoc) {
+    parts.push(dedent(softline));
     parts.push(")");
   }
   // #286 - HAVING is part of the GROUP BY node, however we want them to behave
