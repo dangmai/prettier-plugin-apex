@@ -254,6 +254,9 @@ const identityFunction = (location: MinimalLocation): MinimalLocation =>
 // attached to one WhereCompoundOp, and that operator is printed multiple times.
 const removeFunction = () => null;
 locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
+locationGenerationHandler[APEX_TYPES.SEARCH] = identityFunction;
+locationGenerationHandler[APEX_TYPES.FOR_INIT] = identityFunction;
+locationGenerationHandler[APEX_TYPES.FOR_ENHANCED_CONTROL] = identityFunction;
 locationGenerationHandler[APEX_TYPES.TERNARY_EXPRESSION] = identityFunction;
 locationGenerationHandler[APEX_TYPES.VARIABLE_EXPRESSION] = identityFunction;
 locationGenerationHandler[APEX_TYPES.INNER_CLASS_MEMBER] = identityFunction;
@@ -269,7 +272,6 @@ locationGenerationHandler[APEX_TYPES.ASSIGNMENT_EXPRESSION] = identityFunction;
 locationGenerationHandler[APEX_TYPES.FIELD_MEMBER] = identityFunction;
 locationGenerationHandler[APEX_TYPES.VALUE_WHEN] = identityFunction;
 locationGenerationHandler[APEX_TYPES.ELSE_WHEN] = identityFunction;
-locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
 locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_OPERATOR] = removeFunction;
 locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION_STATEMENT] =
   identityFunction;
@@ -387,7 +389,7 @@ function handleNodeLocation(
 }
 
 /**
- * Generate metadata about empty lines for statement nodes.
+ * Generate extra metadata (e.g. empty lines) for nodes.
  * This method is called recursively while visiting each node in the tree.
  *
  * @param node the node being visited
@@ -416,6 +418,14 @@ function generateExtraMetadata(
   } else {
     allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
   }
+
+  // #511 - If the user manually specify linebreaks in their original query,
+  // we will use that as a heuristic to manually add hardlines to the result
+  // query as well.
+  if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
+    node.forcedHardline = node.loc.startLine !== node.loc.endLine;
+  }
+
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {

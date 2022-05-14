@@ -63,6 +63,17 @@ class SOQLClass {
     Account[] negativeQueryNum = [SELECT Id FROM Account WHERE NumberOfEmployees > -5];
   }
 
+  void hardlineHeuristics() {
+    Account[] accounts = [SELECT Id FROM Account];
+    accounts = [
+      SELECT Id FROM Account
+    ];
+    accounts = [
+      SELECT Id
+      FROM Account
+    ];
+  }
+
   void limitBinds() {
     Integer numRows = 5;
     Contact[] contacts = [SELECT ID FROM Contact LIMIT :numRows OFFSET :numRows];

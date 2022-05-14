@@ -33,7 +33,6 @@ import Concat = builders.Concat;
 const docBuilders = prettier.doc.builders;
 const { align, concat, join, hardline, line, softline, group, indent, dedent } =
   docBuilders;
-const { willBreak } = prettier.doc.utils;
 
 type printFn = (path: AstPath) => Doc;
 
@@ -1858,6 +1857,7 @@ function handleReturningSelectExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleSearch(path: AstPath, print: printFn): Doc {
+  const node = path.getValue();
   const withDocs: Doc[] = path.map(print, "withs");
 
   const parts: Doc[] = [];
@@ -1873,7 +1873,7 @@ function handleSearch(path: AstPath, print: printFn): Doc {
     parts.push(join(line, withDocs));
   }
 
-  return join(line, parts);
+  return join(node.forcedHardline ? hardline : line, parts);
 }
 
 // SOQL
@@ -1915,6 +1915,7 @@ function handleWhereInnerExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleQuery(path: AstPath, print: printFn): Doc {
+  const node = path.getValue();
   const withIdentifierDocs: Doc[] = path.map(print, "withIdentifiers");
   const parts: Doc[] = [];
   parts.push(path.call(print, "select"));
@@ -1932,7 +1933,7 @@ function handleQuery(path: AstPath, print: printFn): Doc {
   pushIfExist(parts, path.call(print, "tracking", "value"));
   pushIfExist(parts, path.call(print, "updateStats", "value"));
   pushIfExist(parts, path.call(print, "options", "value"));
-  return join(line, parts);
+  return join(node.forcedHardline ? hardline : line, parts);
 }
 
 function handleBindClause(path: AstPath, print: printFn): Doc {
@@ -2647,14 +2648,39 @@ function handleForLoop(path: AstPath, print: printFn): Doc {
   parts.push("for");
   parts.push(" ");
   parts.push("(");
-  // For Control
+
+  // For SOQL/SOSL query, we don't want to add unnecessary newlines before the
+  // forControl doc, i.e. we don't want this:
+  // ```
+  // for (
+  //   Contact c: [SELECT Id FROM Contact]
+  // ) {
+  // }
+  // ```
+  // Instead, we want this:
+  // ```
+  // for (Contact c: [SELECT Id FROM Contact]) {
+  // }
+  // ```
+  const isQueryOrSearch =
+    node.forControl?.init?.expr?.value["@class"] ===
+      APEX_TYPES.SOQL_EXPRESSION ||
+    node.forControl?.init?.expr?.value["@class"] === APEX_TYPES.SOSL_EXPRESSION;
+  // #511 - For queries that the user opts in to manual breaks, we *don't* want
+  // the leading newline either
+  const hasForcedHardline =
+    isQueryOrSearch &&
+    (node.forControl?.init?.expr?.value?.query?.forcedHardline ||
+      node.forControl?.init?.expr?.value?.search?.forcedHardline);
+
+  // If there are own line comments in the forControl, we need to be conservative
+  // and group the doc
+  const hasOwnLineComments = node.forControl?.comments?.some(
+    (comment: AnnotatedComment) => comment.placement === "ownLine",
+  );
   if (
-    node.forControl &&
-    node.forControl.init &&
-    node.forControl.init.expr &&
-    node.forControl.init.expr.value &&
-    node.forControl.init.expr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION &&
-    !willBreak(forControlDoc) // if there are breaks, e.g. comments, we need to be conservative and group them
+    isQueryOrSearch &&
+    ((hasForcedHardline && !hasOwnLineComments) || !hasOwnLineComments)
   ) {
     parts.push(forControlDoc);
   } else {

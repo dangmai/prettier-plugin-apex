@@ -35,6 +35,7 @@ export type AnnotatedComment = AnnotatedAstNode &
     enclosingNode?: any;
     followingNode?: any;
     precedingNode?: any;
+    placement: string;
   };
 
 export function isBinaryish(node: jorje.Expr): boolean {
@@ -113,6 +114,7 @@ const METADATA_TO_IGNORE = [
   "isLastNodeInArray",
   "numberOfDottedExpressions",
   "isNextStatementOnSameLine",
+  "forcedHardline",
 ];
 
 /**

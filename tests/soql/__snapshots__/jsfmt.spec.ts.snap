@@ -66,6 +66,17 @@ class SOQLClass {
     Account[] negativeQueryNum = [SELECT Id FROM Account WHERE NumberOfEmployees > -5];
   }
 
+  void hardlineHeuristics() {
+    Account[] accounts = [SELECT Id FROM Account];
+    accounts = [
+      SELECT Id FROM Account
+    ];
+    accounts = [
+      SELECT Id
+      FROM Account
+    ];
+  }
+
   void limitBinds() {
     Integer numRows = 5;
     Contact[] contacts = [SELECT ID FROM Contact LIMIT :numRows OFFSET :numRows];
@@ -473,6 +484,15 @@ class SOQLClass {
     ];
   }
 
+  void hardlineHeuristics() {
+    Account[] accounts = [SELECT Id FROM Account];
+    accounts = [SELECT Id FROM Account];
+    accounts = [
+      SELECT Id
+      FROM Account
+    ];
+  }
+
   void limitBinds() {
     Integer numRows = 5;
     Contact[] contacts = [
@@ -839,9 +859,16 @@ class SOQLClass {
   }
 
   void multipleTypes() {
-    Contact[] a = [SELECT a.Name FROM Contact, Contact.Account a];
+    Contact[] a = [
+      SELECT a.Name
+      FROM Contact, Contact.Account a
+    ];
 
-    a = [SELECT COUNT() FROM Contact c, c.Account a WHERE a.name = 'Name'];
+    a = [
+      SELECT COUNT()
+      FROM Contact c, c.Account a
+      WHERE a.name = 'Name'
+    ];
   }
 
   void selectDistanceExpression() {
@@ -868,9 +895,18 @@ class SOQLClass {
   }
 
   void fieldGroupings() {
-    Contact[] contacts = [SELECT FIELDS(ALL) FROM Contact];
-    contacts = [SELECT FIELDS(STANDARD) FROM Contact];
-    contacts = [SELECT FIELDS(CUSTOM) FROM Contact];
+    Contact[] contacts = [
+      SELECT FIELDS(ALL)
+      FROM Contact
+    ];
+    contacts = [
+      SELECT FIELDS(STANDARD)
+      FROM Contact
+    ];
+    contacts = [
+      SELECT FIELDS(CUSTOM)
+      FROM Contact
+    ];
   }
 }
 

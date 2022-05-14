@@ -9,6 +9,19 @@ class SOSLClass {
     searchResult = [FIND :a USING PHRASE SEARCH];
     searchResult = [FIND :a USING ADVANCED SEARCH];
   }
+
+  void hardlineHeuristics() {
+    List<List<SObject>> searchResult = [FIND 'FirstLastName'];
+    searchResult = [FIND :a USING PHRASE SEARCH];
+    searchResult = [
+      FIND :a USING PHRASE SEARCH
+    ];
+    searchResult = [
+      FIND :a
+      USING PHRASE SEARCH
+    ];
+  }
+
   void inClause() {
     List<List<SObject>> searchResult;
     searchResult = [FIND 'Hello' IN ALL FIELDS];
@@ -122,6 +135,17 @@ class SOSLClass {
     searchResult = [FIND :a USING PHRASE SEARCH];
     searchResult = [FIND :a USING ADVANCED SEARCH];
   }
+
+  void hardlineHeuristics() {
+    List<List<SObject>> searchResult = [FIND 'FirstLastName'];
+    searchResult = [FIND :a USING PHRASE SEARCH];
+    searchResult = [FIND :a USING PHRASE SEARCH];
+    searchResult = [
+      FIND :a
+      USING PHRASE SEARCH
+    ];
+  }
+
   void inClause() {
     List<List<SObject>> searchResult;
     searchResult = [FIND 'Hello' IN ALL FIELDS];
@@ -136,7 +160,11 @@ class SOSLClass {
     String a = 'Local';
     searchResult = [FIND 'Hello' WITH DIVISION = 'Global'];
     searchResult = [FIND 'Hello' WITH DIVISION = :a];
-    searchResult = [FIND 'foobar' RETURNING Account WITH DIVISION = 'global'];
+    searchResult = [
+      FIND 'foobar'
+      RETURNING Account
+      WITH DIVISION = 'global'
+    ];
   }
   void withDataCategory() {
     List<List<SObject>> searchResult;

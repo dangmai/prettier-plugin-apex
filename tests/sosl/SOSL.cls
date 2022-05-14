@@ -6,6 +6,19 @@ class SOSLClass {
     searchResult = [FIND :a USING PHRASE SEARCH];
     searchResult = [FIND :a USING ADVANCED SEARCH];
   }
+
+  void hardlineHeuristics() {
+    List<List<SObject>> searchResult = [FIND 'FirstLastName'];
+    searchResult = [FIND :a USING PHRASE SEARCH];
+    searchResult = [
+      FIND :a USING PHRASE SEARCH
+    ];
+    searchResult = [
+      FIND :a
+      USING PHRASE SEARCH
+    ];
+  }
+
   void inClause() {
     List<List<SObject>> searchResult;
     searchResult = [FIND 'Hello' IN ALL FIELDS];
