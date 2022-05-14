@@ -332,6 +332,38 @@ function handleWhereExpression(
 }
 
 /**
+ * Bring leading comment before Block Statement into the block itself, e.g.:
+ * ```
+ * for (
+ *   Contact a: [SELECT Id FROM Contact] // Trailing EOL Inline comment
+ * ) {
+ *   System.debug('Hello');
+ * }
+ * ```
+ * transformed into
+ * ```
+ * for (Contact a: [SELECT Id FROM Contact]) {
+ *   // Trailing EOL Inline Comment
+ *   System.debug('Hello');
+ * }
+ * ```
+ */
+function handleBlockStatementLeadingComment(
+  comment: AnnotatedComment,
+): boolean {
+  const { followingNode } = comment;
+  if (!followingNode || followingNode["@class"] !== apexTypes.BLOCK_STATEMENT) {
+    return false;
+  }
+  if (followingNode.stmnts.length) {
+    addLeadingComment(followingNode.stmnts[0], comment);
+  } else {
+    addDanglingComment(followingNode, comment, null);
+  }
+  return true;
+}
+
+/**
  * Turn the leading comment in a long method or variable chain into the preceding
  * comment of a previous node. Without doing that, we have an awkward position
  * for the . character like so:
@@ -411,6 +443,7 @@ export function handleOwnLineComment(
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
+    handleBlockStatementLeadingComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
     handleLongChainComment(comment)
@@ -435,6 +468,7 @@ export function handleEndOfLineComment(
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
+    handleBlockStatementLeadingComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
     handleLongChainComment(comment)

@@ -16,6 +16,7 @@
 - Fix unstable leading comment formatting for ternary expressions ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/458)).
 - Add support for prettier-ignore comments in the middle of IfElseBlock ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/464)).
 - Use user input to improve line break heuristics in short SOQL/SOSL queries ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/511)).
+- Fix unstable leading comments before Block Statement.
 
 # 1.10.0
 

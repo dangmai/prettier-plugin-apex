@@ -201,8 +201,49 @@ class Comments {
     ) {
     }
     for (
+      Contact a: [SELECT Id FROM Contact]
+      // Trailing Inline SOQL For 1
+    ) {
+      System.debug('Hello');
+    }
+    for (
+      Contact a: [SELECT Id FROM Contact]
+      /* Trailing Block SOQL For 1 */
+    ) {
+      System.debug('Hello');
+    }
+    for (
+      Contact a: [SELECT Id FROM Contact] // Trailing EOL Inline comment
+    ) {
+      System.debug('Hello');
+    }
+    for (
+      Contact a: [SELECT Id FROM Contact] /* Trailing EOL Block comment */
+    ) {
+      System.debug('Hello');
+    }
+    for (
       // Inline SOQL For 2
       Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']
+    ) {
+    }
+    for (
+      Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']
+      // Trailing Inline SOQL For 2
+    ) {
+    }
+    for (
+      Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']
+      /* Trailing Block SOQL For 2 */
+    ) {
+    }
+    for (
+      Contact a: [
+        SELECT Id, Name, Description, Birthdate
+        FROM Contact
+        WHERE Id != NULL
+        // Inline SOQL for 3
+        AND Name != 'Hello']
     ) {
     }
     for (
