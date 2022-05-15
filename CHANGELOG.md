@@ -8,6 +8,10 @@
 
 - Prettier Apex has been converted to Typescript, enabling faster response time to internal jorje changes from Salesforce.
 
+## CLI Changes
+
+- Add ability to specify `host` and `port` options for built-in parsing server ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/476)).
+
 ## Formatting Changes
 
 - Fix SOQL Time literals always getting printed in UTC timezone.

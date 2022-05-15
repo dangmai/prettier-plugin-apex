@@ -7,28 +7,32 @@ import { getSerializerBinDirectory } from "./util";
 
 const waitOnPromise = util.promisify(waitOn);
 
-export async function start(
-  address: string,
-  port: number,
-): Promise<ChildProcess> {
+export async function start(host: string, port: number): Promise<ChildProcess> {
   let serializerBin = getSerializerBinDirectory();
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http.bat");
   } else {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http");
   }
-  const command = spawn(serializerBin, ["-s", "-a", "secret"]);
+  const command = spawn(serializerBin, [
+    "-s",
+    "-a",
+    "secret",
+    "-h",
+    host,
+    "-p",
+    port.toString(),
+  ]);
 
   await waitOnPromise({
-    resources: [`http://${address}:${port}/api/ast`],
+    resources: [`http://${host}:${port}/api/ast`],
   });
+  // eslint-disable-next-line no-console
+  console.log(`Server listening on http://${host}:${port}`);
 
   return command;
 }
 
-export async function stop(
-  address: string,
-  port: number,
-): Promise<AxiosResponse> {
-  return axios.post(`http://${address}:${port}/shutdown?token=secret`);
+export async function stop(host: string, port: number): Promise<AxiosResponse> {
+  return axios.post(`http://${host}:${port}/shutdown?token=secret`);
 }

@@ -1,13 +1,35 @@
 #!/usr/bin/env node
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+
 import { start } from "../src/http-server";
 
-async function setup() {
-  await start("localhost", 2117);
+async function setup(host: string, port: number) {
+  await start(host, port);
 }
 
 if (require.main === module) {
   // Support calling this directly
-  setup();
+  yargs(hideBin(process.argv))
+    .command(
+      "$0",
+      "start the built-in parsing server",
+      {
+        host: {
+          alias: "h",
+          default: "localhost",
+        },
+        port: {
+          alias: "p",
+          default: 2117,
+        },
+      },
+      (argv) => {
+        setup(argv.host, argv.port);
+      },
+    )
+    .help()
+    .parse();
 }
 
 module.exports = setup;
