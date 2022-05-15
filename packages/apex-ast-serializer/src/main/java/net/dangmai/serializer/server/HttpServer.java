@@ -6,6 +6,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -20,7 +21,8 @@ public class HttpServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
     public static void main(String[] args) throws Exception {
         Options cliOptions = new Options();
-        cliOptions.addOption("p", "port", true, "The port to listen to");
+        cliOptions.addOption("h", "host", true, "The host to listen on, default to 0.0.0.0");
+        cliOptions.addOption("p", "port", true, "The port to listen on, default to 2117");
         cliOptions.addOption("s", "shutdown", false, "Allow the server to be remotely shut down");
         cliOptions.addOption("a", "password", true, "Password to remotely shut down server");
 
@@ -28,7 +30,14 @@ public class HttpServer {
         CommandLine cmd = cliParser.parse(cliOptions, args);
 
         int port = cmd.hasOption("p") ? Integer.parseInt(cmd.getOptionValue("p")) : 2117;
-        Server server = new Server(port);
+        String host = cmd.hasOption("h") ? cmd.getOptionValue("h") : "0.0.0.0";
+        Server server = new Server();
+
+        ServerConnector httpConnector = new ServerConnector(server);
+        httpConnector.setHost(host);
+        httpConnector.setPort(port);
+        httpConnector.setIdleTimeout(-1);
+        server.addConnector(httpConnector);
 
         ServletContextHandler servletContextHandler = new ServletContextHandler(NO_SESSIONS);
         servletContextHandler.setContextPath("/api");
