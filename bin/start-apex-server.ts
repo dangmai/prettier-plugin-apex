@@ -6,6 +6,7 @@ import { start } from "../src/http-server";
 
 async function setup(host: string, port: number) {
   await start(host, port);
+  process.exit();
 }
 
 if (require.main === module) {
