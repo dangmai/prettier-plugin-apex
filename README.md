@@ -165,11 +165,11 @@ stop-apex-server
 node /path/to/library/bin/stop-apex-server.js
 ```
 
-By default, the server listens on `http://localhost:2118`.
+By default, the server listens on `http://localhost:2117`.
 This can be customized by specifying the `--host` and `--port` arguments:
 
 ```bash
-start-apex-server --host 127.0.0.1 --port 2118
+start-apex-server --host 127.0.0.1 --port 2117
 ```
 
 ## Continuous Integration
