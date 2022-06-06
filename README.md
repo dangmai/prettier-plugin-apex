@@ -169,7 +169,7 @@ By default, the server listens on `http://localhost:2117`.
 This can be customized by specifying the `--host` and `--port` arguments:
 
 ```bash
-start-apex-server --host 127.0.0.1 --port 2117
+start-apex-server --host 127.0.0.1 --port 2118
 ```
 
 ## Continuous Integration
@@ -180,7 +180,7 @@ in the context of CI/CD, for example:
 ```bash
 # Start the language server for improved parsing performance,
 # and put it in the background (*nix only) so that next commands can be run.
-nohup start-apex-server >/dev/null &
+nohup start-apex-server >/dev/null 2>&1 &
 # Wait until the server is up before sending requests
 npx wait-on http://localhost:2117/api/ast/
 # Check that Apex files are formatted according to Prettier Apex style
