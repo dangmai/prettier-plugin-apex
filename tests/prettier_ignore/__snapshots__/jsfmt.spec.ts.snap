@@ -15,6 +15,14 @@ class PrettierIgnore {
     Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
   }
 
+  public endOfLineIgnore() {
+    // The following node should not be formatted
+    Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure'); // prettier-ignore
+
+    // The following node should not be formatted
+    Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure'); /* prettier-ignore */
+  }
+
   // prettier-ignore
   public methodInlineCommentIgnore() {
     Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
@@ -71,6 +79,13 @@ class PrettierIgnore {
       anotherRecord.get(
         'Another Super Duper Long String That Will Break For Sure'
       );
+  }
+
+  public endOfLineIgnore() {
+    // The following node should not be formatted
+    Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure'); // prettier-ignore
+    // The following node should not be formatted
+    Integer result = oneRecord.get('Super Duper Long String That Will Break For Sure') + anotherRecord.get('Another Super Duper Long String That Will Break For Sure'); /* prettier-ignore */
   }
 
   // prettier-ignore

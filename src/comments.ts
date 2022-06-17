@@ -39,9 +39,6 @@ function printApexDocComment(comment: jorje.BlockComment): Doc {
 
 export function isPrettierIgnore(comment: AnnotatedComment): boolean {
   let content;
-  if (comment.leading === false) {
-    return false;
-  }
   if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
     // For simplicity sake we only support this format
     // /* prettier-ignore */
