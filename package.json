@@ -53,7 +53,7 @@
     "prettier": "2.7.1",
     "ts-jest": "28.0.5",
     "ts-migrate": "0.1.30",
-    "ts-node": "10.8.1",
+    "ts-node": "10.8.2",
     "typescript": "4.7.4"
   },
   "peerDependencies": {
