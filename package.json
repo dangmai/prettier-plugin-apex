@@ -1,5 +1,5 @@
 {
-  "name": "prettier-plugin-apex",
+  "name": "@ilyamatsuev/prettier-plugin-apex",
   "version": "1.10.0",
   "description": "Salesforce Apex plugin for Prettier",
   "main": "dist/src/index.js",
