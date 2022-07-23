@@ -5,7 +5,6 @@ public class PublicEmptyClass
 {}
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-public class PublicEmptyClass {
-}
+public class PublicEmptyClass {}
 
 `;

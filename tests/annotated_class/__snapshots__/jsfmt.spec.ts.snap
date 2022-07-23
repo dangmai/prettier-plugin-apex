@@ -6,7 +6,6 @@ exports[`Format apex: AnnotatedClass.cls: AnnotatedClass.cls 1`] = `
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 @IsTest
-class TestClass {
-}
+class TestClass {}
 
 `;

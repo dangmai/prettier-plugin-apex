@@ -5,8 +5,7 @@ class ClassDeclarationWithBlockComment {
 }
 /* Test comment */
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ClassDeclarationWithBlockComment {
-}
+class ClassDeclarationWithBlockComment {}
 /* Test comment */
 `;
 
@@ -15,8 +14,7 @@ class ClassDeclarationWithInlineComment {
 }
 // Test comment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ClassDeclarationWithInlineComment {
-}
+class ClassDeclarationWithInlineComment {}
 // Test comment
 `;
 
@@ -26,8 +24,7 @@ class ClassDeclarationWithMixedComments {
 /* Block comment 1 */
 // Another Trailing Comment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class ClassDeclarationWithMixedComments {
-} // Trailing Comment
+class ClassDeclarationWithMixedComments {} // Trailing Comment
 /* Block comment 1 */
 // Another Trailing Comment
 `;

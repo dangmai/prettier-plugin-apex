@@ -39,8 +39,8 @@ public class VariableDeclaration {
     String d = 'd';
     String e = c, d = a;
     HttpRequest request = new HttpRequest();
-    String[] stringArray = new List<String>{};
-    String[] anotherStringArray = new List<String>{ 'a', 'b' };
+    String[] stringArray = new List<String> {};
+    String[] anotherStringArray = new List<String> { 'a', 'b' };
     List<String> anotherArray = new String[1];
     String[] emptyStrings;
     Integer maxNums = 5;

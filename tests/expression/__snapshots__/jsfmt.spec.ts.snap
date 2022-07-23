@@ -334,28 +334,17 @@ class Conditional extends Object {
   void assignmentExpression() {
     Integer i = 0;
     Integer j = 1;
-    if (i = j) {
-    }
-    if (i &= j) {
-    }
-    if (i |= j) {
-    }
-    if (i ^= j) {
-    }
-    if (i += j) {
-    }
-    if (i -= j) {
-    }
-    if (i *= j) {
-    }
-    if (i /= j) {
-    }
-    if (i <<= j) {
-    }
-    if (i >>= j) {
-    }
-    if (i >>>= j) {
-    }
+    if (i = j) {}
+    if (i &= j) {}
+    if (i |= j) {}
+    if (i ^= j) {}
+    if (i += j) {}
+    if (i -= j) {}
+    if (i *= j) {}
+    if (i /= j) {}
+    if (i <<= j) {}
+    if (i >>= j) {}
+    if (i >>>= j) {}
 
     [
       SELECT Id
@@ -563,8 +552,7 @@ class Conditional extends Object {
       .Id != null;
   }
 
-  void triggerVariableExpr_inOtherSuite() {
-  }
+  void triggerVariableExpr_inOtherSuite() {}
 
   void packageVersionExpression() {
     Package.Version.Request;
@@ -801,11 +789,9 @@ class Conditional extends Object {
       .size() > 0;
   }
 
-  void javaMethodCallExpression_notNeeded() {
-  }
+  void javaMethodCallExpression_notNeeded() {}
 
-  void javaVariableExpression_notNeeded() {
-  }
+  void javaVariableExpression_notNeeded() {}
 
   void superVariableExpression() {
     super.methodCall();
@@ -872,11 +858,9 @@ class Conditional extends Object {
       .Name.Name.toString();
   }
 
-  void soqlExpression_inOtherSuite() {
-  }
+  void soqlExpression_inOtherSuite() {}
 
-  void soslExpression_inOtherSuite() {
-  }
+  void soslExpression_inOtherSuite() {}
 
   class InnerClass extends ExpressionClass {
     InnerClass() {

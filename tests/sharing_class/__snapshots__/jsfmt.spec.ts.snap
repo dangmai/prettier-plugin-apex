@@ -30,27 +30,19 @@ class SharingClass {
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class SharingClass {
-  public with sharing class PublicWithSharingClass {
-  }
+  public with sharing class PublicWithSharingClass {}
 
-  private without sharing class PrivateWithoutSharingClass {
-  }
+  private without sharing class PrivateWithoutSharingClass {}
 
-  global without sharing class GlobalWithoutSharingClass {
-  }
+  global without sharing class GlobalWithoutSharingClass {}
 
-  virtual with sharing class VirtualWithSharingClass {
-  }
+  virtual with sharing class VirtualWithSharingClass {}
 
-  abstract with sharing class AbstractWithSharingClass {
-  }
-  without sharing class WithoutSharingClass {
-  }
-  with sharing class WithSharingClass {
-  }
+  abstract with sharing class AbstractWithSharingClass {}
+  without sharing class WithoutSharingClass {}
+  with sharing class WithSharingClass {}
 
-  inherited sharing class InheritedSharingClass {
-  }
+  inherited sharing class InheritedSharingClass {}
 }
 
 `;

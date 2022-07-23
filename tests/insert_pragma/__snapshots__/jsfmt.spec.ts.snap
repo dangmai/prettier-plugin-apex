@@ -5,7 +5,6 @@ class PragmaClass {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /** @format */
 
-class PragmaClass {
-}
+class PragmaClass {}
 
 `;

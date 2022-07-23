@@ -3,7 +3,6 @@
 exports[`Format apex: WithFinalNewLine.cls: WithFinalNewLine.cls 1`] = `
 class WithFinalNewLine {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-class WithFinalNewLine {
-}
+class WithFinalNewLine {}
 
 `;

@@ -349,12 +349,10 @@ class EmptyLine {
   String b;
 
   String a {
-    get {
-    }
+    get {}
   }
   String a {
-    get {
-    }
+    get {}
   }
 
   enum NUMBER {
@@ -362,10 +360,8 @@ class EmptyLine {
     TWO
   }
 
-  enum NUMBER {
-  }
-  void blockStatement() {
-  }
+  enum NUMBER {}
+  void blockStatement() {}
 
   void variableDeclarations() {
     Integer a = 1;
@@ -399,8 +395,7 @@ class EmptyLine {
 
     i--;
   }
-  void blockStatementWithoutEmptyLine() {
-  }
+  void blockStatementWithoutEmptyLine() {}
   void dmlInsert() {
     insert a;
 
@@ -497,20 +492,11 @@ class EmptyLine {
 
   void ifElseBlock() {
     Integer a = 1;
-    if (a == 1) {
-    } else if (a == 2) {
-    } else {
-    }
+    if (a == 1) {} else if (a == 2) {} else {}
 
-    if (a == 1) {
-    } else if (a == 2) {
-    } else {
-    }
+    if (a == 1) {} else if (a == 2) {} else {}
 
-    if (a == 1) {
-    } else if (a == 2) {
-    } else {
-    }
+    if (a == 1) {} else if (a == 2) {} else {}
 
     if (a == 1)
       a = 2;
@@ -524,77 +510,53 @@ class EmptyLine {
   }
 
   void tryCatchBlock() {
-    try {
-    } catch (Exception e) {
-    } finally {
-    }
+    try {} catch (Exception e) {} finally {}
 
-    try {
-    } catch (Exception e) {
-    } finally {
-    }
+    try {} catch (Exception e) {} finally {}
 
-    try {
-    } catch (Exception e) {
-    } finally {
-    }
+    try {} catch (Exception e) {} finally {}
   }
 
   void forLoop() {
-    for (String a : listA) {
-    }
+    for (String a : listA) {}
 
-    for (String a : listA) {
-    }
+    for (String a : listA) {}
 
-    for (String a : listA) {
-    }
+    for (String a : listA) {}
   }
 
   void whileLoop() {
-    while (i < 5) {
-    }
+    while (i < 5) {}
 
-    while (i < 5) {
-    }
+    while (i < 5) {}
 
-    while (i < 5) {
-    }
+    while (i < 5) {}
   }
 
   void doLoop() {
-    do {
-    } while (i < 5);
+    do {} while (i < 5);
 
-    do {
-    } while (i < 5);
+    do {} while (i < 5);
 
-    do {
-    } while (i < 5);
+    do {} while (i < 5);
   }
 
   class ClassDeclaration {
-    class InnerClassMember {
-    }
+    class InnerClassMember {}
 
-    class InnerClassMemberTwo {
-    }
+    class InnerClassMemberTwo {}
   }
 
   class InnerClassTwo {
-    interface InnerInterfaceMember {
-    }
+    interface InnerInterfaceMember {}
 
-    interface InnerInterfaceMemberTwo {
-    }
+    interface InnerInterfaceMemberTwo {}
   }
 
   class InnerClassThree {
-    enum InnerEnumMember {
-    }
+    enum InnerEnumMember {}
 
-    enum InnerEnumMemberTwo {
-    }
+    enum InnerEnumMemberTwo {}
   }
 
   class InnerClassFour {
@@ -609,8 +571,7 @@ class EmptyLine {
     String fieldMemberTwo;
   }
 
-  interface InterfaceDeclaration {
-  }
+  interface InterfaceDeclaration {}
 
   void switchStatement() {
     switch on i {
@@ -620,13 +581,11 @@ class EmptyLine {
     }
 
     switch on i {
-      when 1 {
-      }
+      when 1 {}
     }
 
     switch on i {
-      when 1 {
-      }
+      when 1 {}
     }
   }
 

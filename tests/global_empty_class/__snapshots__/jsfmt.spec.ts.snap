@@ -5,7 +5,6 @@ global class GlobalEmptyClass
 {}
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-global class GlobalEmptyClass {
-}
+global class GlobalEmptyClass {}
 
 `;

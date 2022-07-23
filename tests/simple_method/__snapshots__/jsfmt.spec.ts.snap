@@ -70,8 +70,7 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
 }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface {
-  public String longMethodNameWithNoParamsShouldNotBreakInEmptyParamListAndYetSomehowDoes() {
-  }
+  public String longMethodNameWithNoParamsShouldNotBreakInEmptyParamListAndYetSomehowDoes() {}
 
   public String sayHello() {
     return this.sayHello('Hello', 'World');
@@ -131,10 +130,10 @@ public class SimpleMethod implements FirstSampleInterface, SecondSampleInterface
   void longMethodCall() {
     VeryLongOuterClassNameExtension.InnerWrapperClassName innerClass = new VeryLongOuterClassNameExtension.InnerWrapperClassName();
     controller.addFields(
-      new List<String>{ 'Very_Long_SObject_Chain__r.An_Inner_SObject__r.Name' }
+      new List<String> { 'Very_Long_SObject_Chain__r.An_Inner_SObject__r.Name' }
     );
     controller.addFields(
-      new List<String>{
+      new List<String> {
         'Very_Long_SObject_Chain__r.An_Inner_SObject__r.Name',
         'Another_Long_SObject_Chain__r.Name'
       }

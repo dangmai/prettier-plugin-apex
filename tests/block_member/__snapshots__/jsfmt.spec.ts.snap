@@ -57,12 +57,10 @@ class BlockMember {
 
   String propertyMemberWithGetSet { get; set; }
   String propertyMemberWithGet {
-    get {
-    }
+    get {}
   }
   String propertyMemberWithSet {
-    set {
-    }
+    set {}
   }
 
   public String propertyMemberWithGetPrivateSet {

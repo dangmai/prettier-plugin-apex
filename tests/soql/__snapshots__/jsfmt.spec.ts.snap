@@ -369,7 +369,7 @@ class SOQLClass {
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 class SOQLClass {
   public void simpleSOQL() {
-    Id[] contactIds = new List<Id>{};
+    Id[] contactIds = new List<Id> {};
     Contact[] contacts = [
       SELECT
         Id,

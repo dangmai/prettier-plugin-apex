@@ -105,10 +105,10 @@ class NewObject {
       anotherSuperDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
     );
     List<String> aCopy = new List<String>(a);
-    List<String> b = new List<String>{};
-    String[] c = new List<String>{};
-    String[] d = new List<String>{ 'a', 'b' };
-    String[] e = new List<String>{
+    List<String> b = new List<String> {};
+    String[] c = new List<String> {};
+    String[] d = new List<String> { 'a', 'b' };
+    String[] e = new List<String> {
       'Long string number one',
       'Long string number two'
     };
@@ -133,9 +133,9 @@ class NewObject {
       superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak &&
       anotherSuperDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
     );
-    Set<String> b = new Set<String>{};
-    Set<String> c = new Set<String>{ 'a', 'b' };
-    Set<String> c = new Set<String>{
+    Set<String> b = new Set<String> {};
+    Set<String> c = new Set<String> { 'a', 'b' };
+    Set<String> c = new Set<String> {
       'Long string number one',
       'Long string number two'
     };
@@ -157,17 +157,17 @@ class NewObject {
       superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak &&
       anotherSuperDuperVeryInsanelyLongVariableNameThatWillSurelyBreak
     );
-    Map<String, String> b = new Map<String, String>{};
-    Map<String, String> c = new Map<String, String>{ 'a' => 'b', 'c' => 'd' };
-    Map<String, String> c = new Map<String, String>{
+    Map<String, String> b = new Map<String, String> {};
+    Map<String, String> c = new Map<String, String> { 'a' => 'b', 'c' => 'd' };
+    Map<String, String> c = new Map<String, String> {
       'Long string key' => 'Long string value',
       'Long string key two' => 'Long string value two'
     };
-    Map<String, String[]> d = new Map<String, String[]>{
-      'a' => new List<String>{ 'a', 'b' },
-      'b' => new List<String>{ 'c', 'd' }
+    Map<String, String[]> d = new Map<String, String[]> {
+      'a' => new List<String> { 'a', 'b' },
+      'b' => new List<String> { 'c', 'd' }
     };
-    Map<String, Decimal> fmaIntegerParameterNameDefaultValue = new Map<string, decimal>{
+    Map<String, Decimal> fmaIntegerParameterNameDefaultValue = new Map<string, decimal> {
       'Parameter1' => 1,
       'Parameter2' => 0,
       'Parameter3' => 500
@@ -187,12 +187,12 @@ class NewObject {
     );
     Account account = new Account(
       Body__c = JSON.serialize(
-        new Map<String, Object>{ 'Content' => 'Hello', 'World' => 'There' }
+        new Map<String, Object> { 'Content' => 'Hello', 'World' => 'There' }
       )
     );
     Account account = new Account(
       Body__c = JSON.serialize(
-        new Map<String, Object>{
+        new Map<String, Object> {
           'Content' => 'Hello',
           'World' => 'There',
           'Hi' => 'Yes'
@@ -214,17 +214,17 @@ class NewObject {
   }
 
   void newComplicatedTypesTest() {
-    Map<String, Map<String, String>> a = new Map<String, Map<String, String>>{
-      'a' => new Map<String, String>{ 'b' => 'c' },
-      'd' => new Map<String, String>{ 'e' => 'f' }
+    Map<String, Map<String, String>> a = new Map<String, Map<String, String>> {
+      'a' => new Map<String, String> { 'b' => 'c' },
+      'd' => new Map<String, String> { 'e' => 'f' }
     };
-    Map<String, List<String>> b = new Map<String, List<String>>{
+    Map<String, List<String>> b = new Map<String, List<String>> {
       'a' => new String[5],
-      'b' => new List<String>{ 'c', 'd', 'e' }
+      'b' => new List<String> { 'c', 'd', 'e' }
     };
-    Map<List<String>, List<String>> c = new Map<List<String>, List<String>>{
-      new List<String>{ 'a' } => new List<String>{ 'b', 'c' },
-      new List<String>{ 'd' } => new List<String>{ 'e', 'f' }
+    Map<List<String>, List<String>> c = new Map<List<String>, List<String>> {
+      new List<String> { 'a' } => new List<String> { 'b', 'c' },
+      new List<String> { 'd' } => new List<String> { 'e', 'f' }
     };
     List<List<String>> d = new List<List<String>>(5);
   }

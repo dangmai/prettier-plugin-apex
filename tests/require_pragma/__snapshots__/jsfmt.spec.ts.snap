@@ -9,8 +9,7 @@ class ClassWithFormatPragma {}
 /**
  * @format
  */
-class ClassWithFormatPragma {
-}
+class ClassWithFormatPragma {}
 
 `;
 
@@ -23,8 +22,7 @@ class ClassWithPrettierPragma {}
 /**
  * @prettier
  */
-class ClassWithPrettierPragma {
-}
+class ClassWithPrettierPragma {}
 
 `;
 
@@ -33,8 +31,7 @@ exports[`Format apex: ClassWithShortFormatPragma.cls: ClassWithShortFormatPragma
 class ClassWithShortFormatPragma {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /** @format */
-class ClassWithShortFormatPragma {
-}
+class ClassWithShortFormatPragma {}
 
 `;
 
@@ -43,8 +40,7 @@ exports[`Format apex: ClassWithShortPrettierPragma.cls: ClassWithShortPrettierPr
 class ClassWithShortPrettierPragma {}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 /** @prettier */
-class ClassWithShortPrettierPragma {
-}
+class ClassWithShortPrettierPragma {}
 
 `;
 

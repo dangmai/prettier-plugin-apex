@@ -797,7 +797,7 @@ class Comments {
     List<Integer> dayList;
     Set<Integer> daySet;
     Map<Integer, Integer> dayMap;
-    dayList = new List<Integer>{
+    dayList = new List<Integer> {
       0, // Sunday
       1, // Monday
       2, // Tuesday
@@ -807,7 +807,7 @@ class Comments {
       6 // Saturday
     }; // Final list trailing inline comment
 
-    dayList = new List<Integer>{
+    dayList = new List<Integer> {
       0 /* Sunday */,
       1 /* Monday */,
       2 /* Tuesday */,
@@ -817,7 +817,7 @@ class Comments {
       6 /* Saturday */
     }; /* Final list trailing block comment */
 
-    daySet = new Set<Integer>{
+    daySet = new Set<Integer> {
       0, // Sunday
       1, // Monday
       2, // Tuesday
@@ -827,7 +827,7 @@ class Comments {
       6 // Saturday
     }; // Final set trailing inline comment
 
-    daySet = new Set<Integer>{
+    daySet = new Set<Integer> {
       0 /* Sunday */,
       1 /* Monday */,
       2 /* Tuesday */,
@@ -837,7 +837,7 @@ class Comments {
       6 /* Saturday */
     }; /* Final set trailing block comment */
 
-    dayMap = new Map<Integer>{
+    dayMap = new Map<Integer> {
       0 => 0, // Sunday
       1 => 1, // Monday
       2 => 2, // Tuesday
@@ -847,7 +847,7 @@ class Comments {
       6 => 6 // Saturday
     }; // Final map trailing inline comment
 
-    dayMap = new Map<Integer, Integer>{
+    dayMap = new Map<Integer, Integer> {
       0 => 0 /* Sunday */,
       1 => 1 /* Monday */,
       2 => 2 /* Tuesday */,
@@ -989,8 +989,7 @@ class Comments {
         FROM Contact
         WHERE Id != NULL AND Name != 'Hello'
       ]
-    ) {
-    }
+    ) {}
     for (Contact a : [
       SELECT Id, Name, Description, Birthdate
       FROM Contact
@@ -1012,21 +1011,17 @@ class Comments {
         Id != NULL
         // Inline SOQL for 3
         AND Name != 'Hello'
-    ]) {
-    }
+    ]) {}
     for (
       /* Block SOQL For 1 */
       Contact a : [SELECT Id FROM Contact]
-    ) {
-    }
-    for (/* Block SOQL For 2 */ Contact a : [SELECT Id FROM Contact]) {
-    }
+    ) {}
+    for (/* Block SOQL For 2 */ Contact a : [SELECT Id FROM Contact]) {}
     for (/* Block SOQL For 2 */ Contact a : [
       SELECT Id, Name, Description, Birthdate
       FROM Contact
       WHERE Id != NULL AND Name != 'Hello'
-    ]) {
-    }
+    ]) {}
   }
 
   void trailingCommentAfterStatement() {
@@ -1124,14 +1119,11 @@ class Comments {
 
     switch on s {
       // January comment
-      when JANUARY {
-      }
+      when JANUARY {}
       // February comment
-      when FEBRUARY {
-      }
+      when FEBRUARY {}
       // Default
-      when else {
-      }
+      when else {}
     }
 
     switch on s {
@@ -1151,14 +1143,11 @@ class Comments {
 
     switch on s {
       /* January comment */
-      when JANUARY {
-      }
+      when JANUARY {}
       /* February comment */
-      when FEBRUARY {
-      }
+      when FEBRUARY {}
       /* Default */
-      when else {
-      }
+      when else {}
     }
   }
 
@@ -1508,15 +1497,13 @@ class Comments {
     seeAllData=true // Method annotation inline comment 1
     //isParallel = false // Method annotation inline comment 2
   )
-  void methodAnnotationInlineComment() {
-  }
+  void methodAnnotationInlineComment() {}
 
   @isTest(
     seeAllData=true /* Method annotation block comment 1 */
     /*isParallel = false // Method annotation block comment 2 */
   )
-  void methodAnnotationBlockComment() {
-  }
+  void methodAnnotationBlockComment() {}
 }
 // Trailing Inline Comment
 

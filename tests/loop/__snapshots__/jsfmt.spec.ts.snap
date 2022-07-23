@@ -155,8 +155,7 @@ class LoopClass {
     ) {
       System.debug(count);
     }
-    for (;;) {
-    }
+    for (;;) {}
     for (Integer i; i < 4; i++) {
       System.debug(i);
     }
@@ -170,8 +169,7 @@ class LoopClass {
       }
     }
 
-    for (Integer i = 0; i < 10; i++) {
-    }
+    for (Integer i = 0; i < 10; i++) {}
 
     Contact[] contacts = new List<Contact>{};
     for (Contact a : contacts) {
@@ -192,8 +190,7 @@ class LoopClass {
     ]) {
       System.debug(a);
     }
-    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {
-    }
+    for (Integer i = [SELECT COUNT() FROM Contact]; i < 0; i--) {}
     for (Contact a : [
       SELECT Id
       FROM Contact
@@ -227,8 +224,7 @@ class LoopClass {
     ]) {
       System.debug(a);
     }
-    for (Integer i = [FIND 'Hello' IN ALL FIELDS]; i < 0; i--) {
-    }
+    for (Integer i = [FIND 'Hello' IN ALL FIELDS]; i < 0; i--) {}
     for (SObject[] a : [
       FIND 'Just Barely Out Of Space For This Line'
       IN ALL FIELDS
@@ -256,8 +252,7 @@ class LoopClass {
         continue;
       }
     }
-    while (i < 5) {
-    }
+    while (i < 5) {}
 
     while (
       i > 5000000 &&
@@ -285,10 +280,8 @@ class LoopClass {
         continue;
       }
     } while (count < 10);
-    do {
-    } while (count < 10);
-    do {
-    } while (
+    do {} while (count < 10);
+    do {} while (
       i > 5000000 &&
       i < 34034034 &&
       i != 384294723 &&
