@@ -348,12 +348,8 @@ class EmptyLine {
 
   String b;
 
-  String a {
-    get {}
-  }
-  String a {
-    get {}
-  }
+  String a { get {} }
+  String a { get {} }
 
   enum NUMBER {
     ONE,
@@ -505,8 +501,7 @@ class EmptyLine {
     else
       a = 4;
 
-    if (a == 1) {
-    }
+    if (a == 1) {}
   }
 
   void tryCatchBlock() {

@@ -216,7 +216,7 @@ class DMLClass {
   }
   void mergeTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
-    Id[] accountIds = new List<Id>{ accountId };
+    Id[] accountIds = new List<Id> { accountId };
     Account account = new Account(Id = accountId, Name = 'Acme');
     Account anotherAccount = new Account(Id = accountId, Name = 'Another Acme');
     Account[] account = new List<Account> {

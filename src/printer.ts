@@ -506,10 +506,12 @@ function handleTriggerDeclarationUnit(
   );
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+    parts.push(hardline);
   } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
+    parts.push(hardline);
   }
-  parts.push(dedent(concat([hardline, "}"])));
+  parts.push("}");
   return concat(parts);
 }
 
@@ -563,10 +565,12 @@ function handleInterfaceDeclaration(
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+    parts.push(hardline);
   } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
+    parts.push(hardline);
   }
-  parts.push(concat([hardline, "}"]));
+  parts.push("}");
   return concat(parts);
 }
 
@@ -627,10 +631,12 @@ function handleClassDeclaration(
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+    parts.push(hardline);
   } else if (memberDocs.length > 0) {
     parts.push(indent(concat([hardline, ...memberDocs])));
+    parts.push(hardline);
   }
-  parts.push(concat([hardline, "}"]));
+  parts.push("}");
   return concat(parts);
 }
 
@@ -926,12 +932,14 @@ function handleEnumDeclaration(
   parts.push("{");
   if (danglingCommentDocs.length > 0) {
     parts.push(indent(concat([hardline, ...danglingCommentDocs])));
+    parts.push(hardline);
   } else if (memberDocs.length > 0) {
     parts.push(
       indent(concat([hardline, join(concat([",", hardline]), memberDocs)])),
     );
+    parts.push(hardline);
   }
-  parts.push(concat([hardline, "}"]));
+  parts.push("}");
   return concat(parts);
 }
 

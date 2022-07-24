@@ -171,7 +171,7 @@ class LoopClass {
 
     for (Integer i = 0; i < 10; i++) {}
 
-    Contact[] contacts = new List<Contact>{};
+    Contact[] contacts = new List<Contact> {};
     for (Contact a : contacts) {
       System.debug(a);
     }

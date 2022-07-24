@@ -964,8 +964,7 @@ class Comments {
     for (
       // Inline SOQL For 1
       Contact a : [SELECT Id FROM Contact]
-    ) {
-    }
+    ) {}
     for (Contact a : [SELECT Id FROM Contact]) {
       // Trailing Inline SOQL For 1
       System.debug('Hello');
@@ -1315,8 +1314,7 @@ class Comments {
       // In between Inline Comment 4
     }
 
-    if (true) {
-    } else {
+    if (true) {} else {
       // In between Inline Comment 5
       System.debug('Hello');
     }
@@ -1335,8 +1333,7 @@ class Comments {
       /* In between Block Comment 4 */
     }
 
-    if (true) {
-    } else {
+    if (true) {} else {
       /* In between Block Comment 5 */
       System.debug('Hello');
     }
