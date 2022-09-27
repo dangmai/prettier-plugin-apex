@@ -59,6 +59,18 @@ run {
   standardInput = System.in
 }
 
+// By default Gradle embeds extremely long CLASSPATH,
+// which may fail on Windows because of path length limitation.
+// This issue happens on Prettier Apex: https://github.com/dangmai/prettier-plugin-apex/issues/645
+// This workaround is from https://gist.github.com/jlmelville/2bfe9277e9e2c0ff79b6
+tasks.withType(CreateStartScripts).each { task ->
+  task.doLast {
+    String text = task.windowsScript.text
+    text = text.replaceFirst(/(set CLASSPATH=%APP_HOME%\\lib\\).*/, { "${it[1]}*" })
+    task.windowsScript.write text
+  }
+}
+
 tasks.withType(AbstractArchiveTask) {
   // By default, the result ZIP archive is not reproducible,
   // i.e. running `gradle clean distZip` at different times
