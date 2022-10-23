@@ -233,6 +233,8 @@ export const APEX_TYPES = {
     "apex.jorje.data.soql.DistanceFunctionExpr" as const,
   GEOLOCATION_LITERAL:
     "apex.jorje.data.soql.Geolocation$GeolocationLiteral" as const,
+  GEOLOCATION_EXPRESSION:
+    "apex.jorje.data.soql.Geolocation$GeolocationExpr" as const,
   NUMBER_LITERAL: "apex.jorje.data.soql.NumberClause$NumberLiteral" as const,
   NUMBER_EXPRESSION: "apex.jorje.data.soql.NumberClause$NumberExpr" as const,
   QUERY_LITERAL_EXPRESSION:

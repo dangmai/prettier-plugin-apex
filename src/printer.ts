@@ -2968,6 +2968,7 @@ nodeHandler[APEX_TYPES.WHERE_DISTANCE_EXPRESSION] =
 nodeHandler[APEX_TYPES.DISTANCE_FUNCTION_EXPRESSION] =
   handleDistanceFunctionExpression;
 nodeHandler[APEX_TYPES.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
+nodeHandler[APEX_TYPES.GEOLOCATION_EXPRESSION] = handlePassthroughCall("expr");
 nodeHandler[APEX_TYPES.NUMBER_LITERAL] = handlePassthroughCall("number", "$");
 nodeHandler[APEX_TYPES.NUMBER_EXPRESSION] = handlePassthroughCall("expr");
 nodeHandler[APEX_TYPES.QUERY_LITERAL_EXPRESSION] =

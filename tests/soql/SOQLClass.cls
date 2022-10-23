@@ -226,6 +226,9 @@ class SOQLClass {
       ORDER BY DISTANCE(Location__c, GEOLOCATION(37.775,-122.418), 'mi')
       LIMIT 10
     ];
+    Contact[] geoLocationExprs = [
+      SELECT Id FROM Contact ORDER BY Distance(MailingAddress, :resourceRequestGeoLocation, 'km')
+    ];
     Decimal lat;
     Decimal lon;
     return [
