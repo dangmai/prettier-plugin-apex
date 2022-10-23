@@ -16,15 +16,15 @@ jobs:
       fail-fast: false
       matrix:
         node:
+          - "19"
           - "18"
-          - "17"
           - "16"
           - "14"
         java:
           - "17"
           - "11"
         include:
-          - node: "16"
+          - node: "18"
             java: "11"
             ENABLE_CODE_COVERAGE: true
             ENABLE_INTEGRATION_TESTS: true
