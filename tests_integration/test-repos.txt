@@ -24,6 +24,5 @@ https://github.com/SalesforceFoundation/Households.git
 https://github.com/SalesforceFoundation/kanban-board-rpt.git
 https://github.com/SalesforceFoundation/Volunteers-for-Salesforce.git
 https://github.com/SalesforceFoundation/Relationships.git
-https://github.com/SalesforceFoundation/CampaignTools.git
 https://github.com/SalesforceFoundation/Affiliations.git
 https://github.com/SalesforceFoundation/Contacts_and_Organizations.git
