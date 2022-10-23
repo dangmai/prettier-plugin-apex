@@ -2,7 +2,12 @@
 
 import prettier, { AstPath, Doc, ParserOptions } from "prettier";
 
-import { AnnotatedComment, GenericComment, isApexDocComment } from "./util";
+import {
+  AnnotatedComment,
+  GenericComment,
+  isApexDocComment,
+  isBinaryish,
+} from "./util";
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 
 const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
@@ -329,10 +334,11 @@ function handleWhereExpression(
 }
 
 /**
- * Bring leading comment before Block Statement into the block itself, e.g.:
+ * Bring leading comment before Block Statement into the block itself:
  * ```
  * for (
- *   Contact a: [SELECT Id FROM Contact] // Trailing EOL Inline comment
+ *   Contact a: [SELECT Id FROM Contact]
+ *   // Trailing EOL Inline comment
  * ) {
  *   System.debug('Hello');
  * }
@@ -357,6 +363,27 @@ function handleBlockStatementLeadingComment(
   } else {
     addDanglingComment(followingNode, comment, null);
   }
+  return true;
+}
+
+/**
+ * In a binaryish expression, if there is an end of line comment, we want to
+ * attach it to the right child expression instead of the entire binaryish
+ * expression, because doing the latter can lead to unstable comments in
+ * certain situations.
+ */
+function handleBinaryishExpressionRightChildTrailingComment(
+  comment: AnnotatedComment,
+) {
+  const { precedingNode } = comment;
+  if (
+    comment.placement !== "endOfLine" ||
+    !precedingNode ||
+    !isBinaryish(precedingNode)
+  ) {
+    return false;
+  }
+  addTrailingComment(precedingNode.right, comment);
   return true;
 }
 
@@ -465,6 +492,7 @@ export function handleEndOfLineComment(
     handleDanglingComment(comment) ||
     handleInBetweenConditionalComment(comment, sourceCode) ||
     handleInBetweenTryCatchFinallyComment(comment) ||
+    handleBinaryishExpressionRightChildTrailingComment(comment) ||
     handleBlockStatementLeadingComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||

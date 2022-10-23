@@ -443,6 +443,28 @@ class Comments {
         j
       /* Comments */
       ;
+
+    if (
+      record.isNew() // end of line comment for left child in binaryish expression 1
+      || record.getMethod() != null
+    ) {
+    }
+    if (
+      record.isNew()
+      || record.getMethod() != null // end of line comment for right child in binaryish expression 1
+    ) {
+    }
+    if (
+      record.isNew() // end of line comment for left child in binaryish expression 2
+      || record.getMethod() != null // end of line comment for right child in binaryish expression 2
+    ) {
+    }
+    if (
+      record.isNew() || record.getMethod() != null // small eol
+    ) {
+    }
+    if (record.isNew() || record.getMethod() != null) { // small eol 2
+    }
   }
 
   void commentInSOQL() {

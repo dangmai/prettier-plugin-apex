@@ -23,6 +23,7 @@
 - Use user input to improve line break heuristics in short SOQL/SOSL queries ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/511)).
 - Fix unstable leading comments before Block Statement.
 - Support trailing `prettier-ignore` comments ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/567)).
+- Fix unstable end of line comments in binaryish expressions.
 
 # 1.10.0
 
