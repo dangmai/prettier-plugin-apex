@@ -19,7 +19,7 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:prod": "tsc --project tsconfig.prod.json",
+    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json",
     "dev": "tsc --watch",
     "pretest": "npm run lint && npm run build",
     "test": "jest",
@@ -28,6 +28,7 @@
     "stop-server": "ts-node bin/stop-apex-server.ts",
     "lint": "eslint \"{src,tests_config}/**/*.{js,ts}\"",
     "prettier": "prettier --write \"{src,tests_config}/**/*.{js,ts}\" \"./*.md\"",
+    "prepack": "npm run build:prod",
     "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=."
   },
   "keywords": [
@@ -52,6 +53,7 @@
     "jest": "29.2.1",
     "jest-snapshot-serializer-raw": "1.2.0",
     "prettier": "2.7.1",
+    "rimraf": "^3.0.2",
     "ts-jest": "29.0.3",
     "ts-migrate": "0.1.34",
     "ts-node": "10.9.1",
