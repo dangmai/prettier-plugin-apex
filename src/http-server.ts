@@ -34,5 +34,9 @@ export async function start(host: string, port: number): Promise<ChildProcess> {
 }
 
 export async function stop(host: string, port: number): Promise<AxiosResponse> {
-  return axios.post(`http://${host}:${port}/shutdown?token=secret`);
+  return axios.post(`http://${host}:${port}/shutdown`, null, {
+    params: {
+      token: "secret",
+    },
+  });
 }
