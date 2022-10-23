@@ -7,6 +7,7 @@ on:
     - cron: '0 8 * * *'
   repository_dispatch:
     types: manual-test-run
+  workflow_dispatch:
 
 jobs:
   functional-tests:
@@ -30,7 +31,7 @@ jobs:
             ENABLE_DEPLOYMENT: true
     env:
       ENABLE_CODE_COVERAGE: ${{ matrix.ENABLE_CODE_COVERAGE }}
-      RUN_INTEGRATION_TESTS: ${{ matrix.ENABLE_INTEGRATION_TESTS && (github.event_name == 'schedule' || github.event_name == 'repository_dispatch' || startsWith(github.ref, 'refs/tags')) }}
+      RUN_INTEGRATION_TESTS: ${{ matrix.ENABLE_INTEGRATION_TESTS && (github.event_name == 'schedule' || github.event_name == 'repository_dispatch' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags')) }}
       RUN_DEPLOYMENT: ${{ matrix.ENABLE_DEPLOYMENT && startsWith(github.ref, 'refs/tags') }}
     name: Run tests on NodeJS ${{ matrix.node }} and Java ${{ matrix.java }}
 
