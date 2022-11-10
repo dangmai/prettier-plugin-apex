@@ -1,7 +1,7 @@
 buildscript {
   dependencies {
     // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
-    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '2.37.1128'
+    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.0.1157'
   }
 }
 
@@ -129,7 +129,7 @@ dependencies {
   implementation group: 'commons-io', name: 'commons-io', version: '2.11.0'
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
-  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '2.37.1128'
+  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.0.1157'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.1'
