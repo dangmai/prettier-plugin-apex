@@ -1029,6 +1029,10 @@ function handleEnumCase(path: AstPath, print: printFn): Doc {
 }
 
 function handleInputParameters(path: AstPath, print: printFn): Doc[] {
+  // In most cases, the descendant nodes inside `inputParameters` will create
+  // their own groups. However, in certain circumstances (i.e. with binaryish
+  // behavior), they rely on groups created by their parents. That's why we
+  // wrap each inputParameter in a group here. See #693 for an example case.
   return path.map(print, "inputParameters").map((paramDoc) => group(paramDoc));
 }
 
