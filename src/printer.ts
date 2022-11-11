@@ -177,6 +177,24 @@ function handleBinaryishExpression(path: AstPath, print: printFn): Doc {
   const isTopMostParentNodeWithoutGrouping =
     isNodeSamePrecedenceAsLeftChild && !isNestedExpression;
 
+  // If this expression is directly inside parentheses, we want to give it
+  // an extra level indentation, i.e.:
+  // ```
+  // createObject(
+  //   firstBoolean &&
+  //      secondBoolean
+  // );
+  // ```
+  // This is different behavior vs when the expression is in a variable
+  // declaration, i.e.:
+  // ```
+  // firstBoolean =
+  //   secondBoolean &&
+  //   thirdBoolean;
+  // ```
+  // This behavior is consistent with how upstream formats Javascript
+  const shouldIndentTopMostExpression = node.insideParenthesis;
+
   if (
     isLeftChildNodeWithoutGrouping ||
     leftChildNodeSamePrecedenceAsRightChildNode ||
@@ -185,7 +203,7 @@ function handleBinaryishExpression(path: AstPath, print: printFn): Doc {
     docs.push(leftDoc);
     docs.push(" ");
     docs.push(concat([operationDoc, line, rightDoc]));
-    return concat(docs);
+    return shouldIndentTopMostExpression ? indentConcat(docs) : concat(docs);
   }
   if (hasRightChildNodeWithoutGrouping) {
     docs.push(group(leftDoc));
@@ -1010,8 +1028,12 @@ function handleEnumCase(path: AstPath, print: printFn): Doc {
   return join(".", path.map(print, "identifiers"));
 }
 
+function handleInputParameters(path: AstPath, print: printFn): Doc[] {
+  return path.map(print, "inputParameters").map((paramDoc) => group(paramDoc));
+}
+
 function handleRunAsBlock(path: AstPath, print: printFn): Doc {
-  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = handleInputParameters(path, print);
   const statementDoc: Doc = path.call(print, "stmnt");
 
   const parts: Doc[] = [];
@@ -1138,7 +1160,7 @@ function handleVariableDeclaration(path: AstPath, print: printFn): Doc {
 }
 
 function handleNewStandard(path: AstPath, print: printFn): Doc {
-  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = handleInputParameters(path, print);
   const parts: Doc[] = [];
   // Type
   parts.push(path.call(print, "type"));
@@ -1191,7 +1213,7 @@ function handleThisMethodCallExpression(path: AstPath, print: printFn): Doc {
   parts.push("this");
   parts.push("(");
   parts.push(softline);
-  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = handleInputParameters(path, print);
   parts.push(join(concat([",", line]), paramDocs));
   parts.push(dedent(softline));
   parts.push(")");
@@ -1203,7 +1225,7 @@ function handleSuperMethodCallExpression(path: AstPath, print: printFn): Doc {
   parts.push("super");
   parts.push("(");
   parts.push(softline);
-  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = handleInputParameters(path, print);
   parts.push(join(concat([",", line]), paramDocs));
   parts.push(dedent(softline));
   parts.push(")");
@@ -1234,7 +1256,7 @@ function handleMethodCallExpression(path: AstPath, print: printFn): Doc {
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs: Doc[] = path.map(print, "names");
-  const paramDocs: Doc[] = path.map(print, "inputParameters");
+  const paramDocs: Doc[] = handleInputParameters(path, print);
 
   const resultParamDoc =
     paramDocs.length > 0
@@ -1352,7 +1374,7 @@ function handleJavaMethodCallExpression(path: AstPath, print: printFn): Doc {
   parts.push(join(".", path.map(print, "names")));
   parts.push("(");
   parts.push(softline);
-  parts.push(join(concat([",", line]), path.map(print, "inputParameters")));
+  parts.push(join(concat([",", line]), handleInputParameters(path, print)));
   parts.push(dedent(softline));
   parts.push(")");
   return groupIndentConcat(parts);

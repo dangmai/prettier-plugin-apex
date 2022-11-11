@@ -1,8 +1,14 @@
+# Unreleased
+
+## Formatting Changes
+
+- Fix binaryish expressions having wrong indentation inside parentheses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/693)).
+
 # 1.11.0
 
 ## Dependency Changes
 
-- Drop support for NodeJS < 14
+- Drop support for NodeJS < 14.
 
 ## Internal Changes
 

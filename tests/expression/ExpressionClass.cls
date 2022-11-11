@@ -57,6 +57,21 @@ class Conditional extends Object {
       'together.';
 
     myVeryLongIntegerVariable = aVeryLongInteger + anotherVeryLongInteger * yetAnotherLongInterger - finallyThisVariable;
+
+    UserWrapper user = new UsernameWrapper(
+      foo.Active__c == true && foo.Status__c == 'Active'
+    );
+    user = new UsernameWrapper(
+      foo.Very_Long_Property_Name_That_Will_Break__c == true && foo.Status__c == 'Active'
+    );
+    user = UsernameWrapper.build(
+      foo.Active__c == true && foo.Status__c == 'Active'
+    );
+    user = UsernameWrapper.build(
+      foo.Very_Long_Property_Name_That_Will_Break__c == true && foo.Status__c == 'Active'
+    );
+
+    return foo.Very_Long_Property_Name_That_Will_Break__c == true && foo.Status__c == 'Active';
   }
 
   void castExpression() {
