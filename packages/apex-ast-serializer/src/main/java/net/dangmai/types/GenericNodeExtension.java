@@ -3,8 +3,8 @@ package net.dangmai.types;
 import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.compiler.Symbol;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.*;
 
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class GenericNodeExtension extends Extension {
         return Arrays.asList(
             new TransformerDefinition(
                 ModelCompiler.TransformationPhase.BeforeSymbolResolution,
-                (ModelTransformer) (symbolTable, model) -> addGenericNode(model)
+                (TsModelTransformer) (context, model) -> addGenericNode(model)
             )
         );
     }

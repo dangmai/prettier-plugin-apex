@@ -4,8 +4,8 @@ import cz.habarta.typescript.generator.Extension;
 import cz.habarta.typescript.generator.TsProperty;
 import cz.habarta.typescript.generator.TsType;
 import cz.habarta.typescript.generator.compiler.ModelCompiler;
-import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.compiler.Symbol;
+import cz.habarta.typescript.generator.compiler.TsModelTransformer;
 import cz.habarta.typescript.generator.emitter.*;
 
 import java.util.Arrays;
@@ -30,7 +30,7 @@ public class CustomEnumExtension extends Extension {
         return Arrays.asList(
             new TransformerDefinition(
                 ModelCompiler.TransformationPhase.BeforeEnums,
-                (ModelTransformer) (symbolTable, model) -> transformEnums(model)
+                (TsModelTransformer) (context, model) -> transformEnums(model)
             )
         );
     }

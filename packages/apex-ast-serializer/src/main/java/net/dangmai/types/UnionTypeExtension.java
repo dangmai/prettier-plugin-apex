@@ -5,7 +5,6 @@ import cz.habarta.typescript.generator.compiler.ModelCompiler;
 import cz.habarta.typescript.generator.compiler.ModelTransformer;
 import cz.habarta.typescript.generator.compiler.SymbolTable;
 import cz.habarta.typescript.generator.emitter.EmitterExtensionFeatures;
-import cz.habarta.typescript.generator.emitter.TsModel;
 import cz.habarta.typescript.generator.parser.BeanModel;
 import cz.habarta.typescript.generator.parser.Model;
 import cz.habarta.typescript.generator.util.Utils;
@@ -36,10 +35,6 @@ public class UnionTypeExtension extends Extension {
     }
 
     public static class UnionTypeModelTransformer implements ModelTransformer {
-        @Override
-        public TsModel transformModel(SymbolTable symbolTable, TsModel model) {
-            return model;
-        }
         // This method is copied straight from a private method in
         // typescript-generator
         private Map<Type, List<BeanModel>> createChildrenMap(Model model) {
