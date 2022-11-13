@@ -169,116 +169,6 @@ function handleDanglingComment(comment: AnnotatedComment): boolean {
 }
 
 /**
- * Brings the comments between if-else blocks into the trailing if/else block.
- * For example, formatting the next block:
- * ```
- * if (true) {
- * }
- * // Comment
- * else {
- * }
- * ```
- *
- * Into:
- *
- * ```
- * if (true) {
- * } else {
- *   // Comment
- * }
- * ```
- */
-function handleInBetweenConditionalComment(
-  comment: AnnotatedComment,
-  sourceCode: string,
-) {
-  const { enclosingNode, precedingNode, followingNode } = comment;
-  if (
-    enclosingNode &&
-    precedingNode &&
-    followingNode &&
-    enclosingNode["@class"] === apexTypes.IF_ELSE_BLOCK &&
-    precedingNode["@class"] === apexTypes.IF_BLOCK &&
-    (followingNode["@class"] === apexTypes.IF_BLOCK ||
-      followingNode["@class"] === apexTypes.ELSE_BLOCK) &&
-    !isPrettierIgnore(comment)
-  ) {
-    if (
-      precedingNode.stmnt["@class"] !== apexTypes.BLOCK_STATEMENT &&
-      precedingNode.stmnt.loc.endIndex === precedingNode.loc.endIndex &&
-      !hasNewlineInRange(
-        sourceCode,
-        precedingNode.stmnt.loc.endIndex,
-        comment.location.startIndex,
-      )
-    ) {
-      // The following code can be handled normally without us intervening,
-      // since the comment node should really be trailing to the expression
-      // if (true)
-      //   System.debug('Hello') // Comment
-      // else {
-      // }
-      return false;
-    }
-    if (followingNode.stmnt["@class"] === apexTypes.BLOCK_STATEMENT) {
-      if (followingNode.stmnt.stmnts.length > 0) {
-        addLeadingComment(followingNode.stmnt.stmnts[0], comment);
-      } else {
-        addDanglingComment(followingNode.stmnt, comment, null);
-      }
-    } else {
-      addLeadingComment(followingNode.stmnt, comment);
-    }
-    return true;
-  }
-  return false;
-}
-
-/**
- * Brings the comments between try/catch/finally blocks into the following block.
- * For example, formatting the next block:
- * ```
- * try {
- * }
- * // Comment
- * catch (Exception ex) {
- * }
- * ```
- *
- * Into:
- *
- * ```
- * try {
- * } catch (Exception ex) {
- *   // Comment
- * }
- * ```
- */
-function handleInBetweenTryCatchFinallyComment(
-  comment: AnnotatedComment,
-): boolean {
-  const { enclosingNode, precedingNode, followingNode } = comment;
-  if (
-    !enclosingNode ||
-    !precedingNode ||
-    !followingNode ||
-    enclosingNode["@class"] !== apexTypes.TRY_CATCH_FINALLY_BLOCK ||
-    (precedingNode["@class"] !== apexTypes.BLOCK_STATEMENT &&
-      precedingNode["@class"] !== apexTypes.CATCH_BLOCK) ||
-    (followingNode["@class"] !== apexTypes.CATCH_BLOCK &&
-      followingNode["@class"] !== apexTypes.FINALLY_BLOCK)
-  ) {
-    return false;
-  }
-  if (followingNode.stmnt.stmnts.length > 0) {
-    addLeadingComment(followingNode.stmnt.stmnts[0], comment);
-  } else {
-    addDanglingComment(followingNode.stmnt, comment, null);
-  }
-  return true;
-}
-
-/**
  * Turn the leading comment to a WhereExpression inside a
  * WhereCompoundExpression into a trailing comment to the previous WhereExpression.
  * The reason is that a WhereExpression does not contain the location of
@@ -465,8 +355,6 @@ export function handleOwnLineComment(
 ): boolean {
   return (
     handleDanglingComment(comment) ||
-    handleInBetweenConditionalComment(comment, sourceCode) ||
-    handleInBetweenTryCatchFinallyComment(comment) ||
     handleBlockStatementLeadingComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
@@ -490,8 +378,6 @@ export function handleEndOfLineComment(
 ): boolean {
   return (
     handleDanglingComment(comment) ||
-    handleInBetweenConditionalComment(comment, sourceCode) ||
-    handleInBetweenTryCatchFinallyComment(comment) ||
     handleBinaryishExpressionRightChildTrailingComment(comment) ||
     handleBlockStatementLeadingComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
@@ -515,8 +401,6 @@ export function handleRemainingComment(
   sourceCode: string,
 ): boolean {
   return (
-    handleInBetweenConditionalComment(comment, sourceCode) ||
-    handleInBetweenTryCatchFinallyComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
     handleLongChainComment(comment)

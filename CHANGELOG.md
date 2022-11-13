@@ -3,6 +3,7 @@
 ## Formatting Changes
 
 - Fix binaryish expressions having wrong indentation inside parentheses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/693)).
+- Keep original position for comments in between If-Else blocks and Try-Catch blocks, accordingly fix issue with unprinted comment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/688)).
 
 # 1.11.0
 

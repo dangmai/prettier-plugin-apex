@@ -388,6 +388,10 @@ function handleNodeLocation(
   return null;
 }
 
+export type EnrichedIfBlock = jorje.IfBlock & {
+  ifBlockIndex: number;
+};
+
 /**
  * Generate extra metadata (e.g. empty lines) for nodes.
  * This method is called recursively while visiting each node in the tree.
@@ -424,6 +428,14 @@ function generateExtraMetadata(
   // query as well.
   if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
     node.forcedHardline = node.loc.startLine !== node.loc.endLine;
+  }
+
+  // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
+  // `ifBlockIndex` into the node for handling code to differentiate them.
+  if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
+    node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
+      (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
+    });
   }
 
   Object.keys(node).forEach((key) => {

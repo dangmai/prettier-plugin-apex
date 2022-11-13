@@ -611,6 +611,52 @@ class Comments {
     }
   }
 
+  void specialInBetweenConditionalComments() {
+    if (foo) {
+      System.debug('foo');
+    }
+    // foo own line in between comment 1
+    else if (bar) {
+      System.debug('bar');
+    }
+    // bar own line in between comment 1
+    else {
+      System.debug('baz');
+    }
+
+    if (foo) {
+      System.debug('foo');
+    } // foo trailing inline comment 2
+    else if (bar) {
+      System.debug('bar');
+    } // bar trailing inline comment 2
+    else {
+      System.debug('baz');
+    } // baz trailing inline comment 2
+
+    if (foo) {
+      System.debug('foo');
+    }
+    /* foo block in between comment 3 */
+    else if (bar) {
+      System.debug('bar');
+    }
+    /* bar block in between comment 3 */
+    else {
+      System.debug('baz');
+    }
+
+    if (foo) {
+      System.debug('foo');
+    } /* foo block trailing comment 4 */
+    else if (bar) {
+      System.debug('bar');
+    } /* bar block trailing comment 4 */
+    else {
+      System.debug('baz');
+    } /* baz block trailing comment 4 */
+  }
+
   void ternaryComments() {
     Integer initPrecedingCommentSingleLine =
       // Leading Inline Comment 1 for Ternary Expressions
@@ -683,6 +729,16 @@ class Comments {
 
     try {
       System.debug('Hi');
+    } // In between inline trailing comment 1
+    catch (Exception ex) {
+
+    } // In between inline trailing comment 1
+    finally {
+
+    } // finally trailing comment 1
+
+    try {
+      System.debug('Hi');
     }
     // In between inline comment 3
     catch (Exception ex) {
@@ -716,6 +772,16 @@ class Comments {
     finally {
       System.debug('World');
     }
+
+    try {
+      System.debug('Hi');
+    } /* In between trailing block comment 3 */
+    catch (Exception ex) {
+      System.debug('Hello');
+    } /* In between trailing block comment 4 */
+    finally {
+      System.debug('World');
+    } /* trailing block comment 1 */
   }
 
   void doWhileComments() {
@@ -1360,43 +1426,97 @@ class Comments {
 
     if (a > 1) {
       System.debug('Hi');
-    } else if (b > 2) {
-      // In between Inline Comment 1
+    }
+    // In between Inline Comment 1
+    else if (b > 2) {
       System.debug('Hello');
-    } else if (c > 3) {
-      // In between Inline Comment 2
-    } else if (d > 3)
-      // In between Inline Comment 3
+    }
+    // In between Inline Comment 2
+    else if (c > 3) {
+    }
+    // In between Inline Comment 3
+    else if (d > 3)
       System.debug('World');
+    // In between Inline Comment 4
     else {
-      // In between Inline Comment 4
     }
 
     if (true) {
-    } else {
-      // In between Inline Comment 5
+    }
+    // In between Inline Comment 5
+    else {
       System.debug('Hello');
     }
 
     if (a > 1) {
       System.debug('Hi');
-    } else if (b > 2) {
-      /* In between Block Comment 1 */
+    }
+    /* In between Block Comment 1 */
+    else if (b > 2) {
       System.debug('Hello');
-    } else if (c > 3) {
-      /* In between Block Comment 2 */
-    } else if (d > 3)
-      /* In between Block Comment 3 */
+    }
+    /* In between Block Comment 2 */
+    else if (c > 3) {
+    }
+    /* In between Block Comment 3 */
+    else if (d > 3)
       System.debug('World');
+    /* In between Block Comment 4 */
     else {
-      /* In between Block Comment 4 */
     }
 
     if (true) {
-    } else {
-      /* In between Block Comment 5 */
+    }
+    /* In between Block Comment 5 */
+    else {
       System.debug('Hello');
     }
+  }
+
+  void specialInBetweenConditionalComments() {
+    if (foo) {
+      System.debug('foo');
+    }
+    // foo own line in between comment 1
+    else if (bar) {
+      System.debug('bar');
+    }
+    // bar own line in between comment 1
+    else {
+      System.debug('baz');
+    }
+
+    if (foo) {
+      System.debug('foo');
+    } // foo trailing inline comment 2
+    else if (bar) {
+      System.debug('bar');
+    }  // bar trailing inline comment 2
+    else {
+      System.debug('baz');
+    } // baz trailing inline comment 2
+
+    if (foo) {
+      System.debug('foo');
+    }
+    /* foo block in between comment 3 */
+    else if (bar) {
+      System.debug('bar');
+    }
+    /* bar block in between comment 3 */
+    else {
+      System.debug('baz');
+    }
+
+    if (foo) {
+      System.debug('foo');
+    } /* foo block trailing comment 4 */
+    else if (bar) {
+      System.debug('bar');
+    } /* bar block trailing comment 4 */
+    else {
+      System.debug('baz');
+    } /* baz block trailing comment 4 */
   }
 
   void ternaryComments() {
@@ -1459,39 +1579,65 @@ class Comments {
   void tryCatchComments() {
     try {
       System.debug('Hi');
-    } catch (Exception ex) {
-      // In between inline comment 1
-    } finally {
-      // In between inline comment 2
+    }
+    // In between inline comment 1
+    catch (Exception ex) {
+    }
+    // In between inline comment 2
+    finally {
     }
 
     try {
       System.debug('Hi');
-    } catch (Exception ex) {
-      // In between inline comment 3
+    } // In between inline trailing comment 1
+    catch (Exception ex) {
+    } // In between inline trailing comment 1
+    finally {
+    } // finally trailing comment 1
+
+    try {
+      System.debug('Hi');
+    }
+    // In between inline comment 3
+    catch (Exception ex) {
       System.debug('Hello');
-    } finally {
-      // In between inline comment 4
+    }
+    // In between inline comment 4
+    finally {
       System.debug('World');
     }
 
     try {
       System.debug('Hi');
-    } catch (Exception ex) {
-      /* In between block comment 1 */
-    } finally {
-      /* In between block comment 2 */
+    }
+    /* In between block comment 1 */
+    catch (Exception ex) {
+    }
+    /* In between block comment 2 */
+    finally {
     }
 
     try {
       System.debug('Hi');
-    } catch (Exception ex) {
-      /* In between block comment 3 */
+    }
+    /* In between block comment 3 */
+    catch (Exception ex) {
       System.debug('Hello');
-    } finally {
-      /* In between block comment 4 */
+    }
+    /* In between block comment 4 */
+    finally {
       System.debug('World');
     }
+
+    try {
+      System.debug('Hi');
+    } /* In between trailing block comment 3 */
+    catch (Exception ex) {
+      System.debug('Hello');
+    } /* In between trailing block comment 4 */
+    finally {
+      System.debug('World');
+    } /* trailing block comment 1 */
   }
 
   void doWhileComments() {

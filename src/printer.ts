@@ -2,7 +2,6 @@ import prettier, { AstPath, Doc } from "prettier";
 import { builders } from "prettier/doc";
 import {
   getTrailingComments,
-  isPrettierIgnore,
   printComment,
   printDanglingComment,
 } from "./comments";
@@ -29,6 +28,7 @@ import {
 } from "./constants";
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 import Concat = builders.Concat;
+import { EnrichedIfBlock } from "./parser";
 
 const docBuilders = prettier.doc.builders;
 const { align, concat, join, hardline, line, softline, group, indent, dedent } =
@@ -1072,6 +1072,7 @@ function handleBlockStatement(
 }
 
 function handleTryCatchFinallyBlock(path: AstPath, print: printFn): Doc {
+  const node = path.getNode();
   const tryStatementDoc: Doc = path.call(print, "tryBlock");
   const catchBlockDocs: Doc[] = path.map(print, "catchBlocks");
   const finallyBlockDoc: Doc = path.call(print, "finallyBlock", "value");
@@ -1080,12 +1081,57 @@ function handleTryCatchFinallyBlock(path: AstPath, print: printFn): Doc {
   parts.push("try");
   parts.push(" ");
   pushIfExist(parts, tryStatementDoc);
+
+  const tryBlockContainsTrailingComments: boolean =
+    node.tryBlock.comments?.some(
+      (comment: AnnotatedComment) => comment.trailing,
+    );
+
+  let catchBlockContainsLeadingOwnLineComments: boolean[] = [];
+  let catchBlockContainsTrailingComments: boolean[] = [];
   if (catchBlockDocs.length > 0) {
-    // Can't use pushIfExist here because it doesn't check for Array type
-    parts.push(" ");
-    parts.push(join(" ", catchBlockDocs));
+    catchBlockContainsLeadingOwnLineComments = node.catchBlocks.map(
+      (catchBlock: jorje.CatchBlock & { comments?: AnnotatedComment[] }) =>
+        catchBlock.comments?.some(
+          (comment: AnnotatedComment) =>
+            comment.leading && comment.placement === "ownLine",
+        ),
+    );
+    catchBlockContainsTrailingComments = node.catchBlocks.map(
+      (catchBlock: jorje.CatchBlock & { comments?: AnnotatedComment[] }) =>
+        catchBlock.comments?.some(
+          (comment: AnnotatedComment) => comment.trailing,
+        ),
+    );
+    catchBlockDocs.forEach((catchBlockDoc: Doc, index: number) => {
+      const shouldAddHardLineBeforeCatch =
+        catchBlockContainsLeadingOwnLineComments[index] ||
+        catchBlockContainsTrailingComments[index - 1] ||
+        (index === 0 && tryBlockContainsTrailingComments);
+      if (shouldAddHardLineBeforeCatch) {
+        parts.push(hardline);
+      } else {
+        parts.push(" ");
+      }
+      parts.push(catchBlockDoc);
+    });
   }
-  pushIfExist(parts, finallyBlockDoc, null, [" "]);
+  const finallyBlockContainsLeadingOwnLineComments =
+    node.finallyBlock?.value?.comments?.some(
+      (comment: AnnotatedComment) =>
+        comment.leading && comment.placement === "ownLine",
+    );
+  const shouldAddHardLineBeforeFinally =
+    finallyBlockContainsLeadingOwnLineComments ||
+    (catchBlockContainsTrailingComments.length > 0 &&
+      catchBlockContainsTrailingComments[
+        catchBlockContainsTrailingComments.length - 1
+      ]) ||
+    (catchBlockContainsTrailingComments.length === 0 &&
+      tryBlockContainsTrailingComments);
+  pushIfExist(parts, finallyBlockDoc, null, [
+    shouldAddHardLineBeforeFinally ? hardline : " ",
+  ]);
   return concat(parts);
 }
 
@@ -1550,34 +1596,33 @@ function handleIfElseBlock(path: AstPath, print: printFn): Doc {
   // else if (c) {
   //   b = 2;
   // }
-  const ifBlockContainsBlockStatement = node.ifBlocks.map(
+  const ifBlockContainsBlockStatement: boolean[] = node.ifBlocks.map(
     (ifBlock: jorje.IfBlock) =>
       ifBlock.stmnt["@class"] === APEX_TYPES.BLOCK_STATEMENT,
   );
-  // #464 - Since we allow prettier-ignore comment in the middle of if/else
-  // blocks, we need to make sure that the blocks (both IfBlock and ElseBlock)
-  // trailing this comment is printed correctly.
-  // One major difference is that if a block is ignored, Prettier automatically
-  // prints everything as-is from the user code, which means we don't need to
-  // add `else` literal in between IfBlocks in the final output.
-  const ifBlockContainsPrettierIgnore = node.ifBlocks.map(
+  const ifBlockContainsLeadingOwnLineComments: boolean[] = node.ifBlocks.map(
     (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
       ifBlock.comments?.some(
-        (comment) => comment.leading && isPrettierIgnore(comment),
+        (comment) => comment.leading && comment.placement === "ownLine",
       ),
+  );
+  const ifBlockContainsTrailingComments: boolean[] = node.ifBlocks.map(
+    (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
+      ifBlock.comments?.some((comment) => comment.trailing),
   );
 
   let lastIfBlockHardLineInserted = false;
   ifBlockDocs.forEach((ifBlockDoc: Doc, index: number) => {
     if (index > 0) {
-      parts.push(
-        ifBlockContainsPrettierIgnore[index]
-          ? hardline
-          : concat([
-              ifBlockContainsBlockStatement[index - 1] ? " " : hardline,
-              "else ",
-            ]),
-      );
+      const shouldAddHardLineBeforeElseIf =
+        !ifBlockContainsBlockStatement[index - 1] ||
+        ifBlockContainsLeadingOwnLineComments[index] ||
+        ifBlockContainsTrailingComments[index - 1];
+      if (shouldAddHardLineBeforeElseIf) {
+        parts.push(hardline);
+      } else {
+        parts.push(" ");
+      }
     }
     parts.push(ifBlockDoc);
     // We also need to handle the last if block, since it might need to add
@@ -1592,13 +1637,20 @@ function handleIfElseBlock(path: AstPath, print: printFn): Doc {
     }
   });
   if (elseBlockDoc) {
-    // #464 - see previous note above IfBlock handling
-    const elseBlockContainsPrettierIgnore =
+    const elseBlockContainsLeadingOwnLineComments =
       node.elseBlock?.value?.comments?.some(
         (comment: AnnotatedComment) =>
-          comment.leading && isPrettierIgnore(comment),
+          comment.leading && comment.placement === "ownLine",
       );
-    if (elseBlockContainsPrettierIgnore && !lastIfBlockHardLineInserted) {
+    const lastIfBlockContainsTrailingComments =
+      ifBlockContainsTrailingComments[
+        ifBlockContainsTrailingComments.length - 1
+      ];
+    const shouldAddHardLineBeforeElse =
+      !lastIfBlockHardLineInserted &&
+      (elseBlockContainsLeadingOwnLineComments ||
+        lastIfBlockContainsTrailingComments);
+    if (shouldAddHardLineBeforeElse) {
       parts.push(hardline);
     }
     parts.push(elseBlockDoc);
@@ -1607,11 +1659,16 @@ function handleIfElseBlock(path: AstPath, print: printFn): Doc {
 }
 
 function handleIfBlock(path: AstPath, print: printFn): Doc {
+  const node: EnrichedIfBlock = path.getNode();
   const statementType: Doc = path.call(print, "stmnt", "@class");
   const statementDoc: Doc = path.call(print, "stmnt");
 
   const parts: Doc[] = [];
   const conditionParts = [];
+  if (node.ifBlockIndex > 0) {
+    parts.push("else");
+    parts.push(" ");
+  }
   parts.push("if");
   parts.push(" ");
   // Condition expression
