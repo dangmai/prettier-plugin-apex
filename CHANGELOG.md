@@ -17,6 +17,7 @@
 
 ## CLI Changes
 
+- **Breaking:** Locations for `start-apex-server.js` and `stop-apex-server.js` are changed - they are now in the `dist` directory.
 - Add ability to specify `host` and `port` options for built-in parsing server ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/476)).
 
 ## Formatting Changes
