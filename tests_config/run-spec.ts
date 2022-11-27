@@ -9,11 +9,11 @@ function read(filename: string): string {
   return fs.readFileSync(filename, "utf8");
 }
 
-function prettyPrint(
+async function prettyPrint(
   src: string,
   filename: string,
   options: prettier.Options,
-): string {
+): Promise<string> {
   return prettier.format(src, {
     filepath: filename,
     apexStandaloneParser: "built-in",
@@ -23,7 +23,7 @@ function prettyPrint(
   });
 }
 
-function parse(string: string, opts: prettier.Options): any {
+async function parse(string: string, opts: prettier.Options): Promise<any> {
   // eslint-disable-next-line no-underscore-dangle
   return prettier.__debug.parse(
     string,
@@ -68,30 +68,30 @@ function runSpec(
         options.push({});
       }
       const mergedOptions = options.map((opts: prettier.Options) => ({
-        plugins: ["."],
+        plugins: ["./dist/src/index.js"],
         ...opts,
         parser: parsers[0],
       }));
 
       mergedOptions.forEach((mergedOpts) => {
-        const output = prettyPrint(source, path, mergedOpts);
-        test(`Format ${mergedOpts.parser}: ${filename}`, () => {
+        let output: string;
+        test(`Format ${mergedOpts.parser}: ${filename}`, async () => {
+          output = await prettyPrint(source, path, mergedOpts);
           expect(wrap(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
             filename,
           );
         });
 
         if (AST_COMPARE) {
-          const ast = parse(source, mergedOpts);
-          const ppast = parse(output, mergedOpts);
-          const secondOutput = prettyPrint(output, path, mergedOpts);
-
-          test(`Verify AST: ${filename}`, () => {
+          test(`Verify AST: ${filename}`, async () => {
+            const ast = parse(source, mergedOpts);
+            const ppast = parse(output, mergedOpts);
             expect(ppast).toBeDefined();
             expect(ast).toEqual(ppast);
           });
 
-          test(`Stable format: ${filename}`, () => {
+          test(`Stable format: ${filename}`, async () => {
+            const secondOutput = await prettyPrint(output, path, mergedOpts);
             expect(secondOutput).toEqual(output);
           });
         }

@@ -534,6 +534,7 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
   });
   return node;
 }
+
 // Get a map of line number to the index of its first character
 function getLineIndexes(sourceCode: string) {
   // First line always start with index 0
@@ -573,7 +574,6 @@ function getEmptyLineLocations(sourceCode: string): number[] {
 
 export default function parse(
   sourceCode: string,
-  _: any,
   options: prettier.RequiredOptions,
 ): SerializedAst | Record<string, never> {
   const lineIndexes = getLineIndexes(sourceCode);
