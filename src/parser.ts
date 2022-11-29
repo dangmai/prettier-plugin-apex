@@ -1,7 +1,8 @@
 /* eslint no-param-reassign: 0 */
-import childProcess, { spawnSync } from "child_process";
+import { spawn } from "child_process";
 import path from "path";
 import prettier from "prettier";
+import axios from "axios";
 
 import {
   findNextUncommentedCharacter,
@@ -16,14 +17,15 @@ import {
 } from "./constants";
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 
-const MAX_BUFFER = 8192 * 8192;
-
 type MinimalLocation = {
   startIndex: number;
   endIndex: number;
 };
 
-function parseTextWithSpawn(text: string, anonymous: boolean): string {
+async function parseTextWithSpawn(
+  text: string,
+  anonymous: boolean,
+): Promise<string> {
   let serializerBin = getSerializerBinDirectory();
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
@@ -34,56 +36,46 @@ function parseTextWithSpawn(text: string, anonymous: boolean): string {
   if (anonymous) {
     args.push("-a");
   }
-  const executionResult = spawnSync(serializerBin, args, {
-    input: text,
-    maxBuffer: MAX_BUFFER,
+  return new Promise((resolve, reject) => {
+    const process = spawn(serializerBin, args);
+    process.stdin.write(text);
+    process.stdin.end();
+
+    let stdout = "";
+    let stderr = "";
+    process.stdout.on("data", (chunk) => {
+      stdout += chunk;
+    });
+    process.stderr.on("data", (chunk) => {
+      stderr += chunk;
+    });
+
+    process.on("close", () => {
+      resolve(stdout);
+    });
+    process.on("error", () => {
+      reject(stderr);
+    });
   });
-
-  const executionError = executionResult.error;
-
-  if (executionError) {
-    throw executionError;
-  }
-  if (executionResult.status !== 0) {
-    throw new Error(executionResult.stdout.toString());
-  }
-
-  return executionResult.stdout.toString();
 }
 
-function parseTextWithHttp(
+async function parseTextWithHttp(
   text: string,
   serverHost: string,
   serverPort: number,
   anonymous: boolean,
-): string {
-  const httpClientLocation = path.join(__dirname, "http-client.js");
-  const args = [
-    httpClientLocation,
-    "-a",
-    serverHost,
-    "-f",
-    "json",
-    "-p",
-    serverPort.toString(),
-  ];
-  if (anonymous) {
-    args.push("-n");
-  }
-  if (!process.argv[0]) {
-    throw new Error("Failed to call http client");
-  }
-  const executionResult = childProcess.spawnSync(process.argv[0], args, {
-    input: text,
-    maxBuffer: MAX_BUFFER,
-  });
-
-  if (executionResult.status) {
-    const executionError = `Failed to connect to Apex parsing server\r\n${executionResult.stderr.toString()}`;
-    throw new Error(executionError);
-  }
-
-  return executionResult.stdout.toString();
+): Promise<string> {
+  const result = await axios.post(
+    `http://${serverHost}:${serverPort}/api/ast`,
+    {
+      sourceCode: text,
+      anonymous: anonymous,
+      outputFormat: "json",
+      idRef: true,
+      prettyPrint: false,
+    },
+  );
+  return JSON.stringify(result.data);
 }
 
 // jorje calls the location node differently for different types of nodes,
@@ -572,21 +564,21 @@ function getEmptyLineLocations(sourceCode: string): number[] {
     );
 }
 
-export default function parse(
+export default async function parse(
   sourceCode: string,
   options: prettier.RequiredOptions,
-): SerializedAst | Record<string, never> {
+): Promise<SerializedAst | Record<string, never>> {
   const lineIndexes = getLineIndexes(sourceCode);
-  let serializedAst;
+  let serializedAst: string;
   if (options.apexStandaloneParser === "built-in") {
-    serializedAst = parseTextWithHttp(
+    serializedAst = await parseTextWithHttp(
       sourceCode,
       options.apexStandaloneHost,
       options.apexStandalonePort,
       options.parser === "apex-anonymous",
     );
   } else {
-    serializedAst = parseTextWithSpawn(
+    serializedAst = await parseTextWithSpawn(
       sourceCode,
       options.parser === "apex-anonymous",
     );
