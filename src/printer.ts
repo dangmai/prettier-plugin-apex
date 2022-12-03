@@ -1,5 +1,4 @@
 import prettier, { AstPath, Doc } from "prettier";
-import { builders } from "prettier/doc";
 import {
   getTrailingComments,
   printComment,
@@ -27,7 +26,6 @@ import {
   QUERY_WHERE,
 } from "./constants";
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
-import Concat = builders.Concat;
 import { EnrichedIfBlock } from "./parser";
 
 const docBuilders = prettier.doc.builders;
@@ -1490,11 +1488,13 @@ function handleNewListInit(path: AstPath, print: printFn): Doc {
   const node = path.getValue();
   const expressionDoc: Doc = path.call(print, "expr", "value");
   const parts: Doc[] = [];
-  const typeParts = path.map(print, "types") as Concat[];
+  const typeParts = path.map(print, "types");
   const hasLiteralNumberInitializer =
     typeParts.length &&
     typeParts[0] !== undefined &&
-    typeParts[0].parts.length < 4 &&
+    typeof typeParts[0] !== "string" &&
+    "length" in typeParts[0] &&
+    typeParts[0].length < 4 &&
     node.expr?.value?.type?.$ === "INTEGER";
 
   // Type
