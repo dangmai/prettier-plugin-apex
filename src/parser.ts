@@ -65,17 +65,23 @@ async function parseTextWithHttp(
   serverPort: number,
   anonymous: boolean,
 ): Promise<string> {
-  const result = await axios.post(
-    `http://${serverHost}:${serverPort}/api/ast`,
-    {
-      sourceCode: text,
-      anonymous: anonymous,
-      outputFormat: "json",
-      idRef: true,
-      prettyPrint: false,
-    },
-  );
-  return JSON.stringify(result.data);
+  try {
+    const result = await axios.post(
+      `http://${serverHost}:${serverPort}/api/ast`,
+      {
+        sourceCode: text,
+        anonymous: anonymous,
+        outputFormat: "json",
+        idRef: true,
+        prettyPrint: false,
+      },
+    );
+    return JSON.stringify(result.data);
+  } catch (err: any) {
+    throw new Error(
+      `Failed to connect to Apex parsing server\r\n${err.toString()}`,
+    );
+  }
 }
 
 // jorje calls the location node differently for different types of nodes,
