@@ -25,7 +25,7 @@ async function prettyPrint(
 
 async function parse(string: string, opts: prettier.Options): Promise<any> {
   // eslint-disable-next-line no-underscore-dangle
-  return prettier.__debug.parse(
+  const result = await prettier.__debug.parse(
     string,
     {
       apexStandaloneParser: "built-in",
@@ -33,8 +33,13 @@ async function parse(string: string, opts: prettier.Options): Promise<any> {
       apexStandaloneHost: "localhost",
       ...opts,
     },
-    /* massage */ true,
-  ).ast;
+    // @ts-ignore currently Prettier types haven't been updated to reflect
+    // this change yet
+    {
+      massage: true,
+    },
+  );
+  return result.ast;
 }
 
 function runSpec(
@@ -42,7 +47,7 @@ function runSpec(
   parsers: string[],
   specOptions?: prettier.Options,
 ): void {
-  /* instabul ignore if */
+  /* istanbul ignore if */
   if (!parsers || !parsers.length) {
     throw new Error(`No parsers were specified for ${dirname}`);
   }
@@ -84,8 +89,8 @@ function runSpec(
 
         if (AST_COMPARE) {
           test(`Verify AST: ${filename}`, async () => {
-            const ast = parse(source, mergedOpts);
-            const ppast = parse(output, mergedOpts);
+            const ast = await parse(source, mergedOpts);
+            const ppast = await parse(output, mergedOpts);
             expect(ppast).toBeDefined();
             expect(ast).toEqual(ppast);
           });
