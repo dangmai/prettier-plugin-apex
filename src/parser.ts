@@ -70,7 +70,7 @@ async function parseTextWithHttp(
       `http://${serverHost}:${serverPort}/api/ast`,
       {
         sourceCode: text,
-        anonymous: anonymous,
+        anonymous,
         outputFormat: "json",
         idRef: true,
         prettyPrint: false,
