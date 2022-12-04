@@ -33,8 +33,9 @@ async function parse(string: string, opts: prettier.Options): Promise<any> {
       apexStandaloneHost: "localhost",
       ...opts,
     },
+    /* eslint-disable @typescript-eslint/ban-ts-comment */
     // @ts-ignore currently Prettier types haven't been updated to reflect
-    // this change yet
+    // this change yet. TODO remove these comments when types are updated.
     {
       massage: true,
     },
