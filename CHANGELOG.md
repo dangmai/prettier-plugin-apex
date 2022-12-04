@@ -5,6 +5,10 @@
 - Fix binaryish expressions having wrong indentation inside parentheses ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/693)).
 - Keep original position for comments in between If-Else blocks and Try-Catch blocks, accordingly fix issue with unprinted comment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/688)).
 
+## Internal Changes
+
+- Use `yarn` for internal dependency management instead of `npm`. If you forked this repository before this change, make sure to follow [CONTRIBUTING.md](CONTRIBUTING.md) to set up your environment again.
+
 # 1.11.0
 
 ## Dependency Changes

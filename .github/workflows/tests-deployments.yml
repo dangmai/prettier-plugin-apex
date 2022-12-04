@@ -56,17 +56,17 @@ jobs:
       - name: Remove ipv6 loopback
         run: sudo sed -Ei '/(^::1)/d' /etc/hosts
 
-      - name: Install NPM dependencies
-        run: npm ci
+      - name: Install dependencies
+        run: yarn install
 
       - name: Run Apex parsing server
-        run: nohup npm run start-server &
+        run: nohup yarn run start-server &
 
       - name: Wait for Apex parsing server to be up
-        run: npm run wait-server
+        run: yarn run wait-server
 
       - name: Run functional tests
-        run: AST_COMPARE=true npm test -- -c jest.config.standalone.js
+        run: AST_COMPARE=true yarn test -- -c jest.config.standalone.js
 
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
@@ -97,4 +97,4 @@ jobs:
 
       - name: Stop Apex parsing server
         if: ${{ always() }}
-        run: npm run stop-server
+        run: yarn run stop-server

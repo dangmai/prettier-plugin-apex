@@ -3,13 +3,13 @@
 To get up and running, install the dependencies and run the tests:
 
 ```bash
-npm install
-npm run lint
-npm run start-server # This spins up the built in HTTP parsing server
+yarn install
+yarn run lint
+yarn run start-server # This spins up the built in HTTP parsing server
 # In another terminal
-npm test -- -c jest.config.standalone.js
+yarn test -- -c jest.config.standalone.js
 # When you are done
-npm run stop-server
+yarn run stop-server
 ```
 
 Here's what you need to know about the tests:
@@ -20,7 +20,7 @@ Here's what you need to know about the tests:
 - Each test folder has a `jsfmt.spec.js` that runs the tests. Generally you can just put `runSpec(__dirname, ["apex"]);` there. This will verify that the output using the Apex parser stays consistent. You can also pass options as the third argument, like this: `runSpec(__dirname, ["apex"], { apexInsertFinalNewLine: false });`
 - If you would like to debug prettier locally, you can either debug it in node or the browser. The easiest way to debug it in the browser is to run the interactive `docs` REPL locally. The easiest way to debug it in node, is to create a local test file and run it in an editor like VS Code.
 
-Run `npm run prettier` to automatically format files.
+Run `yarn run prettier` to automatically format files.
 
 If you can, take look at [commands.md](https://github.com/prettier/prettier/blob/master/commands.md) and check out [Wadler's paper](http://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf) to understand how Prettier works.
 
