@@ -8,6 +8,7 @@
 ## Internal Changes
 
 - Use `yarn` for internal dependency management instead of `npm`. If you forked this repository before this change, make sure to follow [CONTRIBUTING.md](CONTRIBUTING.md) to set up your environment again.
+- `start-apex-server` and `stop-apex-server` no longer exports any methods. This should not affect any user functionality, but if you are a developer who's relying on those methods, please import `start` and `stop` from [http-server](src/http-server.ts) instead.
 
 # 1.11.0
 

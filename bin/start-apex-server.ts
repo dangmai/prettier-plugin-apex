@@ -8,28 +8,23 @@ async function setup(host: string, port: number) {
   await start(host, port);
 }
 
-if (require.main === module) {
-  // Support calling this directly
-  yargs(hideBin(process.argv))
-    .command(
-      "$0",
-      "start the built-in parsing server",
-      {
-        host: {
-          alias: "h",
-          default: "localhost",
-        },
-        port: {
-          alias: "p",
-          default: 2117,
-        },
+yargs(hideBin(process.argv))
+  .command(
+    "$0",
+    "start the built-in parsing server",
+    {
+      host: {
+        alias: "h",
+        default: "localhost",
       },
-      (argv) => {
-        setup(argv.host, argv.port);
+      port: {
+        alias: "p",
+        default: 2117,
       },
-    )
-    .help()
-    .parse();
-}
-
-module.exports = setup;
+    },
+    (argv) => {
+      setup(argv.host, argv.port);
+    },
+  )
+  .help()
+  .parse();
