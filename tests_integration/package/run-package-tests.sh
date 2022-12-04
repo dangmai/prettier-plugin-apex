@@ -6,7 +6,7 @@
 set -euxo pipefail
 
 function pkg-script () {
-  echo $(jq --arg key "${1}" --arg val "${2}" '.scripts[$key]=$val' package.json) | jq . | > package.json
+  echo $(jq --arg key "${1}" --arg val "${2}" '.scripts[$key]=$val' package.json) > package.json
 }
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
@@ -20,7 +20,8 @@ mkdir "test-npm-module"
 cd test-npm-module
 npm init --yes
 npm install --save-dev prettier prettier-plugin-apex
-cp "$CURRENT_DIR/*.cls" "$location/test-npm-module"
+cp "$CURRENT_DIR/AnonymousClass.cls" "$location/test-npm-module"
+cp "$CURRENT_DIR/NonEmptyNamedClass.cls" "$location/test-npm-module"
 
 pkg-script "prettier:named" "prettier NonEmptyNamedClass.cls"
 pkg-script "prettier:anonymous" "prettier --parser apex-anonymous AnonymousClass.cls"
