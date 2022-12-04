@@ -1,4 +1,5 @@
 import { stop } from "../src/http-server";
-module.exports = async function () {
+
+export default async function stopTestServer() {
   await stop("localhost", 2117);
-};
+}

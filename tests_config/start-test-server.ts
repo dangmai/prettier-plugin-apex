@@ -1,4 +1,5 @@
 import { start } from "../src/http-server";
-module.exports = async function () {
+
+export default async function startTestServer() {
   await start("localhost", 2117);
-};
+}
