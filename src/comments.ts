@@ -10,7 +10,7 @@ import {
 } from "./util";
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 
-const { concat, join, lineSuffix, hardline } = prettier.doc.builders;
+const { join, lineSuffix, hardline } = prettier.doc.builders;
 const {
   addDanglingComment,
   addLeadingComment,
@@ -28,7 +28,7 @@ const apexTypes = constants.APEX_TYPES;
  */
 function printApexDocComment(comment: jorje.BlockComment): Doc {
   const lines = comment.value.split("\n");
-  return concat([
+  return [
     join(
       hardline,
       lines.map(
@@ -39,7 +39,7 @@ function printApexDocComment(comment: jorje.BlockComment): Doc {
             : commentLine.trimLeft()),
       ),
     ),
-  ]);
+  ];
 }
 
 export function isPrettierIgnore(comment: AnnotatedComment): boolean {
@@ -70,7 +70,7 @@ export function printComment(path: AstPath): Doc {
     result = node.value;
   }
   if (comment.trailingEmptyLine) {
-    result = concat([result, hardline]);
+    result = [result, hardline];
   }
   comment.printed = true;
   return result;
@@ -109,7 +109,7 @@ export function printDanglingComment(
     parts.push(printComment(commentPath));
   }
   comment.printed = true;
-  return concat(parts);
+  return parts;
 }
 
 /**
