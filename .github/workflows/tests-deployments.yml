@@ -106,3 +106,9 @@ jobs:
       - name: Stop Apex parsing server
         if: ${{ always() }}
         run: yarn run stop-server
+        env:
+          # Workaround for this bug from npm-publish Github Action:
+          # https://github.com/JS-DevTools/npm-publish/issues/15
+          # That Action leaves some placeholder (INPUT_TOKEN) in the .npmrc file
+          # which needs to filled in by _something_, otherwise `yarn` fails
+          INPUT_TOKEN: ''
