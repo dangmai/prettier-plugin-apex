@@ -74,7 +74,7 @@ function runSpec(
         options.push({});
       }
       const mergedOptions = options.map((opts: prettier.Options) => ({
-        plugins: ["./dist/src/index.js"],
+        plugins: ["./src/index"],
         ...opts,
         parser: parsers[0],
       }));

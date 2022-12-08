@@ -8,7 +8,7 @@ describe("Parser Tests", () => {
     const source = await fs.readFile(fileName, "utf8");
     await expect(
       prettier.format(source.replace(/\r\n/g, "\n"), {
-        plugins: ["."],
+        plugins: ["./src/index"],
         filepath: fileName,
         parser: "apex",
       }),
@@ -19,7 +19,7 @@ describe("Parser Tests", () => {
     const source = await fs.readFile(fileName, "utf8");
     await expect(
       prettier.format(source.replace(/\r\n/g, "\n"), {
-        plugins: ["."],
+        plugins: ["./src/index"],
         filepath: fileName,
         parser: "apex-anonymous",
       }),
@@ -30,7 +30,7 @@ describe("Parser Tests", () => {
     const source = await fs.readFile(fileName, "utf8");
     await expect(
       prettier.format(source.replace(/\r\n/g, "\n"), {
-        plugins: ["."],
+        plugins: ["./src/index"],
         filepath: fileName,
         parser: "apex",
         apexStandaloneParser: "built-in",
@@ -44,7 +44,7 @@ describe("Parser Tests", () => {
     const source = await fs.readFile(fileName, "utf8");
     await expect(
       prettier.format(source.replace(/\r\n/g, "\n"), {
-        plugins: ["."],
+        plugins: ["./src/index"],
         filepath: fileName,
         parser: "apex",
         apexStandaloneParser: "built-in",
@@ -58,7 +58,7 @@ describe("Parser Tests", () => {
     const source = await fs.readFile(fileName, "utf8");
     await expect(
       prettier.format(source.replace(/\r\n/g, "\n"), {
-        plugins: ["."],
+        plugins: ["./src/index"],
         filepath: fileName,
         parser: "apex",
       }),
@@ -69,7 +69,7 @@ describe("Parser Tests", () => {
     const source = await fs.readFile(fileName, "utf8");
     await expect(
       prettier.format(source.replace(/\r\n/g, "\n"), {
-        plugins: ["."],
+        plugins: ["./src/index"],
         filepath: fileName,
         parser: "apex",
         apexStandaloneParser: "built-in",

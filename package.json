@@ -20,8 +20,7 @@
   "scripts": {
     "build": "tsc",
     "build:prod": "rimraf dist && tsc --project tsconfig.prod.json",
-    "dev": "tsc --watch",
-    "pretest": "yarn run lint && yarn run build",
+    "pretest": "yarn run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "start-server": "ts-node bin/start-apex-server.ts",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",

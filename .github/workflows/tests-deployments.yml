@@ -82,6 +82,13 @@ jobs:
         if: env.RUN_INTEGRATION_TESTS == 'true'
         run: sudo apt-get install -y -qq parallel
 
+      # This step is needed because integration tests rely on the
+      # existence of the compiled JS, as they are run using Node
+      # instead of ts-node
+      - name: Build the project
+        if: env.RUN_INTEGRATION_TESTS == 'true'
+        run: yarn build
+
       - name: Run integration tests
         if: env.RUN_INTEGRATION_TESTS == 'true'
         run: ./tests_integration/format/run-integration-tests.sh
