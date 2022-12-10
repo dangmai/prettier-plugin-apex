@@ -22,7 +22,9 @@ export async function start(
   if (allowedOrigins !== undefined) {
     args.push("-c", allowedOrigins);
   }
-  const command = spawn(serializerBin, args);
+  const command = spawn(serializerBin, args, {
+    stdio: "inherit"
+  });
 
   await waitOnPromise({
     resources: [`http://${host}:${port}/api/ast`],
