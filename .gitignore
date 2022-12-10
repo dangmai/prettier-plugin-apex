@@ -5,4 +5,5 @@ coverage
 tests/local_only
 repo
 dist
+output
 *.tgz

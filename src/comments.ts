@@ -8,6 +8,7 @@ import {
   isApexDocComment,
   isBinaryish,
 } from "./util";
+import { APEX_TYPES as apexTypes, ALLOW_DANGLING_COMMENTS } from "./constants";
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 
 const { join, lineSuffix, hardline } = prettier.doc.builders;
@@ -18,9 +19,6 @@ const {
   hasNewlineInRange,
   skipWhitespace,
 } = prettier.util;
-const constants = require("./constants");
-
-const apexTypes = constants.APEX_TYPES;
 
 /**
  * Print ApexDoc comment. This is straight from prettier handling of JSDoc
@@ -158,7 +156,7 @@ function handleDanglingComment(comment: AnnotatedComment): boolean {
   const { enclosingNode } = comment;
   if (
     enclosingNode &&
-    constants.ALLOW_DANGLING_COMMENTS.indexOf(enclosingNode["@class"]) !== -1 &&
+    ALLOW_DANGLING_COMMENTS.indexOf(enclosingNode["@class"]) !== -1 &&
     ((enclosingNode.stmnts && enclosingNode.stmnts.length === 0) ||
       (enclosingNode.members && enclosingNode.members.length === 0))
   ) {

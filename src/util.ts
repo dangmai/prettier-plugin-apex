@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: 0 */
 import { AstPath } from "prettier";
 import { join } from "path";
-import { accessSync } from "fs";
+import fs from "fs";
 
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
 import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants";
@@ -241,7 +241,7 @@ export function getPrecedence(op: string): number {
 
 function doesFileExist(file: string): boolean {
   try {
-    accessSync(file);
+    fs.accessSync(file);
     return true;
   } catch (err) {
     return false;

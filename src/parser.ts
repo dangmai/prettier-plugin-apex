@@ -1,5 +1,5 @@
 /* eslint no-param-reassign: 0 */
-import { spawn } from "child_process";
+import childProcess from "child_process";
 import path from "path";
 import prettier from "prettier";
 import axios from "axios";
@@ -37,7 +37,7 @@ async function parseTextWithSpawn(
     args.push("-a");
   }
   return new Promise((resolve, reject) => {
-    const process = spawn(serializerBin, args);
+    const process = childProcess.spawn(serializerBin, args);
     process.stdin.write(text);
     process.stdin.end();
 
