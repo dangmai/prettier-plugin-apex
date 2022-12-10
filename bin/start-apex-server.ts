@@ -22,10 +22,11 @@ yargs(hideBin(process.argv))
         default: 2117,
       },
       "cors-allowed-origins": {
-        describe: "Comma-delimited list of allowed origins to be added to CORS headers",
+        describe:
+          "Comma-delimited list of allowed origins to be added to CORS headers",
         alias: "c",
         type: "string",
-      }
+      },
     },
     (argv) => {
       setup(argv.host, argv.port, argv["cors-allowed-origins"]);

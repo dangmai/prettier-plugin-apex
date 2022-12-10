@@ -23,7 +23,7 @@ export async function start(
     args.push("-c", allowedOrigins);
   }
   const command = spawn(serializerBin, args, {
-    stdio: "inherit"
+    stdio: "inherit",
   });
 
   await waitOnPromise({
