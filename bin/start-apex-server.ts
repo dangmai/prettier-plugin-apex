@@ -4,8 +4,8 @@ import { hideBin } from "yargs/helpers";
 
 import { start } from "../src/http-server";
 
-async function setup(host: string, port: number) {
-  await start(host, port);
+async function setup(host: string, port: number, allowedOrigins?: string) {
+  await start(host, port, allowedOrigins);
 }
 
 yargs(hideBin(process.argv))
@@ -21,9 +21,14 @@ yargs(hideBin(process.argv))
         alias: "p",
         default: 2117,
       },
+      "cors-allowed-origins": {
+        describe: "Comma-delimited list of allowed origins to be added to CORS headers",
+        alias: "c",
+        type: "string",
+      }
     },
     (argv) => {
-      setup(argv.host, argv.port);
+      setup(argv.host, argv.port, argv["cors-allowed-origins"]);
     },
   )
   .help()

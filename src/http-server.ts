@@ -7,22 +7,22 @@ import { getSerializerBinDirectory } from "./util";
 
 const waitOnPromise = util.promisify(waitOn);
 
-export async function start(host: string, port: number): Promise<ChildProcess> {
+export async function start(
+  host: string,
+  port: number,
+  allowedOrigins?: string,
+): Promise<ChildProcess> {
   let serializerBin = getSerializerBinDirectory();
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http.bat");
   } else {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http");
   }
-  const command = spawn(serializerBin, [
-    "-s",
-    "-a",
-    "secret",
-    "-h",
-    host,
-    "-p",
-    port.toString(),
-  ]);
+  const args = ["-s", "-a", "secret", "-h", host, "-p", port.toString()];
+  if (allowedOrigins !== undefined) {
+    args.push("-c", allowedOrigins);
+  }
+  const command = spawn(serializerBin, args);
 
   await waitOnPromise({
     resources: [`http://${host}:${port}/api/ast`],

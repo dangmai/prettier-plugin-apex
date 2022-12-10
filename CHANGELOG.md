@@ -1,3 +1,9 @@
+# Unreleased
+
+## Internal Changes
+
+- `start-apex-server` takes optional `-c` flag, which will be passed on to `apex-ast-serializer` as a comma-delimited list of allowed origins that will be added to the CORS headers returned by the parsing server.
+
 # 1.12.0
 
 ## Formatting Changes
