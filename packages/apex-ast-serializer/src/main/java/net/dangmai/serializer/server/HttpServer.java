@@ -1,6 +1,7 @@
 package net.dangmai.serializer.server;
 
 
+import jakarta.servlet.DispatcherType;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -9,22 +10,28 @@ import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
+import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.EnumSet;
 
 import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
 
 public class HttpServer {
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServer.class);
+
     public static void main(String[] args) throws Exception {
         Options cliOptions = new Options();
         cliOptions.addOption("h", "host", true, "The host to listen on, default to 0.0.0.0");
         cliOptions.addOption("p", "port", true, "The port to listen on, default to 2117");
         cliOptions.addOption("s", "shutdown", false, "Allow the server to be remotely shut down");
         cliOptions.addOption("a", "password", true, "Password to remotely shut down server");
+        cliOptions.addOption("c", "cors-allowed-origins", true, "Comma-delimited list of allowed origins to be added the CORS response header");
 
         CommandLineParser cliParser = new DefaultParser();
         CommandLine cmd = cliParser.parse(cliOptions, args);
@@ -44,9 +51,16 @@ public class HttpServer {
         ServletHolder servletHolder = servletContextHandler.addServlet(ServletContainer.class, "/ast/*");
         servletHolder.setInitOrder(0);
         servletHolder.setInitParameter(
-                "jersey.config.server.provider.packages",
-                "net.dangmai.serializer.server.resources"
+            "jersey.config.server.provider.packages",
+            "net.dangmai.serializer.server.resources"
         );
+        if (cmd.hasOption("c")) {
+            FilterHolder filterHolder = servletContextHandler.addFilter(
+                CrossOriginFilter.class,
+                "/*",
+                EnumSet.of(DispatcherType.REQUEST));
+            filterHolder.setInitParameter("allowedOrigins", cmd.getOptionValue("c"));
+        }
 
         HandlerList handlerList = new HandlerList();
         handlerList.addHandler(servletContextHandler);
@@ -61,9 +75,7 @@ public class HttpServer {
         } catch (Exception ex) {
             LOGGER.error("Error occurred while starting Jetty", ex);
             System.exit(1);
-        }
-
-        finally {
+        } finally {
             server.destroy();
         }
     }
