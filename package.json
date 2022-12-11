@@ -3,6 +3,8 @@
   "version": "1.13.0",
   "description": "Salesforce Apex plugin for Prettier",
   "main": "dist/src/index.js",
+  "browser": "dist/src/standalone.js",
+  "unpkg": "dist/src/standalone.js",
   "bin": {
     "start-apex-server": "./dist/bin/start-apex-server.js",
     "stop-apex-server": "./dist/bin/stop-apex-server.js",
@@ -13,12 +15,13 @@
     "node": ">= 14.0.0"
   },
   "files": [
-    "/dist",
+    "/dist/bin",
+    "/dist/src",
     "/vendor"
   ],
   "scripts": {
     "build": "tsc",
-    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json && yarn build:standalone && cpy --flat output/standalone.js dist",
+    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json && yarn build:standalone",
     "build:standalone": "rollup -c rollup.config.mjs",
     "pretest": "yarn run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
@@ -50,7 +53,6 @@
     "@types/wait-on": "5.3.1",
     "@typescript-eslint/eslint-plugin": "5.59.2",
     "@typescript-eslint/parser": "5.59.2",
-    "cpy-cli": "4.2.0",
     "cross-env": "7.0.3",
     "eslint": "8.40.0",
     "eslint-config-airbnb-base": "15.0.0",

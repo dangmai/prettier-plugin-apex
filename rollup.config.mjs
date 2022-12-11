@@ -11,7 +11,7 @@ import terser from "@rollup/plugin-terser";
 export default {
   input: "src/index.ts",
   output: {
-    file: "output/standalone.js",
+    file: "dist/src/standalone.js",
     format: "umd",
     name: "prettierPlugins.apex",
     exports: "named",
@@ -31,6 +31,11 @@ export default {
     nodePolyfills(),
     typescript({
       tsconfig: "tsconfig.prod.json",
+      compilerOptions: {
+        // The declarations are created by `tsc` from the package build already,
+        // so we skip it as part of the standalone build
+        declaration: false,
+      },
     }),
     babel({
       babelrc: false,
