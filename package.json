@@ -69,12 +69,5 @@
     "jest-docblock": "^29.0.0",
     "wait-on": "^6.0.0",
     "yargs": "^17.0.0"
-  },
-  "husky": {
-    "hooks": {
-      "post-checkout": "yarnhook",
-      "post-merge": "yarnhook",
-      "post-rewrite": "yarnhook"
-    }
   }
 }
