@@ -3,6 +3,8 @@ import path from "path";
 import prettier from "prettier";
 
 describe("Parser Tests", () => {
+  // Synchronous parser tends to run slow on GitHub Actions
+  jest.setTimeout(10000);
   it("runs synchronous parser on valid class correctly", async () => {
     const fileName = path.join(__dirname, "ValidClass.cls");
     const source = await fs.readFile(fileName, "utf8");
