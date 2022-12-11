@@ -29,6 +29,7 @@
     "lint": "eslint \"{src,bin,tests_config}/**/*.{js,ts}\"",
     "prettier": "prettier --write \"{src,bin,tests_config}/**/*.{js,ts}\" \"./*.md\"",
     "prepack": "yarn run build:prod",
+    "postinstall": "husky install",
     "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=."
   },
   "keywords": [
