@@ -79,7 +79,7 @@ async function parseTextWithHttp(
         prettyPrint: false,
       }),
     });
-    return result.text();
+    return await result.text();
   } catch (err: any) {
     throw new Error(
       `Failed to connect to Apex parsing server\r\n${err.toString()}`,
