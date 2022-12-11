@@ -2,7 +2,7 @@
 import childProcess from "child_process";
 import path from "path";
 import prettier from "prettier";
-import axios from "axios";
+import fetch from "cross-fetch";
 
 import {
   findNextUncommentedCharacter,
@@ -66,17 +66,20 @@ async function parseTextWithHttp(
   anonymous: boolean,
 ): Promise<string> {
   try {
-    const result = await axios.post(
-      `http://${serverHost}:${serverPort}/api/ast`,
-      {
+    const result = await fetch(`http://${serverHost}:${serverPort}/api/ast`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
         sourceCode: text,
         anonymous,
         outputFormat: "json",
         idRef: true,
         prettyPrint: false,
-      },
-    );
-    return JSON.stringify(result.data);
+      }),
+    });
+    return result.text();
   } catch (err: any) {
     throw new Error(
       `Failed to connect to Apex parsing server\r\n${err.toString()}`,

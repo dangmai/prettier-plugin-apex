@@ -17,10 +17,10 @@ export default {
     exports: "named",
     globals: {
       prettier: "prettier",
-      axios: "axios",
+      fetch: "fetch"
     },
   },
-  external: ["prettier", "axios"],
+  external: ["prettier", "fetch"],
   plugins: [
     nodeResolve({
       browser: true,

@@ -76,7 +76,7 @@
     "prettier": "^3.0.0"
   },
   "dependencies": {
-    "axios": "^1.0.0",
+    "cross-fetch": "3.1.5",
     "jest-docblock": "^29.0.0",
     "wait-on": "^7.0.0",
     "yargs": "^17.0.0"

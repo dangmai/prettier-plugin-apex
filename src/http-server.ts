@@ -1,8 +1,8 @@
 import { spawn, ChildProcess } from "child_process";
 import path from "path";
 import util from "util";
-import axios, { AxiosResponse } from "axios";
 import waitOn from "wait-on";
+import fetch from "cross-fetch";
 import { getSerializerBinDirectory } from "./util";
 
 const waitOnPromise = util.promisify(waitOn);
@@ -35,10 +35,8 @@ export async function start(
   return command;
 }
 
-export async function stop(host: string, port: number): Promise<AxiosResponse> {
-  return axios.post(`http://${host}:${port}/shutdown`, null, {
-    params: {
-      token: "secret",
-    },
+export async function stop(host: string, port: number): Promise<Response> {
+  return fetch(`http://${host}:${port}/shutdown?token=secret`, {
+    method: "POST",
   });
 }
