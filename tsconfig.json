@@ -11,6 +11,6 @@
   "compilerOptions": {
     "outDir": "./dist",
     "sourceMap": true,
-    "inlineSourceMap": true
+    "inlineSourceMap": false
   }
 }

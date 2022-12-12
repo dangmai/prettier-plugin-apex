@@ -16,6 +16,9 @@
       "disableOptimisticBPs": true,
       "windows": {
         "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "env": {
+        "NODE_OPTIONS": "--experimental-vm-modules"
       }
     },
     {
@@ -35,6 +38,9 @@
       "disableOptimisticBPs": true,
       "windows": {
         "program": "${workspaceFolder}/node_modules/jest/bin/jest"
+      },
+      "env": {
+        "NODE_OPTIONS": "--experimental-vm-modules"
       }
     }
   ]
