@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.MarshallingContext;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.converters.collections.TreeMapConverter;
+import com.thoughtworks.xstream.converters.reflection.ReflectionConverter;
 import com.thoughtworks.xstream.core.ClassLoaderReference;
 import com.thoughtworks.xstream.core.util.CompositeClassLoader;
 import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
@@ -31,6 +32,21 @@ public class Apex {
         xstream.setMode(mode);
         xstream.registerConverter(new CustomCollectionConverter(xstream.getMapper()));
         xstream.registerConverter(new CustomTreeMapConverter(xstream.getMapper()));
+
+        // Since XStream 1.4.20, XStream has a dedicated Optional converter.
+        // However, it doesn't play nice with Optional lists when serializing
+        // to JSON, so we use the old ReflectionConverter instead.
+        // The downside for this converter is that it only works if access to
+        // these libraries are opened manually, but we add those access
+        // anyway as part of the Gradle build.
+        xstream.registerConverter(
+            new ReflectionConverter(
+                xstream.getMapper(),
+                xstream.getReflectionProvider(),
+                Optional.class
+            ),
+            XStream.PRIORITY_VERY_HIGH
+        );
     }
 
     public enum OutputFormat { XML, JSON }
