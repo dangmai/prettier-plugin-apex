@@ -674,6 +674,7 @@ function handleAnnotation(path: AstPath, print: printFn): Doc {
   const trailingParts: Doc[] = [];
   const parameterParts = [];
   const parameterDocs: Doc[] = path.map(print, "parameters");
+  let annotationName;
   if (node.comments) {
     // We print the comments manually because this method adds a hardline
     // at the end of the annotation. If we left it to Prettier to print trailing
@@ -694,7 +695,18 @@ function handleAnnotation(path: AstPath, print: printFn): Doc {
     }, "comments");
   }
   parts.push("@");
-  parts.push(path.call(print, "name", "value"));
+
+  // Update the first character of the annotation name to be uppercase
+  annotationName = path.call(print, "name", "value") as string;
+  if (
+    annotationName &&
+    annotationName.length > 0 &&
+    annotationName[0] !== undefined
+  ) {
+    annotationName = annotationName[0].toUpperCase() + annotationName.slice(1);
+  }
+
+  parts.push(annotationName);
   if (parameterDocs.length > 0) {
     parameterParts.push("(");
     parameterParts.push(softline);
