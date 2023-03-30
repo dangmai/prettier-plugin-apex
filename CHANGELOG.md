@@ -5,6 +5,10 @@
 - `start-apex-server` takes optional `-c` flag, which will be passed on to `apex-ast-serializer` as a comma-delimited list of allowed origins that will be added to the CORS headers returned by the parsing server.
 - `start-apex-server` pipes internal logs to console, so that errors can be caught more quickly by users.
 
+## Formatting Changes
+
+- Apex annotations are formated like in the [official documentation](https://developer.salesforce.com/docs/atlas.en-us.apexcode.meta/apexcode/apex_classes_annotation.htm). The first character after the `@` is uppercase.
+
 # 1.12.0
 
 ## Formatting Changes
