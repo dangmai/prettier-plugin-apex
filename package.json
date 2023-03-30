@@ -58,7 +58,7 @@
     "rimraf": "4.4.1",
     "ts-jest": "29.0.5",
     "ts-node": "10.9.1",
-    "typescript": "5.0.2",
+    "typescript": "5.0.3",
     "yarnhook": "0.6.0"
   },
   "peerDependencies": {
