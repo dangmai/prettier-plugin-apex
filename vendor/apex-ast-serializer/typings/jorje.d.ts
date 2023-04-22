@@ -332,6 +332,7 @@ export interface DmlDeleteStmnt extends Stmnt {
     "@class": "apex.jorje.data.ast.Stmnt$DmlDeleteStmnt";
     expr: Expr;
     loc: Location;
+    runAsMode?: Identifier;
     "@id"?: string;
     "@reference"?: string;
 }
@@ -340,6 +341,7 @@ export interface DmlInsertStmnt extends Stmnt {
     "@class": "apex.jorje.data.ast.Stmnt$DmlInsertStmnt";
     expr: Expr;
     loc: Location;
+    runAsMode?: Identifier;
     "@id"?: string;
     "@reference"?: string;
 }
@@ -349,6 +351,7 @@ export interface DmlMergeStmnt extends Stmnt {
     expr1: Expr;
     expr2: Expr;
     loc: Location;
+    runAsMode?: Identifier;
     "@id"?: string;
     "@reference"?: string;
 }
@@ -357,6 +360,7 @@ export interface DmlUndeleteStmnt extends Stmnt {
     "@class": "apex.jorje.data.ast.Stmnt$DmlUndeleteStmnt";
     expr: Expr;
     loc: Location;
+    runAsMode?: Identifier;
     "@id"?: string;
     "@reference"?: string;
 }
@@ -365,6 +369,7 @@ export interface DmlUpdateStmnt extends Stmnt {
     "@class": "apex.jorje.data.ast.Stmnt$DmlUpdateStmnt";
     expr: Expr;
     loc: Location;
+    runAsMode?: Identifier;
     "@id"?: string;
     "@reference"?: string;
 }
@@ -374,6 +379,7 @@ export interface DmlUpsertStmnt extends Stmnt {
     expr: Expr;
     id?: FieldIdentifier;
     loc: Location;
+    runAsMode?: Identifier;
     "@id"?: string;
     "@reference"?: string;
 }
