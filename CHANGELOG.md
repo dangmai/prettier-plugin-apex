@@ -1,5 +1,9 @@
 # Unreleased
 
+## Formatting Changes
+
+- Add support for User Mode in Database Operations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/738)).
+
 ## Internal Changes
 
 - `start-apex-server` takes optional `-c` flag, which will be passed on to `apex-ast-serializer` as a comma-delimited list of allowed origins that will be added to the CORS headers returned by the parsing server.

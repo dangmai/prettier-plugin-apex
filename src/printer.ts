@@ -922,6 +922,7 @@ function handleStatement(
   const parts: Doc[] = [];
   parts.push(doc);
   parts.push(" ");
+  pushIfExist(parts, path.call(print, "runAsMode", "value"), [" "], ["as "]);
   parts.push(path.call(print, "expr"));
   // upsert statement has an extra param that can be tacked on at the end
   if (node.id) {
@@ -935,6 +936,7 @@ function handleDmlMergeStatement(path: AstPath, print: printFn): Doc {
   const parts: Doc[] = [];
   parts.push("merge");
   parts.push(" ");
+  pushIfExist(parts, path.call(print, "runAsMode", "value"), [" "], ["as "]);
   parts.push(path.call(print, "expr1"));
   parts.push(line);
   parts.push(path.call(print, "expr2"));

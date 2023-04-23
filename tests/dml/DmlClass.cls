@@ -12,6 +12,8 @@ class DMLClass {
       new Account(Name = 'Inner Acme Three'),
       new Account(Name = 'Inner Acme Four')
     };
+    insert as user account;
+    insert as system account;
   }
   void updateTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -27,6 +29,8 @@ class DMLClass {
       new Account(Id = accountId, Name = 'Inner Acme Three'),
       new Account(Id = accountId, Name = 'Inner Acme Four')
     };
+    update as user account;
+    update as system account;
   }
   void upsertWithoutOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -42,6 +46,8 @@ class DMLClass {
       new Account(Name = 'Inner Acme Three'),
       new Account(Id = accountId, Name = 'Inner Acme Four')
     };
+    upsert as user account;
+    upsert as system account;
   }
   void upsertWithOptFieldTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -72,6 +78,8 @@ class DMLClass {
       new Account(Id = accountId, Name = 'Inner Acme Three'),
       new Account(Id = accountId, Name = 'Inner Acme Four')
     };
+    delete as user account;
+    delete as system account;
   }
   void undeleteTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1 ALL ROWS].Id;
@@ -90,6 +98,8 @@ class DMLClass {
       new Account(Id = accountId, Name = 'Inner Acme Three'),
       new Account(Id = accountId, Name = 'Inner Acme Four')
     };
+    undelete as user account;
+    undelete as system account;
   }
   void mergeTest() {
     Id accountId = [SELECT Id FROM Account LIMIT 1].Id;
@@ -104,6 +114,8 @@ class DMLClass {
     merge account accounts;
     merge account accountId;
     merge account accountIds;
+    merge as user account accountId;
+    merge as system account accountIds;
 
     merge new Account(Id = accountId, Name = 'Acme One') new Account(Id = accountId, Name = 'Acme Two');
     merge new Account(Id = accountId, Name = 'Acme One') new Account[]{new Account(Id = accountId, Name = 'Acme Two')};
