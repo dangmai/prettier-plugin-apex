@@ -61,7 +61,7 @@ export function isApexDocComment(comment: jorje.BlockComment): boolean {
 }
 
 export function checkIfParentIsDottedExpression(path: AstPath): boolean {
-  const node = path.getValue();
+  const node = path.getNode();
   const parentNode = path.getParentNode();
 
   let result = false;

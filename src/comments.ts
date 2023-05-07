@@ -59,18 +59,17 @@ export function printComment(path: AstPath): Doc {
   // This handles both Inline and Block Comments.
   // We don't just pass through the value because unlike other string literals,
   // this should not be escaped
-  const comment = path.getValue();
   let result;
-  const node = path.getValue();
+  const node = path.getNode();
   if (isApexDocComment(node)) {
     result = printApexDocComment(node);
   } else {
     result = node.value;
   }
-  if (comment.trailingEmptyLine) {
+  if (node.trailingEmptyLine) {
     result = [result, hardline];
   }
-  comment.printed = true;
+  node.printed = true;
   return result;
 }
 
@@ -79,7 +78,7 @@ export function printDanglingComment(
   options: ParserOptions,
 ): Doc {
   const sourceCode = options.originalText;
-  const comment = commentPath.getValue();
+  const comment = commentPath.getNode();
   const loc = comment.location;
   const isFirstComment = commentPath.getName() === 0;
   const parts = [];
@@ -144,7 +143,7 @@ export function isBlockComment(comment: GenericComment): boolean {
  * @returns {boolean} whether or not we will print the comment on this node manually.
  */
 export function willPrintOwnComments(path: AstPath): boolean {
-  const node = path.getValue();
+  const node = path.getNode();
   return !node || !node["@class"] || node["@class"] === apexTypes.ANNOTATION;
 }
 
@@ -412,7 +411,7 @@ export function handleRemainingComment(
  * @returns {boolean} Whether the path should be formatted.
  */
 export function hasPrettierIgnore(path: AstPath): boolean {
-  const node = path.getValue();
+  const node = path.getNode();
   return (
     node &&
     node.comments &&

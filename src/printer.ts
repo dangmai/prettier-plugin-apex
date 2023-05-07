@@ -85,7 +85,7 @@ function escapeString(text: string): string {
 }
 
 function handleReturnStatement(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const docs: Doc[] = [];
   docs.push("return");
   const childDocs: Doc = path.call(print, "expr", "value");
@@ -101,7 +101,7 @@ function handleReturnStatement(path: AstPath, print: printFn): Doc {
 }
 
 function handleTriggerUsage(path: AstPath): Doc {
-  const node: jorje.TriggerDeclUnit["usages"][number] = path.getValue();
+  const node: jorje.TriggerDeclUnit["usages"][number] = path.getNode();
   return TRIGGER_USAGE[node.$];
 }
 
@@ -113,7 +113,7 @@ function getOperator(node: jorje.BinaryExpr | jorje.BooleanExpr): string {
 }
 
 function handleBinaryishExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const nodeOp = getOperator(node);
   const nodePrecedence = getPrecedence(nodeOp);
   const parentNode = path.getParentNode();
@@ -236,7 +236,7 @@ function handleBinaryishExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleAssignmentExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const docs: Doc[] = [];
 
   const leftDoc: Doc = path.call(print, "left");
@@ -262,7 +262,7 @@ function handleAssignmentExpression(path: AstPath, print: printFn): Doc {
 }
 
 function shouldDottedExpressionBreak(path: AstPath): boolean {
-  const node = path.getValue();
+  const node = path.getNode();
   // #62 - `super` cannot  be followed any white spaces
   if (
     node.dottedExpr.value["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION
@@ -290,7 +290,7 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
 }
 
 function handleDottedExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const dottedExpressionParts: Doc[] = [];
   const dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
 
@@ -313,7 +313,7 @@ function handleArrayExpressionIndex(
   print: printFn,
   withGroup = true,
 ): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   let parts;
   if (node.index["@class"] === APEX_TYPES.LITERAL_EXPRESSION) {
     // For literal index, we will make sure it's always attached to the [],
@@ -326,7 +326,7 @@ function handleArrayExpressionIndex(
 }
 
 function handleVariableExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
   const { dottedExpr } = node;
@@ -392,7 +392,7 @@ function handleLiteralExpression(
   print: printFn,
   options: prettier.ParserOptions,
 ): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const literalType: Doc = path.call(print, "type", "$");
   if (literalType === "NULL") {
     return "null";
@@ -440,22 +440,22 @@ function handleLiteralExpression(
 }
 
 function handleBinaryOperation(path: AstPath): Doc {
-  const node: jorje.BinaryExpr["op"] = path.getValue();
+  const node: jorje.BinaryExpr["op"] = path.getNode();
   return BINARY[node.$];
 }
 
 function handleBooleanOperation(path: AstPath): Doc {
-  const node: jorje.BooleanExpr["op"] = path.getValue();
+  const node: jorje.BooleanExpr["op"] = path.getNode();
   return BOOLEAN[node.$];
 }
 
 function handleAssignmentOperation(path: AstPath): Doc {
-  const node: jorje.AssignmentExpr["op"] = path.getValue();
+  const node: jorje.AssignmentExpr["op"] = path.getNode();
   return ASSIGNMENT[node.$];
 }
 
 function getDanglingCommentDocs(path: AstPath, _print: printFn, options: any) {
-  const node = path.getValue();
+  const node = path.getNode();
   if (!node.comments) {
     return [];
   }
@@ -550,7 +550,7 @@ function handleInterfaceDeclaration(
   print: printFn,
   options: any,
 ) {
-  const node = path.getValue();
+  const node = path.getNode();
 
   const superInterface: Doc = path.call(print, "superInterface", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
@@ -607,7 +607,7 @@ function handleClassDeclaration(
   print: printFn,
   options: any,
 ): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
 
   const superClass: Doc = path.call(print, "superClass", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
@@ -667,7 +667,7 @@ function handleClassDeclaration(
 }
 
 function handleAnnotation(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parts: Doc[] = [];
   const trailingParts: Doc[] = [];
   const parameterParts = [];
@@ -682,7 +682,7 @@ function handleAnnotation(path: AstPath, print: printFn): Doc {
     // void method() {}
     // ```
     path.each((innerPath: AstPath) => {
-      const commentNode = innerPath.getValue();
+      const commentNode = innerPath.getNode();
       // This can only be a trailing comment, because if it is a leading one,
       // it will be attached to the Annotation's parent node (e.g. MethodDecl)
       if (commentNode.trailing) {
@@ -916,7 +916,7 @@ function handleStatement(
         `Statement ${childClass} is not supported. Please file a bug report.`,
       );
   }
-  const node = path.getValue();
+  const node = path.getNode();
   const parts: Doc[] = [];
   parts.push(doc);
   parts.push(" ");
@@ -1175,7 +1175,7 @@ function handleVariableDeclarations(path: AstPath, print: printFn): Doc {
 }
 
 function handleVariableDeclaration(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parts: Doc[] = [];
   let resultDoc;
 
@@ -1239,7 +1239,7 @@ function handleNewKeyValue(path: AstPath, print: printFn): Doc {
 }
 
 function handleNameValueParameter(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
 
   const parts: Doc[] = [];
   parts.push(path.call(print, "name"));
@@ -1281,7 +1281,7 @@ function handleSuperMethodCallExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleMethodCallExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parentNode = path.getParentNode();
   const nodeName = path.getName();
   const { dottedExpr } = node;
@@ -1477,7 +1477,7 @@ function handleNewListInit(path: AstPath, print: printFn): Doc {
   // We use List<Object>(param) otherwise.
   // This should provide compatibility for all known types without knowing
   // if the parameter is a variable (copy constructor) or literal size.
-  const node = path.getValue();
+  const node = path.getNode();
   const expressionDoc: Doc = path.call(print, "expr", "value");
   const parts: Doc[] = [];
   const typeParts = path.map(print, "types");
@@ -1578,7 +1578,7 @@ function handleNewExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleIfElseBlock(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parts: Doc[] = [];
   const ifBlockDocs: Doc[] = path.map(print, "ifBlocks");
   const elseBlockDoc: Doc = path.call(print, "elseBlock", "value");
@@ -1754,7 +1754,7 @@ function handleStructuredVersion(path: AstPath, print: printFn): Doc {
 }
 
 function handleArrayExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr");
   // In certain situations we need to defer printing the [] part to be part of
@@ -1950,7 +1950,7 @@ function handleReturningSelectExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleSearch(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const withDocs: Doc[] = path.map(print, "withs");
 
   const parts: Doc[] = [];
@@ -2008,7 +2008,7 @@ function handleWhereInnerExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handleQuery(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const withIdentifierDocs: Doc[] = path.map(print, "withIdentifiers");
   const parts: Doc[] = [];
   parts.push(path.call(print, "select"));
@@ -2333,7 +2333,7 @@ function handleWhereQueryLiteral(
   print: printFn,
   options: any,
 ): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const grandParentNode = path.getParentNode(1);
 
   let doc: Doc;
@@ -2379,7 +2379,7 @@ function handleWhereQueryLiteral(
 }
 
 function handleWhereCompoundExpression(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const parentNode = path.getParentNode();
   const isNestedExpression =
     parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
@@ -2470,7 +2470,7 @@ function handleOrderOperation(
   _print: printFn,
   opts: prettier.ParserOptions,
 ): Doc {
-  const loc = opts.locStart(path.getValue());
+  const loc = opts.locStart(path.getNode());
   if (loc) {
     return ORDER[childClass as jorje.Order["@class"]];
   }
@@ -2483,7 +2483,7 @@ function handleNullOrderOperation(
   _print: printFn,
   opts: prettier.ParserOptions,
 ): Doc {
-  const loc = opts.locStart(path.getValue());
+  const loc = opts.locStart(path.getNode());
   if (loc) {
     return ORDER_NULL[childClass as jorje.OrderNull["@class"]];
   }
@@ -2667,17 +2667,17 @@ function handlePrefixExpression(path: AstPath, print: printFn): Doc {
 }
 
 function handlePostfixOperator(path: AstPath): Doc {
-  const node: jorje.PostfixExpr["op"] = path.getValue();
+  const node: jorje.PostfixExpr["op"] = path.getNode();
   return POSTFIX[node.$];
 }
 
 function handlePrefixOperator(path: AstPath): Doc {
-  const node: jorje.PrefixExpr["op"] = path.getValue();
+  const node: jorje.PrefixExpr["op"] = path.getNode();
   return PREFIX[node.$];
 }
 
 function handleWhileLoop(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const conditionDoc: Doc = path.call(print, "condition");
 
   const parts: Doc[] = [];
@@ -2724,7 +2724,7 @@ function handleDoLoop(path: AstPath, print: printFn): Doc {
 }
 
 function handleForLoop(path: AstPath, print: printFn): Doc {
-  const node = path.getValue();
+  const node = path.getNode();
   const forControlDoc: Doc = path.call(print, "forControl");
 
   const parts: Doc[] = [];
@@ -3145,7 +3145,7 @@ function genericPrint(
   options: prettier.ParserOptions,
   print: printFn,
 ) {
-  const n = path.getValue();
+  const n = path.getNode();
   if (typeof n === "number" || typeof n === "boolean") {
     return n.toString();
   }
@@ -3199,7 +3199,7 @@ export default function printGenerically(
   if (typeof opts === "object") {
     options = opts;
   }
-  const node = path.getValue();
+  const node = path.getNode();
   const doc = genericPrint(path, options, print);
   return handleTrailingEmptyLines(doc, node);
 }
