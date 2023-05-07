@@ -412,7 +412,11 @@ function handleLiteralExpression(
       node.loc.startIndex,
       node.loc.endIndex,
     );
-    const lastCharacter = literal[literal.length - 1]!.toLowerCase();
+    let lastCharacter = literal[literal.length - 1];
+    if (lastCharacter === undefined) {
+      lastCharacter = "";
+    }
+    const lowercasedLastCharacter = lastCharacter.toLowerCase();
     // We handle the letters d and l at the end of Decimal and Long manually:
     // ```
     // Decimal a = 1.0D
@@ -425,9 +429,9 @@ function handleLiteralExpression(
     // ```
     // In general we try to keep keywords lowercase, however uppercase L is better
     // the lowercase l because lowercase l can be mistaken for number 1
-    if (lastCharacter === "d") {
+    if (lowercasedLastCharacter === "d") {
       doc = `${literal.substring(0, literal.length - 1)}d`;
-    } else if (lastCharacter === "l") {
+    } else if (lowercasedLastCharacter === "l") {
       doc = `${literal.substring(0, literal.length - 1)}L`;
     } else {
       doc = literal;

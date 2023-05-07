@@ -547,10 +547,12 @@ function getLineIndexes(sourceCode: string) {
     if (eolIndex < 0) {
       break;
     }
+    const lastLineIndex = lineIndexes[lineIndex - 1];
+    if (lastLineIndex === undefined) {
+      return lineIndexes;
+    }
     lineIndexes[lineIndex] =
-      lineIndexes[lineIndex - 1]! +
-      sourceCode.substring(characterIndex, eolIndex).length +
-      1;
+      lastLineIndex + sourceCode.substring(characterIndex, eolIndex).length + 1;
     characterIndex = eolIndex + 1;
     lineIndex += 1;
   }
