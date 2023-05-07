@@ -4117,10 +4117,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@3.0.0-alpha.11:
-  version "3.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.0-alpha.11.tgz#fb6f9c7b4495fcc8c70b6633de885bf38b8585af"
-  integrity sha512-/x61/kcsjjU8kUEDKnn8PtqRzMXROg68KbUOtRC09oOQ3Vs6Bjwz7tabF98xu/K/RP/jZzWIvxphWr881DaokQ==
+prettier@3.0.0-alpha.9-for-vscode:
+  version "3.0.0-alpha.9-for-vscode"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-3.0.0-alpha.9-for-vscode.tgz#163beaa27b76178a3a66dbca2087d0f464204f94"
+  integrity sha512-1PRIN3j5DKFi/BGBYB6aErxkq76ml2n1AHPmwrqh/bCiBkmXio5eFTrNMpDls/529r+8TSzVLQMhDFzrwMA2ag==
 
 pretty-format@^29.0.0, pretty-format@^29.5.0:
   version "29.5.0"
