@@ -17,7 +17,7 @@ export default {
     exports: "named",
     globals: {
       prettier: "prettier",
-      fetch: "fetch"
+      fetch: "fetch",
     },
   },
   external: ["prettier", "fetch"],
