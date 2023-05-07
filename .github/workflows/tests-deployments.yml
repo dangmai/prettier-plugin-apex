@@ -15,11 +15,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # We are supporting NodeJS 14, however there is a bug with Jest Runner
-        # that prevents us from running tests on NodeJS 14, see:
-        # https://github.com/facebook/jest/issues/11814
         node:
-          - "19"
+          - "20"
           - "18"
           - "16"
         java:

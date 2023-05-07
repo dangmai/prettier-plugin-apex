@@ -12,7 +12,7 @@
     "apex-ast-serializer-http": "./vendor/apex-ast-serializer/bin/apex-ast-serializer-http"
   },
   "engines": {
-    "node": ">= 14.0.0"
+    "node": ">= 16.0.0"
   },
   "files": [
     "/dist/bin",

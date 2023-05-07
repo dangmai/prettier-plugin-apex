@@ -1,3 +1,10 @@
+# Unreleased
+
+## Dependency Changes
+
+- Support Prettier v3 ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/673)). You cannot use this version with Prettier v2, please plan your upgrade accordingly.
+- Drop support for NodeJS < 16.
+
 # 1.13.0
 
 ## Formatting Changes
