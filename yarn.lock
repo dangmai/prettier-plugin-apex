@@ -2440,12 +2440,13 @@ eslint-plugin-prettier-doc@1.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-prettier-doc/-/eslint-plugin-prettier-doc-1.1.0.tgz#ebf679b480e6048e90d5b152e6043714780bb4e6"
   integrity sha512-ytzztiiqobTeYLqdRnv+dgowcb63gFFy31RekPeVPB6YOshwuGKJVKPdkq/mYtwsJ+eDtLiHksfwH5/M5nU09g==
 
-eslint-plugin-prettier@5.0.0-alpha.0:
-  version "5.0.0-alpha.0"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.0.0-alpha.0.tgz#8a4b4d511db39dc7830cc8ee83967f8ba3cf8577"
-  integrity sha512-ZFQYCs/SGj4eVRtBGdG+ZNcV0N8QJstm03SQL8e0I/A/5VGJfH0kX88shUv5cHWFN6xTuISGvAG6XVCYUT1YVw==
+eslint-plugin-prettier@5.0.0-alpha.1:
+  version "5.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.0.0-alpha.1.tgz#fc81f9041497b2ee79b777a3ae52006622624097"
+  integrity sha512-VB20LzLKsHC19yRtxyr73OFJexGaIm8dkODwtUB5qwFrqRhswr/J624dMxCSBe6Dyx3993dbm2jr+rwJ9yoPhA==
   dependencies:
     prettier-linter-helpers "^1.0.0"
+    synckit "^0.8.5"
 
 eslint-scope@^5.1.1:
   version "5.1.1"
@@ -4520,6 +4521,14 @@ synckit@0.8.4:
   dependencies:
     "@pkgr/utils" "^2.3.1"
     tslib "^2.4.0"
+
+synckit@^0.8.5:
+  version "0.8.5"
+  resolved "https://registry.yarnpkg.com/synckit/-/synckit-0.8.5.tgz#b7f4358f9bb559437f9f167eb6bc46b3c9818fa3"
+  integrity sha512-L1dapNV6vu2s/4Sputv8xGsCdAVlb5nRDMFU/E27D44l5U6cw1g0dGd45uLc+OXjNMmF4ntiMdCimzcjFKQI8Q==
+  dependencies:
+    "@pkgr/utils" "^2.3.1"
+    tslib "^2.5.0"
 
 terser@^5.15.1:
   version "5.17.1"
