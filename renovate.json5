@@ -1,17 +1,26 @@
 {
-  extends: ["config:base"],
-  assignees: ["dangmai"],
-  lockFileMaintenance: { enabled: true },
-  packageRules: [
+  "extends": ["config:base"],
+  "assignees": ["dangmai"],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
+  "asdf": {
+    "enabled": false
+  },
+  "packageRules": [
     {
-      matchUpdateTypes: [
+      "matchUpdateTypes": [
         "minor",
         "patch",
         "pin",
         "digest",
-        "lockFileMaintenance",
+        "lockFileMaintenance"
       ],
-      automerge: true,
+      "automerge": true
     },
-  ],
+    {
+      "matchPackageNames": ["@types/node"],
+      "enabled": false
+    }
+  ]
 }
