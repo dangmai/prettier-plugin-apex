@@ -1,36 +1,34 @@
 #!/usr/bin/env node
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
+import { parseArgs } from "util";
 
 import { start } from "../src/http-server";
 
-async function setup(host: string, port: number, allowedOrigins?: string) {
-  await start(host, port, allowedOrigins);
+async function setup(host: string, port: string, allowedOrigins?: string) {
+  await start(host, Number.parseInt(port, 10), allowedOrigins);
 }
 
-yargs(hideBin(process.argv))
-  .command(
-    "$0",
-    "start the built-in parsing server",
-    {
-      host: {
-        alias: "h",
-        default: "localhost",
-      },
-      port: {
-        alias: "p",
-        default: 2117,
-      },
-      "cors-allowed-origins": {
-        describe:
-          "Comma-delimited list of allowed origins to be added to CORS headers",
-        alias: "c",
-        type: "string",
-      },
-    },
-    (argv) => {
-      setup(argv.host, argv.port, argv["cors-allowed-origins"]);
-    },
-  )
-  .help()
-  .parse();
+const options = {
+  host: {
+    short: "h",
+    default: "localhost",
+    type: "string" as const,
+  },
+  port: {
+    short: "p",
+    default: "2117",
+    type: "string" as const,
+  },
+  "cors-allowed-origins": {
+    describe:
+      "Comma-delimited list of allowed origins to be added to CORS headers",
+    short: "c",
+    type: "string" as const,
+  },
+};
+
+const parsed = parseArgs({ options });
+setup(
+  parsed.values.host ?? options.host.default,
+  parsed.values.port ?? options.port.default,
+  parsed.values["cors-allowed-origins"],
+);

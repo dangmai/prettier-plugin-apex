@@ -1,30 +1,27 @@
 #!/usr/bin/env node
-import yargs from "yargs";
-import { hideBin } from "yargs/helpers";
+import { parseArgs } from "util";
 
 import { stop } from "../src/http-server";
 
-async function teardown(host: string, port: number) {
-  await stop(host, port);
+async function teardown(host: string, port: string) {
+  await stop(host, Number.parseInt(port, 10));
 }
 
-yargs(hideBin(process.argv))
-  .command(
-    "$0",
-    "stop the built-in parsing server",
-    {
-      host: {
-        alias: "h",
-        default: "localhost",
-      },
-      port: {
-        alias: "p",
-        default: 2117,
-      },
-    },
-    (argv) => {
-      teardown(argv.host, argv.port);
-    },
-  )
-  .help()
-  .parse();
+const options = {
+  host: {
+    short: "h",
+    default: "localhost",
+    type: "string" as const,
+  },
+  port: {
+    short: "p",
+    default: "2117",
+    type: "string" as const,
+  },
+};
+
+const parsed = parseArgs({ options });
+teardown(
+  parsed.values.host ?? options.host.default,
+  parsed.values.port ?? options.port.default,
+);
