@@ -25,6 +25,7 @@
     "build:standalone": "rollup -c rollup.config.mjs",
     "pretest": "yarn run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test:standalone": "yarn test -c jest.config.standalone.js",
     "start-server": "ts-node bin/start-apex-server.ts",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
     "stop-server": "ts-node bin/stop-apex-server.ts",

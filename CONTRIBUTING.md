@@ -7,7 +7,7 @@ yarn install
 yarn run lint
 yarn run start-server # This spins up the built in HTTP parsing server
 # In another terminal
-yarn test -c jest.config.standalone.js
+yarn test:standalone
 # When you are done
 yarn run stop-server
 ```

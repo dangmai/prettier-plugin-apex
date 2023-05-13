@@ -69,7 +69,7 @@ jobs:
         run: yarn run wait-server
 
       - name: Run functional tests
-        run: AST_COMPARE=true yarn test -c jest.config.standalone.js
+        run: AST_COMPARE=true yarn test:standalone
 
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
