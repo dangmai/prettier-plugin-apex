@@ -76,7 +76,7 @@
     "prettier": "^3.0.0-alpha"
   },
   "dependencies": {
-    "cross-fetch": "3.1.5",
+    "cross-fetch": "3.1.6",
     "jest-docblock": "^29.0.0",
     "wait-on": "^7.0.0"
   }
