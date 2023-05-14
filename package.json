@@ -3,8 +3,8 @@
   "version": "1.13.0",
   "description": "Salesforce Apex plugin for Prettier",
   "main": "dist/src/index.js",
-  "browser": "dist/src/standalone.js",
-  "unpkg": "dist/src/standalone.js",
+  "browser": "dist/src/standalone.umd.js",
+  "unpkg": "dist/src/standalone.umd.js",
   "bin": {
     "start-apex-server": "./dist/bin/start-apex-server.js",
     "stop-apex-server": "./dist/bin/stop-apex-server.js",
