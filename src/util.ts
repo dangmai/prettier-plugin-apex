@@ -1,6 +1,6 @@
 /* eslint no-param-reassign: 0 */
 import { AstPath } from "prettier";
-import { join } from "path";
+import nodePath from "path";
 import fs from "fs";
 
 import jorje from "../vendor/apex-ast-serializer/typings/jorje";
@@ -252,9 +252,15 @@ function doesFileExist(file: string): boolean {
 // is being run - running using ts-node vs running after code has been compiled
 // to `dist` directory. We use this method to abstract out that difference.
 export function getSerializerBinDirectory(): string {
-  let serializerBin = join(__dirname, "../vendor/apex-ast-serializer/bin");
+  let serializerBin = nodePath.join(
+    __dirname,
+    "../vendor/apex-ast-serializer/bin",
+  );
   if (!doesFileExist(serializerBin)) {
-    serializerBin = join(__dirname, "../../vendor/apex-ast-serializer/bin");
+    serializerBin = nodePath.join(
+      __dirname,
+      "../../vendor/apex-ast-serializer/bin",
+    );
   }
   return serializerBin;
 }
