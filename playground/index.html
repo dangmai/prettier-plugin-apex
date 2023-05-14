@@ -1,34 +1,42 @@
 <html>
-<head>
-  <title>Test Page</title>
-  <script src="../node_modules/prettier/standalone.js"></script>
-  <script src="../dist/src/standalone.js"></script>
-</head>
-<body>
-  <form>
-    <textarea name="original" cols="70" rows="60" id="original"></textarea>
-    <textarea name="formatted" cols="70" rows="60" id="formatted"></textarea>
-    <input id="submit" type="button" value="Format" />
-  </form>
-
+  <head>
+    <title>Test Page</title>
+    <script src="../node_modules/prettier/standalone.js"></script>
+    <script src="../dist/src/standalone.umd.js"></script>
+  </head>
+  <body>
+    <form>
+      <label for="host">Host</label>
+      <input name="host" id="host" type="text" value="localhost" />
+      <label for="port">port</label>
+      <input name="port" id="port" type="text" value="2117" />
+      <textarea name="original" cols="70" rows="60" id="original"></textarea>
+      <textarea name="formatted" cols="70" rows="60" id="formatted"></textarea>
+      <input id="submit" type="button" value="Format" />
+    </form>
+  </body>
   <script>
     const formatApex = () => {
+      const host = document.querySelector("input#host").value;
+      const port = document.querySelector("input#port").value;
       const parseOptions = {
         apexStandaloneParser: "built-in",
-        apexStandalonePort: 2117,
-        apexStandaloneHost: "localhost",
+        apexStandalonePort: Number.parseInt(port, 10),
+        apexStandaloneHost: host,
         plugins: [prettierPlugins.apex],
-        parser: 'apex'
-      }
+        parser: "apex",
+      };
       const originalText = document.querySelector("textarea#original").value;
       prettier.format(originalText, parseOptions).then((formatted) => {
         document.querySelector("textarea#formatted").value = formatted;
       });
-    }
-    document.getElementById("submit").addEventListener("click", function(event){
-      formatApex();
-      event.preventDefault();
-    });
+    };
+
+    document
+      .getElementById("submit")
+      .addEventListener("click", function (event) {
+        formatApex();
+        event.preventDefault();
+      });
   </script>
-</body>
 </html>

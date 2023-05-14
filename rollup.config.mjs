@@ -11,7 +11,7 @@ import terser from "@rollup/plugin-terser";
 export default {
   input: "src/index.ts",
   output: {
-    file: "dist/src/standalone.js",
+    file: "dist/src/standalone.umd.js",
     format: "umd",
     name: "prettierPlugins.apex",
     exports: "named",
