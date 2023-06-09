@@ -121,7 +121,7 @@ dependencies {
   implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.2'
 
   // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.2'
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.3'
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
   implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
