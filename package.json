@@ -44,7 +44,7 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
-    "@tsconfig/node16": "1.0.4",
+    "@tsconfig/node16": "16.1.0",
     "@types/jest": "29.5.2",
     "@types/node": "18.16.9",
     "@types/wait-on": "5.3.1",
