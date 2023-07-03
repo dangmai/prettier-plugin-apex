@@ -13,7 +13,7 @@
     "apex-ast-serializer-http": "./vendor/apex-ast-serializer/bin/apex-ast-serializer-http"
   },
   "engines": {
-    "node": ">= 16.19.0"
+    "node": ">= 18.0.0"
   },
   "files": [
     "/dist/bin",
@@ -45,7 +45,7 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
-    "@tsconfig/node16": "16.1.0",
+    "@tsconfig/node18": "18.2.0",
     "@types/jest": "29.5.2",
     "@types/node": "18.16.9",
     "@types/wait-on": "5.3.1",
