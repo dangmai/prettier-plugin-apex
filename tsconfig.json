@@ -12,5 +12,8 @@
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false
+  },
+  "ts-node": {
+    "esm": true
   }
 }
