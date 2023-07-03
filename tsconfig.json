@@ -14,6 +14,7 @@
     "inlineSourceMap": false
   },
   "ts-node": {
-    "esm": true
+    "esm": true,
+    "transpileOnly": true
   }
 }

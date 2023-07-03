@@ -2,7 +2,6 @@
 import childProcess from "child_process";
 import path from "path";
 import prettier from "prettier";
-import fetch from "cross-fetch";
 
 import {
   findNextUncommentedCharacter,
