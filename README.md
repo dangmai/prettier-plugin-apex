@@ -37,7 +37,7 @@ npm install --global prettier prettier-plugin-apex
 If you install globally, run:
 
 ```bash
-prettier --write "/path/to/project/**/*.{trigger,cls}"
+prettier --plugin=prettier-plugin-apex --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
 If you install locally, you can add prettier as a script in `package.json`:
@@ -53,7 +53,7 @@ If you install locally, you can add prettier as a script in `package.json`:
 Then in order to run it:
 
 ```bash
-npm run prettier -- --write "/path/to/project/**/*.{trigger,cls}"
+npm run prettier -- --plugin=prettier-plugin-apex --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
 ### Tip
@@ -67,7 +67,7 @@ You should also run Prettier with the `--debug-check` [argument](https://prettie
 For example:
 
 ```bash
-prettier --debug-check "/path/to/project/**/*.{trigger,cls}"
+prettier --plugin=prettier-plugin-apex --debug-check "/path/to/project/**/*.{trigger,cls}"
 ```
 
 This will guarantee that the behavior of your code will not change because of
@@ -84,7 +84,7 @@ You can also format anonymous Apex with this program by using the
 For example:
 
 ```bash
-prettier --write "/path/to/project/anonymous/**/*.cls" --parser apex-anonymous
+prettier --write "/path/to/project/anonymous/**/*.cls" --plugin=prettier-plugin-apex --parser apex-anonymous
 ```
 
 Note that Prettier will treat any Apex file that it finds using the glob above
@@ -184,7 +184,7 @@ nohup start-apex-server >/dev/null 2>&1 &
 # Wait until the server is up before sending requests
 npx wait-on http://localhost:2117/api/ast/
 # Check that Apex files are formatted according to Prettier Apex style
-prettier --check 'project/**/*.{trigger,cls}' --apex-standalone-parser built-in
+prettier --plugin=prettier-plugin-apex --check 'project/**/*.{trigger,cls}' --apex-standalone-parser built-in
 # Clean up the language server
 stop-apex-server
 ```
