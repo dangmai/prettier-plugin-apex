@@ -2,9 +2,10 @@
 import { AstPath } from "prettier";
 import nodePath from "path";
 import fs from "fs";
+import { fileURLToPath } from "url";
 
-import jorje from "../vendor/apex-ast-serializer/typings/jorje";
-import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants";
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants.js";
 
 export type SerializedAst = {
   [APEX_TYPES.PARSER_OUTPUT]: jorje.ParserOutput;
@@ -253,12 +254,12 @@ function doesFileExist(file: string): boolean {
 // to `dist` directory. We use this method to abstract out that difference.
 export function getSerializerBinDirectory(): string {
   let serializerBin = nodePath.join(
-    __dirname,
+    fileURLToPath(new URL(".", import.meta.url)),
     "../vendor/apex-ast-serializer/bin",
   );
   if (!doesFileExist(serializerBin)) {
     serializerBin = nodePath.join(
-      __dirname,
+      fileURLToPath(new URL(".", import.meta.url)),
       "../../vendor/apex-ast-serializer/bin",
     );
   }

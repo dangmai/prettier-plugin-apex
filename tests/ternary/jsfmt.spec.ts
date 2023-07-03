@@ -1,5 +1,7 @@
+import * as url from "url";
+
 runSpec(
-  __dirname,
+  url.fileURLToPath(new URL(".", import.meta.url)),
   ["apex"],
   [
     { useTabs: false, tabWidth: 2 },

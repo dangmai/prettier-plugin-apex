@@ -1,4 +1,4 @@
-import jorje from "../vendor/apex-ast-serializer/typings/jorje";
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 
 import {
   canAttachComment,
@@ -9,11 +9,11 @@ import {
   isBlockComment,
   printComment,
   willPrintOwnComments,
-} from "./comments";
-import parse from "./parser";
-import { hasPragma, insertPragma } from "./pragma";
-import printFn from "./printer";
-import { massageAstNode } from "./util";
+} from "./comments.js";
+import parse from "./parser.js";
+import { hasPragma, insertPragma } from "./pragma.js";
+import printFn from "./printer.js";
+import { massageAstNode } from "./util.js";
 
 export const languages = [
   {

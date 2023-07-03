@@ -9,13 +9,13 @@ import {
   GenericComment,
   getSerializerBinDirectory,
   SerializedAst,
-} from "./util";
+} from "./util.js";
 import {
   APEX_TYPES,
   ALLOW_TRAILING_EMPTY_LINE,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
-} from "./constants";
-import jorje from "../vendor/apex-ast-serializer/typings/jorje";
+} from "./constants.js";
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 
 type MinimalLocation = {
   startIndex: number;

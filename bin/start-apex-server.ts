@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "util";
 
-import { start } from "../src/http-server";
+import { start } from "../src/http-server.js";
 
 async function setup(host: string, port: string, allowedOrigins?: string) {
   await start(host, Number.parseInt(port, 10), allowedOrigins);

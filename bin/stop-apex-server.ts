@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { parseArgs } from "util";
 
-import { stop } from "../src/http-server";
+import { stop } from "../src/http-server.js";
 
 async function teardown(host: string, port: string) {
   await stop(host, Number.parseInt(port, 10));

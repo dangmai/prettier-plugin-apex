@@ -7,9 +7,12 @@ import {
   GenericComment,
   isApexDocComment,
   isBinaryish,
-} from "./util";
-import { APEX_TYPES as apexTypes, ALLOW_DANGLING_COMMENTS } from "./constants";
-import jorje from "../vendor/apex-ast-serializer/typings/jorje";
+} from "./util.js";
+import {
+  APEX_TYPES as apexTypes,
+  ALLOW_DANGLING_COMMENTS,
+} from "./constants.js";
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 
 const { join, lineSuffix, hardline } = prettier.doc.builders;
 const {

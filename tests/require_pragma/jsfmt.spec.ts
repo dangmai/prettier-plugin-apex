@@ -1,1 +1,5 @@
-runSpec(__dirname, ["apex"], { requirePragma: true });
+import { fileURLToPath } from "url";
+
+runSpec(fileURLToPath(new URL(".", import.meta.url)), ["apex"], {
+  requirePragma: true,
+});

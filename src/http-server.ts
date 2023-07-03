@@ -3,7 +3,7 @@ import path from "path";
 import util from "util";
 import waitOn from "wait-on";
 import fetch from "cross-fetch";
-import { getSerializerBinDirectory } from "./util";
+import { getSerializerBinDirectory } from "./util.js";
 
 const waitOnPromise = util.promisify(waitOn);
 

@@ -3,13 +3,13 @@ import {
   getTrailingComments,
   printComment,
   printDanglingComment,
-} from "./comments";
+} from "./comments.js";
 import {
   AnnotatedComment,
   checkIfParentIsDottedExpression,
   getPrecedence,
   isBinaryish,
-} from "./util";
+} from "./util.js";
 import {
   ASSIGNMENT,
   APEX_TYPES,
@@ -24,9 +24,9 @@ import {
   TRIGGER_USAGE,
   QUERY,
   QUERY_WHERE,
-} from "./constants";
-import jorje from "../vendor/apex-ast-serializer/typings/jorje";
-import { EnrichedIfBlock } from "./parser";
+} from "./constants.js";
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import { EnrichedIfBlock } from "./parser.js";
 
 const docBuilders = prettier.doc.builders;
 const { align, join, hardline, line, softline, group, indent, dedent } =

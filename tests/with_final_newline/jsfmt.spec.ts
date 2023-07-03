@@ -1,1 +1,5 @@
-runSpec(__dirname, ["apex"], { apexInsertFinalNewline: true });
+import { fileURLToPath } from "url";
+
+runSpec(fileURLToPath(new URL(".", import.meta.url)), ["apex"], {
+  apexInsertFinalNewline: true,
+});

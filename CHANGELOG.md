@@ -5,6 +5,10 @@
 - Support Prettier v3 ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/673)). You cannot use this version with Prettier v2, please plan your upgrade accordingly.
 - Drop support for NodeJS < 16.19.0.
 
+## Internal Changes
+
+- Prettier Apex is now distributed as an ECMAScript Module. This shouldn't affect normal usage of the library, but if you run into issues please open a ticket.
+
 # 1.13.0
 
 ## Formatting Changes

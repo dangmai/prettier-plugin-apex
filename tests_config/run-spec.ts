@@ -54,7 +54,7 @@ function runSpec(
   }
 
   fs.readdirSync(dirname).forEach((filename: string) => {
-    const path = `${dirname}/${filename}`;
+    const path = `${dirname}${filename}`;
     if (
       extname(filename) !== ".snap" &&
       fs.lstatSync(path).isFile() &&
@@ -74,7 +74,7 @@ function runSpec(
         options.push({});
       }
       const mergedOptions = options.map((opts: prettier.Options) => ({
-        plugins: ["./src/index"],
+        plugins: ["./src/index.ts"],
         ...opts,
         parser: parsers[0],
       }));
