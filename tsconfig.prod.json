@@ -43,7 +43,7 @@
     "noPropertyAccessFromIndexSignature": true /* Require undeclared properties from index signatures to use element accesses. */,
 
     /* Module Resolution Options */
-    "module": "Node16",
+    "module": "ESNext" /* I wanted to use Node16 or NodeNext for this, however with that setting we run into this issue: https://github.com/microsoft/TypeScript/issues/50058 */,
     "moduleResolution": "node16" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
     // "baseUrl": "./",                             /* Base directory to resolve non-absolute module names. */
     // "paths": {},                                 /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */
