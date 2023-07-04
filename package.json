@@ -36,7 +36,7 @@
     "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js",
     "vite:build": "vite build",
     "vite:build:watch": "vite build --watch",
-    "vite:dev": "vite"
+    "vite:dev": "vite --open http://localhost:5173/playground/index.html"
   },
   "keywords": [
     "apex",

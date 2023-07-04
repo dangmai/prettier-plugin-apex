@@ -1,3 +1,4 @@
+import type { SupportOptions } from "prettier";
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 
 import {
@@ -86,7 +87,7 @@ export const printers = {
 
 const CATEGORY_APEX = "apex";
 
-export const options = {
+export const options: SupportOptions = {
   apexStandaloneParser: {
     type: "choice",
     category: CATEGORY_APEX,

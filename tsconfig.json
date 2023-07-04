@@ -7,9 +7,11 @@
     "tests/**/*",
     "typings/global.d.ts",
     "typings/test-global.d.ts",
-    "vite.config.ts"
+    "vite.config.ts",
+    "playground/main.ts"
   ],
   "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false

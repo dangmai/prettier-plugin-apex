@@ -1,4 +1,5 @@
-import prettier, { AstPath, Doc } from "prettier";
+import * as prettier from "prettier";
+import type { AstPath, Doc } from "prettier";
 import {
   getTrailingComments,
   printComment,

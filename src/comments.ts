@@ -1,6 +1,7 @@
 /* eslint no-param-reassign: 0, no-plusplus: 0, no-else-return: 0, consistent-return: 0 */
 
-import prettier, { AstPath, Doc, ParserOptions } from "prettier";
+import * as prettier from "prettier";
+import type { AstPath, Doc, ParserOptions } from "prettier";
 
 import {
   AnnotatedComment,
