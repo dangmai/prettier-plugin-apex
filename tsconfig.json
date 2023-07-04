@@ -6,7 +6,8 @@
     "tests_config/**/*",
     "tests/**/*",
     "typings/global.d.ts",
-    "typings/test-global.d.ts"
+    "typings/test-global.d.ts",
+    "vite.config.ts"
   ],
   "compilerOptions": {
     "outDir": "./dist",
