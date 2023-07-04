@@ -15,7 +15,10 @@
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/naming-convention": 0,
     "@typescript-eslint/switch-exhaustiveness-check": "error",
-    "import/no-extraneous-dependencies": ["error", {"devDependencies": ["tests*/**/*.ts"]}],
+    "import/no-extraneous-dependencies": [
+      "error",
+      { "devDependencies": ["tests*/**/*.ts"] }
+    ],
     "default-case": 0
   },
   "globals": {
@@ -26,5 +29,11 @@
   },
   "parserOptions": {
     "project": "./tsconfig.json"
-  }
+  },
+  "overrides": [
+    {
+      "extends": ["plugin:@typescript-eslint/disable-type-checked"],
+      "files": ["./vite.config.ts"]
+    }
+  ]
 }
