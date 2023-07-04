@@ -2,7 +2,7 @@ name: Update Jorje
 
 on:
   repository_dispatch:
-    types: jorje-update
+    types: [jorje-update]
 
 jobs:
   jorje:
@@ -24,6 +24,6 @@ jobs:
         uses: peter-evans/create-pull-request@v5.0.2
         with:
           commit-message: Updated jorje
-          title: 'Update jorje dependency'
+          title: "Update jorje dependency"
           branch: updates/jorje
           token: ${{ secrets.PERSONAL_TOKEN }}
