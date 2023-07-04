@@ -19,7 +19,7 @@ including a mix of open source/proprietary/Salesforce internal code bases.
 
 ### Requirements
 
-- Node >= 14.0.0
+- Node >= 18.11.0
 - Java Runtime Engine >= 11
 
 ### How to use
