@@ -17,7 +17,7 @@
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "import/no-extraneous-dependencies": [
       "error",
-      { "devDependencies": ["tests*/**/*.ts"] }
+      { "devDependencies": ["tests*/**/*.ts", "vite.config.ts"] }
     ],
     "default-case": 0
   },
@@ -30,10 +30,5 @@
   "parserOptions": {
     "project": "./tsconfig.json"
   },
-  "overrides": [
-    {
-      "extends": ["plugin:@typescript-eslint/disable-type-checked"],
-      "files": ["./vite.config.ts"]
-    }
-  ]
+  "ignorePatterns": ["jest.*.js"]
 }
