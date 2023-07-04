@@ -17,7 +17,13 @@
     "@typescript-eslint/switch-exhaustiveness-check": "error",
     "import/no-extraneous-dependencies": [
       "error",
-      { "devDependencies": ["tests*/**/*.ts", "vite.config.ts"] }
+      {
+        "devDependencies": [
+          "tests*/**/*.ts",
+          "vite.config.ts",
+          "playground/*.tsx"
+        ]
+      }
     ],
     "default-case": 0
   },

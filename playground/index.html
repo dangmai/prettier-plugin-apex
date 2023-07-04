@@ -1,17 +1,12 @@
-<html>
+<!doctype html>
+<html lang="en">
   <head>
-    <title>Test Page</title>
-    <script type="module" src="main.ts"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prettier Apex Playground</title>
   </head>
   <body>
-    <form>
-      <label for="host">Host</label>
-      <input name="host" id="host" type="text" value="localhost" />
-      <label for="port">port</label>
-      <input name="port" id="port" type="text" value="2117" />
-      <textarea name="original" cols="70" rows="60" id="original"></textarea>
-      <textarea name="formatted" cols="70" rows="60" id="formatted"></textarea>
-      <input id="submit" type="button" value="Format" />
-    </form>
+    <div id="root"></div>
+    <script type="module" src="main.tsx"></script>
   </body>
 </html>
