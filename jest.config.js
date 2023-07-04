@@ -1,7 +1,7 @@
-const defaultConfig = require("./jest.config.standalone");
+import defaultConfig from "./jest.config.standalone.js";
 
 // This config starts up the standalone parser by default
-module.exports = {
+export default {
   ...defaultConfig,
   globalSetup: "<rootDir>/dist/tests_config/start-test-server.js",
   globalTeardown: "<rootDir>/dist/tests_config/stop-test-server.js",
