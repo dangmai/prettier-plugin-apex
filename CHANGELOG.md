@@ -1,3 +1,7 @@
+# 2.0.1
+
+- This is a fix version that includes the correct Production bundle. Please refer to the [2.0.0](#200) changes for actual change notes.
+
 # 2.0.0
 
 Please follow [this guide](https://github.com/dangmai/prettier-plugin-apex/wiki/Upgrading-to-Prettier-Apex-v2) to upgrade Prettier Apex to this new major version.
