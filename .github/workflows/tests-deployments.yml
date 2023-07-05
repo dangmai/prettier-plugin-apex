@@ -92,6 +92,12 @@ jobs:
         if: env.RUN_PACKAGE_TESTS == 'true'
         run: ./tests_integration/package/run-package-tests.sh
 
+      # npm-publish no longer automatically runs `prepack`, so we have to build
+      # the Prod bundle manually here
+      - name: Build Production bundle
+        if: env.RUN_DEPLOYMENT == 'true'
+        run: yarn build:prod
+
       - name: Deploy to NPM
         if: env.RUN_DEPLOYMENT == 'true'
         uses: JS-DevTools/npm-publish@v2
