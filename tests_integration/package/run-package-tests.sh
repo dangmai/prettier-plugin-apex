@@ -23,8 +23,8 @@ npm install --save-dev prettier prettier-plugin-apex
 cp "$CURRENT_DIR/AnonymousClass.cls" "$location/test-npm-module"
 cp "$CURRENT_DIR/NonEmptyNamedClass.cls" "$location/test-npm-module"
 
-pkg-script "prettier:named" "prettier NonEmptyNamedClass.cls"
-pkg-script "prettier:anonymous" "prettier --parser apex-anonymous AnonymousClass.cls"
+pkg-script "prettier:named" "prettier --plugin=prettier-plugin-apex NonEmptyNamedClass.cls"
+pkg-script "prettier:anonymous" "prettier --plugin=prettier-plugin-apex --parser apex-anonymous AnonymousClass.cls"
 
 npm run prettier:named | grep NonEmptyNamedClass
 npm run prettier:anonymous | grep Hello
