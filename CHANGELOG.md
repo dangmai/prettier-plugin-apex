@@ -1,4 +1,6 @@
-# Unreleased
+# 2.0.0
+
+Please follow [this guide](https://github.com/dangmai/prettier-plugin-apex/wiki/Upgrading-to-Prettier-Apex-v2) to upgrade Prettier Apex to this new major version.
 
 ## Dependency Changes
 
@@ -7,7 +9,7 @@
 
 ## Internal Changes
 
-- Prettier Apex is now distributed as an ECMAScript Module. This shouldn't affect normal usage of the library, but if you run into issues please open a ticket.
+- Prettier Apex is now distributed as an ECMAScript Module. This shouldn't affect normal usage of the library, but if you are importing code from Prettier Apex you may need to change your code to adapt.
 
 # 1.13.0
 
