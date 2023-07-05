@@ -75,7 +75,7 @@
     "vite": "4.3.9"
   },
   "peerDependencies": {
-    "prettier": "^3.0.0-alpha"
+    "prettier": "^3.0.0"
   },
   "dependencies": {
     "jest-docblock": "^29.0.0",
