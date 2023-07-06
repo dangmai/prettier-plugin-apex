@@ -2002,10 +2002,10 @@ eslint-plugin-prettier-doc@1.1.0:
   resolved "https://registry.yarnpkg.com/eslint-plugin-prettier-doc/-/eslint-plugin-prettier-doc-1.1.0.tgz#ebf679b480e6048e90d5b152e6043714780bb4e6"
   integrity sha512-ytzztiiqobTeYLqdRnv+dgowcb63gFFy31RekPeVPB6YOshwuGKJVKPdkq/mYtwsJ+eDtLiHksfwH5/M5nU09g==
 
-eslint-plugin-prettier@5.0.0-alpha.1:
-  version "5.0.0-alpha.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.0.0-alpha.1.tgz#fc81f9041497b2ee79b777a3ae52006622624097"
-  integrity sha512-VB20LzLKsHC19yRtxyr73OFJexGaIm8dkODwtUB5qwFrqRhswr/J624dMxCSBe6Dyx3993dbm2jr+rwJ9yoPhA==
+eslint-plugin-prettier@5.0.0-alpha.2:
+  version "5.0.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-prettier/-/eslint-plugin-prettier-5.0.0-alpha.2.tgz#4dd7edf88ff9bc13a3bbd91c059aae267dac4576"
+  integrity sha512-F6YBCbrRzvZwcINw3crm1+/uX/i+rJYaFErPtwCfUoPLywRfY7pwBtI3yMe5OpIotuaiws8cd29oM80ca6NQSQ==
   dependencies:
     prettier-linter-helpers "^1.0.0"
     synckit "^0.8.5"
