@@ -54,7 +54,7 @@
     "@types/wait-on": "5.3.1",
     "@typescript-eslint/eslint-plugin": "5.61.0",
     "@typescript-eslint/parser": "5.61.0",
-    "@vitejs/plugin-react": "4.0.1",
+    "@vitejs/plugin-react": "4.0.2",
     "cross-env": "7.0.3",
     "endent": "2.1.0",
     "eslint": "8.44.0",
