@@ -2,8 +2,11 @@ import Editor from "@monaco-editor/react";
 import endent from "endent";
 import * as prettier from "prettier";
 import { useEffect, useState } from "react";
+import { useDebounce } from "use-debounce";
 import * as prettierApex from "../src/index.js";
 import OptionEntry from "./OptionEntry.js";
+
+const DEBOUNCE_TIME = 500;
 
 function App() {
   const [parser, setParser] = useState("apex");
@@ -21,38 +24,56 @@ function App() {
     }
   `);
   const [formattedCode, setFormattedCode] = useState("");
+  const [debouncedCode] = useDebounce(originalCode, DEBOUNCE_TIME);
+  const [debouncedHost] = useDebounce(host, DEBOUNCE_TIME);
+  const [debouncedPort] = useDebounce(port, DEBOUNCE_TIME);
 
-  const format = async (
-    code: string,
-    parserChoice: string,
-    withPrintWidth: number,
-    withTabWidth: number,
-    shouldUseTabs: boolean,
-  ) => {
-    const parseOptions = {
-      apexStandaloneParser: "built-in",
-      apexStandalonePort: port,
-      apexStandaloneHost: host,
-      plugins: [prettierApex],
-      parser: parserChoice,
-      printWidth: withPrintWidth,
-      tabWidth: withTabWidth,
-      useTabs: shouldUseTabs,
-    };
-    try {
-      const result = await prettier.format(code, parseOptions);
-      setFormattedCode(result);
-    } catch (err: any) {
-      if ("message" in err) {
-        setFormattedCode(err.message);
-      } else {
-        setFormattedCode(err);
-      }
-    }
-  };
   useEffect(() => {
-    format(originalCode, parser, printWidth, tabWidth, useTabs);
-  }, []);
+    let staleResponse = false;
+
+    const format = async () => {
+      const parseOptions = {
+        apexStandaloneParser: "built-in",
+        apexStandalonePort: debouncedPort,
+        apexStandaloneHost: debouncedHost,
+        plugins: [prettierApex],
+        parser,
+        printWidth,
+        tabWidth,
+        useTabs,
+      };
+      try {
+        const result = await prettier.format(debouncedCode, parseOptions);
+        if (!staleResponse) {
+          setFormattedCode(result);
+        }
+      } catch (err: any) {
+        if (staleResponse) {
+          return;
+        }
+        if ("message" in err) {
+          setFormattedCode(err.message);
+        } else {
+          setFormattedCode(err);
+        }
+      }
+    };
+
+    format();
+
+    return () => {
+      staleResponse = true;
+    };
+  }, [
+    parser,
+    debouncedHost,
+    debouncedPort,
+    printWidth,
+    tabWidth,
+    useTabs,
+    debouncedCode,
+  ]);
+
   return (
     <div className="grid">
       <div>
@@ -78,16 +99,7 @@ function App() {
           <select
             id="parser"
             value={parser}
-            onChange={(event) => {
-              setParser(event.target.value);
-              format(
-                originalCode,
-                event.target.value,
-                printWidth,
-                tabWidth,
-                useTabs,
-              );
-            }}
+            onChange={(event) => setParser(event.target.value)}
           >
             <option value="apex">apex</option>
             <option value="apex-anonymous">apex-anonymous</option>
@@ -98,11 +110,9 @@ function App() {
             type="number"
             id="print-width"
             value={printWidth}
-            onChange={(event) => {
-              const width = Number.parseInt(event.target.value, 10);
-              setPrintWidth(width);
-              format(originalCode, parser, width, tabWidth, useTabs);
-            }}
+            onChange={(event) =>
+              setPrintWidth(Number.parseInt(event.target.value, 10))
+            }
           />
         </OptionEntry>
         <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
@@ -110,11 +120,9 @@ function App() {
             type="number"
             id="tab-width"
             value={tabWidth}
-            onChange={(event) => {
-              const width = Number.parseInt(event.target.value, 10);
-              setTabWidth(width);
-              format(originalCode, parser, printWidth, width, useTabs);
-            }}
+            onChange={(event) =>
+              setTabWidth(Number.parseInt(event.target.value, 10))
+            }
           />
         </OptionEntry>
         <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
@@ -122,16 +130,7 @@ function App() {
             type="checkbox"
             id="use-tabs"
             checked={useTabs}
-            onChange={(event) => {
-              setUseTabs(event.target.checked);
-              format(
-                originalCode,
-                parser,
-                printWidth,
-                tabWidth,
-                event.target.checked,
-              );
-            }}
+            onChange={(event) => setUseTabs(event.target.checked)}
           />
         </OptionEntry>
       </div>
@@ -145,7 +144,6 @@ function App() {
             return;
           }
           setOriginalCode(value);
-          format(value, parser, printWidth, tabWidth, useTabs);
         }}
       />
       <Editor
