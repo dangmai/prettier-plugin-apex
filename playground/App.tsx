@@ -139,7 +139,7 @@ function App() {
         height="100%"
         defaultLanguage="apex"
         value={originalCode}
-        options={{ minimap: { enabled: false } }}
+        options={{ minimap: { enabled: false }, rulers: [printWidth] }}
         onChange={async (value) => {
           if (value === undefined) {
             return;
@@ -156,6 +156,7 @@ function App() {
           domReadyOnly: true,
           readOnly: true,
           minimap: { enabled: false },
+          rulers: [printWidth],
         }}
       />
     </div>
