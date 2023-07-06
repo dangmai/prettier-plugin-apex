@@ -31,7 +31,7 @@
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
     "stop-server": "node --loader ts-node/esm bin/stop-apex-server.ts",
     "lint": "eslint \"{src,bin,tests_config}/**/*.{js,ts}\"",
-    "prettier": "prettier --write \"{bin,src,tests_config}/**/*.{js,mjs,ts}\" \"./*.{md,mjs,ts}\"",
+    "prettier": "prettier --write \"{bin,src,playground,tests_config}/**/*.{js,mjs,ts,tsx,css,html}\" \"./*.{md,mjs,ts}\"",
     "prepack": "yarn run build:prod",
     "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js",
     "vite:build": "vite build",
