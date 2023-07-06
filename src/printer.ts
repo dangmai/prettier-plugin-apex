@@ -1,19 +1,15 @@
-import * as prettier from "prettier";
 import type { AstPath, Doc } from "prettier";
+import * as prettier from "prettier";
+
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   getTrailingComments,
   printComment,
   printDanglingComment,
 } from "./comments.js";
 import {
-  AnnotatedComment,
-  checkIfParentIsDottedExpression,
-  getPrecedence,
-  isBinaryish,
-} from "./util.js";
-import {
-  ASSIGNMENT,
   APEX_TYPES,
+  ASSIGNMENT,
   BINARY,
   BOOLEAN,
   DATA_CATEGORY,
@@ -22,12 +18,17 @@ import {
   ORDER_NULL,
   POSTFIX,
   PREFIX,
-  TRIGGER_USAGE,
   QUERY,
   QUERY_WHERE,
+  TRIGGER_USAGE,
 } from "./constants.js";
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import { EnrichedIfBlock } from "./parser.js";
+import {
+  AnnotatedComment,
+  checkIfParentIsDottedExpression,
+  getPrecedence,
+  isBinaryish,
+} from "./util.js";
 
 const docBuilders = prettier.doc.builders;
 const { align, join, hardline, line, softline, group, indent, dedent } =

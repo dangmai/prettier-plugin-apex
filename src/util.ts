@@ -1,7 +1,7 @@
 /* eslint no-param-reassign: 0 */
-import { AstPath } from "prettier";
-import nodePath from "path";
 import fs from "fs";
+import nodePath from "path";
+import { AstPath } from "prettier";
 import * as url from "url";
 
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";

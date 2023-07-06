@@ -1,7 +1,8 @@
-import { spawn, ChildProcess } from "child_process";
+import { ChildProcess, spawn } from "child_process";
 import path from "path";
 import util from "util";
 import waitOn from "wait-on";
+
 import { getSerializerBinDirectory } from "./util.js";
 
 const waitOnPromise = util.promisify(waitOn);

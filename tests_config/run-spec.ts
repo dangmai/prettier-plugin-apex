@@ -1,7 +1,7 @@
 import fs from "fs";
+import { wrap } from "jest-snapshot-serializer-raw";
 import { extname } from "path";
 import prettier from "prettier";
-import { wrap } from "jest-snapshot-serializer-raw";
 
 const { AST_COMPARE } = process.env;
 

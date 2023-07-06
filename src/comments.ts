@@ -1,19 +1,18 @@
 /* eslint no-param-reassign: 0, no-plusplus: 0, no-else-return: 0, consistent-return: 0 */
-
-import * as prettier from "prettier";
 import type { AstPath, Doc, ParserOptions } from "prettier";
+import * as prettier from "prettier";
 
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import {
+  ALLOW_DANGLING_COMMENTS,
+  APEX_TYPES as apexTypes,
+} from "./constants.js";
 import {
   AnnotatedComment,
   GenericComment,
   isApexDocComment,
   isBinaryish,
 } from "./util.js";
-import {
-  APEX_TYPES as apexTypes,
-  ALLOW_DANGLING_COMMENTS,
-} from "./constants.js";
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 
 const { join, lineSuffix, hardline } = prettier.doc.builders;
 const {

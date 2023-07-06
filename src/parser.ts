@@ -3,18 +3,18 @@ import childProcess from "child_process";
 import path from "path";
 import prettier from "prettier";
 
+import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
-  findNextUncommentedCharacter,
-  GenericComment,
-  getSerializerBinDirectory,
-  SerializedAst,
-} from "./util.js";
-import {
-  APEX_TYPES,
   ALLOW_TRAILING_EMPTY_LINE,
+  APEX_TYPES,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import {
+  GenericComment,
+  SerializedAst,
+  findNextUncommentedCharacter,
+  getSerializerBinDirectory,
+} from "./util.js";
 
 type MinimalLocation = {
   startIndex: number;
