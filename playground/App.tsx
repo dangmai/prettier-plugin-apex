@@ -1,87 +1,163 @@
-import { useEffect, useRef, useState } from "react";
-import { useCodeMirror } from "@uiw/react-codemirror/esm";
+import { useEffect, useState } from "react";
+import Editor from "@monaco-editor/react";
+import endent from "endent";
 import * as prettier from "prettier";
 import * as prettierApex from "../src/index.js";
-
-const formatApex = async (
-  originalCode: string,
-  host: string,
-  port: number,
-  parser: string,
-): Promise<string> => {
-  const parseOptions = {
-    apexStandaloneParser: "built-in",
-    apexStandalonePort: port,
-    apexStandaloneHost: host,
-    plugins: [prettierApex],
-    parser,
-  };
-  return prettier.format(originalCode, parseOptions);
-};
+import OptionEntry from "./OptionEntry.js";
 
 function App() {
   const [parser, setParser] = useState("apex");
   const [host, setHost] = useState("localhost");
   const [port, setPort] = useState(2117);
-  const [originalCode, setOriginalCode] = useState("");
+  const [printWidth, setPrintWidth] = useState(80);
+  const [tabWidth, setTabWidth] = useState(2);
+  const [useTabs, setUseTabs] = useState(false);
+  const [originalCode, setOriginalCode] = useState(endent`
+    class HelloWorld {
+      void hello() {
+        Account[] accounts = [select id from account];
+        System.debug(accounts);
+      }
+    }
+  `);
   const [formattedCode, setFormattedCode] = useState("");
-  const originalEditor = useRef<HTMLDivElement>(null);
-  const formattedEditor = useRef<HTMLDivElement>(null);
 
-  const { setContainer: setOriginalContainer } = useCodeMirror({
-    container: originalEditor.current,
-    value: originalCode,
-    onChange: async (value) => {
-      setOriginalCode(value);
-      setFormattedCode(await formatApex(value, host, port, parser));
-    },
-    height: "100%",
-  });
-  const { setContainer: setFormattedContainer } = useCodeMirror({
-    container: formattedEditor.current,
-    value: formattedCode,
-    readOnly: true,
-    height: "100%",
-  });
-  useEffect(() => {
-    if (originalEditor.current) {
-      setOriginalContainer(originalEditor.current);
+  const format = async (
+    code: string,
+    parserChoice: string,
+    withPrintWidth: number,
+    withTabWidth: number,
+    shouldUseTabs: boolean,
+  ) => {
+    const parseOptions = {
+      apexStandaloneParser: "built-in",
+      apexStandalonePort: port,
+      apexStandaloneHost: host,
+      plugins: [prettierApex],
+      parser: parserChoice,
+      printWidth: withPrintWidth,
+      tabWidth: withTabWidth,
+      useTabs: shouldUseTabs,
+    };
+    try {
+      const result = await prettier.format(code, parseOptions);
+      setFormattedCode(result);
+    } catch (err: any) {
+      if ("message" in err) {
+        setFormattedCode(err.message);
+      } else {
+        setFormattedCode(err);
+      }
     }
-  }, [originalEditor.current]);
+  };
   useEffect(() => {
-    if (formattedEditor.current) {
-      setFormattedContainer(formattedEditor.current);
-    }
-  }, [formattedEditor.current]);
+    format(originalCode, parser, printWidth, tabWidth, useTabs);
+  }, []);
   return (
     <div className="grid">
       <div>
-        <label htmlFor="host">--host</label>
-        <input
-          type="text"
-          id="host"
-          value={host}
-          onChange={(event) => setHost(event.target.value)}
-        />
-        <label htmlFor="port">--port</label>
-        <input
-          type="number"
-          id="port"
-          value={port}
-          onChange={(event) => setPort(Number.parseInt(event.target.value, 10))}
-        />
-        <label htmlFor="parser">--parser</label>
-        <select
-          id="parser"
-          value={parser}
-          onChange={(event) => setParser(event.target.value)}
-        >
-          <option value="apex">apex</option>
-          <option value="apex-anonymous">apex-anonymous</option>
-        </select>
+        <OptionEntry label="--host" labelHtmlFor="host">
+          <input
+            type="text"
+            id="host"
+            value={host}
+            onChange={(event) => setHost(event.target.value)}
+          />
+        </OptionEntry>
+        <OptionEntry label="--port" labelHtmlFor="port">
+          <input
+            type="number"
+            id="port"
+            value={port}
+            onChange={(event) =>
+              setPort(Number.parseInt(event.target.value, 10))
+            }
+          />
+        </OptionEntry>
+        <OptionEntry label="--parser" labelHtmlFor="parser">
+          <select
+            id="parser"
+            value={parser}
+            onChange={(event) => {
+              setParser(event.target.value);
+              format(
+                originalCode,
+                event.target.value,
+                printWidth,
+                tabWidth,
+                useTabs,
+              );
+            }}
+          >
+            <option value="apex">apex</option>
+            <option value="apex-anonymous">apex-anonymous</option>
+          </select>
+        </OptionEntry>
+        <OptionEntry label="--print-width" labelHtmlFor="print-width">
+          <input
+            type="number"
+            id="print-width"
+            value={printWidth}
+            onChange={(event) => {
+              const width = Number.parseInt(event.target.value, 10);
+              setPrintWidth(width);
+              format(originalCode, parser, width, tabWidth, useTabs);
+            }}
+          />
+        </OptionEntry>
+        <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
+          <input
+            type="number"
+            id="tab-width"
+            value={tabWidth}
+            onChange={(event) => {
+              const width = Number.parseInt(event.target.value, 10);
+              setTabWidth(width);
+              format(originalCode, parser, printWidth, width, useTabs);
+            }}
+          />
+        </OptionEntry>
+        <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
+          <input
+            type="checkbox"
+            id="use-tabs"
+            checked={useTabs}
+            onChange={(event) => {
+              setUseTabs(event.target.checked);
+              format(
+                originalCode,
+                parser,
+                printWidth,
+                tabWidth,
+                event.target.checked,
+              );
+            }}
+          />
+        </OptionEntry>
       </div>
-      <div ref={originalEditor} />
-      <div ref={formattedEditor} />
+      <Editor
+        height="100%"
+        defaultLanguage="apex"
+        value={originalCode}
+        options={{ minimap: { enabled: false } }}
+        onChange={async (value) => {
+          if (value === undefined) {
+            return;
+          }
+          setOriginalCode(value);
+          format(value, parser, printWidth, tabWidth, useTabs);
+        }}
+      />
+      <Editor
+        height="100%"
+        defaultLanguage="apex"
+        value={formattedCode}
+        options={{
+          domReadyOnly: true,
+          readOnly: true,
+          minimap: { enabled: false },
+        }}
+      />
     </div>
   );
 }

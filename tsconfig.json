@@ -12,6 +12,7 @@
   ],
   "compilerOptions": {
     "lib": ["ES2023", "DOM"],
+    "moduleResolution": "node",
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false,

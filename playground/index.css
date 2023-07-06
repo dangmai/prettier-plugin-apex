@@ -1,5 +1,9 @@
 .grid {
   display: grid;
   grid-template-columns: 1fr 3fr 3fr;
-  height: 500px;
+  height: 1000px;
+}
+
+.grid label {
+  margin-right: 5px;
 }

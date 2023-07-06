@@ -25,6 +25,7 @@
         ]
       }
     ],
+    "import/extensions": [2, "always"],
     "default-case": 0
   },
   "globals": {
