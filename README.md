@@ -10,12 +10,18 @@ used on the Salesforce development platform.
 It uses the excellent [Prettier](https://prettier.io/) engine for formatting,
 and the jorje compiler from Salesforce for parsing.
 
-## Status
+## ⚡️ Quick start
+
+You can automatically format Apex code in our [playground](https://apex.dangmai.net) without having to install anything.
+
+To integrate Prettier Apex in your workflow, please follow the [Usage](#-usage) section.
+
+## ✨ Status
 
 This project is production ready, and have been tested on multiple projects,
 including a mix of open source/proprietary/Salesforce internal code bases.
 
-## Usage
+## 📖 Usage
 
 ### Requirements
 
@@ -117,26 +123,26 @@ The amount of configuration is very limited,
 because this is intended to be a very opinionated formatter.
 Here is the default configuration that can be overriden:
 
-| Name                     | Default     | Description                                                                                                                                                                                                                    |
-| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `printWidth`             | `80`        | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))                                                                                                                                |
-| `tabWidth`               | `2`         | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))                                                                                                                                  |
-| `useTabs`                | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))                                                                                                                                       |
-| `requirePragma`          | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma))                                                                                                                             |
-| `insertPragma`           | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))                                                                                                                              |
-| `apexInsertFinalNewline` | `true`      | Whether a newline is added as the last thing in the output                                                                                                                                                                     |
-| `apexStandaloneParser`   | `none`      | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Performance Tip](#performance-tips3rd-party-integration).<br>If set to `none`, Prettier invokes the CLI parser for every file. |
-| `apexStandalonePort`     | `2117`      | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                               |
-| `apexStandaloneHost`     | `localhost` | The host that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                               |
-| `apexStandaloneProtocol` | `http`      | The protocol that the standalone Apex parser uses.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                 |
+| Name                     | Default     | Description                                                                                                                                                                                                                     |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `printWidth`             | `80`        | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))                                                                                                                                 |
+| `tabWidth`               | `2`         | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))                                                                                                                                   |
+| `useTabs`                | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))                                                                                                                                        |
+| `requirePragma`          | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma))                                                                                                                              |
+| `insertPragma`           | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))                                                                                                                               |
+| `apexInsertFinalNewline` | `true`      | Whether a newline is added as the last thing in the output                                                                                                                                                                      |
+| `apexStandaloneParser`   | `none`      | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Performance Tip](#-performance-tips3rd-party-integration).<br>If set to `none`, Prettier invokes the CLI parser for every file. |
+| `apexStandalonePort`     | `2117`      | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                |
+| `apexStandaloneHost`     | `localhost` | The host that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                |
+| `apexStandaloneProtocol` | `http`      | The protocol that the standalone Apex parser uses.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                  |
 
-## Editor integration
+## 📝 Editor integration
 
 ### VScode
 
 Follow [this tutorial](https://developer.salesforce.com/tools/vscode/en/user-guide/prettier) from Salesforce in order to use this plugin in VSCode.
 
-## Performance Tips/3rd party integration
+## 🚀 Performance Tips/3rd party integration
 
 By default,
 this library invokes a CLI application to get the AST of the Apex code.
@@ -173,7 +179,7 @@ This can be customized by specifying the `--host` and `--port` arguments:
 start-apex-server --host 127.0.0.1 --port 2118
 ```
 
-## Continuous Integration
+## 🚢 Continuous Integration
 
 Prettier Apex can be used to automatically check correct formatting for Apex code
 in the context of CI/CD, for example:

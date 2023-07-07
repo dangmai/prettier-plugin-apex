@@ -27,6 +27,7 @@ about: Issues for ugly or incorrect code
 
 **Additional information (please fill this out)**:
 
+- [Playground](https://apex.dangmai.net) URL: (you can click on `Copy Link` in the Playground, then paste the URL here)
 - OS: [e.g. Windows/OS X/Ubuntu]
 - Version (you can check this by running `npm ls prettier-plugin-apex`): [e.g. `prettier-plugin-apex@2.0.0`]
 - Prettier Version (you can check this by running `npm ls prettier`): [e.g. `prettier@3.0.0`]
