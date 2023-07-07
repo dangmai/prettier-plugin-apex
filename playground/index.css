@@ -171,3 +171,37 @@ header h1 {
 .formatted-editor {
   position: relative;
 }
+
+.sub-options {
+  flex: 1;
+  padding: 15px 0 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.sub-options > summary {
+  font-size: 14px;
+  font-weight: bold;
+  padding-bottom: 5px;
+  cursor: pointer;
+}
+
+.sub-options > * {
+  margin-left: 10px;
+}
+
+.option-entry {
+  margin: 5px;
+}
+
+.option-entry input[type="number"] {
+  max-width: 60px;
+}
+
+label {
+  font-family:
+    Consolas,
+    Courier New,
+    Courier,
+    monospace;
+  margin: 10px 0;
+}

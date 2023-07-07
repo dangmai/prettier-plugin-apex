@@ -131,72 +131,78 @@ function App() {
             }`}
           >
             <div className={`options ${hiddenOptions ? "hide" : ""}`}>
-              <OptionEntry label="--host" labelHtmlFor="host">
-                <input
-                  type="text"
-                  id="host"
-                  value={host}
-                  onChange={(event) => setHost(event.target.value)}
-                />
-              </OptionEntry>
-              <OptionEntry label="--port" labelHtmlFor="port">
-                <input
-                  type="number"
-                  id="port"
-                  value={port}
-                  onChange={(event) =>
-                    setPort(Number.parseInt(event.target.value, 10))
-                  }
-                />
-              </OptionEntry>
-              <OptionEntry label="--protocol" labelHtmlFor="protocol">
-                <select
-                  id="protocol"
-                  value={protocol}
-                  onChange={(event) => setProtocol(event.target.value)}
-                >
-                  <option value="http">http</option>
-                  <option value="https">https</option>
-                </select>
-              </OptionEntry>
-              <OptionEntry label="--parser" labelHtmlFor="parser">
-                <select
-                  id="parser"
-                  value={parser}
-                  onChange={(event) => setParser(event.target.value)}
-                >
-                  <option value="apex">apex</option>
-                  <option value="apex-anonymous">apex-anonymous</option>
-                </select>
-              </OptionEntry>
-              <OptionEntry label="--print-width" labelHtmlFor="print-width">
-                <input
-                  type="number"
-                  id="print-width"
-                  value={printWidth}
-                  onChange={(event) =>
-                    setPrintWidth(Number.parseInt(event.target.value, 10))
-                  }
-                />
-              </OptionEntry>
-              <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
-                <input
-                  type="number"
-                  id="tab-width"
-                  value={tabWidth}
-                  onChange={(event) =>
-                    setTabWidth(Number.parseInt(event.target.value, 10))
-                  }
-                />
-              </OptionEntry>
-              <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
-                <input
-                  type="checkbox"
-                  id="use-tabs"
-                  checked={useTabs}
-                  onChange={(event) => setUseTabs(event.target.checked)}
-                />
-              </OptionEntry>
+              <details open={true} className="sub-options">
+                <summary>Global</summary>
+                <OptionEntry label="--parser" labelHtmlFor="parser">
+                  <select
+                    id="parser"
+                    value={parser}
+                    onChange={(event) => setParser(event.target.value)}
+                  >
+                    <option value="apex">apex</option>
+                    <option value="apex-anonymous">apex-anonymous</option>
+                  </select>
+                </OptionEntry>
+                <OptionEntry label="--print-width" labelHtmlFor="print-width">
+                  <input
+                    type="number"
+                    id="print-width"
+                    value={printWidth}
+                    onChange={(event) =>
+                      setPrintWidth(Number.parseInt(event.target.value, 10))
+                    }
+                  />
+                </OptionEntry>
+                <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
+                  <input
+                    type="number"
+                    id="tab-width"
+                    value={tabWidth}
+                    onChange={(event) =>
+                      setTabWidth(Number.parseInt(event.target.value, 10))
+                    }
+                  />
+                </OptionEntry>
+                <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
+                  <input
+                    type="checkbox"
+                    id="use-tabs"
+                    checked={useTabs}
+                    onChange={(event) => setUseTabs(event.target.checked)}
+                  />
+                </OptionEntry>
+              </details>
+              <details open={false} className="sub-options">
+                <summary>Advanced</summary>
+                <OptionEntry label="--host" labelHtmlFor="host">
+                  <input
+                    type="text"
+                    id="host"
+                    value={host}
+                    onChange={(event) => setHost(event.target.value)}
+                  />
+                </OptionEntry>
+                <OptionEntry label="--port" labelHtmlFor="port">
+                  <input
+                    type="number"
+                    id="port"
+                    value={port}
+                    onChange={(event) =>
+                      setPort(Number.parseInt(event.target.value, 10))
+                    }
+                  />
+                </OptionEntry>
+                <OptionEntry label="--protocol" labelHtmlFor="protocol">
+                  <select
+                    id="protocol"
+                    value={protocol}
+                    onChange={(event) => setProtocol(event.target.value)}
+                  >
+                    <option value="http">http</option>
+                    <option value="https">https</option>
+                  </select>
+                </OptionEntry>
+              </details>
             </div>
 
             <Editor

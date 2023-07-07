@@ -6,7 +6,7 @@ interface OptionEntryProps {
   children: ReactNode;
 }
 const OptionEntry = (props: OptionEntryProps) => (
-  <div>
+  <div className="option-entry">
     <label htmlFor={props.labelHtmlFor}>{props.label}</label>
     {props.children}
   </div>
