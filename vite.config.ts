@@ -38,9 +38,6 @@ export default defineConfig(
           emptyOutDir: false,
           outDir: resolve(__dirname, "dist", "playground"),
           rollupOptions: {
-            // input: {
-            //   main: resolve(__dirname, "playground/index.html"),
-            // },
             plugins: [react()],
           },
         },
