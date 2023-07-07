@@ -17,7 +17,7 @@
     "sourceMap": true,
     "inlineSourceMap": false,
     "jsx": "react-jsx",
-    "types": ["vite/client"]
+    "types": ["vite/client", "jest"]
   },
   "ts-node": {
     "esm": true,
