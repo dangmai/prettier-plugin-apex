@@ -12,6 +12,7 @@ function App() {
   const [parser, setParser] = useState("apex");
   const [host, setHost] = useState("localhost");
   const [port, setPort] = useState(2117);
+  const [protocol, setProtocol] = useState("http");
   const [printWidth, setPrintWidth] = useState(80);
   const [tabWidth, setTabWidth] = useState(2);
   const [useTabs, setUseTabs] = useState(false);
@@ -36,6 +37,7 @@ function App() {
         apexStandaloneParser: "built-in",
         apexStandalonePort: debouncedPort,
         apexStandaloneHost: debouncedHost,
+        apexStandaloneProtocol: protocol,
         plugins: [prettierApex],
         parser,
         printWidth,
@@ -68,6 +70,7 @@ function App() {
     parser,
     debouncedHost,
     debouncedPort,
+    protocol,
     printWidth,
     tabWidth,
     useTabs,
@@ -94,6 +97,16 @@ function App() {
               setPort(Number.parseInt(event.target.value, 10))
             }
           />
+        </OptionEntry>
+        <OptionEntry label="--protocol" labelHtmlFor="protocol">
+          <select
+            id="protocol"
+            value={protocol}
+            onChange={(event) => setProtocol(event.target.value)}
+          >
+            <option value="http">http</option>
+            <option value="https">https</option>
+          </select>
         </OptionEntry>
         <OptionEntry label="--parser" labelHtmlFor="parser">
           <select
