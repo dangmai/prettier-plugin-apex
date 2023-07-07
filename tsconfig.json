@@ -8,7 +8,7 @@
     "typings/global.d.ts",
     "typings/test-global.d.ts",
     "vite.config.ts",
-    "playground/*.tsx"
+    "playground"
   ],
   "compilerOptions": {
     "lib": ["ES2023", "DOM"],

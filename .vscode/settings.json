@@ -6,5 +6,6 @@
     }
   ],
   "editor.formatOnSave": true,
-  "jestrunner.configPath": "jest.config.standalone.js"
+  "jestrunner.configPath": "jest.config.standalone.js",
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

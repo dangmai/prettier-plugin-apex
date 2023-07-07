@@ -6,10 +6,28 @@ import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 import { version } from "../package.json";
 import * as prettierApex from "../src/index.js";
+import { ClipboardButton } from "./Buttons.js";
 import OptionEntry from "./OptionEntry.js";
 import icon from "./static/icon.png";
+import { getStateFromUrl, getUrlWithState } from "./urlHash.js";
 
 const DEBOUNCE_TIME = 500;
+
+let didInit = false;
+
+interface EncodedState {
+  options: {
+    apexInsertFinalNewline: boolean;
+    host: string;
+    parser: string;
+    port: number;
+    printWidth: number;
+    tabWidth: number;
+    protocol: string;
+    useTabs: boolean;
+  };
+  code: string;
+}
 
 function App() {
   const [isFormatting, setIsFormatting] = useState(false);
@@ -44,6 +62,25 @@ function App() {
   const [debouncedPort] = useDebounce(port, DEBOUNCE_TIME);
 
   useEffect(() => {
+    if (!didInit) {
+      didInit = true;
+      const state = getStateFromUrl<EncodedState>();
+      if (state === null) {
+        return;
+      }
+      setParser(state.options.parser);
+      setHost(state.options.host);
+      setPort(state.options.port);
+      setProtocol(state.options.protocol);
+      setPrintWidth(state.options.printWidth);
+      setTabWidth(state.options.tabWidth);
+      setUseTabs(state.options.useTabs);
+      setApexInsertFinalNewline(state.options.apexInsertFinalNewline);
+      setOriginalCode(state.code);
+    }
+  }, []);
+
+  useEffect(() => {
     let staleResponse = false;
 
     const format = async () => {
@@ -62,10 +99,10 @@ function App() {
       try {
         setIsFormatting(true);
         const result = await prettier.format(debouncedCode, parseOptions);
-        if (!staleResponse) {
-          setFormattedCode(result);
-          setIsFormatting(false);
+        if (staleResponse) {
+          return;
         }
+        setFormattedCode(result);
       } catch (err: any) {
         if (staleResponse) {
           return;
@@ -75,8 +112,8 @@ function App() {
         } else {
           setFormattedCode(err);
         }
-        setIsFormatting(false);
       }
+      setIsFormatting(false);
     };
 
     format();
@@ -282,6 +319,26 @@ function App() {
             >
               Clear
             </button>
+            <ClipboardButton
+              copy={() => {
+                const newUrl = getUrlWithState({
+                  options: {
+                    port: debouncedPort,
+                    host: debouncedHost,
+                    protocol,
+                    parser,
+                    printWidth,
+                    tabWidth,
+                    useTabs,
+                    apexInsertFinalNewline,
+                  },
+                  code: debouncedCode,
+                } as EncodedState);
+                return newUrl.href;
+              }}
+            >
+              Copy Link
+            </ClipboardButton>
           </div>
         </div>
       </div>

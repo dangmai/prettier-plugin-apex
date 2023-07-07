@@ -21,6 +21,7 @@
         "devDependencies": [
           "tests*/**/*.ts",
           "vite.config.ts",
+          "playground/*.ts",
           "playground/*.tsx"
         ]
       }

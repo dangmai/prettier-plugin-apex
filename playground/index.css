@@ -205,3 +205,28 @@ label {
     monospace;
   margin: 10px 0;
 }
+
+.tooltip {
+  position: absolute;
+  z-index: 6;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 4px;
+  padding: 0.4em 0.8em;
+  background-color: #000;
+  color: #fff;
+  border-radius: 0.4em;
+  pointer-events: none;
+}
+
+.tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-bottom: none;
+  border-top-color: #000;
+}
