@@ -7,6 +7,7 @@ import { useDebounce } from "use-debounce";
 import { version } from "../package.json";
 import * as prettierApex from "../src/index.js";
 import OptionEntry from "./OptionEntry.js";
+import icon from "./static/icon.png";
 
 const DEBOUNCE_TIME = 500;
 
@@ -91,7 +92,7 @@ function App() {
     <div className="playground-container">
       <header>
         <a href="/" className="logo-wrapper">
-          <img className="logo" src="/static/icon.png" alt="" />
+          <img className="logo" src={icon} alt="" />
           <h1>
             Prettier Apex{" "}
             <span id="version">
