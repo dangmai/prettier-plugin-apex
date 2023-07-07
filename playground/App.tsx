@@ -36,6 +36,7 @@ function App() {
     }
   `);
   const [formattedCode, setFormattedCode] = useState("");
+  const [hiddenOptions, setHiddenOptions] = useState(false);
   const [debouncedCode] = useDebounce(originalCode, DEBOUNCE_TIME);
   const [debouncedHost] = useDebounce(host, DEBOUNCE_TIME);
   const [debouncedPort] = useDebounce(port, DEBOUNCE_TIME);
@@ -89,7 +90,7 @@ function App() {
   ]);
 
   return (
-    <div className="playground-container">
+    <>
       <header>
         <a href="/" className="logo-wrapper">
           <img className="logo" src={icon} alt="" />
@@ -118,105 +119,132 @@ function App() {
           </a>
         </span>
       </header>
-      <div className="panels">
-        <div>
-          <OptionEntry label="--host" labelHtmlFor="host">
-            <input
-              type="text"
-              id="host"
-              value={host}
-              onChange={(event) => setHost(event.target.value)}
+      <div className="playground-container">
+        <div className="editors-container">
+          <div
+            className={`panels ${
+              hiddenOptions ? "panels-half" : "panels-third"
+            }`}
+          >
+            <div className={`options ${hiddenOptions ? "hide" : ""}`}>
+              <OptionEntry label="--host" labelHtmlFor="host">
+                <input
+                  type="text"
+                  id="host"
+                  value={host}
+                  onChange={(event) => setHost(event.target.value)}
+                />
+              </OptionEntry>
+              <OptionEntry label="--port" labelHtmlFor="port">
+                <input
+                  type="number"
+                  id="port"
+                  value={port}
+                  onChange={(event) =>
+                    setPort(Number.parseInt(event.target.value, 10))
+                  }
+                />
+              </OptionEntry>
+              <OptionEntry label="--protocol" labelHtmlFor="protocol">
+                <select
+                  id="protocol"
+                  value={protocol}
+                  onChange={(event) => setProtocol(event.target.value)}
+                >
+                  <option value="http">http</option>
+                  <option value="https">https</option>
+                </select>
+              </OptionEntry>
+              <OptionEntry label="--parser" labelHtmlFor="parser">
+                <select
+                  id="parser"
+                  value={parser}
+                  onChange={(event) => setParser(event.target.value)}
+                >
+                  <option value="apex">apex</option>
+                  <option value="apex-anonymous">apex-anonymous</option>
+                </select>
+              </OptionEntry>
+              <OptionEntry label="--print-width" labelHtmlFor="print-width">
+                <input
+                  type="number"
+                  id="print-width"
+                  value={printWidth}
+                  onChange={(event) =>
+                    setPrintWidth(Number.parseInt(event.target.value, 10))
+                  }
+                />
+              </OptionEntry>
+              <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
+                <input
+                  type="number"
+                  id="tab-width"
+                  value={tabWidth}
+                  onChange={(event) =>
+                    setTabWidth(Number.parseInt(event.target.value, 10))
+                  }
+                />
+              </OptionEntry>
+              <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
+                <input
+                  type="checkbox"
+                  id="use-tabs"
+                  checked={useTabs}
+                  onChange={(event) => setUseTabs(event.target.checked)}
+                />
+              </OptionEntry>
+            </div>
+
+            <Editor
+              height="100%"
+              defaultLanguage="apex"
+              value={originalCode}
+              options={{
+                minimap: { enabled: false },
+                rulers: [printWidth],
+                scrollBeyondLastLine: false,
+              }}
+              onChange={async (value) => {
+                if (value === undefined) {
+                  return;
+                }
+                setOriginalCode(value);
+              }}
             />
-          </OptionEntry>
-          <OptionEntry label="--port" labelHtmlFor="port">
-            <input
-              type="number"
-              id="port"
-              value={port}
-              onChange={(event) =>
-                setPort(Number.parseInt(event.target.value, 10))
-              }
+            <Editor
+              height="100%"
+              defaultLanguage="apex"
+              value={formattedCode}
+              options={{
+                domReadyOnly: true,
+                readOnly: true,
+                minimap: { enabled: false },
+                rulers: [printWidth],
+                scrollBeyondLastLine: false,
+              }}
             />
-          </OptionEntry>
-          <OptionEntry label="--protocol" labelHtmlFor="protocol">
-            <select
-              id="protocol"
-              value={protocol}
-              onChange={(event) => setProtocol(event.target.value)}
-            >
-              <option value="http">http</option>
-              <option value="https">https</option>
-            </select>
-          </OptionEntry>
-          <OptionEntry label="--parser" labelHtmlFor="parser">
-            <select
-              id="parser"
-              value={parser}
-              onChange={(event) => setParser(event.target.value)}
-            >
-              <option value="apex">apex</option>
-              <option value="apex-anonymous">apex-anonymous</option>
-            </select>
-          </OptionEntry>
-          <OptionEntry label="--print-width" labelHtmlFor="print-width">
-            <input
-              type="number"
-              id="print-width"
-              value={printWidth}
-              onChange={(event) =>
-                setPrintWidth(Number.parseInt(event.target.value, 10))
-              }
-            />
-          </OptionEntry>
-          <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
-            <input
-              type="number"
-              id="tab-width"
-              value={tabWidth}
-              onChange={(event) =>
-                setTabWidth(Number.parseInt(event.target.value, 10))
-              }
-            />
-          </OptionEntry>
-          <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
-            <input
-              type="checkbox"
-              id="use-tabs"
-              checked={useTabs}
-              onChange={(event) => setUseTabs(event.target.checked)}
-            />
-          </OptionEntry>
+          </div>
         </div>
-        <Editor
-          height="100%"
-          defaultLanguage="apex"
-          value={originalCode}
-          options={{
-            minimap: { enabled: false },
-            rulers: [printWidth],
-            scrollBeyondLastLine: false,
-          }}
-          onChange={async (value) => {
-            if (value === undefined) {
-              return;
-            }
-            setOriginalCode(value);
-          }}
-        />
-        <Editor
-          height="100%"
-          defaultLanguage="apex"
-          value={formattedCode}
-          options={{
-            domReadyOnly: true,
-            readOnly: true,
-            minimap: { enabled: false },
-            rulers: [printWidth],
-            scrollBeyondLastLine: false,
-          }}
-        />
+        <div className="bottom-bar">
+          <div className="bottom-bar-buttons">
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setHiddenOptions(!hiddenOptions)}
+            >
+              {hiddenOptions ? "Show" : "Hide"} options
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setOriginalCode("")}
+            >
+              Clear
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

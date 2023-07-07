@@ -14,7 +14,8 @@ body {
   margin: 0;
 }
 
-#root {
+#root,
+.playground-container {
   height: 100%;
   display: flex;
   flex: 1;
@@ -71,12 +72,68 @@ header h1 {
   opacity: 0.5;
 }
 
+.editors-container {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.options {
+  border-right: 1px solid #ddd;
+}
+
+.hide {
+  display: none;
+}
+
 .panels {
   display: grid;
-  grid-template-columns: 1fr 3fr 3fr;
   height: 100%;
+}
+
+.panels-third {
+  grid-template-columns: 1fr 3fr 3fr;
+}
+
+.panels-half {
+  grid-template-columns: 1fr 1fr;
 }
 
 .panels label {
   margin-right: 5px;
+}
+
+.bottom-bar {
+  position: relative;
+  border-top: 1px solid #ddd;
+}
+
+.bottom-bar-buttons {
+  z-index: 10;
+  padding: 8px;
+  display: flex;
+  float: left;
+}
+
+.bottom-bar-buttons > * + * {
+  margin-left: 9px;
+}
+
+.btn {
+  box-sizing: content-box;
+  display: inline-block;
+  height: 18px;
+  padding: 0 5px;
+  border: 1px solid #d1d2d3;
+  border-radius: 0.25em;
+  background-image: linear-gradient(to bottom, #fafbfc, #e4ebf0);
+  font-size: 11px;
+  line-height: 18px;
+  font-weight: 600;
+  font-family: inherit;
+  color: #24292e;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  position: relative;
 }
