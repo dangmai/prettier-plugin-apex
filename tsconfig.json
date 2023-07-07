@@ -16,7 +16,8 @@
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vite/client"]
   },
   "ts-node": {
     "esm": true,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/dot-notation */
 import Editor from "@monaco-editor/react";
 import endent from "endent";
 import * as prettier from "prettier";
@@ -10,9 +11,17 @@ const DEBOUNCE_TIME = 500;
 
 function App() {
   const [parser, setParser] = useState("apex");
-  const [host, setHost] = useState("localhost");
-  const [port, setPort] = useState(2117);
-  const [protocol, setProtocol] = useState("http");
+  const [host, setHost] = useState(
+    import.meta.env["VITE_APEX_AST_HOST"] ?? "localhost",
+  );
+  const [port, setPort] = useState(
+    import.meta.env["VITE_APEX_AST_PORT"]
+      ? Number.parseInt(import.meta.env["VITE_APEX_AST_PORT"], 10)
+      : 2117,
+  );
+  const [protocol, setProtocol] = useState(
+    import.meta.env["VITE_APEX_AST_PROTOCOL"] ?? "http",
+  );
   const [printWidth, setPrintWidth] = useState(80);
   const [tabWidth, setTabWidth] = useState(2);
   const [useTabs, setUseTabs] = useState(false);
