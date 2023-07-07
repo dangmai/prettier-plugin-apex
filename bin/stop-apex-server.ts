@@ -3,8 +3,8 @@ import { parseArgs } from "util";
 
 import { stop } from "../src/http-server.js";
 
-async function teardown(host: string, port: string) {
-  await stop(host, Number.parseInt(port, 10));
+async function teardown(host: string, port: string, password: string) {
+  await stop(host, Number.parseInt(port, 10), password);
 }
 
 const options = {
@@ -18,10 +18,17 @@ const options = {
     default: "2117",
     type: "string" as const,
   },
+  password: {
+    short: "s",
+    default: "secret",
+    type: "string" as const,
+    describe: "Password that can be used to remotely shutdown the server",
+  },
 };
 
 const parsed = parseArgs({ options });
 teardown(
   parsed.values.host ?? options.host.default,
   parsed.values.port ?? options.port.default,
+  parsed.values.password ?? options.password.default,
 );

@@ -10,6 +10,7 @@ const waitOnPromise = util.promisify(waitOn);
 export async function start(
   host: string,
   port: number,
+  password: string,
   allowedOrigins?: string,
 ): Promise<ChildProcess> {
   let serializerBin = getSerializerBinDirectory();
@@ -18,7 +19,7 @@ export async function start(
   } else {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http");
   }
-  const args = ["-s", "-a", "secret", "-h", host, "-p", port.toString()];
+  const args = ["-s", "-a", password, "-h", host, "-p", port.toString()];
   if (allowedOrigins !== undefined) {
     args.push("-c", allowedOrigins);
   }
@@ -35,8 +36,12 @@ export async function start(
   return command;
 }
 
-export async function stop(host: string, port: number): Promise<Response> {
-  return fetch(`http://${host}:${port}/shutdown?token=secret`, {
+export async function stop(
+  host: string,
+  port: number,
+  password: string,
+): Promise<Response> {
+  return fetch(`http://${host}:${port}/shutdown?token=${password}`, {
     method: "POST",
   });
 }

@@ -1,3 +1,9 @@
+# Unreleased
+
+## Internal Changes
+
+- Allow user to customize the secret used to shut down the parsing server.
+
 # 2.0.1
 
 - This is a fix version that includes the correct Production bundle. Please refer to the [2.0.0](#200) changes for actual change notes.

@@ -3,8 +3,13 @@ import { parseArgs } from "util";
 
 import { start } from "../src/http-server.js";
 
-async function setup(host: string, port: string, allowedOrigins?: string) {
-  await start(host, Number.parseInt(port, 10), allowedOrigins);
+async function setup(
+  host: string,
+  port: string,
+  password: string,
+  allowedOrigins?: string,
+) {
+  await start(host, Number.parseInt(port, 10), password, allowedOrigins);
 }
 
 const options = {
@@ -24,11 +29,18 @@ const options = {
     short: "c",
     type: "string" as const,
   },
+  password: {
+    short: "s",
+    default: "secret",
+    type: "string" as const,
+    describe: "Password that can be used to remotely shutdown the server",
+  },
 };
 
 const parsed = parseArgs({ options });
 setup(
   parsed.values.host ?? options.host.default,
   parsed.values.port ?? options.port.default,
+  parsed.values.password ?? options.password.default,
   parsed.values["cors-allowed-origins"],
 );
