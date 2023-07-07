@@ -12,6 +12,7 @@ import icon from "./static/icon.png";
 const DEBOUNCE_TIME = 500;
 
 function App() {
+  const [isFormatting, setIsFormatting] = useState(false);
   const [parser, setParser] = useState("apex");
   const [host, setHost] = useState(
     import.meta.env["VITE_APEX_AST_HOST"] ?? "localhost",
@@ -57,9 +58,11 @@ function App() {
         useTabs,
       };
       try {
+        setIsFormatting(true);
         const result = await prettier.format(debouncedCode, parseOptions);
         if (!staleResponse) {
           setFormattedCode(result);
+          setIsFormatting(false);
         }
       } catch (err: any) {
         if (staleResponse) {
@@ -70,6 +73,7 @@ function App() {
         } else {
           setFormattedCode(err);
         }
+        setIsFormatting(false);
       }
     };
 
@@ -211,18 +215,25 @@ function App() {
                 setOriginalCode(value);
               }}
             />
-            <Editor
-              height="100%"
-              defaultLanguage="apex"
-              value={formattedCode}
-              options={{
-                domReadyOnly: true,
-                readOnly: true,
-                minimap: { enabled: false },
-                rulers: [printWidth],
-                scrollBeyondLastLine: false,
-              }}
-            />
+            <div className="formatted-editor">
+              <div
+                className={`spinner-container ${!isFormatting ? "hide" : ""}`}
+              >
+                <div className="loading-spinner"></div>
+              </div>
+              <Editor
+                height="100%"
+                defaultLanguage="apex"
+                value={formattedCode}
+                options={{
+                  domReadyOnly: true,
+                  readOnly: true,
+                  minimap: { enabled: false },
+                  rulers: [printWidth],
+                  scrollBeyondLastLine: false,
+                }}
+              />
+            </div>
           </div>
         </div>
         <div className="bottom-bar">
