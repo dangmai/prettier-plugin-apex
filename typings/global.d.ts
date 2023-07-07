@@ -1,4 +1,4 @@
-import prettier from "prettier";
+import "prettier";
 // eslint-disable-next-line import/no-extraneous-dependencies -- temporary workaround, only needed in dev
 import {
   type FormData as FormDataType,
@@ -12,6 +12,7 @@ declare module "prettier" {
     apexStandaloneParser: string;
     apexStandalonePort: number;
     apexStandaloneHost: string;
+    apexStandaloneProtocol: string;
     apexInsertFinalNewline: boolean;
   }
   namespace __debug {

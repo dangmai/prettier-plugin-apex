@@ -107,7 +107,7 @@ export const options: SupportOptions = {
   },
   apexStandaloneHost: {
     type: "string",
-    category: "Global",
+    category: CATEGORY_APEX,
     default: "localhost",
     description:
       "The standalone server host to connect to. Only applicable if apexStandaloneParser is true. Default to localhost.",
@@ -118,6 +118,13 @@ export const options: SupportOptions = {
     default: 2117,
     description:
       "The standalone server port to connect to. Only applicable if apexStandaloneParser is true. Default to 2117.",
+  },
+  apexStandaloneProtocol: {
+    type: "string",
+    category: CATEGORY_APEX,
+    default: "http",
+    description:
+      "The protocol for the standalone server. Only applicable if apexStandaloneParser is true. Default to http.",
   },
   apexInsertFinalNewline: {
     type: "boolean",

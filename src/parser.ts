@@ -62,22 +62,26 @@ async function parseTextWithHttp(
   text: string,
   serverHost: string,
   serverPort: number,
+  serverProtocol: string,
   anonymous: boolean,
 ): Promise<string> {
   try {
-    const result = await fetch(`http://${serverHost}:${serverPort}/api/ast`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const result = await fetch(
+      `${serverProtocol}://${serverHost}:${serverPort}/api/ast`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          sourceCode: text,
+          anonymous,
+          outputFormat: "json",
+          idRef: true,
+          prettyPrint: false,
+        }),
       },
-      body: JSON.stringify({
-        sourceCode: text,
-        anonymous,
-        outputFormat: "json",
-        idRef: true,
-        prettyPrint: false,
-      }),
-    });
+    );
     return await result.text();
   } catch (err: any) {
     throw new Error(
@@ -585,6 +589,7 @@ export default async function parse(
       sourceCode,
       options.apexStandaloneHost,
       options.apexStandalonePort,
+      options.apexStandaloneProtocol,
       options.parser === "apex-anonymous",
     );
   } else {

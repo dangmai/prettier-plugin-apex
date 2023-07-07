@@ -3,6 +3,7 @@
 ## Internal Changes
 
 - Allow user to customize the secret used to shut down the parsing server.
+- Allow user to specify the protocol (HTTP/HTTPS) that the parsing server uses.
 
 # 2.0.1
 

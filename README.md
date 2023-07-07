@@ -128,6 +128,7 @@ Here is the default configuration that can be overriden:
 | `apexStandaloneParser`   | `none`      | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Performance Tip](#performance-tips3rd-party-integration).<br>If set to `none`, Prettier invokes the CLI parser for every file. |
 | `apexStandalonePort`     | `2117`      | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                               |
 | `apexStandaloneHost`     | `localhost` | The host that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                               |
+| `apexStandaloneProtocol` | `http`      | The protocol that the standalone Apex parser uses.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                 |
 
 ## Editor integration
 
