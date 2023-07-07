@@ -1,0 +1,15 @@
+# We use Render free plan for the hosted parser, and their cold boots can take
+# very long to warm up, so we use this workflow to keep it warm
+name: Warm hosted service
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+
+jobs:
+  warm-hosted-service:
+    runs-on: ubuntu-latest
+
+    steps:
+      - run: curl https://apex-ast.onrender.com/api/ast/
