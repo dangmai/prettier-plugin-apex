@@ -340,6 +340,13 @@ function App() {
               Copy Link
             </ClipboardButton>
           </div>
+          <div className="copyright">
+            © {new Date().getFullYear()}{" "}
+            <a target="_blank" href="https://dangmai.net">
+              Dang Mai
+            </a>
+            . All rights reserved.
+          </div>
         </div>
       </div>
     </>

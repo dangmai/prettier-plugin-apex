@@ -230,3 +230,18 @@ label {
   border-bottom: none;
   border-top-color: #000;
 }
+
+.copyright {
+  float: right;
+  padding-top: 10px;
+  padding-right: 20px;
+}
+
+.copyright a {
+  text-decoration: none;
+}
+
+.copyright a,
+.copyright a:visited {
+  color: inherit;
+}
