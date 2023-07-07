@@ -2,6 +2,7 @@
 
 ## Internal Changes
 
+- Our new [Playground](https://apex.dangmai.net) has been published, allowing users to try out Prettier Apex without installing anything.
 - Allow user to customize the secret used to shut down the parsing server.
 - Allow user to specify the protocol (HTTP/HTTPS) that the parsing server uses.
 
