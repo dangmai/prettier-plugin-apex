@@ -28,6 +28,7 @@ function App() {
   const [printWidth, setPrintWidth] = useState(80);
   const [tabWidth, setTabWidth] = useState(2);
   const [useTabs, setUseTabs] = useState(false);
+  const [apexInsertFinalNewline, setApexInsertFinalNewline] = useState(true);
   const [originalCode, setOriginalCode] = useState(endent`
     class HelloWorld {
       void hello() {
@@ -51,6 +52,7 @@ function App() {
         apexStandalonePort: debouncedPort,
         apexStandaloneHost: debouncedHost,
         apexStandaloneProtocol: protocol,
+        apexInsertFinalNewline,
         plugins: [prettierApex],
         parser,
         printWidth,
@@ -90,6 +92,7 @@ function App() {
     printWidth,
     tabWidth,
     useTabs,
+    apexInsertFinalNewline,
     debouncedCode,
   ]);
 
@@ -169,6 +172,22 @@ function App() {
                     id="use-tabs"
                     checked={useTabs}
                     onChange={(event) => setUseTabs(event.target.checked)}
+                  />
+                </OptionEntry>
+              </details>
+              <details open={true} className="sub-options">
+                <summary>Apex</summary>
+                <OptionEntry
+                  label="--apex-insert-final-newline"
+                  labelHtmlFor="apex-insert-final-newline"
+                >
+                  <input
+                    type="checkbox"
+                    id="apex-insert-final-newline"
+                    checked={apexInsertFinalNewline}
+                    onChange={(event) =>
+                      setApexInsertFinalNewline(event.target.checked)
+                    }
                   />
                 </OptionEntry>
               </details>
