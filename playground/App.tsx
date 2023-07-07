@@ -99,7 +99,12 @@ function App() {
   return (
     <>
       <header>
-        <a href="/" className="logo-wrapper">
+        <a
+          href="https://github.com/dangmai/prettier-plugin-apex"
+          target="_blank"
+          rel="noreferrer noopener"
+          className="logo-wrapper"
+        >
           <img className="logo" src={icon} alt="" />
           <h1>
             Prettier Apex{" "}
