@@ -1,9 +1,82 @@
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 3fr 3fr;
-  height: 1000px;
+html {
+  background-color: #fafafa;
+  color: #6a6a6a;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
+    Arial, sans-serif;
+  font-size: 12px;
+  line-height: 1.25;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
 }
 
-.grid label {
+#root {
+  height: 100%;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+header {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  height: 30px;
+  padding: 11px 27px;
+  background-color: #1a2b34;
+  color: #e0e0e0;
+  position: relative;
+  z-index: 20;
+}
+
+header a,
+header a:visited,
+header a:focus,
+header a:active,
+header a:hover {
+  color: #fff;
+  text-decoration: none;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 34px;
+  margin-right: 10px;
+}
+
+header h1 {
+  font-size: 20px;
+  display: block;
+  font-family: inherit;
+  font-weight: 400;
+  line-height: 18px;
+  position: relative;
+  z-index: 9999;
+  margin: 0;
+}
+
+#version {
+  font-size: 0.5em;
+  line-height: 0;
+  opacity: 0.5;
+}
+
+.panels {
+  display: grid;
+  grid-template-columns: 1fr 3fr 3fr;
+  height: 100%;
+}
+
+.panels label {
   margin-right: 5px;
 }

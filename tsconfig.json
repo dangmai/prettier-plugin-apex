@@ -17,6 +17,7 @@
     "sourceMap": true,
     "inlineSourceMap": false,
     "jsx": "react-jsx",
+    "resolveJsonModule": true,
     "types": ["vite/client", "jest"]
   },
   "ts-node": {

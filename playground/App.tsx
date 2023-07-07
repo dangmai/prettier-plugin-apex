@@ -4,6 +4,7 @@ import endent from "endent";
 import * as prettier from "prettier";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
+import { version } from "../package.json";
 import * as prettierApex from "../src/index.js";
 import OptionEntry from "./OptionEntry.js";
 
@@ -87,98 +88,133 @@ function App() {
   ]);
 
   return (
-    <div className="grid">
-      <div>
-        <OptionEntry label="--host" labelHtmlFor="host">
-          <input
-            type="text"
-            id="host"
-            value={host}
-            onChange={(event) => setHost(event.target.value)}
-          />
-        </OptionEntry>
-        <OptionEntry label="--port" labelHtmlFor="port">
-          <input
-            type="number"
-            id="port"
-            value={port}
-            onChange={(event) =>
-              setPort(Number.parseInt(event.target.value, 10))
-            }
-          />
-        </OptionEntry>
-        <OptionEntry label="--protocol" labelHtmlFor="protocol">
-          <select
-            id="protocol"
-            value={protocol}
-            onChange={(event) => setProtocol(event.target.value)}
+    <div className="playground-container">
+      <header>
+        <a href="/" className="logo-wrapper">
+          <img className="logo" src="/static/icon.png" alt="" />
+          <h1>
+            Prettier Apex{" "}
+            <span id="version">
+              <a
+                href={`https://github.com/dangmai/prettier-plugin-apex/releases/tag/v${version}`}
+                target="_blank"
+                rel="noreferrer noopener"
+              >
+                v{version}
+              </a>
+            </span>
+          </h1>
+        </a>
+
+        <span className="links">
+          <a
+            className="github-button"
+            href="https://github.com/dangmai/prettier-plugin-apex"
+            data-show-count="true"
+            aria-label="Star prettier-plugin-apex on GitHub"
           >
-            <option value="http">http</option>
-            <option value="https">https</option>
-          </select>
-        </OptionEntry>
-        <OptionEntry label="--parser" labelHtmlFor="parser">
-          <select
-            id="parser"
-            value={parser}
-            onChange={(event) => setParser(event.target.value)}
-          >
-            <option value="apex">apex</option>
-            <option value="apex-anonymous">apex-anonymous</option>
-          </select>
-        </OptionEntry>
-        <OptionEntry label="--print-width" labelHtmlFor="print-width">
-          <input
-            type="number"
-            id="print-width"
-            value={printWidth}
-            onChange={(event) =>
-              setPrintWidth(Number.parseInt(event.target.value, 10))
+            GitHub
+          </a>
+        </span>
+      </header>
+      <div className="panels">
+        <div>
+          <OptionEntry label="--host" labelHtmlFor="host">
+            <input
+              type="text"
+              id="host"
+              value={host}
+              onChange={(event) => setHost(event.target.value)}
+            />
+          </OptionEntry>
+          <OptionEntry label="--port" labelHtmlFor="port">
+            <input
+              type="number"
+              id="port"
+              value={port}
+              onChange={(event) =>
+                setPort(Number.parseInt(event.target.value, 10))
+              }
+            />
+          </OptionEntry>
+          <OptionEntry label="--protocol" labelHtmlFor="protocol">
+            <select
+              id="protocol"
+              value={protocol}
+              onChange={(event) => setProtocol(event.target.value)}
+            >
+              <option value="http">http</option>
+              <option value="https">https</option>
+            </select>
+          </OptionEntry>
+          <OptionEntry label="--parser" labelHtmlFor="parser">
+            <select
+              id="parser"
+              value={parser}
+              onChange={(event) => setParser(event.target.value)}
+            >
+              <option value="apex">apex</option>
+              <option value="apex-anonymous">apex-anonymous</option>
+            </select>
+          </OptionEntry>
+          <OptionEntry label="--print-width" labelHtmlFor="print-width">
+            <input
+              type="number"
+              id="print-width"
+              value={printWidth}
+              onChange={(event) =>
+                setPrintWidth(Number.parseInt(event.target.value, 10))
+              }
+            />
+          </OptionEntry>
+          <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
+            <input
+              type="number"
+              id="tab-width"
+              value={tabWidth}
+              onChange={(event) =>
+                setTabWidth(Number.parseInt(event.target.value, 10))
+              }
+            />
+          </OptionEntry>
+          <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
+            <input
+              type="checkbox"
+              id="use-tabs"
+              checked={useTabs}
+              onChange={(event) => setUseTabs(event.target.checked)}
+            />
+          </OptionEntry>
+        </div>
+        <Editor
+          height="100%"
+          defaultLanguage="apex"
+          value={originalCode}
+          options={{
+            minimap: { enabled: false },
+            rulers: [printWidth],
+            scrollBeyondLastLine: false,
+          }}
+          onChange={async (value) => {
+            if (value === undefined) {
+              return;
             }
-          />
-        </OptionEntry>
-        <OptionEntry label="--tab-width" labelHtmlFor="tab-width">
-          <input
-            type="number"
-            id="tab-width"
-            value={tabWidth}
-            onChange={(event) =>
-              setTabWidth(Number.parseInt(event.target.value, 10))
-            }
-          />
-        </OptionEntry>
-        <OptionEntry label="--use-tabs" labelHtmlFor="use-tabs">
-          <input
-            type="checkbox"
-            id="use-tabs"
-            checked={useTabs}
-            onChange={(event) => setUseTabs(event.target.checked)}
-          />
-        </OptionEntry>
+            setOriginalCode(value);
+          }}
+        />
+        <Editor
+          height="100%"
+          defaultLanguage="apex"
+          value={formattedCode}
+          options={{
+            domReadyOnly: true,
+            readOnly: true,
+            minimap: { enabled: false },
+            rulers: [printWidth],
+            scrollBeyondLastLine: false,
+          }}
+        />
       </div>
-      <Editor
-        height="100%"
-        defaultLanguage="apex"
-        value={originalCode}
-        options={{ minimap: { enabled: false }, rulers: [printWidth] }}
-        onChange={async (value) => {
-          if (value === undefined) {
-            return;
-          }
-          setOriginalCode(value);
-        }}
-      />
-      <Editor
-        height="100%"
-        defaultLanguage="apex"
-        value={formattedCode}
-        options={{
-          domReadyOnly: true,
-          readOnly: true,
-          minimap: { enabled: false },
-          rulers: [printWidth],
-        }}
-      />
     </div>
   );
 }
