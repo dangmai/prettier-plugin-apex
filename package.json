@@ -22,8 +22,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json && yarn build:standalone",
-    "build:standalone": "yarn vite build",
+    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json && yarn build:standalone && yarn build:site",
+    "build:standalone": "cross-env BUILD_MODE=library yarn vite build",
+    "build:site": "cross-env BUILD_MODE=site yarn vite build",
     "pretest": "yarn run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:standalone": "yarn test -c jest.config.standalone.js",
