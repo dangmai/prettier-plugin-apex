@@ -2,10 +2,14 @@ import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { defineConfig } from "vite";
 
-const buildMode = process.env["BUILD_MODE"] || "site";
+const buildTarget = process.env["BUILD_TARGET"] || "site";
 
-export default defineConfig(
-  buildMode === "library"
+export default defineConfig(({ mode }) => {
+  process.env["VITE_APP_TITLE"] =
+    mode === "production"
+      ? "Salesforce Apex Formatter"
+      : `[${mode}] Salesforce Apex Formatter`;
+  return buildTarget === "library"
     ? {
         build: {
           emptyOutDir: false,
@@ -41,5 +45,5 @@ export default defineConfig(
             plugins: [react()],
           },
         },
-      },
-);
+      };
+});
