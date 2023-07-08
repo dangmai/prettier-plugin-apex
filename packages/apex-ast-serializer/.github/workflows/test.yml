@@ -3,9 +3,9 @@ name: Test and Release
 on:
   push:
     branches:
-      - '**'
+      - "**"
     tags-ignore:
-      - '**'
+      - "**"
   workflow_dispatch:
 
 jobs:
@@ -17,7 +17,7 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
+          distribution: "adopt"
           java-version: 11
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -33,7 +33,7 @@ jobs:
       - name: Set up JDK 11
         uses: actions/setup-java@v3
         with:
-          distribution: 'adopt'
+          distribution: "adopt"
           java-version: 11
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -47,8 +47,8 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: 'build/distributions/apex-ast-serializer.zip'
+          artifacts: "build/distributions/apex-ast-serializer.zip"
           token: ${{ secrets.PERSONAL_TOKEN }}
-          tag: '${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}'
+          tag: "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}"
       - name: Send event to prettier-plugin-apex
         run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
