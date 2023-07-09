@@ -139,7 +139,7 @@ function App() {
         <a
           href="https://github.com/dangmai/prettier-plugin-apex"
           target="_blank"
-          rel="noreferrer noopener"
+          rel="noopener"
           className="logo-wrapper"
         >
           <img className="logo" src={icon} alt="" />
@@ -149,7 +149,7 @@ function App() {
               <a
                 href={`https://github.com/dangmai/prettier-plugin-apex/releases/tag/v${version}`}
                 target="_blank"
-                rel="noreferrer noopener"
+                rel="noopener"
               >
                 v{version}
               </a>
@@ -160,6 +160,8 @@ function App() {
         <span className="links">
           <a
             className="github-button"
+            target="_blank"
+            rel="noopener"
             href="https://github.com/dangmai/prettier-plugin-apex"
             data-show-count="true"
             aria-label="Star prettier-plugin-apex on GitHub"
@@ -342,7 +344,7 @@ function App() {
           </div>
           <div className="copyright">
             © {new Date().getFullYear()}{" "}
-            <a target="_blank" href="https://dangmai.net">
+            <a target="_blank" rel="noopener" href="https://dangmai.net">
               Dang Mai
             </a>
             . All rights reserved.
