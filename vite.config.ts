@@ -40,6 +40,10 @@ export default defineConfig(({ mode }) => {
       }
     : {
         root: resolve(__dirname, "playground"),
+        server: {
+          port: 5173,
+          strictPort: true,
+        },
         plugins: [
           react(),
           VitePluginRadar({
