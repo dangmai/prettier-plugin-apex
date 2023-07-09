@@ -40,20 +40,18 @@ export default defineConfig(({ mode }) => {
       }
     : {
         root: resolve(__dirname, "playground"),
+        plugins: [
+          react(),
+          VitePluginRadar({
+            enableDev: true,
+            analytics: {
+              id: analyticsId,
+            },
+          }),
+        ],
         build: {
           emptyOutDir: false,
           outDir: resolve(__dirname, "dist", "playground"),
-          rollupOptions: {
-            plugins: [
-              react(),
-              VitePluginRadar({
-                enableDev: true,
-                analytics: {
-                  id: analyticsId,
-                },
-              }),
-            ],
-          },
         },
       };
 });
