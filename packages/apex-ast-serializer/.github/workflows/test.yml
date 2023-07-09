@@ -15,11 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 11
-        uses: actions/setup-java@v3
+      - name: Set up JDK
+        uses: graalvm/setup-graalvm@v1
         with:
-          distribution: "adopt"
-          java-version: 11
+          java-version: "17"
+          distribution: "graalvm-community" # See 'Options' for all available distributions
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Test with Gradle
@@ -40,16 +41,20 @@ jobs:
         run: chmod +x gradlew
       - name: Create zip file
         run: ./gradlew clean distZip
-      - name: Get current time
-        uses: srfrnk/current-time@master
-        id: current-time
-        with:
-          format: YYYYMMDD
-      - name: Create Release
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "build/distributions/apex-ast-serializer.zip"
-          token: ${{ secrets.PERSONAL_TOKEN }}
-          tag: "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}"
-      - name: Send event to prettier-plugin-apex
-        run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
+      - name: Build native executable
+        run: ./gradlew buildNative
+      - name: Trial run of executable file
+        run: time ./build/native/nativeCompile/apex-ast-serializer -f json -l src/test/resources/NonEmptyNamedClass.cls
+      # - name: Get current time
+      #   uses: srfrnk/current-time@master
+      #   id: current-time
+      #   with:
+      #     format: YYYYMMDD
+      # - name: Create Release
+      #   uses: ncipollo/release-action@v1
+      #   with:
+      #     artifacts: "build/distributions/apex-ast-serializer.zip"
+      #     token: ${{ secrets.PERSONAL_TOKEN }}
+      #     tag: "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}"
+      # - name: Send event to prettier-plugin-apex
+      #   run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
