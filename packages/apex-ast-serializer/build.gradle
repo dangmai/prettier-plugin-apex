@@ -181,3 +181,43 @@ generateTypeScript {
   noFileComment = true
 }
 
+graalvmNative {
+  agent {
+    enabled = true
+  }
+  binaries {
+    main {
+      configurationFileDirectories.from(file('build/native/agent-output/run'))
+    }
+  }
+}
+
+tasks.register("generateNativeImageConfig") {
+  doFirst {
+    run.configure {
+      args = [
+        "-f",
+        "json",
+        "-l",
+        "./src/test/resources/NonEmptyNamedClass.cls"
+      ]
+    }
+  }
+  finalizedBy(run)
+}
+
+// This is the task that builds native executable for the host platform.
+// Run it: `gradle buildNative`
+// It contains multiple steps in order to achive this goal:
+// - It runs the main module with a sample Apex file, and uses native-image-agent
+// to figure out what reflections/proxies are used as part of that run.
+// - Then it uses native-image to compile the final artifacts, using the information
+// in the previous step (which is stored in `build/native/agent-output/run`)
+// - The final artifact is produced and stored in `build/native/nativeCompile`
+task buildNative {
+    dependsOn 'clean'
+    dependsOn 'generateNativeImageConfig'
+    dependsOn 'nativeCompile'
+    tasks.findByName('generateNativeImageConfig').mustRunAfter 'clean'
+    tasks.findByName('nativeCompile').mustRunAfter 'run'
+}
