@@ -79,7 +79,8 @@
     "typescript": "5.1.6",
     "undici": "5.22.1",
     "use-debounce": "9.0.4",
-    "vite": "4.4.2"
+    "vite": "4.4.2",
+    "vite-plugin-radar": "0.9.0"
   },
   "peerDependencies": {
     "prettier": "^3.0.0"

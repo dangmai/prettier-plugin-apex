@@ -1,8 +1,10 @@
 import react from "@vitejs/plugin-react";
 import { resolve } from "path";
 import { defineConfig } from "vite";
+import { VitePluginRadar } from "vite-plugin-radar";
 
 const buildTarget = process.env["BUILD_TARGET"] || "site";
+const analyticsId = process.env["GOOGLE_ANALYTICS_ID"] || "";
 
 export default defineConfig(({ mode }) => {
   process.env["VITE_APP_TITLE"] =
@@ -42,7 +44,15 @@ export default defineConfig(({ mode }) => {
           emptyOutDir: false,
           outDir: resolve(__dirname, "dist", "playground"),
           rollupOptions: {
-            plugins: [react()],
+            plugins: [
+              react(),
+              VitePluginRadar({
+                enableDev: true,
+                analytics: {
+                  id: analyticsId,
+                },
+              }),
+            ],
           },
         },
       };

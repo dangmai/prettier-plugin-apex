@@ -4323,6 +4323,11 @@ v8-to-istanbul@^9.0.1:
     "@types/istanbul-lib-coverage" "^2.0.1"
     convert-source-map "^1.6.0"
 
+vite-plugin-radar@0.9.0:
+  version "0.9.0"
+  resolved "https://registry.yarnpkg.com/vite-plugin-radar/-/vite-plugin-radar-0.9.0.tgz#3fac988c64cd9f9513b469fb7190b09edb142e3d"
+  integrity sha512-nKRSNMoZ8ehg2U/1rMSG9be53JrbEMzsARpbHJHgfHFe7TyIKr1ew2xvMol4TSNTeI6LKYroAqgpoxdbomBnTQ==
+
 vite@4.4.2:
   version "4.4.2"
   resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.2.tgz#acd47de771c498aec80e4900f30133d9529b278a"
