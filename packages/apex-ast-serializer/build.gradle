@@ -8,6 +8,7 @@ buildscript {
 plugins {
   id 'java'
   id 'application'
+  id 'org.graalvm.buildtools.native' version '0.9.23'
 }
 apply plugin: 'cz.habarta.typescript-generator'
 
@@ -53,6 +54,7 @@ repositories {
   }
   mavenCentral()
   maven { url "https://jitpack.io" }
+  gradlePluginPortal()
 }
 
 run {
