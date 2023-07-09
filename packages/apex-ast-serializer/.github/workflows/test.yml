@@ -6,12 +6,13 @@ on:
       - "**"
     tags-ignore:
       - "**"
+  schedule:
+    - cron: "0 0 1 * *" # Release once a month automatically
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -26,7 +27,7 @@ jobs:
 
   release:
     needs: test
-    if: github.ref == 'refs/heads/master'
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
