@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}
     steps:
       - name: Get current time
         uses: srfrnk/current-time@master
@@ -60,12 +61,14 @@ jobs:
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-linux-amd64
+            CREATE_DIST: true
           - os: macos-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-mac-amd64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
+      CREATE_DIST: ${{ matrix.CREATE_DIST }}
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -78,10 +81,21 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Create zip file
+        if: env.CREATE_DIST
         run: ./gradlew clean distZip
       - name: Build native executable
         run: ./gradlew buildNative
-      - name: Attach artifact to release
+      - name: Attach vendor distribution to release
+        uses: actions/upload-release-asset@v1
+        if: env.CREATE_DIST
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./build/distributions/apex-ast-serializer.zip
+          asset_name: apex-ast-serializer.zip
+          asset_content_type: application/zip
+      - name: Attach native artifact to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -96,4 +110,4 @@ jobs:
   #   runs-on: ubuntu-latest
   #   steps:
   #     - name: Send event to prettier-plugin-apex
-  #       run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
+  #       run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ needs.create-release.outputs.release_name }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'
