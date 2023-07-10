@@ -215,9 +215,7 @@ tasks.register("generateNativeImageConfig") {
 // in the previous step (which is stored in `build/native/agent-output/run`)
 // - The final artifact is produced and stored in `build/native/nativeCompile`
 task buildNative {
-    dependsOn 'clean'
     dependsOn 'generateNativeImageConfig'
     dependsOn 'nativeCompile'
-    tasks.findByName('generateNativeImageConfig').mustRunAfter 'clean'
     tasks.findByName('nativeCompile').mustRunAfter 'run'
 }
