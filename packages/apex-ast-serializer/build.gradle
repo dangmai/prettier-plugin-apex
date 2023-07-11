@@ -91,9 +91,22 @@ distZip {
   archiveFileName = "${project.name}.zip"
 }
 distZip.dependsOn generateTypeScript
+generateTypeScript.mustRunAfter 'classes'
 
 jar {
   exclude('net/dangmai/types/**')
+}
+
+sourceSets {
+  core {}
+  main {
+    compileClasspath += sourceSets.core.compileClasspath
+    runtimeClasspath += sourceSets.core.runtimeClasspath
+  }
+  test {
+    compileClasspath += sourceSets.core.compileClasspath
+    runtimeClasspath += sourceSets.core.runtimeClasspath
+  }
 }
 
 ext {
@@ -103,9 +116,9 @@ ext {
 }
 
 dependencies {
-  implementation name: 'apex-jorje-lsp'
+  coreImplementation name: 'apex-jorje-lsp'
   // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
+  coreImplementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
 
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
@@ -126,10 +139,10 @@ dependencies {
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.3'
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
-  implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
+  coreImplementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
+  coreImplementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
   compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
@@ -188,6 +201,8 @@ graalvmNative {
   binaries {
     main {
       configurationFileDirectories.from(file('build/native/agent-output/run'))
+      configurations.coreImplementation.setCanBeResolved(true)
+      classpath = project.files(configurations.coreImplementation, sourceSets.main.output)
     }
   }
 }
