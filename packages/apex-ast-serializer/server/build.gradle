@@ -54,8 +54,6 @@ repositories {
     dirs '../libs'
   }
   mavenCentral()
-  maven { url "https://jitpack.io" }
-  gradlePluginPortal()
 }
 
 run {
@@ -107,12 +105,6 @@ dependencies {
   implementation project(':parser')
   testImplementation(testFixtures(project(":parser")))
 
-  // https://mvnrepository.com/artifact/commons-cli/commons-cli
-  implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
-
-  // https://mvnrepository.com/artifact/commons-io/commons-io
-  implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
-
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
   implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
@@ -134,9 +126,6 @@ dependencies {
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.3'
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.3'
-
-  // https://mvnrepository.com/artifact/org.json/json
-  testImplementation group: 'org.json', name: 'json', version: '20230618'
 }
 
 test {

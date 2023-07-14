@@ -6,7 +6,7 @@ buildscript {
 }
 
 plugins {
-  id 'java'
+  id 'java-library'
   id "java-test-fixtures"
   id 'application'
   id 'org.graalvm.buildtools.native' version '0.9.23'
@@ -47,15 +47,15 @@ run {
 }
 
 dependencies {
-  implementation name: 'apex-jorje-lsp'
+  api name: 'apex-jorje-lsp'
   // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
+  api group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
-  implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
+  api group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
+  api group: 'commons-io', name: 'commons-io', version: '2.13.0'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.3'
@@ -75,6 +75,7 @@ test {
 graalvmNative {
   agent {
     enabled = true
+    defaultMode = "standard"
   }
   binaries {
     main {
