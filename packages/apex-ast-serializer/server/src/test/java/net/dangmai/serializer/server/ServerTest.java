@@ -1,16 +1,10 @@
-package net.dangmai.serializer;
+package net.dangmai.serializer.server;
 
 import net.dangmai.serializer.TestUtilities;
-import net.dangmai.serializer.server.HttpServer;
-import org.apache.commons.io.FileUtils;
-import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,7 +26,7 @@ public class ServerTest {
     void shouldGetJsonFromNamedApexFile() {
         assertDoesNotThrow(() -> {
             File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
-            String content = postRequest(createJsonRequest("json", false, file));
+            String content = TestUtilities.postRequest(TestUtilities.createJsonRequest("json", false, file));
             assertNotNull(content, "There should be content");
             assertTrue(TestUtilities.isJSONValid(content), "Content should be valid JSON");
         });
@@ -42,7 +36,7 @@ public class ServerTest {
     void shouldGetXmlFromNamedApexFile() {
         assertDoesNotThrow(() -> {
             File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
-            String content = postRequest(createJsonRequest("xml", false, file));
+            String content = TestUtilities.postRequest(TestUtilities.createJsonRequest("xml", false, file));
             assertNotNull(content, "There should be content");
             assertTrue(TestUtilities.isXmlValid(content), "Content should be valid XML");
         });
@@ -52,7 +46,7 @@ public class ServerTest {
     void shouldGetJsonFromAnonymousApexFile() {
         assertDoesNotThrow(() -> {
             File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
-            String content = postRequest(createJsonRequest("json", true, file));
+            String content = TestUtilities.postRequest(TestUtilities.createJsonRequest("json", true, file));
             assertNotNull(content, "There should be content");
             assertTrue(TestUtilities.isJSONValid(content), "Content should be valid JSON");
         });
@@ -62,38 +56,10 @@ public class ServerTest {
     void shouldGetXmlFromAnonymousApexFile() {
         assertDoesNotThrow(() -> {
             File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
-            String content = postRequest(createJsonRequest("xml", true, file));
+            String content = TestUtilities.postRequest(TestUtilities.createJsonRequest("xml", true, file));
             assertNotNull(content, "There should be content");
             assertTrue(TestUtilities.isXmlValid(content), "Content should be valid XML");
         });
     }
 
-    private static JSONObject createJsonRequest(String format, Boolean anonymous, File file) throws IOException {
-        return new JSONObject()
-                .put("anonymous", anonymous)
-                .put("idRef", true)
-                .put("prettyPrint", false)
-                .put("outputFormat", format)
-                .put("sourceCode", FileUtils.readFileToString(file, StandardCharsets.UTF_8));
-    }
-
-    private static String postRequest(JSONObject jsonInput) throws Exception {
-        URL url = new URL("http://localhost:58867/api/ast/");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("POST");
-        con.setRequestProperty("Content-Type", "application/javascript");
-        con.setDoOutput(true);
-        try(OutputStream os = con.getOutputStream()) {
-            byte[] input = jsonInput.toString().getBytes(StandardCharsets.UTF_8);
-            os.write(input, 0, input.length);
-        }
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8))) {
-            StringBuilder response = new StringBuilder();
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            return response.toString();
-        }
-    }
 }

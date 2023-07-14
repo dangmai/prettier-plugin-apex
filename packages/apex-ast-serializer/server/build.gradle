@@ -4,15 +4,14 @@ plugins {
 }
 
 sourceSets {
-  test {
+  test{
+    compileClasspath += project(':parser').sourceSets.testFixtures.compileClasspath
+    runtimeClasspath += project(':parser').sourceSets.testFixtures.runtimeClasspath
     resources {
-      srcDirs += [
-        project(':parser').sourceSets.test.resources
-      ]
+      srcDirs += [project(':parser').sourceSets.test.resources]
     }
   }
 }
-
 
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
@@ -52,7 +51,7 @@ targetCompatibility = 1.11
 
 repositories {
   flatDir {
-    dirs 'libs'
+    dirs '../libs'
   }
   mavenCentral()
   maven { url "https://jitpack.io" }
@@ -106,7 +105,7 @@ ext {
 
 dependencies {
   implementation project(':parser')
-  testImplementation project(':parser')
+  testImplementation(testFixtures(project(":parser")))
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
   implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'

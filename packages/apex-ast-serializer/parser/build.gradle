@@ -7,10 +7,23 @@ buildscript {
 
 plugins {
   id 'java'
+  id "java-test-fixtures"
   id 'application'
   id 'org.graalvm.buildtools.native' version '0.9.23'
 }
 apply plugin: 'cz.habarta.typescript-generator'
+
+sourceSets {
+  test {
+    resources {
+      srcDirs "src/testFixtures/resources"
+    }
+  }
+  testFixtures {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+  }
+}
 
 mainClassName = 'net.dangmai.serializer.Apex'
 
@@ -22,7 +35,7 @@ targetCompatibility = 1.11
 
 repositories {
   flatDir {
-    dirs 'libs'
+    dirs '../libs'
   }
   mavenCentral()
   maven { url "https://jitpack.io" }
@@ -49,7 +62,7 @@ dependencies {
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.3'
 
   // https://mvnrepository.com/artifact/org.json/json
-  testImplementation group: 'org.json', name: 'json', version: '20230618'
+  testFixturesImplementation group: 'org.json', name: 'json', version: '20230618'
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
   compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
@@ -77,7 +90,7 @@ tasks.register("generateNativeImageConfig") {
         "-f",
         "json",
         "-l",
-        "./src/test/resources/NonEmptyNamedClass.cls"
+        "./src/testFixtures/resources/NonEmptyNamedClass.cls"
       ]
     }
   }
