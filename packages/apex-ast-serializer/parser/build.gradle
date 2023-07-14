@@ -69,6 +69,8 @@ graalvmNative {
   binaries {
     main {
       configurationFileDirectories.from(file('build/native/agent-output/run'))
+      imageName = 'apex-ast-serializer'
+      sharedLibrary = false
     }
   }
 }
