@@ -1,4 +1,4 @@
-name: Test and Release
+name: Test and Release Artifacts
 
 on:
   push:
