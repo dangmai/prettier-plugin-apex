@@ -1,17 +1,9 @@
-buildscript {
-  dependencies {
-    // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
-    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.2.1263'
-  }
-}
-
 plugins {
   id 'java-library'
   id "java-test-fixtures"
   id 'application'
   id 'org.graalvm.buildtools.native' version '0.9.23'
 }
-apply plugin: 'cz.habarta.typescript-generator'
 
 sourceSets {
   test {
@@ -63,9 +55,6 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20230618'
-
-  // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
-  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
 }
 
 test {
@@ -110,39 +99,4 @@ task buildNative {
     dependsOn 'generateNativeImageConfig'
     dependsOn 'nativeCompile'
     tasks.findByName('nativeCompile').mustRunAfter 'run'
-}
-
-generateTypeScript {
-  jsonLibrary = 'jackson2'
-  classes = [
-    'apex.jorje.semantic.compiler.parser.ParserOutput',
-  ]
-  classPatterns = [
-    'apex.jorje.data.**',
-    'apex.jorje.parser.impl.HiddenToken**',
-  ]
-  excludeClassPatterns = [
-    'apex.jorje.**$MatchBlock',
-    'apex.jorje.**$MatchBlockWithDefault',
-    'apex.jorje.**$SwitchBlock',
-    'apex.jorje.**$SwitchBlockWithDefault',
-    'apex.jorje.**$Visitor',
-    'apex.jorje.**Factory',
-    'apex.jorje.**Decorator',
-  ]
-  customTypeNaming = [
-    'apex.jorje.data.ast.Expr$LiteralExpr:ExprLiteralExpr',
-    'apex.jorje.data.soql.QueryExpr$LiteralExpr:QueryExprLiteralExpr',
-  ]
-  customTypeProcessor = 'net.dangmai.types.CustomTypeProcessor'
-  outputFile = 'build/typings/jorje.d.ts'
-  outputKind = 'module'
-  extensionClasses = [
-    'net.dangmai.types.CustomEnumExtension',
-    'net.dangmai.types.CustomFieldExtension',
-    'net.dangmai.types.UnionTypeExtension',
-    'net.dangmai.types.GenericNodeExtension',
-  ]
-  sortDeclarations = true
-  noFileComment = true
 }

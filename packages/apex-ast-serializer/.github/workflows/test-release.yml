@@ -57,14 +57,14 @@ jobs:
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
-            OUTPUT_NAME: apex-ast-serializer-win-amd64.exe
+            OUTPUT_NAME: apex-ast-serializer-win32-amd64.exe
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-linux-amd64
             CREATE_DIST: true
           - os: macos-latest
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-mac-amd64
+            OUTPUT_NAME: apex-ast-serializer-darwin-amd64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
@@ -82,9 +82,9 @@ jobs:
         run: chmod +x gradlew
       - name: Create zip file
         if: env.CREATE_DIST
-        run: ./gradlew clean distZip
+        run: ./gradlew :server:clean :server:distZip
       - name: Build native executable
-        run: ./gradlew buildNative
+        run: ./gradlew :parser:buildNative
       - name: Attach vendor distribution to release
         uses: actions/upload-release-asset@v1
         if: env.CREATE_DIST
@@ -92,7 +92,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./build/distributions/apex-ast-serializer.zip
+          asset_path: ./server/build/distributions/apex-ast-serializer.zip
           asset_name: apex-ast-serializer.zip
           asset_content_type: application/zip
       - name: Attach native artifact to release
@@ -101,7 +101,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./build/native/nativeCompile/${{ env.ASSET_NAME }}
+          asset_path: ./parser/build/native/nativeCompile/${{ env.ASSET_NAME }}
           asset_name: ${{ env.OUTPUT_NAME }}
           asset_content_type: application/octet-stream
 

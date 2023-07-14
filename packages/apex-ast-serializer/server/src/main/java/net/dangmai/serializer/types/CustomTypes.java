@@ -1,4 +1,4 @@
-package net.dangmai.types;
+package net.dangmai.serializer.types;
 
 import cz.habarta.typescript.generator.Settings;
 import cz.habarta.typescript.generator.TsType;

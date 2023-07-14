@@ -1,4 +1,3 @@
-rootProject.name = 'apex-ast-serializer'
+rootProject.name = 'apex-ast-serializer-root'
 include 'parser'
 include 'server'
-
