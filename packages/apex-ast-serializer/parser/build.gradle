@@ -1,0 +1,134 @@
+buildscript {
+  dependencies {
+    // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
+    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.2.1263'
+  }
+}
+
+plugins {
+  id 'java'
+  id 'application'
+  id 'org.graalvm.buildtools.native' version '0.9.23'
+}
+apply plugin: 'cz.habarta.typescript-generator'
+
+mainClassName = 'net.dangmai.serializer.Apex'
+
+group 'net.dangmai'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+repositories {
+  flatDir {
+    dirs 'libs'
+  }
+  mavenCentral()
+  maven { url "https://jitpack.io" }
+  gradlePluginPortal()
+}
+
+run {
+  standardInput = System.in
+}
+
+dependencies {
+  implementation name: 'apex-jorje-lsp'
+  // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+  implementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
+
+  // https://mvnrepository.com/artifact/commons-cli/commons-cli
+  implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
+
+  // https://mvnrepository.com/artifact/commons-io/commons-io
+  implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
+
+  // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.3'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.3'
+
+  // https://mvnrepository.com/artifact/org.json/json
+  testImplementation group: 'org.json', name: 'json', version: '20230618'
+
+  // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
+  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+graalvmNative {
+  agent {
+    enabled = true
+  }
+  binaries {
+    main {
+      configurationFileDirectories.from(file('build/native/agent-output/run'))
+    }
+  }
+}
+
+tasks.register("generateNativeImageConfig") {
+  doFirst {
+    run.configure {
+      args = [
+        "-f",
+        "json",
+        "-l",
+        "./src/test/resources/NonEmptyNamedClass.cls"
+      ]
+    }
+  }
+  finalizedBy(run)
+}
+
+// This is the task that builds native executable for the host platform.
+// Run it: `gradle buildNative`
+// It contains multiple steps in order to achive this goal:
+// - It runs the main module with a sample Apex file, and uses native-image-agent
+// to figure out what reflections/proxies are used as part of that run.
+// - Then it uses native-image to compile the final artifacts, using the information
+// in the previous step (which is stored in `build/native/agent-output/run`)
+// - The final artifact is produced and stored in `build/native/nativeCompile`
+task buildNative {
+    dependsOn 'generateNativeImageConfig'
+    dependsOn 'nativeCompile'
+    tasks.findByName('nativeCompile').mustRunAfter 'run'
+}
+
+generateTypeScript {
+  jsonLibrary = 'jackson2'
+  classes = [
+    'apex.jorje.semantic.compiler.parser.ParserOutput',
+  ]
+  classPatterns = [
+    'apex.jorje.data.**',
+    'apex.jorje.parser.impl.HiddenToken**',
+  ]
+  excludeClassPatterns = [
+    'apex.jorje.**$MatchBlock',
+    'apex.jorje.**$MatchBlockWithDefault',
+    'apex.jorje.**$SwitchBlock',
+    'apex.jorje.**$SwitchBlockWithDefault',
+    'apex.jorje.**$Visitor',
+    'apex.jorje.**Factory',
+    'apex.jorje.**Decorator',
+  ]
+  customTypeNaming = [
+    'apex.jorje.data.ast.Expr$LiteralExpr:ExprLiteralExpr',
+    'apex.jorje.data.soql.QueryExpr$LiteralExpr:QueryExprLiteralExpr',
+  ]
+  customTypeProcessor = 'net.dangmai.types.CustomTypeProcessor'
+  outputFile = 'build/typings/jorje.d.ts'
+  outputKind = 'module'
+  extensionClasses = [
+    'net.dangmai.types.CustomEnumExtension',
+    'net.dangmai.types.CustomFieldExtension',
+    'net.dangmai.types.UnionTypeExtension',
+    'net.dangmai.types.GenericNodeExtension',
+  ]
+  sortDeclarations = true
+  noFileComment = true
+}

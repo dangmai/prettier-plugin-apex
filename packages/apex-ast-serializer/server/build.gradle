@@ -1,16 +1,18 @@
-buildscript {
-  dependencies {
-    // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
-    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.2.1263'
-  }
-}
-
 plugins {
   id 'java'
   id 'application'
-  id 'org.graalvm.buildtools.native' version '0.9.23'
 }
-apply plugin: 'cz.habarta.typescript-generator'
+
+sourceSets {
+  test {
+    resources {
+      srcDirs += [
+        project(':parser').sourceSets.test.resources
+      ]
+    }
+  }
+}
+
 
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
@@ -90,24 +92,11 @@ distZip {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   archiveFileName = "${project.name}.zip"
 }
-distZip.dependsOn generateTypeScript
-generateTypeScript.mustRunAfter 'classes'
+// distZip.dependsOn generateTypeScript
 
-jar {
-  exclude('net/dangmai/types/**')
-}
-
-sourceSets {
-  core {}
-  main {
-    compileClasspath += sourceSets.core.compileClasspath
-    runtimeClasspath += sourceSets.core.runtimeClasspath
-  }
-  test {
-    compileClasspath += sourceSets.core.compileClasspath
-    runtimeClasspath += sourceSets.core.runtimeClasspath
-  }
-}
+// jar {
+//   exclude('net/dangmai/types/**')
+// }
 
 ext {
   slf4jVersion = '2.0.7'
@@ -116,9 +105,14 @@ ext {
 }
 
 dependencies {
-  coreImplementation name: 'apex-jorje-lsp'
-  // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  coreImplementation group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
+  implementation project(':parser')
+  testImplementation project(':parser')
+
+  // https://mvnrepository.com/artifact/commons-cli/commons-cli
+  implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
+
+  // https://mvnrepository.com/artifact/commons-io/commons-io
+  implementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
 
   implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
@@ -138,15 +132,6 @@ dependencies {
   // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.3'
 
-  // https://mvnrepository.com/artifact/commons-cli/commons-cli
-  coreImplementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
-
-  // https://mvnrepository.com/artifact/commons-io/commons-io
-  coreImplementation group: 'commons-io', name: 'commons-io', version: '2.13.0'
-
-  // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
-  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
-
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.3'
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.3'
@@ -157,80 +142,4 @@ dependencies {
 
 test {
   useJUnitPlatform()
-}
-
-generateTypeScript {
-  jsonLibrary = 'jackson2'
-  classes = [
-    'apex.jorje.semantic.compiler.parser.ParserOutput',
-  ]
-  classPatterns = [
-    'apex.jorje.data.**',
-    'apex.jorje.parser.impl.HiddenToken**',
-  ]
-  excludeClassPatterns = [
-    'apex.jorje.**$MatchBlock',
-    'apex.jorje.**$MatchBlockWithDefault',
-    'apex.jorje.**$SwitchBlock',
-    'apex.jorje.**$SwitchBlockWithDefault',
-    'apex.jorje.**$Visitor',
-    'apex.jorje.**Factory',
-    'apex.jorje.**Decorator',
-  ]
-  customTypeNaming = [
-    'apex.jorje.data.ast.Expr$LiteralExpr:ExprLiteralExpr',
-    'apex.jorje.data.soql.QueryExpr$LiteralExpr:QueryExprLiteralExpr',
-  ]
-  customTypeProcessor = 'net.dangmai.types.CustomTypeProcessor'
-  outputFile = 'build/typings/jorje.d.ts'
-  outputKind = 'module'
-  extensionClasses = [
-    'net.dangmai.types.CustomEnumExtension',
-    'net.dangmai.types.CustomFieldExtension',
-    'net.dangmai.types.UnionTypeExtension',
-    'net.dangmai.types.GenericNodeExtension',
-  ]
-  sortDeclarations = true
-  noFileComment = true
-}
-
-graalvmNative {
-  agent {
-    enabled = true
-  }
-  binaries {
-    main {
-      configurationFileDirectories.from(file('build/native/agent-output/run'))
-      configurations.coreImplementation.setCanBeResolved(true)
-      classpath = project.files(configurations.coreImplementation, sourceSets.main.output)
-    }
-  }
-}
-
-tasks.register("generateNativeImageConfig") {
-  doFirst {
-    run.configure {
-      args = [
-        "-f",
-        "json",
-        "-l",
-        "./src/test/resources/NonEmptyNamedClass.cls"
-      ]
-    }
-  }
-  finalizedBy(run)
-}
-
-// This is the task that builds native executable for the host platform.
-// Run it: `gradle buildNative`
-// It contains multiple steps in order to achive this goal:
-// - It runs the main module with a sample Apex file, and uses native-image-agent
-// to figure out what reflections/proxies are used as part of that run.
-// - Then it uses native-image to compile the final artifacts, using the information
-// in the previous step (which is stored in `build/native/agent-output/run`)
-// - The final artifact is produced and stored in `build/native/nativeCompile`
-task buildNative {
-    dependsOn 'generateNativeImageConfig'
-    dependsOn 'nativeCompile'
-    tasks.findByName('nativeCompile').mustRunAfter 'run'
 }

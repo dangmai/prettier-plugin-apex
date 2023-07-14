@@ -1,2 +1,4 @@
 rootProject.name = 'apex-ast-serializer'
+include 'parser'
+include 'server'
 
