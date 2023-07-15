@@ -81,6 +81,7 @@ graalvmNative {
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
+      buildArgs.add('-H:IncludeResourceBundles=messages_en_US')
     }
   }
 }
