@@ -19,6 +19,12 @@ sourceSets {
 }
 
 mainClassName = 'net.dangmai.serializer.Apex'
+applicationDefaultJvmArgs = [
+  "--add-opens=java.base/java.lang=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+  "--add-opens=java.base/java.util=ALL-UNNAMED",
+  "--add-opens=java.base/java.text=ALL-UNNAMED"
+]
 
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
@@ -81,19 +87,22 @@ graalvmNative {
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
-      buildArgs.add('-H:IncludeResourceBundles=messages_en_US')
+      // buildArgs.add('-H:IncludeResourceBundles=messages_en_US')
     }
   }
 }
 
 tasks.register("generateNativeImageConfig") {
   doFirst {
+    // Weirdly enough we should run this on an invalid class instead of the
+    // standard one, because it uses the resource bundle that the standard one
+    // doesn't
     run.configure {
       args = [
         "-f",
         "json",
         "-l",
-        "./src/testFixtures/resources/NonEmptyNamedClass.cls"
+        "./src/testFixtures/resources/AnonymousClass.cls"
       ]
     }
   }
