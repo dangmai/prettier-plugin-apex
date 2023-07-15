@@ -57,14 +57,14 @@ jobs:
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
-            OUTPUT_NAME: apex-ast-serializer-win32-amd64.exe
+            OUTPUT_NAME: apex-ast-serializer-win32-x64.exe
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-linux-amd64
+            OUTPUT_NAME: apex-ast-serializer-linux-x64
             CREATE_DIST: true
           - os: macos-latest
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-darwin-amd64
+            OUTPUT_NAME: apex-ast-serializer-darwin-x64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
