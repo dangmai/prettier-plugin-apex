@@ -82,9 +82,7 @@ jobs:
         run: chmod +x gradlew
       - name: Create zip file
         if: env.CREATE_DIST
-        run: ./gradlew :server:clean :server:distZip
-      - name: Build native executable
-        run: ./gradlew :parser:buildNative
+        run: ./gradlew clean :server:distZip
       - name: Attach vendor distribution to release
         uses: actions/upload-release-asset@v1
         if: env.CREATE_DIST
@@ -95,6 +93,8 @@ jobs:
           asset_path: ./server/build/distributions/apex-ast-serializer.zip
           asset_name: apex-ast-serializer.zip
           asset_content_type: application/zip
+      - name: Build native executable
+        run: ./gradlew clean :parser:buildNative
       - name: Attach native artifact to release
         uses: actions/upload-release-asset@v1
         env:
