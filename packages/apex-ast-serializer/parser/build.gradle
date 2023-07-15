@@ -15,6 +15,7 @@ sourceSets {
     compileClasspath += sourceSets.main.compileClasspath
     runtimeClasspath += sourceSets.main.runtimeClasspath
   }
+  graalvm {}
 }
 
 mainClassName = 'net.dangmai.serializer.Apex'
@@ -55,6 +56,14 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20230618'
+
+  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
+  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.161'
+  nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
+}
+
+configurations {
+  nativeImageClasspath.extendsFrom(graalvmImplementation)
 }
 
 test {
@@ -71,6 +80,7 @@ graalvmNative {
       configurationFileDirectories.from(file('build/native/agent-output/run'))
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
+      buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
     }
   }
 }

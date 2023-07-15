@@ -34,7 +34,9 @@ function minimize() {
         -and -not -path "./org/antlr/runtime*" \
         -and -not -path "./org/objectweb*" \
         -and -not -path "./org/objectweb/asm*" \
+        -and -not -path "./org/hamcrest*" \
         -print0 | xargs -0 rm -rf
+    rm -rf ./apex/jorje/lsp
     popd
     jar -cvf ${FILENAME_MINIMIZED} -C temp/ .
     rm -rf temp
