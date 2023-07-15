@@ -16,7 +16,9 @@ public class RuntimeReflectionRegistrationFeature implements Feature {
             .acceptPackages("apex.jorje", "com.google")
             .scan()) {               // Start the scan
         for (ClassInfo routeClassInfo : scanResult.getAllClasses()) {
-            RuntimeReflection.register(routeClassInfo.loadClass());
+            Class clazz = routeClassInfo.loadClass();
+            RuntimeReflection.register(clazz);
+            RuntimeReflection.register(clazz.getDeclaredFields());
         }
         }
     }
