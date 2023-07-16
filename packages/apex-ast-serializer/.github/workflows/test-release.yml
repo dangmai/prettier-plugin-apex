@@ -6,8 +6,6 @@ on:
       - "**"
     tags-ignore:
       - "**"
-  schedule:
-    - cron: "0 0 1 * *" # Release once a month automatically
   workflow_dispatch:
 
 jobs:
@@ -54,6 +52,7 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-latest
+          - self-hosted
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
@@ -65,6 +64,9 @@ jobs:
           - os: macos-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-darwin-x64
+          - os: self-hosted
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-darwin-arm64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
