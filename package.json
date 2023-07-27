@@ -80,7 +80,7 @@
     "undici": "5.22.1",
     "use-debounce": "9.0.4",
     "vite": "4.4.7",
-    "vite-plugin-radar": "0.9.0"
+    "vite-plugin-radar": "0.9.1"
   },
   "peerDependencies": {
     "prettier": "^3.0.0"
