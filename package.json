@@ -47,7 +47,7 @@
   "license": "MIT",
   "devDependencies": {
     "@monaco-editor/react": "4.5.2",
-    "@tsconfig/node18": "18.2.1",
+    "@tsconfig/node18": "18.2.2",
     "@types/jest": "29.5.4",
     "@types/node": "18.16.9",
     "@types/react": "18.2.21",
