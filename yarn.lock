@@ -4216,10 +4216,10 @@ unbox-primitive@^1.0.2:
     has-symbols "^1.0.3"
     which-boxed-primitive "^1.0.2"
 
-undici@5.25.0:
-  version "5.25.0"
-  resolved "https://registry.yarnpkg.com/undici/-/undici-5.25.0.tgz#618318268e1b496bd8ab370ded86745aab3f68e1"
-  integrity sha512-DgU98Ll+r1ssO8PcGFWIfj6kie0ttV20DSyE/CVYDVeHvfwBwQbjlsIYJIwAoU1WRhGuEEbj+jgZqcKPco5vkQ==
+undici@5.25.1:
+  version "5.25.1"
+  resolved "https://registry.yarnpkg.com/undici/-/undici-5.25.1.tgz#3fa537eb89a6a0bb576b395f0f7bcdedf7b8336a"
+  integrity sha512-nTw6b2G2OqP6btYPyghCgV4hSwjJlL/78FMJatVLCa3otj6PCOQSt6dVtYt82OtNqFz8XsnJ+vsXLADPXjPhqw==
   dependencies:
     busboy "^1.6.0"
 
