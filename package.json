@@ -79,7 +79,7 @@
     "typescript": "5.2.2",
     "undici": "5.25.4",
     "use-debounce": "9.0.4",
-    "vite": "4.4.9",
+    "vite": "4.4.10",
     "vite-plugin-radar": "0.9.1"
   },
   "peerDependencies": {
