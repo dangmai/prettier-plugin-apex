@@ -4261,10 +4261,10 @@ vite-plugin-radar@0.9.1:
   resolved "https://registry.yarnpkg.com/vite-plugin-radar/-/vite-plugin-radar-0.9.1.tgz#1ee8866cb2f2275f3eb56bfe49fea82bbdd673d2"
   integrity sha512-stnb+LxeEKobcesXW2JA0OdCaBRgR/zZwN6ACXZf1gF9MNR689aiK5UlgTVmrpUnEcPucO9U0M0WHnuM6NXPsA==
 
-vite@4.4.10:
-  version "4.4.10"
-  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.10.tgz#3794639cc433f7cb33ad286930bf0378c86261c8"
-  integrity sha512-TzIjiqx9BEXF8yzYdF2NTf1kFFbjMjUSV0LFZ3HyHoI3SGSPLnnFUKiIQtL3gl2AjHvMrprOvQ3amzaHgQlAxw==
+vite@4.4.11:
+  version "4.4.11"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-4.4.11.tgz#babdb055b08c69cfc4c468072a2e6c9ca62102b0"
+  integrity sha512-ksNZJlkcU9b0lBwAGZGGaZHCMqHsc8OpgtoYhsQ4/I2v5cnpmmmqe5pM4nv/4Hn6G/2GhTdj0DhZh2e+Er1q5A==
   dependencies:
     esbuild "^0.18.10"
     postcss "^8.4.27"
