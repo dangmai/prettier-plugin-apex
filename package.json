@@ -46,7 +46,7 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
-    "@monaco-editor/react": "4.5.2",
+    "@monaco-editor/react": "4.6.0",
     "@tsconfig/node18": "18.2.2",
     "@types/jest": "29.5.5",
     "@types/node": "18.16.9",
