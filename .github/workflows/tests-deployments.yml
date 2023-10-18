@@ -100,7 +100,7 @@ jobs:
 
       - name: Deploy to NPM
         if: env.RUN_DEPLOYMENT == 'true'
-        uses: JS-DevTools/npm-publish@v2
+        uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
 
