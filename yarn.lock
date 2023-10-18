@@ -1008,10 +1008,10 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.1.tgz#20f18294f797f2209b5f65c8e3b5c8e8261d127c"
   integrity sha512-Hl219/BT5fLAaz6NDkSuhzasy49dwQS/DSdu4MdggFB8zcXv7vflBI3xp7FEmkmdDkBUI2bPUNeMttp2knYdxw==
 
-"@types/wait-on@5.3.2":
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/@types/wait-on/-/wait-on-5.3.2.tgz#f3722017a2bfacdc9bee095185a312befecea28c"
-  integrity sha512-7NBSJs/YvbHlaYCJ7wIUF6t7ct3OMt525NmZ+US73pPlkmpxd9ADwfNxrRAmg8nWlcTMqR0PkhW7aYk3FLlvrQ==
+"@types/wait-on@5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@types/wait-on/-/wait-on-5.3.3.tgz#e0cb6ddc3f7fade127f0d8cb295499f75e65b849"
+  integrity sha512-I8EnhU/DuvV2LODzBcLw85FPFFZ9mBvtgqfsgXbhkbo5IZYfIne5qxPTv4PGbD8d5uDQJG5g/pGwGdpM8lQ6Lg==
   dependencies:
     "@types/node" "*"
 
