@@ -50,7 +50,7 @@
     "@tsconfig/node18": "18.2.2",
     "@types/jest": "29.5.7",
     "@types/node": "18.16.9",
-    "@types/react": "18.2.34",
+    "@types/react": "18.2.35",
     "@types/react-dom": "18.2.14",
     "@types/wait-on": "5.3.3",
     "@typescript-eslint/eslint-plugin": "6.9.1",
