@@ -21,6 +21,11 @@
     {
       "matchPackageNames": ["@types/node"],
       "enabled": false
+    },
+    {
+      "matchPackageNames": ["eclipse-temurin"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }
