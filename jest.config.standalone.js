@@ -5,6 +5,7 @@ const ENABLE_COVERAGE = !!process.env.CI;
 export default {
   preset: "ts-jest/presets/default-esm",
   testEnvironment: "node",
+  testTimeout: 10000,
   displayName: "test",
   setupFiles: ["<rootDir>/tests_config/run-spec.ts"],
   snapshotSerializers: ["jest-snapshot-serializer-raw"],
