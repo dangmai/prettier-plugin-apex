@@ -7,17 +7,13 @@
     "tests/**/*",
     "typings/global.d.ts",
     "typings/test-global.d.ts",
-    "vite.config.ts",
-    "playground"
+    "vite.config.ts"
   ],
   "compilerOptions": {
     "lib": ["ES2023", "DOM"],
-    "moduleResolution": "node",
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false,
-    "jsx": "react-jsx",
-    "resolveJsonModule": true,
     "types": ["vite/client", "jest"]
   },
   "ts-node": {
