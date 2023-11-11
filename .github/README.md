@@ -1,1 +1,1 @@
-./packages/prettier-plugin-apex/README.md
+../packages/prettier-plugin-apex/README.md
