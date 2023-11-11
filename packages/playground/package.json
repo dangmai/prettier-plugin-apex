@@ -4,7 +4,7 @@
   "description": "Prettier Apex Playground Website",
   "main": "index.js",
   "scripts": {
-    "build": "vite build",
+    "build": "rimraf dist && vite build",
     "build:watch": "vite build --watch",
     "clean": "rimraf node_modules dist",
     "lint": "eslint \"src/*.{ts,tsx}\" \"*.ts\"",
