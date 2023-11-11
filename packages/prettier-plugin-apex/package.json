@@ -19,8 +19,8 @@
   ],
   "scripts": {
     "build": "tsc",
-    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json",
-    "build:standalone": "pnpm run vite build",
+    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json && pnpm run build:standalone",
+    "build:standalone": "vite build",
     "clean": "rimraf node_modules dist",
     "pretest": "pnpm run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
@@ -31,8 +31,7 @@
     "lint": "eslint \"{src,bin,tests_config}/**/*.{js,ts}\"",
     "prettier": "prettier --write \"{bin,src,playground,tests_config}/**/*.{js,mjs,ts,tsx,css,html}\" \"./*.{md,mjs,ts}\"",
     "prepack": "pnpm run build:prod",
-    "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js",
-    "vite:build": "vite build"
+    "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js"
   },
   "keywords": [
     "apex",
