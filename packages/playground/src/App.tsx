@@ -2,13 +2,14 @@
 import Editor from "@monaco-editor/react";
 import endent from "endent";
 import * as prettier from "prettier";
+import * as prettierApex from "prettier-plugin-apex";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
+
 import { version } from "../package.json";
-import * as prettierApex from "../src/index.js";
+import icon from "../static/icon.png";
 import { ClipboardButton } from "./Buttons.js";
 import OptionEntry from "./OptionEntry.js";
-import icon from "./static/icon.png";
 import { getStateFromUrl, getUrlWithState } from "./urlHash.js";
 
 const DEBOUNCE_TIME = 500;

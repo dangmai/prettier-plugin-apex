@@ -1,12 +1,10 @@
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+
 import prettier from "prettier";
-import { jest } from "@jest/globals";
 
 describe("Parser Tests", () => {
-  // Synchronous parser tends to run slow on GitHub Actions
-  jest.setTimeout(10000);
   it("runs synchronous parser on valid class correctly", async () => {
     const fileName = path.join(
       fileURLToPath(new URL(".", import.meta.url)),

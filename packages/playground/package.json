@@ -1,0 +1,29 @@
+{
+  "name": "prettier-apex-playground",
+  "version": "1.0.0",
+  "description": "Prettier Apex Playground Website",
+  "main": "index.js",
+  "scripts": {
+    "build": "vite build",
+    "build:watch": "vite build --watch",
+    "dev": "vite --open http://localhost:5173/",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@monaco-editor/react": "4.6.0",
+    "clipboard": "2.0.11",
+    "endent": "2.1.0",
+    "lz-string": "1.5.0",
+    "prettier-plugin-apex": "workspace:*",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "use-debounce": "10.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.37",
+    "@types/react-dom": "18.2.15",
+    "@vitejs/plugin-react": "4.1.1"
+  },
+  "author": "Dang Mai <contact@dangmai.net>",
+  "license": "MIT"
+}
