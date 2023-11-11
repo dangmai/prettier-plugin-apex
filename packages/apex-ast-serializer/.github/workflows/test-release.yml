@@ -1,0 +1,115 @@
+name: Test and Release Artifacts
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: "17"
+          distribution: "graalvm-community" # See 'Options' for all available distributions
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Test with Gradle
+        run: ./gradlew clean check
+
+  create-release:
+    needs: test
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
+      release_name: ${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}
+    steps:
+      - name: Get current time
+        uses: srfrnk/current-time@master
+        id: current-time
+        with:
+          format: YYYYMMDD
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        id: create-release
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+          tag: "${{ steps.current-time.outputs.formattedTime }}-${{ github.run_number }}"
+
+  build-artifacts:
+    needs: create-release
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-latest
+          - self-hosted
+        include:
+          - os: windows-latest
+            ASSET_NAME: apex-ast-serializer.exe
+            OUTPUT_NAME: apex-ast-serializer-win32-x64.exe
+          - os: ubuntu-latest
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-linux-x64
+            CREATE_DIST: true
+          - os: macos-latest
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-darwin-x64
+          - os: self-hosted
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-darwin-arm64
+    env:
+      ASSET_NAME: ${{ matrix.ASSET_NAME }}
+      OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
+      CREATE_DIST: ${{ matrix.CREATE_DIST }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: "17"
+          distribution: "graalvm-community" # See 'Options' for all available distributions
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Create zip file
+        if: env.CREATE_DIST
+        run: ./gradlew clean :server:distZip
+      - name: Attach vendor distribution to release
+        uses: actions/upload-release-asset@v1
+        if: env.CREATE_DIST
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./server/build/distributions/apex-ast-serializer.zip
+          asset_name: apex-ast-serializer.zip
+          asset_content_type: application/zip
+      - name: Build native executable
+        run: ./gradlew clean :parser:buildNative
+      - name: Attach native artifact to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-release.outputs.upload_url }}
+          asset_path: ./parser/build/native/nativeCompile/${{ env.ASSET_NAME }}
+          asset_name: ${{ env.OUTPUT_NAME }}
+          asset_content_type: application/octet-stream
+
+  # notifier:
+  #   needs: build-artifacts
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Send event to prettier-plugin-apex
+  #       run: 'curl -H "Accept: application/vnd.github.everest-preview+json" -H "Authorization: token ${{ secrets.PERSONAL_TOKEN }}" --request POST --data ''{"event_type": "jorje-update", "client_payload": { "release": "${{ needs.create-release.outputs.release_name }}" }}'' https://api.github.com/repos/dangmai/prettier-plugin-apex/dispatches'

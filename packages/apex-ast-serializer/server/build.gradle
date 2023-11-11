@@ -1,0 +1,180 @@
+buildscript {
+  dependencies {
+    // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
+    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.2.1263'
+  }
+}
+
+plugins {
+  id 'java'
+  id 'application'
+}
+apply plugin: 'cz.habarta.typescript-generator'
+
+sourceSets {
+  test{
+    compileClasspath += project(':parser').sourceSets.testFixtures.compileClasspath
+    runtimeClasspath += project(':parser').sourceSets.testFixtures.runtimeClasspath
+    resources {
+      srcDirs += [project(':parser').sourceSets.test.resources]
+    }
+  }
+}
+
+group 'net.dangmai'
+version '1.0-SNAPSHOT'
+
+application.applicationName = "apex-ast-serializer-http"
+mainClassName = 'net.dangmai.serializer.server.HttpServer'
+applicationDefaultJvmArgs = [
+  "--add-opens=java.base/java.lang=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+  "--add-opens=java.base/java.util=ALL-UNNAMED",
+  "--add-opens=java.base/java.text=ALL-UNNAMED"
+]
+task parserStartScripts(type: CreateStartScripts) {
+  mainClass.set('net.dangmai.serializer.Apex')
+  applicationName = 'apex-ast-serializer'
+  defaultJvmOpts = [
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.text=ALL-UNNAMED"
+  ]
+  classpath = startScripts.classpath
+  outputDir = startScripts.outputDir
+}
+
+applicationDistribution.into("bin") {
+  from(parserStartScripts)
+  fileMode = 0755
+}
+
+applicationDistribution.from("build/typings") {
+  into "typings"
+}
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+repositories {
+  flatDir {
+    dirs '../libs'
+  }
+  mavenCentral()
+}
+
+run {
+  standardInput = System.in
+}
+
+// By default Gradle embeds extremely long CLASSPATH,
+// which may fail on Windows because of path length limitation.
+// This issue happens on Prettier Apex: https://github.com/dangmai/prettier-plugin-apex/issues/645
+// This workaround is from https://gist.github.com/jlmelville/2bfe9277e9e2c0ff79b6
+tasks.withType(CreateStartScripts).each { task ->
+  task.doLast {
+    String text = task.windowsScript.text
+    text = text.replaceFirst(/(set CLASSPATH=%APP_HOME%\\lib\\).*/, { "${it[1]}*" })
+    task.windowsScript.write text
+  }
+}
+
+tasks.withType(AbstractArchiveTask) {
+  // By default, the result ZIP archive is not reproducible,
+  // i.e. running `gradle clean distZip` at different times
+  // leads to ZIP files that have different md5 sums.
+  // This is a workaround to make it reproducible, from:
+  // https://dzone.com/articles/reproducible-builds-in-java
+  preserveFileTimestamps = false
+  reproducibleFileOrder = true
+}
+
+distTar {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+distZip {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  archiveFileName = "apex-ast-serializer.zip"
+}
+distZip.dependsOn generateTypeScript
+
+jar {
+  exclude('net/dangmai/serializer/types/**')
+}
+
+ext {
+  slf4jVersion = '2.0.9'
+  jettyVersion = '11.0.18'
+  jerseyVersion = '3.1.3'
+}
+
+dependencies {
+  implementation project(':parser')
+  testImplementation(testFixtures(project(":parser")))
+
+  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+  implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
+  implementation "org.eclipse.jetty:jetty-server:${jettyVersion}"
+  implementation "org.eclipse.jetty:jetty-servlet:${jettyVersion}"
+  implementation "org.eclipse.jetty:jetty-servlets:${jettyVersion}"
+  implementation "org.glassfish.jersey.core:jersey-server:${jerseyVersion}"
+  implementation "org.glassfish.jersey.containers:jersey-container-servlet-core:${jerseyVersion}"
+  implementation "org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}"
+  implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
+  implementation "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
+
+  // https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api
+  implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.2'
+
+  // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
+  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.4'
+
+  // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.1'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.1'
+
+  // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
+  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
+}
+
+test {
+  useJUnitPlatform()
+}
+
+generateTypeScript {
+  jsonLibrary = 'jackson2'
+  classes = [
+    'apex.jorje.semantic.compiler.parser.ParserOutput',
+  ]
+  classPatterns = [
+    'apex.jorje.data.**',
+    'apex.jorje.parser.impl.HiddenToken**',
+  ]
+  excludeClassPatterns = [
+    'apex.jorje.**$MatchBlock',
+    'apex.jorje.**$MatchBlockWithDefault',
+    'apex.jorje.**$SwitchBlock',
+    'apex.jorje.**$SwitchBlockWithDefault',
+    'apex.jorje.**$Visitor',
+    'apex.jorje.**Factory',
+    'apex.jorje.**Decorator',
+  ]
+  customTypeNaming = [
+    'apex.jorje.data.ast.Expr$LiteralExpr:ExprLiteralExpr',
+    'apex.jorje.data.soql.QueryExpr$LiteralExpr:QueryExprLiteralExpr',
+  ]
+  customTypeProcessor = 'net.dangmai.serializer.types.CustomTypeProcessor'
+  outputFile = 'build/typings/jorje.d.ts'
+  outputKind = 'module'
+  extensionClasses = [
+    'net.dangmai.serializer.types.CustomEnumExtension',
+    'net.dangmai.serializer.types.CustomFieldExtension',
+    'net.dangmai.serializer.types.UnionTypeExtension',
+    'net.dangmai.serializer.types.GenericNodeExtension',
+  ]
+  sortDeclarations = true
+  noFileComment = true
+}
+

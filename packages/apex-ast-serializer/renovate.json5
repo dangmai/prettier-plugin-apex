@@ -1,0 +1,15 @@
+{
+  "extends": ["config:base"],
+  "assignees": ["dangmai"],
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "matchPackagePatterns": ["typescript-generator"],
+      "groupName": "typescript-generator",
+      "additionalBranchPrefix": ""
+    }
+  ]
+}
