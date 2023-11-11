@@ -296,7 +296,7 @@ function App() {
                 defaultLanguage="apex"
                 value={formattedCode}
                 options={{
-                  domReadyOnly: true,
+                  domReadOnly: true,
                   readOnly: true,
                   minimap: { enabled: false },
                   rulers: [printWidth],
