@@ -1,0 +1,124 @@
+plugins {
+  id 'java-library'
+  id "java-test-fixtures"
+  id 'application'
+  id 'org.graalvm.buildtools.native' version '0.9.23'
+}
+
+sourceSets {
+  test {
+    resources {
+      srcDirs "src/testFixtures/resources"
+    }
+  }
+  testFixtures {
+    compileClasspath += sourceSets.main.compileClasspath
+    runtimeClasspath += sourceSets.main.runtimeClasspath
+  }
+  graalvm {}
+}
+
+mainClassName = 'net.dangmai.serializer.Apex'
+applicationDefaultJvmArgs = [
+  "--add-opens=java.base/java.lang=ALL-UNNAMED",
+  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+  "--add-opens=java.base/java.util=ALL-UNNAMED",
+  "--add-opens=java.base/java.text=ALL-UNNAMED"
+]
+
+group 'net.dangmai'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.11
+targetCompatibility = 1.11
+
+repositories {
+  flatDir {
+    dirs '../libs'
+  }
+  mavenCentral()
+  maven { url "https://jitpack.io" }
+  gradlePluginPortal()
+}
+
+run {
+  standardInput = System.in
+}
+
+dependencies {
+  api name: 'apex-jorje-lsp'
+  // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
+  api group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
+
+  // https://mvnrepository.com/artifact/commons-cli/commons-cli
+  api group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
+
+  // https://mvnrepository.com/artifact/commons-io/commons-io
+  api group: 'commons-io', name: 'commons-io', version: '2.13.0'
+
+  // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.9.3'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.9.3'
+
+  // https://mvnrepository.com/artifact/org.json/json
+  testFixturesImplementation group: 'org.json', name: 'json', version: '20230618'
+
+  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
+  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.161'
+  nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
+}
+
+configurations {
+  nativeImageClasspath.extendsFrom(graalvmImplementation)
+}
+
+test {
+  useJUnitPlatform()
+}
+
+graalvmNative {
+  agent {
+    enabled = true
+    defaultMode = "standard"
+  }
+  binaries {
+    main {
+      configurationFileDirectories.from(file('build/native/agent-output/run'))
+      imageName = 'apex-ast-serializer'
+      sharedLibrary = false
+      buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
+      buildArgs.addAll(applicationDefaultJvmArgs)
+    }
+  }
+}
+
+tasks.register("generateNativeImageConfig") {
+  doFirst {
+    // Weirdly enough we should run this on an invalid class instead of the
+    // standard one, because it uses the resource bundle that the standard one
+    // doesn't
+    run.configure {
+      args = [
+        "-f",
+        "json",
+        "-l",
+        "./src/testFixtures/resources/AnonymousClass.cls"
+      ]
+    }
+  }
+  finalizedBy(run)
+}
+
+// This is the task that builds native executable for the host platform.
+// Run it: `gradle buildNative`
+// It contains multiple steps in order to achive this goal:
+// - It runs the main module with a sample Apex file, and uses native-image-agent
+// to figure out what reflections/proxies are used as part of that run.
+// - Then it uses native-image to compile the final artifacts, using the information
+// in the previous step (which is stored in `build/native/agent-output/run`)
+// - The final artifact is produced and stored in `build/native/nativeCompile`
+task buildNative {
+    dependsOn 'generateNativeImageConfig'
+    dependsOn 'nativeCompile'
+    tasks.findByName('nativeCompile').mustRunAfter 'run'
+}
