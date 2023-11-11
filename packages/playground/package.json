@@ -7,6 +7,7 @@
     "build": "vite build",
     "build:watch": "vite build --watch",
     "clean": "rimraf node_modules dist",
+    "lint": "eslint \"src/*.{ts,tsx}\" \"*.ts\"",
     "dev": "vite --open http://localhost:5173/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/dot-notation */
 import Editor from "@monaco-editor/react";
 import endent from "endent";
+// eslint-disable-next-line import/no-extraneous-dependencies -- we will use shared Prettier install from the root
 import * as prettier from "prettier";
 import * as prettierApex from "prettier-plugin-apex";
 import { useEffect, useState } from "react";

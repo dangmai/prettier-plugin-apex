@@ -1,5 +1,5 @@
 {
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "typings/**/*", "vite.config.ts"],
   "compilerOptions": {
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "noUnusedLocals": true /* Report errors on unused locals. */,
@@ -16,7 +16,8 @@
     "sourceMap": true,
     "inlineSourceMap": false,
     "jsx": "react-jsx",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "types": ["vite/client"]
   },
   "ts-node": {
     "esm": true,
