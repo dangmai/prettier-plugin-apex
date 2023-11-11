@@ -64,7 +64,7 @@ dependencies {
   testFixturesImplementation group: 'org.json', name: 'json', version: '20230618'
 
   // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.161'
+  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.164'
   nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
 }
 
