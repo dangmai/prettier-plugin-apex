@@ -3,7 +3,10 @@
   "version": "1.0.0",
   "description": "Monorepo for the Prettier Apex project",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "clean": "rimraf node_modules",
+    "all:clean": "pnpm run -r clean && pnpm run clean"
+  },
   "engines": {
     "node": ">= 18.11.0",
     "pnpm": "^8.10.2"

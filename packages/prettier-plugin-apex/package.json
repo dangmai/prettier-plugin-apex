@@ -21,6 +21,7 @@
     "build": "tsc",
     "build:prod": "rimraf dist && tsc --project tsconfig.prod.json",
     "build:standalone": "pnpm run vite build",
+    "clean": "rimraf node_modules dist",
     "pretest": "pnpm run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "test:standalone": "pnpm test -- -c jest.config.standalone.js",

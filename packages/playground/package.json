@@ -1,11 +1,12 @@
 {
-  "name": "prettier-apex-playground",
+  "name": "playground",
   "version": "1.0.0",
   "description": "Prettier Apex Playground Website",
   "main": "index.js",
   "scripts": {
     "build": "vite build",
     "build:watch": "vite build --watch",
+    "clean": "rimraf node_modules dist",
     "dev": "vite --open http://localhost:5173/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
