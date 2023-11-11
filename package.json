@@ -26,7 +26,8 @@
     "prettier-plugin-organize-imports": "3.2.4",
     "rimraf": "5.0.5",
     "vite": "4.5.0",
-    "vite-plugin-radar": "0.9.1"
+    "vite-plugin-radar": "0.9.1",
+    "nx": "17.1.1"
   },
   "keywords": [],
   "author": "Dang Mai <contact@dangmai.net>",

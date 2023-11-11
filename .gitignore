@@ -6,3 +6,6 @@ tests/local_only
 repo
 dist
 *.tgz
+
+
+.nx/cache
