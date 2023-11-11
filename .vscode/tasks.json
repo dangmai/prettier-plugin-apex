@@ -7,6 +7,7 @@
       "label": "Run HTTP Apex Parsing Server",
       "isBackground": true,
       "problemMatcher": [],
+      "path": "packages/prettier-plugin-apex",
       "runOptions": {
         "runOn": "folderOpen"
       }

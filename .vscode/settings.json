@@ -5,6 +5,7 @@
       "url": "https://docs.renovatebot.com/renovate-schema.json"
     }
   ],
+  "npm.packageManager": "pnpm",
   "editor.formatOnSave": true,
   "jestrunner.configPath": "jest.config.standalone.js",
   "typescript.tsdk": "node_modules/typescript/lib"
