@@ -98,6 +98,10 @@ distZip {
   archiveFileName = "apex-ast-serializer.zip"
 }
 distZip.dependsOn generateTypeScript
+installDist {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+installDist.dependsOn generateTypeScript
 
 jar {
   exclude('net/dangmai/serializer/types/**')
