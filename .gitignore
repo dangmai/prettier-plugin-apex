@@ -6,6 +6,9 @@ tests/local_only
 repo
 dist
 *.tgz
-
+.gradle
+build
+out
+bin
 
 .nx/cache

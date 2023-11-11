@@ -11,5 +11,8 @@ end_of_line = lf
 [*.md]
 trim_trailing_whitespace = false
 
+[*.java]
+indent_size = 4
+
 [*.bat]
 end_of_line = crlf

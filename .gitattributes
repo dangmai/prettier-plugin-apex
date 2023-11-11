@@ -12,17 +12,28 @@
 *.trigger text eol=lf
 *.apex text eol=lf
 *.snap text eol=lf
-vendor/apex-ast-serializer/bin/apex-ast-serializer text eof=lf
-vendor/apex-ast-serializer/bin/apex-ast-serializer-http text eof=lf
+*.soql text eol=lf
+*.java text eol=lf
+*.gradle text eol=lf
+*.properties text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.js text eol=lf
+packages/prettier-plugin-apex/vendor/apex-ast-serializer/bin/apex-ast-serializer text eof=lf
+packages/prettier-plugin-apex/vendor/apex-ast-serializer/bin/apex-ast-serializer-http text eof=lf
 
 # Misc config files
 .gitignore text eol=lf
 .prettierrc text eol=lf
 .editorconfig text eol=lf
 .gitattributes text eol=lf
+gradlew text eol=lf
 
 # Windows specific files
 *.bat text eol=crlf
 
 # Binary files
 *.jar binary
+*.class binary
+*.bin binary
+*.idx binary

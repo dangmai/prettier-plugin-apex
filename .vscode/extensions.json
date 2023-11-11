@@ -2,6 +2,7 @@
   "recommendations": [
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
+    "vscjava.vscode-java-pack",
     "tintinweb.vscode-decompiler"
   ]
 }

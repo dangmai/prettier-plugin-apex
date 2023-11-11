@@ -2,24 +2,26 @@ name: Update Jorje
 
 on:
   repository_dispatch:
-    types: [jorje-update]
+    types:
+      - manual-jorje-update
+  workflow_dispatch:
+  # TODO re-enable this when this PR is ready
+  # schedule:
+  #   - cron: "0 1 * * *"
 
 jobs:
   jorje:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install Linux dependencies
-        run: sudo apt install wget unzip
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
-      - name: Download zip archive from apex-ast-serializer
-        run: wget -O /tmp/apex-ast-serializer.zip https://github.com/dangmai/apex-ast-serializer/releases/download/${{ github.event.client_payload.release }}/apex-ast-serializer.zip
-      - name: Remove current apex-ast-serializer vendor
-        run: rm -rf vendor/apex-ast-serializer
-      - name: Unzip file to correct directory
-        run: unzip /tmp/apex-ast-serializer.zip -d vendor/
-      - name: Give execute bit to executables
-        run: chmod +x vendor/apex-ast-serializer/bin/apex-ast-serializer vendor/apex-ast-serializer/bin/apex-ast-serializer-http
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: "adopt"
+          java-version: 11
+      - name: Run create-jorje-jar.sh
+        run: ./packages/apex-ast-serializer/tools/create-jorje-jar.sh
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5.0.2
         with:

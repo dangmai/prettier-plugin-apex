@@ -26,6 +26,11 @@
       "matchPackageNames": ["eclipse-temurin"],
       "matchUpdateTypes": ["major"],
       "enabled": false
+    },
+    {
+      "matchPackagePatterns": ["typescript-generator"],
+      "groupName": "typescript-generator",
+      "additionalBranchPrefix": ""
     }
   ]
 }

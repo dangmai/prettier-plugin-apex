@@ -1,9 +1,7 @@
-# Apex AST Serializer ![Test and Release](https://github.com/dangmai/apex-ast-serializer/workflows/Test%20and%20Release/badge.svg)
+# Apex AST Serializer
 
 This program serializes the Abstract Syntax Tree of an Apex Class/Trigger,
 using the jorje Apex parser distributed by Salesforce.
-
-It is mainly used by the [prettier-plugin-apex](https://github.com/dangmai/prettier-plugin-apex) project.
 
 The result is printed out to `stdout` as either a JSON or XML object.
 

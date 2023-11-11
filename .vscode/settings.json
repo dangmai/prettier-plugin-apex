@@ -12,5 +12,6 @@
   "eslint.workingDirectories": [
     "./packages/playground",
     "./packages/prettier-plugin-apex"
-  ]
+  ],
+  "java.configuration.updateBuildConfiguration": "automatic"
 }
