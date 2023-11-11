@@ -18,8 +18,8 @@
     "/vendor"
   ],
   "scripts": {
-    "build": "tsc",
-    "build:prod": "rimraf dist && tsc --project tsconfig.prod.json && pnpm run build:standalone",
+    "build": "rimraf dist && tsc --project tsconfig.prod.json && pnpm run build:standalone",
+    "build:dev": "tsc",
     "build:standalone": "vite build",
     "clean": "rimraf node_modules dist",
     "pretest": "pnpm run lint",
