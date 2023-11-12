@@ -10,5 +10,6 @@ dist
 build
 out
 bin
+packages/prettier-plugin-apex/vendor
 
 .nx/cache
