@@ -69,6 +69,11 @@
         "dependsOn": [
           "build:dev"
         ]
+      },
+      "start-server": {
+        "dependsOn": [
+          "^build"
+        ]
       }
     }
   }
