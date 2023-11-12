@@ -1,29 +1,21 @@
 {
   "targetDefaults": {
     "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/dist"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
       "cache": true
     },
     "dev": {
-      "dependsOn": [
-        "^dev"
-      ]
+      "dependsOn": ["^build"]
     },
     "test": {
-      "outputs": [
-        "{projectRoot}/coverage"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/coverage"],
       "cache": true
     },
     "test:standalone": {
-      "outputs": [
-        "{projectRoot}/coverage"
-      ],
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/coverage"],
       "cache": true
     },
     "clean": {

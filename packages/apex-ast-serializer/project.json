@@ -6,6 +6,10 @@
   "targets": {
     "build": {
       "executor": "nx:run-commands",
+      "outputs": [
+        "{workspaceRoot}/packages/prettier-plugin-apex/vendor",
+        "{projectRoot}/server/build"
+      ],
       "options": {
         "cwd": "packages/apex-ast-serializer",
         "command": "./gradlew clean :server:installDist"

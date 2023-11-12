@@ -59,5 +59,17 @@
   "dependencies": {
     "jest-docblock": "^29.0.0",
     "wait-on": "^7.0.0"
+  },
+  "nx": {
+    "implicitDependencies": [
+      "apex-ast-serializer"
+    ],
+    "targets": {
+      "test": {
+        "dependsOn": [
+          "build:dev"
+        ]
+      }
+    }
   }
 }

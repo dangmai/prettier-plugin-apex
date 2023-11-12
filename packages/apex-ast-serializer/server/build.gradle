@@ -102,6 +102,7 @@ installDist {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 installDist.dependsOn generateTypeScript
+installDist.destinationDir = file("../../prettier-plugin-apex/vendor/apex-ast-serializer")
 
 jar {
   exclude('net/dangmai/serializer/types/**')

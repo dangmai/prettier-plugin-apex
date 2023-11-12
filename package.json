@@ -22,12 +22,12 @@
     "eslint-plugin-import": "2.29.0",
     "eslint-plugin-prettier": "5.0.1",
     "eslint-plugin-prettier-doc": "1.1.0",
+    "nx": "17.1.1",
     "prettier": "3.0.3",
     "prettier-plugin-organize-imports": "3.2.4",
     "rimraf": "5.0.5",
     "vite": "4.5.0",
-    "vite-plugin-radar": "0.9.1",
-    "nx": "17.1.1"
+    "vite-plugin-radar": "0.9.1"
   },
   "keywords": [],
   "author": "Dang Mai <contact@dangmai.net>",
