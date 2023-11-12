@@ -7,7 +7,8 @@ import * as prettierApex from "prettier-plugin-apex";
 import { useEffect, useState } from "react";
 import { useDebounce } from "use-debounce";
 
-import { version } from "../package.json";
+// eslint-disable-next-line import/no-relative-packages -- this is easiest way to get Prettier Apex version
+import { version } from "../../prettier-plugin-apex/package.json";
 import icon from "../static/icon.png";
 import { ClipboardButton } from "./Buttons.js";
 import OptionEntry from "./OptionEntry.js";
