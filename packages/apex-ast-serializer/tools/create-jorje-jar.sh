@@ -29,7 +29,13 @@ function minimize() {
         -and -not -path "./com" \
         -and -not -path "./com/google" \
         -and -not -path "./com/google/common*" \
+        -and -not -path "./com/google/inject*" \
+        -and -not -path "./javax" \
+        -and -not -path "./javax/inject*" \
         -and -not -path "./org" \
+        -and -not -path "./org/aopalliance" \
+        -and -not -path "./org/aopalliance/aop*" \
+        -and -not -path "./org/aopalliance/intercept*" \
         -and -not -path "./org/antlr" \
         -and -not -path "./org/antlr/runtime*" \
         -and -not -path "./org/objectweb*" \
