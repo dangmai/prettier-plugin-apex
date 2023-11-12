@@ -7,12 +7,22 @@ The result is printed out to `stdout` as either a JSON or XML object.
 
 ## Building
 
+This project requires Java >= 11 to compile, and specifically [GraalVM](https://www.graalvm.org/) to build native images.
+If you want to build native image, make sure you run `gu install native-image` first.
+
+To get the distributable package (without the native image), run:
+
 ```bash
-./gradlew distZip
+./gradlew installDist
 ```
 
-A zip file will be created in `distributions` directory.
-You can unzip that file to get to the executables under `apex-ast-serializer/bin`.
+The package will be built and installed directly under `packages/prettier-plugin-apex/vendor`.
+
+For native image, run:
+
+```bash
+./gradlew buildNative
+```
 
 ## Running
 
