@@ -1,53 +1,54 @@
 package net.dangmai.serializer.server;
 
 public class Request {
-    public Boolean getAnonymous() {
-        return anonymous;
-    }
 
-    public void setAnonymous(Boolean anonymous) {
-        this.anonymous = anonymous;
-    }
+  public Boolean getAnonymous() {
+    return anonymous;
+  }
 
-    private Boolean anonymous;
+  public void setAnonymous(Boolean anonymous) {
+    this.anonymous = anonymous;
+  }
 
-    public String getSourceCode() {
-        return sourceCode;
-    }
+  private Boolean anonymous;
 
-    public void setSourceCode(String sourceCode) {
-        this.sourceCode = sourceCode;
-    }
+  public String getSourceCode() {
+    return sourceCode;
+  }
 
-    private String sourceCode;
+  public void setSourceCode(String sourceCode) {
+    this.sourceCode = sourceCode;
+  }
 
-    public Boolean getIdRef() {
-        return idRef;
-    }
+  private String sourceCode;
 
-    public void setIdRef(Boolean idRef) {
-        this.idRef = idRef;
-    }
+  public Boolean getIdRef() {
+    return idRef;
+  }
 
-    private Boolean idRef;
+  public void setIdRef(Boolean idRef) {
+    this.idRef = idRef;
+  }
 
-    public Boolean getPrettyPrint() {
-        return prettyPrint;
-    }
+  private Boolean idRef;
 
-    public void setPrettyPrint(Boolean prettyPrint) {
-        this.prettyPrint = prettyPrint;
-    }
+  public Boolean getPrettyPrint() {
+    return prettyPrint;
+  }
 
-    private Boolean prettyPrint;
+  public void setPrettyPrint(Boolean prettyPrint) {
+    this.prettyPrint = prettyPrint;
+  }
 
-    public String getOutputFormat() {
-        return outputFormat;
-    }
+  private Boolean prettyPrint;
 
-    public void setOutputFormat(String outputFormat) {
-        this.outputFormat = outputFormat;
-    }
+  public String getOutputFormat() {
+    return outputFormat;
+  }
 
-    private String outputFormat;
+  public void setOutputFormat(String outputFormat) {
+    this.outputFormat = outputFormat;
+  }
+
+  private String outputFormat;
 }

@@ -14,6 +14,12 @@
         "cwd": "packages/apex-ast-serializer",
         "command": "./gradlew clean :server:installDist"
       }
+    },
+    "prettier": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm prettier --write 'packages/apex-ast-serializer/**/*.{java,md}'"
+      }
     }
   }
 }
