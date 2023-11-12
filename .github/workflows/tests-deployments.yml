@@ -65,13 +65,13 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run Apex parsing server
-        run: pnpm --filter=prettier-plugin-apex run start-server &
+        run: pnpm nx run prettier-plugin-apex:start-server &
 
       - name: Wait for Apex parsing server to be up
-        run: pnpm --filter=prettier-plugin-apex run wait-server
+        run: pnpm nx run prettier-plugin-apex:wait-server
 
       - name: Run functional tests
-        run: AST_COMPARE=true pnpm --filter=prettier-plugin-apex test:standalone
+        run: AST_COMPARE=true pnpm nx run test:standalone
 
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
@@ -86,7 +86,7 @@ jobs:
       # instead of ts-node
       - name: Build the project
         if: env.RUN_INTEGRATION_TESTS == 'true'
-        run: pnpm --filter=prettier-plugin-apex build
+        run: pnpm nx run prettier-plugin-apex:build:dev
 
       - name: Run integration tests
         if: env.RUN_INTEGRATION_TESTS == 'true'
@@ -100,7 +100,7 @@ jobs:
       # the Prod bundle manually here
       - name: Build Production bundle
         if: env.RUN_DEPLOYMENT == 'true'
-        run: pnpm --filter=prettier-plugin-apex build:prod
+        run: pnpm nx run prettier-plugin-apex:build:prod
 
       - name: Deploy to NPM
         if: env.RUN_DEPLOYMENT == 'true'
@@ -119,4 +119,4 @@ jobs:
 
       - name: Stop Apex parsing server
         if: ${{ always() }}
-        run: pnpm --filter=prettier-plugin-apex run stop-server
+        run: pnpm nx run prettier-plugin-apex:stop-server
