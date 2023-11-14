@@ -9,6 +9,7 @@
     "clean": "rimraf node_modules dist",
     "lint": "eslint \"src/*.{ts,tsx}\" \"*.ts\"",
     "dev": "vite --open http://localhost:5173/",
+    "prettier": "prettier --write \"src/**/*.{ts,tsx,css,html}\" \"./*.{md,ts}\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
