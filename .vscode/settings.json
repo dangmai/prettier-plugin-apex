@@ -7,7 +7,6 @@
   ],
   "npm.packageManager": "pnpm",
   "editor.formatOnSave": true,
-  "jestrunner.configPath": "jest.config.standalone.js",
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.workingDirectories": [
     "./packages/playground",
