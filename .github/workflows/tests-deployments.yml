@@ -59,10 +59,6 @@ jobs:
           distribution: "adopt"
           java-version: ${{ matrix.java }}
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8.10.2
-
       # Starting with Node 17, DNS is resolved by order that the resolver
       # returns it. In Github Actions environment, there is a loopback IP
       # for ::1 to localhost, which means our tests try to connect to the ipv6
