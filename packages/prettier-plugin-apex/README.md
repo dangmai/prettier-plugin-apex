@@ -25,7 +25,7 @@ including a mix of open source/proprietary/Salesforce internal code bases.
 
 ### Requirements
 
-- Node >= 18.11.0
+- Node >= 18.11.0 (that have not been End-of-Life'd)
 - Java Runtime Engine >= 11
 
 ### How to use
