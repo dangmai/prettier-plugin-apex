@@ -45,6 +45,15 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Read pnpm version
+        id: read-pnpm-version
+        run: echo "version=$(cat .tool-versions | grep pnpm | cut -d ' ' -f 2)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ steps.read-pnpm-version.outputs.version }}
+
       - uses: actions/setup-java@v3
         with:
           distribution: "adopt"
