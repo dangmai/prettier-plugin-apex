@@ -250,7 +250,7 @@ function doesFileExist(file: string): boolean {
 }
 
 // The relative path to the binary can be different based on how the script
-// is being run - running using ts-node vs running after code has been compiled
+// is being run - running using tsx vs running after code has been compiled
 // to `dist` directory. We use this method to abstract out that difference.
 export function getSerializerBinDirectory(): string {
   let serializerBin = nodePath.join(

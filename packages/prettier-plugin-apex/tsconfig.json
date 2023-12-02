@@ -15,9 +15,5 @@
     "sourceMap": true,
     "inlineSourceMap": false,
     "types": ["vite/client", "jest"]
-  },
-  "ts-node": {
-    "esm": true,
-    "transpileOnly": true
   }
 }

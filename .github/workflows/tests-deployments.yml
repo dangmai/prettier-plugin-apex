@@ -88,7 +88,7 @@ jobs:
 
       # This step is needed because integration tests rely on the
       # existence of the compiled JS, as they are run using Node
-      # instead of ts-node
+      # instead of tsx
       - name: Build the project
         if: env.RUN_INTEGRATION_TESTS == 'true'
         run: pnpm nx run prettier-plugin-apex:build:dev
