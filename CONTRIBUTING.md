@@ -16,7 +16,16 @@ pnpm nx run prettier-plugin-apex:test:standalone
 pnpm nx run prettier-plugin-apex:stop-server
 ```
 
-Here's what you need to know about the tests:
+Running the aforementioned comments will ensure that the `apex-ast-serializer`
+project also gets built and put into the correct directory for Prettier Apex
+to pick it up. If you are changing files inside `apex-ast-serializer` itself,
+you can explicit build that project by running:
+
+```bash
+pnpm nx run apex-ast-serializer:build
+```
+
+Here's what you need to know about the Prettier Apex tests:
 
 - The tests use [Jest snapshots](https://facebook.github.io/jest/docs/en/snapshot-testing.html).
 - You can make changes and run `jest -u` to update the snapshots. Then run `git diff` to take a look at what changed. Always update the snapshots when opening a PR.
