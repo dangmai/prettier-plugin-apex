@@ -54,7 +54,7 @@ dependencies {
   api group: 'commons-cli', name: 'commons-cli', version: '1.6.0'
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  api group: 'commons-io', name: 'commons-io', version: '2.15.0'
+  api group: 'commons-io', name: 'commons-io', version: '2.15.1'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.1'
@@ -64,7 +64,7 @@ dependencies {
   testFixturesImplementation group: 'org.json', name: 'json', version: '20231013'
 
   // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.164'
+  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.165'
   nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
 }
 
