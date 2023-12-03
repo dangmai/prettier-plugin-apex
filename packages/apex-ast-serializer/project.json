@@ -3,9 +3,14 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "packages/apex-ast-serializer",
+  "namedInputs": {
+    "gradle": ["{projectRoot}/**/build.gradle"],
+    "default": ["{projectRoot}/**/*.java"]
+  },
   "targets": {
     "build": {
       "executor": "nx:run-commands",
+      "inputs": ["gradle", "default"],
       "outputs": [
         "{workspaceRoot}/packages/prettier-plugin-apex/vendor",
         "{projectRoot}/server/build"
