@@ -13,11 +13,6 @@
       "outputs": ["{projectRoot}/coverage"],
       "cache": true
     },
-    "test:standalone": {
-      "dependsOn": ["^build"],
-      "outputs": ["{projectRoot}/coverage"],
-      "cache": true
-    },
     "clean": {
       "cache": true
     },

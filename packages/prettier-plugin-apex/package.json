@@ -70,6 +70,15 @@
           "build:dev"
         ]
       },
+      "test:standalone": {
+        "dependsOn": [
+          "build:dev"
+        ],
+        "outputs": [
+          "{projectRoot}/coverage"
+        ],
+        "cache": true
+      },
       "build:dev": {
         "dependsOn": [
           "^build"
