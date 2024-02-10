@@ -8,7 +8,7 @@ This is a code formatter for the Apex Programming Language,
 used on the Salesforce development platform.
 
 It uses the excellent [Prettier](https://prettier.io/) engine for formatting,
-and the jorje compiler from Salesforce for parsing.
+and the language server provided by Salesforce for parsing.
 
 ## ⚡️ Quick start
 
