@@ -5,9 +5,8 @@ on:
     types:
       - manual-jorje-update
   workflow_dispatch:
-  # TODO re-enable this when this PR is ready
-  # schedule:
-  #   - cron: "0 1 * * *"
+  schedule:
+    - cron: "0 1 * * *"
 
 jobs:
   jorje:
