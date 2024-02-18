@@ -140,6 +140,8 @@ export const APEX_TYPES = {
     "apex.jorje.data.ast.Expr$JavaVariableExpr" as const,
   JAVA_METHOD_CALL_EXPRESSION:
     "apex.jorje.data.ast.Expr$JavaMethodCallExpr" as const,
+  NULL_COALESCING_EXPRESSION:
+    "apex.jorje.data.ast.Expr$NullCoalescingExpr" as const,
 
   // New Object Init
   NEW_SET_INIT: "apex.jorje.data.ast.NewObject$NewSetInit" as const,

@@ -1790,6 +1790,15 @@ function handleCastExpression(path: AstPath, print: printFn): Doc {
   return parts;
 }
 
+function handleNullCoalescingExpression(path: AstPath, print: printFn): Doc {
+  const parts: Doc[] = [];
+  parts.push(path.call(print, "left"));
+  parts.push(" ");
+  parts.push("??");
+  parts.push(groupIndentConcat([line, path.call(print, "right")]));
+  return parts;
+}
+
 function handleExpressionStatement(path: AstPath, print: printFn): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
@@ -2997,6 +3006,8 @@ nodeHandler[APEX_TYPES.SUPER_METHOD_CALL_EXPRESSION] =
   handleSuperMethodCallExpression;
 nodeHandler[APEX_TYPES.SOQL_EXPRESSION] = handleSoqlExpression;
 nodeHandler[APEX_TYPES.SOSL_EXPRESSION] = handleSoslExpression;
+nodeHandler[APEX_TYPES.NULL_COALESCING_EXPRESSION] =
+  handleNullCoalescingExpression;
 
 // New Object Init
 nodeHandler[APEX_TYPES.NEW_SET_INIT] = handleNewSetInit;

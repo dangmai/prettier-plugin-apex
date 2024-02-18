@@ -1,5 +1,7 @@
 # Unreleased
 
+- Add support for Null Coalescing Expression ([doc](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_NullCoalescingOper.htm&release=248&type=5)).
+
 ## Internal Changes
 
 - Use `pnpm` for internal dependency management instead of `yarn`. If you forked this repository before this change, make sure to follow [CONTRIBUTING.md](CONTRIBUTING.md) to set up your environment again.
