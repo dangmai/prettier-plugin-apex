@@ -8,7 +8,7 @@ WORKDIR /prettier-plugin-apex/packages/apex-ast-serializer
 RUN ./gradlew clean :server:installDist
 
 FROM eclipse-temurin:17.0.10_7-jre-jammy
-COPY --from=build /prettier-plugin-apex/packages/prettier-plugin-apex/vendor /opt/apex-ast-serializer
+COPY --from=build /prettier-plugin-apex/packages/prettier-plugin-apex/vendor /opt
 RUN echo /opt/apex-ast-serializer/bin/apex-ast-serializer-http -c '$CORS_HOST' -h 0.0.0.0 -p '$PORT' > /opt/apex-ast-serializer.sh
 RUN chmod +x /opt/apex-ast-serializer.sh
 CMD /opt/apex-ast-serializer.sh
