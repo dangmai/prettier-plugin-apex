@@ -72,6 +72,8 @@ jobs:
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
         uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Install integration test suite dependencies
         if: env.RUN_INTEGRATION_TESTS == 'true'
