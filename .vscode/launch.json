@@ -8,15 +8,13 @@
       "type": "node",
       "request": "launch",
       "name": "Jest All",
-      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "program": "${workspaceFolder}/packages/prettier-plugin-apex/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceFolder}/packages/prettier-plugin-apex",
       "args": ["-c", "jest.config.standalone.js", "--runInBand"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
-      "windows": {
-        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-      },
       "env": {
         "NODE_OPTIONS": "--experimental-vm-modules"
       }
@@ -25,10 +23,11 @@
       "type": "node",
       "request": "launch",
       "name": "Jest Current File",
-      "program": "${workspaceFolder}/node_modules/.bin/jest",
+      "program": "${workspaceFolder}/packages/prettier-plugin-apex/node_modules/jest/bin/jest.js",
+      "cwd": "${workspaceFolder}/packages/prettier-plugin-apex",
       "args": [
         "--runTestsByPath",
-        "${relativeFile}",
+        "${file}",
         "-c",
         "jest.config.standalone.js"
       ],
@@ -36,9 +35,6 @@
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
-      "windows": {
-        "program": "${workspaceFolder}/node_modules/jest/bin/jest"
-      },
       "env": {
         "NODE_OPTIONS": "--experimental-vm-modules"
       }
