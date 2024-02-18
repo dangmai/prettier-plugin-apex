@@ -19,7 +19,7 @@ declare module "prettier" {
     export function parse(
       originalText: string,
       originalOptions: Partial<RequiredOptions>,
-      massage: boolean,
+      { massage: boolean },
     ): AST;
   }
 }
