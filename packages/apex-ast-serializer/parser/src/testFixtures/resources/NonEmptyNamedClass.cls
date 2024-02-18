@@ -1,0 +1,4 @@
+class NonEmptyNamedClass {
+    public NonEmptyNamedClass() {
+    }
+}

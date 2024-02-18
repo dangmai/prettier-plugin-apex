@@ -14,8 +14,8 @@ jobs:
       fail-fast: false
       matrix:
         node:
+          - "21"
           - "20"
-          - "19"
           - "18"
         java:
           - "17"
@@ -45,6 +45,15 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
+      - name: Read pnpm version
+        id: read-pnpm-version
+        run: echo "version=$(cat .tool-versions | grep pnpm | cut -d ' ' -f 2)" >> $GITHUB_OUTPUT
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ steps.read-pnpm-version.outputs.version }}
+
       - uses: actions/setup-java@v4
         with:
           distribution: "adopt"
@@ -58,16 +67,16 @@ jobs:
         run: sudo sed -Ei '/(^::1)/d' /etc/hosts
 
       - name: Install dependencies
-        run: yarn install
+        run: pnpm install --frozen-lockfile
 
       - name: Run Apex parsing server
-        run: nohup yarn run start-server &
+        run: pnpm nx run prettier-plugin-apex:start-server &
 
       - name: Wait for Apex parsing server to be up
-        run: yarn run wait-server
+        run: pnpm nx run prettier-plugin-apex:wait-server
 
       - name: Run functional tests
-        run: AST_COMPARE=true yarn test:standalone
+        run: AST_COMPARE=true pnpm nx run prettier-plugin-apex:test:standalone
 
       - name: Upload code coverage
         if: matrix.ENABLE_CODE_COVERAGE
@@ -79,24 +88,24 @@ jobs:
 
       # This step is needed because integration tests rely on the
       # existence of the compiled JS, as they are run using Node
-      # instead of ts-node
+      # instead of tsx
       - name: Build the project
         if: env.RUN_INTEGRATION_TESTS == 'true'
-        run: yarn build
+        run: pnpm nx run prettier-plugin-apex:build:dev
 
       - name: Run integration tests
         if: env.RUN_INTEGRATION_TESTS == 'true'
-        run: ./tests_integration/format/run-integration-tests.sh
+        run: ./packages/prettier-plugin-apex/tests_integration/format/run-integration-tests.sh
 
       - name: Run package tests
         if: env.RUN_PACKAGE_TESTS == 'true'
-        run: ./tests_integration/package/run-package-tests.sh
+        run: ./packages/prettier-plugin-apex/tests_integration/package/run-package-tests.sh
 
       # npm-publish no longer automatically runs `prepack`, so we have to build
       # the Prod bundle manually here
       - name: Build Production bundle
         if: env.RUN_DEPLOYMENT == 'true'
-        run: yarn build:prod
+        run: pnpm nx run prettier-plugin-apex:build:prod
 
       - name: Deploy to NPM
         if: env.RUN_DEPLOYMENT == 'true'
@@ -115,4 +124,4 @@ jobs:
 
       - name: Stop Apex parsing server
         if: ${{ always() }}
-        run: yarn run stop-server
+        run: pnpm nx run prettier-plugin-apex:stop-server

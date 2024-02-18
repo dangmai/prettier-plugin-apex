@@ -1,0 +1,30 @@
+{
+  "name": "apex-ast-serializer",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "library",
+  "sourceRoot": "packages/apex-ast-serializer",
+  "namedInputs": {
+    "gradle": ["{projectRoot}/**/build.gradle"],
+    "default": ["{projectRoot}/**/*.java"]
+  },
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "inputs": ["gradle", "default"],
+      "outputs": [
+        "{workspaceRoot}/packages/prettier-plugin-apex/vendor",
+        "{projectRoot}/server/build"
+      ],
+      "options": {
+        "cwd": "packages/apex-ast-serializer",
+        "command": "./gradlew clean :server:installDist"
+      }
+    },
+    "prettier": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "pnpm prettier --write 'packages/apex-ast-serializer/**/*.{java,md}'"
+      }
+    }
+  }
+}

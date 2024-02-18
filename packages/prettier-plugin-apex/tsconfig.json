@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.prod.json",
+  "include": [
+    "src/**/*",
+    "bin/**/*",
+    "tests_config/**/*",
+    "tests/**/*",
+    "typings/global.d.ts",
+    "typings/test-global.d.ts",
+    "vite.config.ts"
+  ],
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"],
+    "outDir": "./dist",
+    "sourceMap": true,
+    "inlineSourceMap": false,
+    "types": ["vite/client", "jest"]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/dist"],
+      "cache": true
+    },
+    "dev": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "outputs": ["{projectRoot}/coverage"],
+      "cache": true
+    },
+    "clean": {
+      "cache": true
+    },
+    "lint": {
+      "cache": true
+    }
+  },
+  "affected": {
+    "defaultBase": "master"
+  }
+}
