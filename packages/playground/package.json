@@ -23,9 +23,9 @@
     "use-debounce": "10.0.0"
   },
   "devDependencies": {
-    "@types/react": "18.2.41",
-    "@types/react-dom": "18.2.17",
-    "@vitejs/plugin-react": "4.2.0"
+    "@types/react": "18.2.56",
+    "@types/react-dom": "18.2.19",
+    "@vitejs/plugin-react": "4.2.1"
   },
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT"

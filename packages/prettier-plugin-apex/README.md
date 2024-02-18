@@ -8,7 +8,7 @@ This is a code formatter for the Apex Programming Language,
 used on the Salesforce development platform.
 
 It uses the excellent [Prettier](https://prettier.io/) engine for formatting,
-and the jorje compiler from Salesforce for parsing.
+and the language server provided by Salesforce for parsing.
 
 ## ⚡️ Quick start
 
@@ -62,7 +62,7 @@ Then in order to run it:
 npm run prettier -- --plugin=prettier-plugin-apex --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
-### Tip
+### Tips
 
 #### Initial run
 
@@ -112,6 +112,16 @@ matrix(
   0, 1, 0,
   0, 0, 1
 )
+```
+
+#### Checking your plugin version
+
+For debugging purposes, you might want to check which version of the plugin you are using.
+
+Use NPM's `list` command, like this:
+
+```bash
+npm list prettier-plugin-apex
 ```
 
 ### Configuration
