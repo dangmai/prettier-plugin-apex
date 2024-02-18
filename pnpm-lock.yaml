@@ -125,8 +125,8 @@ importers:
         specifier: 29.7.0
         version: 29.7.0(@types/node@18.16.9)
       jest-snapshot-serializer-raw:
-        specifier: 1.2.0
-        version: 1.2.0
+        specifier: 2.0.0
+        version: 2.0.0
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -4056,9 +4056,9 @@ packages:
       - supports-color
     dev: true
 
-  /jest-snapshot-serializer-raw@1.2.0:
-    resolution: {integrity: sha512-Cnp2u7GkaXBVOOelhU94x6Kb/10WJjQtgKDvqynnYGNGQlKBj06x8QZmRkL8XWWVLQ5DKA2fT5rY9kRd512JcA==}
-    engines: {node: '>= 4'}
+  /jest-snapshot-serializer-raw@2.0.0:
+    resolution: {integrity: sha512-E/gWFBAltOPQVAvafH/zYkob3G/TqL/DFG3fHurinwLcFRkz6kASjuihyJJ6zoizlLUNaiOdS3v5ZflTvifpBA==}
+    engines: {node: '>=16'}
     dev: true
 
   /jest-snapshot@29.7.0:
