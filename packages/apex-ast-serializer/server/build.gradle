@@ -126,7 +126,12 @@ dependencies {
   implementation "org.eclipse.jetty:jetty-servlets:${jettyVersion}"
   implementation "org.glassfish.jersey.core:jersey-server:${jerseyVersion}"
   implementation "org.glassfish.jersey.containers:jersey-container-servlet-core:${jerseyVersion}"
-  implementation "org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}"
+  // The next time we bump jersey major version, we will need to change the package
+  // here back to org.glassfish.jersey.containers:jersey-container-jetty-http.
+  // The current package is a workaround for 3.1.5 to work specifically with
+  // Jetty 11. See this issue for more detail:
+  // https://github.com/eclipse-ee4j/jersey/issues/5483
+  implementation "org.glassfish.jersey.containers:jersey-container-jetty11-http:${jerseyVersion}"
   implementation "org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}"
   implementation "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
 
