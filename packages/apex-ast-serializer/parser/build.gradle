@@ -57,8 +57,8 @@ dependencies {
   api group: 'commons-io', name: 'commons-io', version: '2.15.1'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.1'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.1'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.2'
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20240205'
