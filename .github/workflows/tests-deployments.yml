@@ -128,7 +128,8 @@ jobs:
         if: ${{ always() }}
         run: pnpm nx run prettier-plugin-apex:stop-server
 
-  build-artifacts:
+  build-native-executables:
+    name: Build Native Executables
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags')
     strategy:
       matrix:
