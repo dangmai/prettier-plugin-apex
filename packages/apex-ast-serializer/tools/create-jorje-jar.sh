@@ -32,6 +32,8 @@ function minimize() {
         -and -not -path "./com/google/inject*" \
         -and -not -path "./javax" \
         -and -not -path "./javax/inject*" \
+        -and -not -path "./jakarta" \
+        -and -not -path "./jakarta/inject*" \
         -and -not -path "./org" \
         -and -not -path "./org/aopalliance" \
         -and -not -path "./org/aopalliance/aop*" \
@@ -62,4 +64,3 @@ else
   cleanup
   echo "${NEW_MD5}" > "${CURRENT_DIR}/${CURRENT_MD5_FILENAME}"
 fi
-
