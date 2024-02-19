@@ -77,6 +77,14 @@ test {
 }
 
 graalvmNative {
+  metadataRepository {
+    // Since version 0.10.0, the metadata repository is enabled by default,
+    // The metadata repository contains community-driven collection of
+    // reachability metadata for open-source libraries. However, they are
+    // leading to issues with apex-jorje-lsp library, and I haven't found
+    // a way to exclude it yet, so for now I'll disable it.
+    enabled = false
+  }
   agent {
     enabled = true
     defaultMode = "standard"
