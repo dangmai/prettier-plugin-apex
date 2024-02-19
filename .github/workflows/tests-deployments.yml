@@ -151,6 +151,9 @@ jobs:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: ./packages/apex-ast-serializer
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK
