@@ -136,7 +136,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest
+          - macos-latest-xlarge
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
