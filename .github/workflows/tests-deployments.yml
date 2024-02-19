@@ -136,7 +136,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - macos-latest-xlarge
+          - flyci-macos-large-latest-m1
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
@@ -144,7 +144,7 @@ jobs:
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-linux-x64
-          - os: macos-latest-xlarge
+          - os: flyci-macos-large-latest-m1
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-darwin-arm64
     env:
