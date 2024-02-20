@@ -1,6 +1,7 @@
-# Unreleased
+# 2.1.0
 
 - Add support for Null Coalescing Expression ([doc](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_NullCoalescingOper.htm&release=248&type=5)).
+- Add experimental support for using native executables to speed up parsing Apex code. Follow the [documentation](https://github.com/dangmai/prettier-plugin-apex?tab=readme-ov-file#-using-native-executables-experimental) to try it out, and please report any issues you encounter.
 
 ## Internal Changes
 
