@@ -114,6 +114,7 @@ jobs:
         uses: JS-DevTools/npm-publish@v3
         with:
           token: ${{ secrets.NPM_TOKEN }}
+          package: packages/prettier-plugin-apex
 
       - name: Create Release
         if: env.RUN_DEPLOYMENT == 'true'
