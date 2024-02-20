@@ -106,8 +106,7 @@ export const options: SupportOptions = {
         description: "Use native executable parser",
       },
     ],
-    description:
-      "Use a standalone process to speed up parsing. This process needs to be started and stopped separately from the Prettier process",
+    description: "Use different methods to speed up parsing. Default to none.",
   },
   apexStandaloneHost: {
     type: "string",
