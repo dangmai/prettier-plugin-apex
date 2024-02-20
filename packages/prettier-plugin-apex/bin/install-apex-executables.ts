@@ -2,7 +2,7 @@
 
 /* eslint-disable no-console -- this is a NodeJS script so console usage is expected */
 import { createWriteStream } from "fs";
-import { unlink } from "fs/promises";
+import { chmod, unlink } from "fs/promises";
 import https from "https";
 import path from "path";
 import { getSerializerBinDirectory } from "../src/util.js";
@@ -52,12 +52,16 @@ const downloadFile = (url: string, dest: string) =>
       });
   });
 
-const downloadLocation = path.join(getSerializerBinDirectory(), filename);
-downloadFile(artifactUrl, downloadLocation)
-  .then(() =>
-    console.log(`File downloaded successfully to ${downloadLocation}`),
-  )
-  .catch((error) => {
+(async () => {
+  try {
+    const downloadLocation = path.join(getSerializerBinDirectory(), filename);
+    await downloadFile(artifactUrl, downloadLocation);
+    // By default, this file is not executable, so we need to manually give it
+    // the +x permission bit here
+    await chmod(downloadLocation, 0o755);
+    console.log(`File downloaded successfully to ${downloadLocation}`);
+  } catch (error) {
     console.error(`Failed to download from URL ${artifactUrl}: ${error}`);
     process.exit(2);
-  });
+  }
+})();
