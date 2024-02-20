@@ -133,7 +133,7 @@ jobs:
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
-            OUTPUT_NAME: apex-ast-serializer-${version}-win32-x64.exe
+            OUTPUT_NAME: apex-ast-serializer-${env:version}-win32-x64.exe
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
@@ -144,6 +144,7 @@ jobs:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
       UPLOAD_ARTIFACTS: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags') }}
+      OS: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -162,9 +163,18 @@ jobs:
         run: ./gradlew clean :parser:buildNative
       - name: Set version
         run: echo "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" >> $GITHUB_ENV
+        if: env.OS != 'windows-latest'
+      - name: Set version
+        run: |
+          "version=$(cat ../prettier-plugin-apex/package.json | Out-File -FilePath $env:GITHUB_ENV -Append
+        if: env.OS == 'windows-latest'
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
-      - run: echo "ARTIFACT_LOCATION=packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}" >> $GITHUB_ENV
+      - if: env.OS != 'windows-latest'
+        run: echo "ARTIFACT_LOCATION=packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}" >> $GITHUB_ENV
+      - if: env.OS == 'windows-latest'
+        run: |
+          "ARTIFACT_LOCATION=packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
