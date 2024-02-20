@@ -173,7 +173,7 @@ as well as specifying a special flag when running Prettier:
 # Start the server (if installed globally)
 start-apex-server
 # Or if installed locally
-node /path/to/library/dist/bin/start-apex-server.js
+npx start-apex-server
 
 # In a separate console
 prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigger,cls}"
@@ -181,7 +181,7 @@ prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigg
 # After you are done, stop the server (if installed globally)
 stop-apex-server
 # Or if installed locally
-node /path/to/library/dist/bin/stop-apex-server.js
+npx stop-apex-server
 ```
 
 By default, the server listens on `http://localhost:2117`.
