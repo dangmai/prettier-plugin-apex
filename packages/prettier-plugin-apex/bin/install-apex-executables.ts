@@ -4,11 +4,9 @@
 import { createWriteStream } from "fs";
 import { chmod, unlink } from "fs/promises";
 import https from "https";
-import path from "path";
-import { getSerializerBinDirectory } from "../src/util.js";
+import { getNativeExecutable } from "../src/util.js";
 
 const { arch, platform } = process;
-const version = process.env["npm_package_version"];
 
 const SUPPORTED_ARCHITECTURES = ["win32-x64", "linux-x64", "darwin-arm64"];
 
@@ -17,9 +15,6 @@ if (!SUPPORTED_ARCHITECTURES.includes(currentArch)) {
   console.warn("Unsupported OS or architecture");
   process.exit(1);
 }
-
-const filename = `apex-ast-serializer-${version}-${currentArch}${platform === "win32" ? ".exe" : ""}`;
-const artifactUrl = `https://github.com/dangmai/prettier-plugin-apex/releases/download/v${version}/${filename}`;
 
 const downloadFile = (url: string, dest: string) =>
   new Promise<void>((resolve, reject) => {
@@ -53,13 +48,14 @@ const downloadFile = (url: string, dest: string) =>
   });
 
 (async () => {
+  const { path, filename, version } = getNativeExecutable();
+  const artifactUrl = `https://github.com/dangmai/prettier-plugin-apex/releases/download/v${version}/${filename}`;
   try {
-    const downloadLocation = path.join(getSerializerBinDirectory(), filename);
-    await downloadFile(artifactUrl, downloadLocation);
+    await downloadFile(artifactUrl, path);
     // By default, this file is not executable, so we need to manually give it
     // the +x permission bit here
-    await chmod(downloadLocation, 0o755);
-    console.log(`File downloaded successfully to ${downloadLocation}`);
+    await chmod(path, 0o755);
+    console.log(`File downloaded successfully to ${path}`);
   } catch (error) {
     console.error(`Failed to download from URL ${artifactUrl}: ${error}`);
     process.exit(2);
