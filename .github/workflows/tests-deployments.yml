@@ -163,7 +163,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.OUTPUT_NAME }}
-          path: parser/build/native/nativeCompile/${{ env.ASSET_NAME }}
+          path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.ASSET_NAME }}
 
   create-release-with-artifacts:
     runs-on: ubuntu-latest
