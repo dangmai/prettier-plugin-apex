@@ -134,15 +134,19 @@ jobs:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
             OUTPUT_NAME: apex-ast-serializer-${env:version}-win32-x64.exe
+            ARTIFACT_NAME: apex-ast-serializer-win32-x64
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
+            ARTIFACT_NAME: apex-ast-serializer-linux-x64
           - os: flyci-macos-large-latest-m1
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
+            ARTIFACT_NAME: apex-ast-serializer-darwin-arm64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
+      ARTIFACT_NAME: ${{ matrix.ARTIFACT_NAME }}
       UPLOAD_ARTIFACTS: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags') }}
       OS: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
@@ -178,7 +182,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.OUTPUT_NAME }}
+          name: ${{ env.ARTIFACT_NAME }}
           path: ${{ env.ARTIFACT_LOCATION }}
 
   create-release-with-artifacts:
