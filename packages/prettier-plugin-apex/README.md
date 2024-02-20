@@ -133,18 +133,18 @@ The amount of configuration is very limited,
 because this is intended to be a very opinionated formatter.
 Here is the default configuration that can be overriden:
 
-| Name                     | Default     | Description                                                                                                                                                                                                                     |
-| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `printWidth`             | `80`        | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))                                                                                                                                 |
-| `tabWidth`               | `2`         | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))                                                                                                                                   |
-| `useTabs`                | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))                                                                                                                                        |
-| `requirePragma`          | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma))                                                                                                                              |
-| `insertPragma`           | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))                                                                                                                               |
-| `apexInsertFinalNewline` | `true`      | Whether a newline is added as the last thing in the output                                                                                                                                                                      |
-| `apexStandaloneParser`   | `none`      | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Performance Tip](#-performance-tips3rd-party-integration).<br>If set to `none`, Prettier invokes the CLI parser for every file. |
-| `apexStandalonePort`     | `2117`      | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                |
-| `apexStandaloneHost`     | `localhost` | The host that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                |
-| `apexStandaloneProtocol` | `http`      | The protocol that the standalone Apex parser uses.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                  |
+| Name                     | Default     | Description                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------------------------ | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `printWidth`             | `80`        | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#print-width))                                                                                                                                                                                                                                                                                                       |
+| `tabWidth`               | `2`         | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tab-width))                                                                                                                                                                                                                                                                                                         |
+| `useTabs`                | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#tabs))                                                                                                                                                                                                                                                                                                              |
+| `requirePragma`          | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#require-pragma))                                                                                                                                                                                                                                                                                                    |
+| `insertPragma`           | `false`     | Same as in Prettier ([see prettier docs](https://prettier.io/docs/en/options.html#insert-pragma))                                                                                                                                                                                                                                                                                                     |
+| `apexInsertFinalNewline` | `true`      | Whether a newline is added as the last thing in the output                                                                                                                                                                                                                                                                                                                                            |
+| `apexStandaloneParser`   | `none`      | If set to `built-in`, Prettier uses the built in standalone parser for better performance. See [Using built-in HTTP Server](#-using-built-in-http-server).<br>If set to `none`, Prettier invokes the CLI parser for every file.<br>If set to `native`, Prettier uses the native executables to speed up the parsing process. See [Using native executables](#-using-native-executables-experimental). |
+| `apexStandalonePort`     | `2117`      | The port that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                                                                                                                                                                                      |
+| `apexStandaloneHost`     | `localhost` | The host that the standalone Apex parser listens on.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                                                                                                                                                                                      |
+| `apexStandaloneProtocol` | `http`      | The protocol that the standalone Apex parser uses.<br>Only applicable if `apexStandaloneParser` is `built-in`.                                                                                                                                                                                                                                                                                        |
 
 ## 📝 Editor integration
 
@@ -153,6 +153,8 @@ Here is the default configuration that can be overriden:
 Follow [this tutorial](https://developer.salesforce.com/tools/vscode/en/user-guide/prettier) from Salesforce in order to use this plugin in VSCode.
 
 ## 🚀 Performance Tips/3rd party integration
+
+### 💻 Using built-in HTTP Server
 
 By default,
 this library invokes a CLI application to get the AST of the Apex code.
@@ -171,7 +173,7 @@ as well as specifying a special flag when running Prettier:
 # Start the server (if installed globally)
 start-apex-server
 # Or if installed locally
-node /path/to/library/dist/bin/start-apex-server.js
+npx start-apex-server
 
 # In a separate console
 prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigger,cls}"
@@ -179,7 +181,7 @@ prettier --apex-standalone-parser built-in --write "/path/to/project/**/*.{trigg
 # After you are done, stop the server (if installed globally)
 stop-apex-server
 # Or if installed locally
-node /path/to/library/dist/bin/stop-apex-server.js
+npx stop-apex-server
 ```
 
 By default, the server listens on `http://localhost:2117`.
@@ -187,6 +189,23 @@ This can be customized by specifying the `--host` and `--port` arguments:
 
 ```bash
 start-apex-server --host 127.0.0.1 --port 2118
+```
+
+### 🧪 Using native executables (EXPERIMENTAL)
+
+Since version `2.1.0`, we have added support for using native executables to speed up the parsing process.
+This is an experimental feature and is not enabled by default.
+In order to use it, first run:
+
+```bash
+# Download the native executables
+npx install-apex-executables
+```
+
+Then, you can use the `--apex-standalone-parser native` flag to use the native executables:
+
+```bash
+prettier --apex-standalone-parser native --write "/path/to/project/**/*.{trigger,cls}"
 ```
 
 ## 🚢 Continuous Integration

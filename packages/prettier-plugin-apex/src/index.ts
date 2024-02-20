@@ -101,30 +101,33 @@ export const options: SupportOptions = {
         value: "built-in",
         description: "Use the built in HTTP standalone parser",
       },
+      {
+        value: "native",
+        description: "Use native executable parser",
+      },
     ],
-    description:
-      "Use a standalone process to speed up parsing. This process needs to be started and stopped separately from the Prettier process",
+    description: "Use different methods to speed up parsing. Default to none.",
   },
   apexStandaloneHost: {
     type: "string",
     category: CATEGORY_APEX,
     default: "localhost",
     description:
-      "The standalone server host to connect to. Only applicable if apexStandaloneParser is true. Default to localhost.",
+      "The standalone server host to connect to. Only applicable if apexStandaloneParser is built-in. Default to localhost.",
   },
   apexStandalonePort: {
     type: "int",
     category: CATEGORY_APEX,
     default: 2117,
     description:
-      "The standalone server port to connect to. Only applicable if apexStandaloneParser is true. Default to 2117.",
+      "The standalone server port to connect to. Only applicable if apexStandaloneParser is built-in. Default to 2117.",
   },
   apexStandaloneProtocol: {
     type: "string",
     category: CATEGORY_APEX,
     default: "http",
     description:
-      "The protocol for the standalone server. Only applicable if apexStandaloneParser is true. Default to http.",
+      "The protocol for the standalone server. Only applicable if apexStandaloneParser is built-in. Default to http.",
   },
   apexInsertFinalNewline: {
     type: "boolean",

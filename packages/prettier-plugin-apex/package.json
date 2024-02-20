@@ -10,6 +10,7 @@
   "bin": {
     "start-apex-server": "./dist/bin/start-apex-server.js",
     "stop-apex-server": "./dist/bin/stop-apex-server.js",
+    "install-apex-executables": "./dist/bin/install-apex-executables.js",
     "apex-ast-serializer": "./vendor/apex-ast-serializer/bin/apex-ast-serializer",
     "apex-ast-serializer-http": "./vendor/apex-ast-serializer/bin/apex-ast-serializer-http"
   },
@@ -32,7 +33,8 @@
     "lint": "eslint \"{src,bin,tests_config}/**/*.{js,ts}\"",
     "prettier": "prettier --write \"{bin,src,playground,tests_config}/**/*.{js,mjs,ts,tsx,css,html}\" \"./*.{md,mjs,ts}\"",
     "prepack": "pnpm run build",
-    "debug-check": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js"
+    "debug-check:native": "prettier --no-config --apex-standalone-parser native --debug-check --plugin=./dist/src/index.js",
+    "debug-check:built-in": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js"
   },
   "keywords": [
     "apex",

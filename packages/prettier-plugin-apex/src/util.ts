@@ -240,7 +240,7 @@ export function getPrecedence(op: string): number {
   return precedence;
 }
 
-function doesFileExist(file: string): boolean {
+export function doesFileExist(file: string): boolean {
   try {
     fs.accessSync(file);
     return true;
@@ -264,4 +264,21 @@ export function getSerializerBinDirectory(): string {
     );
   }
   return serializerBin;
+}
+
+interface NativeExecutable {
+  path: string;
+  filename: string;
+  version: string;
+}
+export function getNativeExecutable(): NativeExecutable {
+  const { arch, platform } = process;
+  const version = process.env["npm_package_version"];
+  const filename = `apex-ast-serializer-${version}-${platform}-${arch}${platform === "win32" ? ".exe" : ""}`;
+  const serializerBin = getSerializerBinDirectory();
+  return {
+    version: process.env["npm_package_version"] ?? "",
+    path: nodePath.join(serializerBin, filename),
+    filename,
+  };
 }
