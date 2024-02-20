@@ -163,6 +163,8 @@ jobs:
         run: echo "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" >> $GITHUB_ENV
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
+      - run: ls -alh parser/build/native/nativeCompile
+      - run: echo $version
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
