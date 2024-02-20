@@ -195,10 +195,16 @@ start-apex-server --host 127.0.0.1 --port 2118
 
 Since version `2.1.0`, we have added support for using native executables to speed up the parsing process.
 This is an experimental feature and is not enabled by default.
+This method is available for the following platforms:
+
+- Windows x64
+- Linux x64
+- macOS M-based (ARM64)
+
 In order to use it, first run:
 
 ```bash
-# Download the native executables
+# Download the native executable for your architecture. It will fail if your platform is not supported.
 npx install-apex-executables
 ```
 
