@@ -132,13 +132,13 @@ jobs:
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
-            OUTPUT_NAME: apex-ast-serializer-win32-x64.exe
+            OUTPUT_NAME: apex-ast-serializer-${version}-win32-x64.exe
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-linux-x64
+            OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
           - os: flyci-macos-large-latest-m1
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-darwin-arm64
+            OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
@@ -159,11 +159,15 @@ jobs:
         run: chmod +x gradlew
       - name: Build native executable
         run: ./gradlew clean :parser:buildNative
+      - name: Set version
+        run: echo "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" >> $GITHUB_ENV
+      - name: Rename executable
+        run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.OUTPUT_NAME }}
-          path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.ASSET_NAME }}
+          path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
 
   create-release-with-artifacts:
     runs-on: ubuntu-latest
