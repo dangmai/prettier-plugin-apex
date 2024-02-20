@@ -166,7 +166,7 @@ jobs:
         if: env.OS != 'windows-latest'
       - name: Set version
         run: |
-          "version=$(cat ../prettier-plugin-apex/package.json | Out-File -FilePath $env:GITHUB_ENV -Append
+          "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" | Out-File -FilePath $env:GITHUB_ENV -Append
         if: env.OS == 'windows-latest'
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
