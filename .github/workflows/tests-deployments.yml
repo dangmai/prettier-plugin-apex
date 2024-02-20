@@ -107,7 +107,7 @@ jobs:
       # the Prod bundle manually here
       - name: Build Production bundle
         if: env.RUN_DEPLOYMENT == 'true'
-        run: pnpm nx run prettier-plugin-apex:build:prod
+        run: pnpm nx run prettier-plugin-apex:build
 
       - name: Deploy to NPM
         if: env.RUN_DEPLOYMENT == 'true'
