@@ -12,7 +12,9 @@ import {
 import {
   GenericComment,
   SerializedAst,
+  doesFileExist,
   findNextUncommentedCharacter,
+  getNativeExecutable,
   getSerializerBinDirectory,
 } from "./util.js";
 
@@ -22,21 +24,16 @@ type MinimalLocation = {
 };
 
 async function parseTextWithSpawn(
+  executable: string,
   text: string,
   anonymous: boolean,
 ): Promise<string> {
-  let serializerBin = getSerializerBinDirectory();
-  if (process.platform === "win32") {
-    serializerBin = path.join(serializerBin, "apex-ast-serializer.bat");
-  } else {
-    serializerBin = path.join(serializerBin, "apex-ast-serializer");
-  }
   const args = ["-f", "json", "-i"];
   if (anonymous) {
     args.push("-a");
   }
   return new Promise((resolve, reject) => {
-    const process = childProcess.spawn(serializerBin, args);
+    const process = childProcess.spawn(executable, args);
     process.stdin.write(text);
     process.stdin.end();
 
@@ -592,8 +589,24 @@ export default async function parse(
       options.apexStandaloneProtocol,
       options.parser === "apex-anonymous",
     );
+  } else if (options.apexStandaloneParser === "native") {
+    const { path: serializerBin } = getNativeExecutable();
+    if (!doesFileExist(serializerBin)) {
+      throw new Error(
+        "Native executable does not exist. Please download with `npx install-apex-executables`",
+      );
+    }
+    serializedAst = await parseTextWithSpawn(
+      serializerBin,
+      sourceCode,
+      options.parser === "apex-anonymous",
+    );
   } else {
     serializedAst = await parseTextWithSpawn(
+      path.join(
+        getSerializerBinDirectory(),
+        `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`,
+      ),
       sourceCode,
       options.parser === "apex-anonymous",
     );

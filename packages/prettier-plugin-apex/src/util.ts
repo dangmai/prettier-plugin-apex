@@ -240,7 +240,7 @@ export function getPrecedence(op: string): number {
   return precedence;
 }
 
-function doesFileExist(file: string): boolean {
+export function doesFileExist(file: string): boolean {
   try {
     fs.accessSync(file);
     return true;
