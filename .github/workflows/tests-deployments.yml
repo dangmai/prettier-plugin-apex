@@ -164,12 +164,12 @@ jobs:
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
       - run: ls -alh parser/build/native/nativeCompile
-      - run: echo $version
+      - run: echo "ARTIFACT_LOCATION=parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}" >> $GITHUB_ENV
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.OUTPUT_NAME }}
-          path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
+          path: ${{ env.ARTIFACT_LOCATION }}
 
   create-release-with-artifacts:
     runs-on: ubuntu-latest
