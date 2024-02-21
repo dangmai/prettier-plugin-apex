@@ -195,7 +195,8 @@ start-apex-server --host 127.0.0.1 --port 2118
 
 Since version `2.1.0`, we have added support for using native executables to speed up the parsing process.
 This is an experimental feature and is not enabled by default.
-This method is available for the following platforms:
+This method is faster than calling the parser via Java, but slower than the built-in HTTP server.
+It is only available for the following platforms:
 
 - Windows x64
 - Linux x64
@@ -208,7 +209,7 @@ In order to use it, first run:
 npx install-apex-executables
 ```
 
-Then, you can use the `--apex-standalone-parser native` flag to use the native executables:
+Then, you can use the `--apex-standalone-parser native` flag to use the native executables (or configure it via `.prettierrc`):
 
 ```bash
 prettier --apex-standalone-parser native --write "/path/to/project/**/*.{trigger,cls}"
