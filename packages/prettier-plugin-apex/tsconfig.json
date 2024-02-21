@@ -3,6 +3,7 @@
   "include": [
     "src/**/*",
     "bin/**/*",
+    "scripts/**/*",
     "tests_config/**/*",
     "tests/**/*",
     "typings/global.d.ts",
@@ -14,6 +15,7 @@
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false,
-    "types": ["vite/client", "jest"]
+    "types": ["vite/client", "jest"],
+    "resolveJsonModule": true
   }
 }

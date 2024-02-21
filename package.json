@@ -1,11 +1,13 @@
 {
   "name": "monorepo-prettier-plugin-apex",
-  "version": "1.0.0",
+  "version": "2.1.0-rc.6",
   "description": "Monorepo for the Prettier Apex project",
   "main": "index.js",
   "scripts": {
     "clean": "rimraf node_modules",
-    "all:clean": "pnpm run -r clean && pnpm run clean"
+    "all:clean": "pnpm run -r clean && pnpm run clean",
+    "release": "npm version --force",
+    "version": "cd packages/prettier-plugin-apex && npm version ----no-git-tag-version $(npx tsx scripts/release.ts) && git add ."
   },
   "engines": {
     "node": ">= 18.11.0",

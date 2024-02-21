@@ -273,11 +273,12 @@ interface NativeExecutable {
 }
 export function getNativeExecutable(): NativeExecutable {
   const { arch, platform } = process;
-  const version = process.env["npm_package_version"];
+  // This will be bumped automatically when we run the release script for new versions
+  const version = "2.1.0-rc.6";
   const filename = `apex-ast-serializer-${version}-${platform}-${arch}${platform === "win32" ? ".exe" : ""}`;
   const serializerBin = getSerializerBinDirectory();
   return {
-    version: process.env["npm_package_version"] ?? "",
+    version,
     path: nodePath.join(serializerBin, filename),
     filename,
   };
