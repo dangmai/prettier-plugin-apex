@@ -15,7 +15,6 @@ location="${CLONE_DIR:-`echo $PWD`}"
 rm -rf "$location/$name"
 git clone --depth 1 "$1" "$location/$name"
 ls -alh
-ls -alh packages/prettier-plugin-apex/dist
 # Here we use --no-config so that Prettier does not try to use the test repos
 # Prettier config, as they may interfere with the test runs.
 pnpm --filter=prettier-plugin-apex run debug-check:built-in "$location/$name/**/{classes,triggers}/*.{cls,trigger}" --no-config --ignore-path=./tests_integration/format/ignore-list.txt

@@ -34,7 +34,7 @@
     "prettier": "prettier --write \"{bin,src,playground,tests_config}/**/*.{js,mjs,ts,tsx,css,html}\" \"./*.{md,mjs,ts}\"",
     "prepack": "pnpm run build",
     "debug-check:native": "prettier --no-config --apex-standalone-parser native --debug-check --plugin=./dist/src/index.js",
-    "debug-check:built-in": "prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js"
+    "debug-check:built-in": "ls -alh && ls -alh dist && ls -alh dist/src && prettier --apex-standalone-parser built-in --apex-standalone-port 2117 --debug-check --plugin=./dist/src/index.js"
   },
   "keywords": [
     "apex",
