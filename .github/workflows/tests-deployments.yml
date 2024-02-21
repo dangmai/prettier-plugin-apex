@@ -115,7 +115,6 @@ jobs:
         with:
           token: ${{ secrets.NPM_TOKEN }}
           package: packages/prettier-plugin-apex
-          tag: beta
 
       - name: Stop Apex parsing server
         if: ${{ always() }}
