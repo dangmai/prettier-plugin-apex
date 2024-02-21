@@ -4,11 +4,19 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-// eslint-disable-next-line import/no-relative-packages
-import rootPackageJson from "../../../package.json";
 
 async function release() {
-  const { version } = rootPackageJson;
+  // We use readFileSync instead of import here, because with import we have to turn
+  // on resolveJsonModule in tsconfig, which messes up the dev build.
+  const { version } = JSON.parse(
+    fs.readFileSync(
+      path.join(
+        path.dirname(fileURLToPath(import.meta.url)),
+        "../../../package.json",
+      ),
+      "utf8",
+    ),
+  );
 
   // eslint-disable-next-line no-console
   console.log(version);

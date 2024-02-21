@@ -15,7 +15,6 @@
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false,
-    "types": ["vite/client", "jest"],
-    "resolveJsonModule": true
+    "types": ["vite/client", "jest"]
   }
 }
