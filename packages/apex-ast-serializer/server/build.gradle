@@ -136,7 +136,7 @@ dependencies {
   implementation "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
 
   // https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api
-  implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.2'
+  implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.3'
 
   // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.4'
