@@ -54,11 +54,11 @@ importers:
         specifier: 5.0.5
         version: 5.0.5
       vite:
-        specifier: 5.1.4
-        version: 5.1.4
+        specifier: 5.1.5
+        version: 5.1.5
       vite-plugin-radar:
         specifier: 0.9.3
-        version: 0.9.3(vite@5.1.4)
+        version: 0.9.3(vite@5.1.5)
 
   packages/playground:
     dependencies:
@@ -95,7 +95,7 @@ importers:
         version: 18.2.19
       '@vitejs/plugin-react':
         specifier: 4.2.1
-        version: 4.2.1(vite@5.1.4)
+        version: 4.2.1(vite@5.1.5)
 
   packages/prettier-plugin-apex:
     dependencies:
@@ -1636,7 +1636,7 @@ packages:
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
     dev: true
 
-  /@vitejs/plugin-react@4.2.1(vite@5.1.4):
+  /@vitejs/plugin-react@4.2.1(vite@5.1.5):
     resolution: {integrity: sha512-oojO9IDc4nCUUi8qIR11KoQm0XFFLIwsRBwHRR4d/88IWghn1y6ckz/bJ8GHDCsYEJee8mDzqtJxh15/cisJNQ==}
     engines: {node: ^14.18.0 || >=16.0.0}
     peerDependencies:
@@ -1647,7 +1647,7 @@ packages:
       '@babel/plugin-transform-react-jsx-source': 7.23.3(@babel/core@7.24.0)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.0
-      vite: 5.1.4
+      vite: 5.1.5
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -5185,16 +5185,16 @@ packages:
       convert-source-map: 2.0.0
     dev: true
 
-  /vite-plugin-radar@0.9.3(vite@5.1.4):
+  /vite-plugin-radar@0.9.3(vite@5.1.5):
     resolution: {integrity: sha512-o/7F0gHQW9yUxpExXYwQLxFYOSxiWIPs3Uh24sg+wl5ikghzLKMQ2Xldak/rsT0o06rzdrAqP9+XSOwfCbwz2Q==}
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0
     dependencies:
-      vite: 5.1.4
+      vite: 5.1.5
     dev: true
 
-  /vite@5.1.4:
-    resolution: {integrity: sha512-n+MPqzq+d9nMVTKyewqw6kSt+R3CkvF9QAKY8obiQn8g1fwTscKxyfaYnC632HtBXAQGc1Yjomphwn1dtwGAHg==}
+  /vite@5.1.5:
+    resolution: {integrity: sha512-BdN1xh0Of/oQafhU+FvopafUp6WaYenLU/NFoL5WyJL++GxkNfieKzBhM24H3HVsPQrlAqB7iJYTHabzaRed5Q==}
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
     peerDependencies:
