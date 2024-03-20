@@ -52,7 +52,7 @@
     "rimraf": "5.0.5",
     "ts-jest": "29.1.2",
     "tsx": "4.7.1",
-    "typescript": "5.4.2",
+    "typescript": "5.4.3",
     "undici": "6.9.0"
   },
   "peerDependencies": {
