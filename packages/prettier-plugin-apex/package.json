@@ -43,7 +43,7 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
-    "@tsconfig/node18": "18.2.2",
+    "@tsconfig/node18": "18.2.3",
     "@types/jest": "29.5.12",
     "@types/node": "18.16.9",
     "@types/wait-on": "5.3.4",
