@@ -140,8 +140,8 @@ importers:
         specifier: 5.4.3
         version: 5.4.3
       undici:
-        specifier: 6.11.0
-        version: 6.11.0
+        specifier: 6.11.1
+        version: 6.11.1
 
 packages:
 
@@ -5423,8 +5423,8 @@ packages:
       which-boxed-primitive: 1.0.2
     dev: true
 
-  /undici@6.11.0:
-    resolution: {integrity: sha512-y4AOKcD36FXz+MY19yw8Emtbsdp8wBWTLln508+EJwqWezUheU5PSRbvIb+pQld7ZoOY8ruNwqSejSVGZUS/aA==}
+  /undici@6.11.1:
+    resolution: {integrity: sha512-KyhzaLJnV1qa3BSHdj4AZ2ndqI0QWPxYzaIOio0WzcEJB9gvuysprJSLtpvc2D9mhR9jPDUk7xlJlZbH2KR5iw==}
     engines: {node: '>=18.0'}
     dev: true
 
