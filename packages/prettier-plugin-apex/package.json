@@ -53,7 +53,7 @@
     "ts-jest": "29.1.2",
     "tsx": "4.7.1",
     "typescript": "5.4.3",
-    "undici": "6.10.2"
+    "undici": "6.11.0"
   },
   "peerDependencies": {
     "prettier": "^3.0.0"
