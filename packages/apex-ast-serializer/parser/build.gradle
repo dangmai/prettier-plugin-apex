@@ -54,7 +54,7 @@ dependencies {
   api group: 'commons-cli', name: 'commons-cli', version: '1.6.0'
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  api group: 'commons-io', name: 'commons-io', version: '2.16.0'
+  api group: 'commons-io', name: 'commons-io', version: '2.16.1'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
