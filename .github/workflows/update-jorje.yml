@@ -17,8 +17,9 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: "adopt"
+          distribution: temurin
           java-version: 11
+          cache: gradle
       - name: Run create-jorje-jar.sh
         run: ./packages/apex-ast-serializer/tools/create-jorje-jar.sh
       - name: Create Pull Request

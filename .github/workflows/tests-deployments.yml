@@ -56,8 +56,9 @@ jobs:
 
       - uses: actions/setup-java@v4
         with:
-          distribution: "adopt"
+          distribution: temurin
           java-version: ${{ matrix.java }}
+          cache: gradle
 
       # Starting with Node 17, DNS is resolved by order that the resolver
       # returns it. In Github Actions environment, there is a loopback IP
