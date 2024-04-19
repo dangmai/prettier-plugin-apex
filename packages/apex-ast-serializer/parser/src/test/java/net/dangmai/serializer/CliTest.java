@@ -20,7 +20,7 @@ public class CliTest {
   @Test
   void shouldGetJsonFromNamedApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(null, new String[] { "-f", "json", "-l", file.getAbsolutePath() });
 
       String content = byteArrayOutputStream.toString();
@@ -35,7 +35,8 @@ public class CliTest {
   @Test
   void shouldGetJsonFromStdinApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
+
       runCli(new FileInputStream(file), new String[] { "-f", "json" });
 
       String content = byteArrayOutputStream.toString();
@@ -50,7 +51,7 @@ public class CliTest {
   @Test
   void shouldGetXmlFromNamedApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(null, new String[] { "-f", "xml", "-l", file.getAbsolutePath() });
 
       String content = byteArrayOutputStream.toString();
@@ -65,7 +66,7 @@ public class CliTest {
   @Test
   void shouldGetXmlFromStdinApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(new FileInputStream(file), new String[] { "-f", "xml" });
 
       String content = byteArrayOutputStream.toString();
@@ -80,7 +81,7 @@ public class CliTest {
   @Test
   void shouldGetJsonFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(
         null,
         new String[] { "-a", "-f", "json", "-l", file.getAbsolutePath() }
@@ -98,7 +99,7 @@ public class CliTest {
   @Test
   void shouldGetJsonFromStdinAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(new FileInputStream(file), new String[] { "-a", "-f", "json" });
 
       String content = byteArrayOutputStream.toString();
@@ -113,7 +114,7 @@ public class CliTest {
   @Test
   void shouldGetXmlFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(
         null,
         new String[] { "-a", "-f", "xml", "-l", file.getAbsolutePath() }
@@ -131,7 +132,7 @@ public class CliTest {
   @Test
   void shouldGetXmlFromStdinAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       runCli(new FileInputStream(file), new String[] { "-a", "-f", "xml" });
 
       String content = byteArrayOutputStream.toString();

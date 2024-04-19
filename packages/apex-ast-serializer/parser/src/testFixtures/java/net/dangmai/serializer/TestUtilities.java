@@ -10,6 +10,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.apache.commons.io.FileUtils;
@@ -46,11 +50,32 @@ public class TestUtilities {
     return true;
   }
 
-  public static File getTestResourceFile(String fileName) {
+  public static List<File> getApexTestFiles() throws IOException {
     ClassLoader classLoader = TestUtilities.class.getClassLoader();
-    System.out.println("Hey");
-    System.out.println(classLoader);
-    return new File(classLoader.getResource(fileName).getFile());
+
+    File folder = Collections.list(classLoader.getResources(""))
+      .stream()
+      .map(resource -> new File(resource.getFile()))
+      .filter(
+        f -> f.isDirectory() && f.getAbsolutePath().endsWith("resources/test")
+      )
+      .findFirst()
+      .get();
+    List<File> files = Arrays.stream(folder.listFiles())
+      .filter(file -> file.isDirectory())
+      .flatMap(dir -> Arrays.stream(dir.listFiles()))
+      .filter(file -> file.isFile() && file.getName().endsWith(".cls"))
+      .collect(Collectors.toList());
+    return files;
+  }
+
+  public static File getApexTestFile(String fileName) throws IOException {
+    List<File> files = getApexTestFiles();
+    return files
+      .stream()
+      .filter(file -> file.getName().equals(fileName))
+      .findFirst()
+      .get();
   }
 
   public static JSONObject createJsonRequest(

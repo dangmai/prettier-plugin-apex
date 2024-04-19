@@ -25,7 +25,7 @@ public class ServerTest {
   @Test
   void shouldGetJsonFromNamedApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       String content = TestUtilities.postRequest(
         TestUtilities.createJsonRequest("json", false, file)
       );
@@ -40,7 +40,7 @@ public class ServerTest {
   @Test
   void shouldGetXmlFromNamedApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       String content = TestUtilities.postRequest(
         TestUtilities.createJsonRequest("xml", false, file)
       );
@@ -55,7 +55,7 @@ public class ServerTest {
   @Test
   void shouldGetJsonFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       String content = TestUtilities.postRequest(
         TestUtilities.createJsonRequest("json", true, file)
       );
@@ -70,7 +70,7 @@ public class ServerTest {
   @Test
   void shouldGetXmlFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getTestResourceFile("NonEmptyNamedClass.cls");
+      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
       String content = TestUtilities.postRequest(
         TestUtilities.createJsonRequest("xml", true, file)
       );

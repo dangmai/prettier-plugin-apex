@@ -20,13 +20,13 @@ mkdir "test-npm-module"
 cd test-npm-module
 npm init --yes
 npm install --save-dev prettier prettier-plugin-apex
-cp "$CURRENT_DIR/AnonymousClass.cls" "$location/test-npm-module"
-cp "$CURRENT_DIR/NonEmptyNamedClass.cls" "$location/test-npm-module"
+cp "$CURRENT_DIR/../../tests/anonymous/AnonymousBlock.cls" "$location/test-npm-module"
+cp "$CURRENT_DIR/../../tests/annotated_class/AnnotatedClass.cls" "$location/test-npm-module"
 
-pkg-script "prettier:named" "prettier --plugin=prettier-plugin-apex NonEmptyNamedClass.cls"
-pkg-script "prettier:anonymous" "prettier --plugin=prettier-plugin-apex --parser apex-anonymous AnonymousClass.cls"
+pkg-script "prettier:named" "prettier --plugin=prettier-plugin-apex AnnotatedClass.cls"
+pkg-script "prettier:anonymous" "prettier --plugin=prettier-plugin-apex --parser apex-anonymous AnonymousBlock.cls"
 
-npm run prettier:named | grep NonEmptyNamedClass
+npm run prettier:named | grep TestClass
 npm run prettier:anonymous | grep Hello
 
 rm -rf "$location/test-npm-module"
