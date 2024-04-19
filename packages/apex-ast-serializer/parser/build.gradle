@@ -117,7 +117,7 @@ tasks.register("generateNativeImageConfig") {
         "-f",
         "json",
         "-l",
-        "./src/testFixtures/resources/AnonymousClass.cls"
+        "../../prettier-plugin-apex/tests/anonymous/AnonymousBlock.cls"
       ]
     }
   }
