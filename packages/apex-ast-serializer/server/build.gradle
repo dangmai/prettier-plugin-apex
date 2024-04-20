@@ -24,14 +24,6 @@ sourceSets {
 group 'net.dangmai'
 version '1.0-SNAPSHOT'
 
-application.applicationName = "apex-ast-serializer-http"
-mainClassName = 'net.dangmai.serializer.server.HttpServer'
-applicationDefaultJvmArgs = [
-  "--add-opens=java.base/java.lang=ALL-UNNAMED",
-  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-  "--add-opens=java.base/java.util=ALL-UNNAMED",
-  "--add-opens=java.base/java.text=ALL-UNNAMED"
-]
 task parserStartScripts(type: CreateStartScripts) {
   mainClass.set('net.dangmai.serializer.Apex')
   applicationName = 'apex-ast-serializer'
@@ -45,17 +37,29 @@ task parserStartScripts(type: CreateStartScripts) {
   outputDir = startScripts.outputDir
 }
 
-applicationDistribution.into("bin") {
-  from(parserStartScripts)
-  fileMode = 0755
+application {
+  mainClass.set("net.dangmai.serializer.server.HttpServer")
+  applicationName = "apex-ast-serializer-http"
+  applicationDefaultJvmArgs = [
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.text=ALL-UNNAMED"
+  ]
+  applicationDistribution.into("bin") {
+    from(parserStartScripts)
+    fileMode = 0755
+  }
+
+  applicationDistribution.from("build/typings") {
+    into "typings"
+  }
 }
 
-applicationDistribution.from("build/typings") {
-  into "typings"
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
 }
-
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
 
 repositories {
   flatDir {
@@ -112,6 +116,7 @@ ext {
   slf4jVersion = '2.0.13'
   jettyVersion = '11.0.20'
   jerseyVersion = '3.1.6'
+  junitVersion = '5.10.2'
 }
 
 dependencies {
@@ -144,8 +149,9 @@ dependencies {
   implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
   compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'

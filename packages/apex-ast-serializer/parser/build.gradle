@@ -18,19 +18,25 @@ sourceSets {
   graalvm {}
 }
 
-mainClassName = 'net.dangmai.serializer.Apex'
-applicationDefaultJvmArgs = [
-  "--add-opens=java.base/java.lang=ALL-UNNAMED",
-  "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-  "--add-opens=java.base/java.util=ALL-UNNAMED",
-  "--add-opens=java.base/java.text=ALL-UNNAMED"
-]
+application {
+  mainClass.set("net.dangmai.serializer.Apex")
+  applicationDefaultJvmArgs = [
+    "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
+    "--add-opens=java.base/java.util=ALL-UNNAMED",
+    "--add-opens=java.base/java.text=ALL-UNNAMED"
+  ]
+}
 
-group 'net.dangmai'
-version '1.0-SNAPSHOT'
+java {
+  group 'net.dangmai'
+  version '1.0-SNAPSHOT'
 
-sourceCompatibility = 1.11
-targetCompatibility = 1.11
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
+
 
 repositories {
   flatDir {
@@ -45,6 +51,10 @@ run {
   standardInput = System.in
 }
 
+ext {
+  junitVersion = '5.10.2'
+}
+
 dependencies {
   api name: 'apex-jorje-lsp'
   // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
@@ -57,8 +67,9 @@ dependencies {
   api group: 'commons-io', name: 'commons-io', version: '2.16.1'
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.2'
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.2'
+  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
+  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20240303'
@@ -76,7 +87,7 @@ configurations {
 // `test` task, and the `nativeInstrumentedTest` task.
 tasks.withType(Test) {
   useJUnitPlatform()
-  jvmArgs += applicationDefaultJvmArgs
+  jvmArgs += application.applicationDefaultJvmArgs
   testLogging.showStandardStreams = true
 }
 
@@ -112,7 +123,7 @@ graalvmNative {
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
-      buildArgs.addAll(applicationDefaultJvmArgs)
+      buildArgs.addAll(application.applicationDefaultJvmArgs)
     }
   }
 }
