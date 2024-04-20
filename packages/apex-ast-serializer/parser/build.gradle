@@ -117,7 +117,6 @@ graalvmNative {
   binaries {
     main {
       configurationFileDirectories.from(
-        file('build/native/agent-output/run'),
         file('build/native/agent-output/nativeInstrumentedTest')
       )
       imageName = 'apex-ast-serializer'
@@ -128,36 +127,16 @@ graalvmNative {
   }
 }
 
-tasks.register("generateNativeImageConfig") {
-  doFirst {
-    // Weirdly enough we should run this on an invalid class instead of the
-    // standard one, because it uses the resource bundle that the standard one
-    // doesn't
-    run.configure {
-      args = [
-        "-f",
-        "json",
-        "-l",
-        "../../prettier-plugin-apex/tests/anonymous/AnonymousBlock.cls"
-      ]
-    }
-  }
-  finalizedBy(run)
-}
-
 // This is the task that builds native executable for the host platform.
 // Run it: `gradle buildNative`
 // It contains multiple steps in order to achive this goal:
-// - It runs the main module with a sample Apex file, and uses native-image-agent
+// - It runs the entire test suite, and uses native-image-agent
 // to figure out what reflections/proxies are used as part of that run.
-// - It runs the entire test suite with the same agent, to gather even more information.
 // - Then it uses native-image to compile the final artifacts, using the information
-// in the previous step (which is stored in `build/native/agent-output/run`)
+// in the previous step (which is stored in `build/native/agent-output/`)
 // - The final artifact is produced and stored in `build/native/nativeCompile`
 task buildNative {
-    dependsOn 'generateNativeImageConfig'
-    dependsOn 'nativeInstrumentedTest'
-    dependsOn 'nativeCompile'
-    tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
-    tasks.findByName('nativeCompile').mustRunAfter 'run'
+  dependsOn 'nativeInstrumentedTest'
+  dependsOn 'nativeCompile'
+  tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
 }
