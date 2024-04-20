@@ -274,7 +274,7 @@ interface NativeExecutable {
 export function getNativeExecutable(): NativeExecutable {
   const { arch, platform } = process;
   // This will be bumped automatically when we run the release script for new versions
-  const version = "2.1.0";
+  const version = "2.1.1";
   const filename = `apex-ast-serializer-${version}-${platform}-${arch}${platform === "win32" ? ".exe" : ""}`;
   const serializerBin = getSerializerBinDirectory();
   return {

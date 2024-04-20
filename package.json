@@ -1,6 +1,6 @@
 {
   "name": "monorepo-prettier-plugin-apex",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Monorepo for the Prettier Apex project",
   "main": "index.js",
   "scripts": {
