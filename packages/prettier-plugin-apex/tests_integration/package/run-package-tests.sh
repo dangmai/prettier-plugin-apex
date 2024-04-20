@@ -7,6 +7,7 @@ set -euxo pipefail
 
 function pkg-script () {
   echo $(jq --arg key "${1}" --arg val "${2}" '.scripts[$key]=$val' package.json) > package.json
+  npx prettier --write package.json
 }
 
 CURRENT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
