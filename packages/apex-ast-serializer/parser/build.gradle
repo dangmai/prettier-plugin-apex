@@ -110,7 +110,10 @@ graalvmNative {
   }
   binaries {
     main {
-      configurationFileDirectories.from(file('build/native/agent-output/run'))
+      configurationFileDirectories.from(
+        file('build/native/agent-output/run'),
+        file('build/native/agent-output/nativeInstrumentedTest')
+      )
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
