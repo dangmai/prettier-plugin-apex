@@ -9,6 +9,12 @@ function read(filename: string): string {
   return fs.readFileSync(filename, "utf8");
 }
 
+const PARSER_OPTIONS = {
+  apexStandaloneParser: "built-in",
+  apexStandalonePort: 2117,
+  apexStandaloneHost: "localhost",
+};
+
 async function prettyPrint(
   src: string,
   filename: string,
@@ -16,9 +22,7 @@ async function prettyPrint(
 ): Promise<string> {
   return prettier.format(src, {
     filepath: filename,
-    apexStandaloneParser: "built-in",
-    apexStandalonePort: 2117,
-    apexStandaloneHost: "localhost",
+    ...PARSER_OPTIONS,
     ...options,
   });
 }
@@ -28,9 +32,7 @@ async function parse(string: string, opts: prettier.Options): Promise<any> {
   const result = await prettier.__debug.parse(
     string,
     {
-      apexStandaloneParser: "built-in",
-      apexStandalonePort: 2117,
-      apexStandaloneHost: "localhost",
+      ...PARSER_OPTIONS,
       ...opts,
     },
     {
