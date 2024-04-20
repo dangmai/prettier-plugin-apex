@@ -1,8 +1,8 @@
 /* eslint no-param-reassign: 0 */
-import fs from "fs";
-import nodePath from "path";
+import fs from "node:fs/promises";
+import nodePath from "node:path";
+import * as url from "node:url";
 import { AstPath } from "prettier";
-import * as url from "url";
 
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants.js";
@@ -240,24 +240,22 @@ export function getPrecedence(op: string): number {
   return precedence;
 }
 
-export function doesFileExist(file: string): boolean {
-  try {
-    fs.accessSync(file);
-    return true;
-  } catch (err) {
-    return false;
-  }
+export async function doesFileExist(file: string): Promise<boolean> {
+  return fs
+    .access(file, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => false);
 }
 
 // The relative path to the binary can be different based on how the script
 // is being run - running using tsx vs running after code has been compiled
 // to `dist` directory. We use this method to abstract out that difference.
-export function getSerializerBinDirectory(): string {
+export async function getSerializerBinDirectory(): Promise<string> {
   let serializerBin = nodePath.join(
     url.fileURLToPath(new URL(".", import.meta.url)),
     "../vendor/apex-ast-serializer/bin",
   );
-  if (!doesFileExist(serializerBin)) {
+  if (!(await doesFileExist(serializerBin))) {
     serializerBin = nodePath.join(
       url.fileURLToPath(new URL(".", import.meta.url)),
       "../../vendor/apex-ast-serializer/bin",
@@ -271,12 +269,12 @@ interface NativeExecutable {
   filename: string;
   version: string;
 }
-export function getNativeExecutable(): NativeExecutable {
+export async function getNativeExecutable(): Promise<NativeExecutable> {
   const { arch, platform } = process;
   // This will be bumped automatically when we run the release script for new versions
   const version = "2.1.1";
   const filename = `apex-ast-serializer-${version}-${platform}-${arch}${platform === "win32" ? ".exe" : ""}`;
-  const serializerBin = getSerializerBinDirectory();
+  const serializerBin = await getSerializerBinDirectory();
   return {
     version,
     path: nodePath.join(serializerBin, filename),

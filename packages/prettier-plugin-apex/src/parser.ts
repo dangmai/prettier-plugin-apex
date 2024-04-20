@@ -590,8 +590,8 @@ export default async function parse(
       options.parser === "apex-anonymous",
     );
   } else if (options.apexStandaloneParser === "native") {
-    const { path: serializerBin } = getNativeExecutable();
-    if (!doesFileExist(serializerBin)) {
+    const { path: serializerBin } = await getNativeExecutable();
+    if (!(await doesFileExist(serializerBin))) {
       throw new Error(
         "Native executable does not exist. Please download with `npx install-apex-executables`",
       );
@@ -604,7 +604,7 @@ export default async function parse(
   } else {
     serializedAst = await parseTextWithSpawn(
       path.join(
-        getSerializerBinDirectory(),
+        await getSerializerBinDirectory(),
         `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`,
       ),
       sourceCode,

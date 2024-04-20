@@ -13,7 +13,7 @@ export async function start(
   password: string,
   allowedOrigins?: string,
 ): Promise<ChildProcess> {
-  let serializerBin = getSerializerBinDirectory();
+  let serializerBin = await getSerializerBinDirectory();
   if (process.platform === "win32") {
     serializerBin = path.join(serializerBin, "apex-ast-serializer-http.bat");
   } else {
