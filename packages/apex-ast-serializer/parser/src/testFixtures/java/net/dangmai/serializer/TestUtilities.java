@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -57,7 +58,11 @@ public class TestUtilities {
       .stream()
       .map(resource -> new File(resource.getFile()))
       .filter(
-        f -> f.isDirectory() && f.getAbsolutePath().endsWith("resources/test")
+        f ->
+          f.isDirectory() &&
+          f
+            .getAbsolutePath()
+            .endsWith(Paths.get("resources", "test").toString())
       )
       .findFirst()
       .get();
