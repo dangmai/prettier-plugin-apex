@@ -13,134 +13,201 @@ public class CliTest {
 
   @BeforeEach
   public void setup() {
-    byteArrayOutputStream = new ByteArrayOutputStream();
     console = System.out;
   }
 
   @Test
   void shouldGetJsonFromNamedApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(null, new String[] { "-f", "json", "-l", file.getAbsolutePath() });
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(
+              null,
+              new String[] { "-f", "json", "-l", file.getAbsolutePath() }
+            );
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isJSONValid(content),
-        "Content should be valid JSON"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isJSONValid(content),
+              "Content should be valid JSON"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetJsonFromStdinApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(new FileInputStream(file), new String[] { "-f", "json" });
 
-      runCli(new FileInputStream(file), new String[] { "-f", "json" });
-
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isJSONValid(content),
-        "Content should be valid JSON"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isJSONValid(content),
+              "Content should be valid JSON"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetXmlFromNamedApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(null, new String[] { "-f", "xml", "-l", file.getAbsolutePath() });
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(
+              null,
+              new String[] { "-f", "xml", "-l", file.getAbsolutePath() }
+            );
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isXmlValid(content),
-        "Content should be valid XML"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isXmlValid(content),
+              "Content should be valid XML"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetXmlFromStdinApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(new FileInputStream(file), new String[] { "-f", "xml" });
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(new FileInputStream(file), new String[] { "-f", "xml" });
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isXmlValid(content),
-        "Content should be valid xml"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isXmlValid(content),
+              "Content should be valid xml"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetJsonFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(
-        null,
-        new String[] { "-a", "-f", "json", "-l", file.getAbsolutePath() }
-      );
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isJSONValid(content),
-        "Content should be valid JSON"
-      );
+            runCli(
+              null,
+              new String[] { "-a", "-f", "json", "-l", file.getAbsolutePath() }
+            );
+
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isJSONValid(content),
+              "Content should be valid JSON"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetJsonFromStdinAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(new FileInputStream(file), new String[] { "-a", "-f", "json" });
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(
+              new FileInputStream(file),
+              new String[] { "-a", "-f", "json" }
+            );
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isJSONValid(content),
-        "Content should be valid JSON"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isJSONValid(content),
+              "Content should be valid JSON"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetXmlFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(
-        null,
-        new String[] { "-a", "-f", "xml", "-l", file.getAbsolutePath() }
-      );
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(
+              null,
+              new String[] { "-a", "-f", "xml", "-l", file.getAbsolutePath() }
+            );
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isXmlValid(content),
-        "Content should be valid XML"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isXmlValid(content),
+              "Content should be valid XML"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 
   @Test
   void shouldGetXmlFromStdinAnonymousApexFile() {
     assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      runCli(new FileInputStream(file), new String[] { "-a", "-f", "xml" });
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(
+              new FileInputStream(file),
+              new String[] { "-a", "-f", "xml" }
+            );
 
-      String content = byteArrayOutputStream.toString();
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isXmlValid(content),
-        "Content should be valid xml"
-      );
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isXmlValid(content),
+              "Content should be valid xml"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
     });
   }
 

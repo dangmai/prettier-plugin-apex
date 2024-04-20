@@ -72,9 +72,16 @@ configurations {
   nativeImageClasspath.extendsFrom(graalvmImplementation)
 }
 
-test {
+// Common configs for all Test tasks. Currently this includes the standard
+// `test` task, and the `nativeInstrumentedTest` task.
+tasks.withType(Test) {
   useJUnitPlatform()
+  jvmArgs += applicationDefaultJvmArgs
   testLogging.showStandardStreams = true
+}
+
+// This task can be used to run tests under native instrumentation
+task nativeInstrumentedTest(type: Test) {
 }
 
 graalvmNative {
@@ -98,7 +105,10 @@ graalvmNative {
   }
   binaries {
     main {
-      configurationFileDirectories.from(file('build/native/agent-output/run'))
+      configurationFileDirectories.from(
+        file('build/native/agent-output/run'),
+        file('build/native/agent-output/nativeInstrumentedTest')
+      )
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
@@ -129,11 +139,14 @@ tasks.register("generateNativeImageConfig") {
 // It contains multiple steps in order to achive this goal:
 // - It runs the main module with a sample Apex file, and uses native-image-agent
 // to figure out what reflections/proxies are used as part of that run.
+// - It runs the entire test suite with the same agent, to gather even more information.
 // - Then it uses native-image to compile the final artifacts, using the information
 // in the previous step (which is stored in `build/native/agent-output/run`)
 // - The final artifact is produced and stored in `build/native/nativeCompile`
 task buildNative {
     dependsOn 'generateNativeImageConfig'
+    dependsOn 'nativeInstrumentedTest'
     dependsOn 'nativeCompile'
+    tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
     tasks.findByName('nativeCompile').mustRunAfter 'run'
 }

@@ -1,3 +1,7 @@
+# 2.1.1
+
+- Fix native executable not having generated with enough reflection metadata ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1335)).
+
 # 2.1.0
 
 - Add support for Null Coalescing Expression ([doc](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_NullCoalescingOper.htm&release=248&type=5)).

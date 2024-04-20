@@ -89,28 +89,27 @@ public class Apex {
     Mapper defaultMapper = (new XStream()).getMapper();
     XStream xstream;
     if (format == OutputFormat.JSON) {
-      xstream =
-        new XStream(
-          null,
-          new JsonHierarchicalStreamDriver() {
-            @Override
-            public HierarchicalStreamWriter createWriter(Writer writer) {
-              if (prettyPrint) {
-                // By default, JSON is pretty printed
-                return super.createWriter(writer);
-              }
-              JsonWriter.Format format = new JsonWriter.Format(
-                new char[0],
-                "".toCharArray(),
-                JsonWriter.Format.SPACE_AFTER_LABEL |
-                JsonWriter.Format.COMPACT_EMPTY_ELEMENT
-              );
-              return new CustomJsonWriter(writer, format);
+      xstream = new XStream(
+        null,
+        new JsonHierarchicalStreamDriver() {
+          @Override
+          public HierarchicalStreamWriter createWriter(Writer writer) {
+            if (prettyPrint) {
+              // By default, JSON is pretty printed
+              return super.createWriter(writer);
             }
-          },
-          new ClassLoaderReference(new CompositeClassLoader()),
-          new WithClassMapper(defaultMapper)
-        );
+            JsonWriter.Format format = new JsonWriter.Format(
+              new char[0],
+              "".toCharArray(),
+              JsonWriter.Format.SPACE_AFTER_LABEL |
+              JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+            );
+            return new CustomJsonWriter(writer, format);
+          }
+        },
+        new ClassLoaderReference(new CompositeClassLoader()),
+        new WithClassMapper(defaultMapper)
+      );
       setUpXStream(xstream, mode);
 
       xstream.toXML(output, writer);
@@ -173,12 +172,14 @@ public class Apex {
       System.out.println("Format not specified or not supported.");
     } else {
       if (cmd.hasOption("l")) {
-        apexReader = new FileReader(cmd.getOptionValue("l"));
+        apexReader = new FileReader(
+          cmd.getOptionValue("l"),
+          StandardCharsets.UTF_8
+        );
       } else {
-        apexReader =
-          new BufferedReader(
-            new InputStreamReader(System.in, StandardCharsets.UTF_8)
-          );
+        apexReader = new BufferedReader(
+          new InputStreamReader(System.in, StandardCharsets.UTF_8)
+        );
       }
       Writer writer = new OutputStreamWriter(
         System.out,
