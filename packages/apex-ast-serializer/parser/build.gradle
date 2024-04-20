@@ -76,6 +76,7 @@ configurations {
 // `test` task, and the `nativeInstrumentedTest` task.
 tasks.withType(Test) {
   useJUnitPlatform()
+  jvmArgs += applicationDefaultJvmArgs
   testLogging.showStandardStreams = true
 }
 
