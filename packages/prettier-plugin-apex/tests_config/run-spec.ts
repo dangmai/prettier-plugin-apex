@@ -50,7 +50,6 @@ function runSpec(
   parsers: string[],
   specOptions?: prettier.Options,
 ): void {
-  /* istanbul ignore if */
   if (!parsers || !parsers.length) {
     throw new Error(`No parsers were specified for ${dirname}`);
   }
