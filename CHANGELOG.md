@@ -1,3 +1,11 @@
+# Unreleased
+
+## Internal Changes
+
+- Native executable location has been moved to be under the `vendor` directory.
+  This should not affect any usage of the library,
+  unless you are referencing this location from a custom script.
+
 # 2.1.1
 
 - Fix native executable not having generated with enough reflection metadata ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1335)).

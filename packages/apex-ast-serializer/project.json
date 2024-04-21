@@ -12,7 +12,7 @@
       "executor": "nx:run-commands",
       "inputs": ["gradle", "default"],
       "outputs": [
-        "{workspaceRoot}/packages/prettier-plugin-apex/vendor",
+        "{workspaceRoot}/packages/prettier-plugin-apex/vendor/apex-ast-serializer",
         "{projectRoot}/server/build"
       ],
       "options": {

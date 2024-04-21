@@ -277,7 +277,7 @@ export async function getNativeExecutable(): Promise<NativeExecutable> {
   const serializerBin = await getSerializerBinDirectory();
   return {
     version,
-    path: nodePath.join(serializerBin, filename),
+    path: nodePath.join(serializerBin, "..", "..", filename),
     filename,
   };
 }
