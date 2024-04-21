@@ -32,6 +32,7 @@ export default defineConfig({
   test: {
     coverage: {
       enabled: ENABLE_COVERAGE,
+      include: ["src/**/*.ts"],
     },
     setupFiles: ["tests_config/run-spec.ts"],
   },
