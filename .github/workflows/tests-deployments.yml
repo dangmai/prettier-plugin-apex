@@ -88,6 +88,9 @@ jobs:
         uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          flags: prettier-plugin-apex
+          directory: packages/prettier-plugin-apex/coverage
 
       - name: Install integration test suite dependencies
         if: env.RUN_INTEGRATION_TESTS == 'true'
