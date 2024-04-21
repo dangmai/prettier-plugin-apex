@@ -113,14 +113,14 @@ importers:
         specifier: 18.2.4
         version: 18.2.4
       '@types/node':
-        specifier: 18.16.9
-        version: 18.16.9
+        specifier: 18.19.31
+        version: 18.19.31
       '@types/wait-on':
         specifier: 5.3.4
         version: 5.3.4
       '@vitest/coverage-v8':
         specifier: 1.5.0
-        version: 1.5.0(vitest@1.5.0(@types/node@18.16.9))
+        version: 1.5.0(vitest@1.5.0(@types/node@18.19.31))
       rimraf:
         specifier: 5.0.5
         version: 5.0.5
@@ -130,15 +130,12 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-      undici:
-        specifier: 6.13.0
-        version: 6.13.0
       vite:
         specifier: 5.2.10
-        version: 5.2.10(@types/node@18.16.9)
+        version: 5.2.10(@types/node@18.19.31)
       vitest:
         specifier: 1.5.0
-        version: 1.5.0(@types/node@18.16.9)
+        version: 1.5.0(@types/node@18.19.31)
 
 packages:
 
@@ -826,6 +823,9 @@ packages:
 
   '@types/node@18.16.9':
     resolution: {integrity: sha512-IeB32oIV4oGArLrd7znD2rkHQ6EDCM+2Sr76dJnrHwv9OHBTTM6nuDLK9bmikXzPa0ZlWMWtRGo/Uw4mrzQedA==}
+
+  '@types/node@18.19.31':
+    resolution: {integrity: sha512-ArgCD39YpyyrtFKIqMDvjz79jto5fcI/SVUs2HwB+f0dAzq68yqOdyaSivLiLugSziTpNXLQrVb7RZFmdZzbhA==}
 
   '@types/prop-types@15.7.12':
     resolution: {integrity: sha512-5zvhXYtRNRluoE/jAp4GVsSduVUzNWKkOZrCDBWYtE7biZywwdC2AcEzg+cSMLFRfVgeAFqpfNabiPjxFddV1Q==}
@@ -2474,9 +2474,8 @@ packages:
   unbox-primitive@1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
 
-  undici@6.13.0:
-    resolution: {integrity: sha512-Q2rtqmZWrbP8nePMq7mOJIN98M0fYvSgV89vwl/BQRT4mDOeY2GXZngfGpcBBhtky3woM7G24wZV3Q304Bv6cw==}
-    engines: {node: '>=18.0'}
+  undici-types@5.26.5:
+    resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
   universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
@@ -3157,7 +3156,12 @@ snapshots:
 
   '@types/json5@0.0.29': {}
 
-  '@types/node@18.16.9': {}
+  '@types/node@18.16.9':
+    optional: true
+
+  '@types/node@18.19.31':
+    dependencies:
+      undici-types: 5.26.5
 
   '@types/prop-types@15.7.12': {}
 
@@ -3174,7 +3178,7 @@ snapshots:
 
   '@types/wait-on@5.3.4':
     dependencies:
-      '@types/node': 18.16.9
+      '@types/node': 18.19.31
 
   '@typescript-eslint/eslint-plugin@7.7.0(@typescript-eslint/parser@7.7.0(eslint@8.57.0)(typescript@5.4.5))(eslint@8.57.0)(typescript@5.4.5)':
     dependencies:
@@ -3275,7 +3279,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@1.5.0(vitest@1.5.0(@types/node@18.16.9))':
+  '@vitest/coverage-v8@1.5.0(vitest@1.5.0(@types/node@18.19.31))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 0.2.3
@@ -3290,7 +3294,7 @@ snapshots:
       std-env: 3.7.0
       strip-literal: 2.1.0
       test-exclude: 6.0.0
-      vitest: 1.5.0(@types/node@18.16.9)
+      vitest: 1.5.0(@types/node@18.19.31)
     transitivePeerDependencies:
       - supports-color
 
@@ -5062,7 +5066,7 @@ snapshots:
       has-symbols: 1.0.3
       which-boxed-primitive: 1.0.2
 
-  undici@6.13.0: {}
+  undici-types@5.26.5: {}
 
   universalify@2.0.1: {}
 
@@ -5082,13 +5086,13 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite-node@1.5.0(@types/node@18.16.9):
+  vite-node@1.5.0(@types/node@18.19.31):
     dependencies:
       cac: 6.7.14
       debug: 4.3.4
       pathe: 1.1.2
       picocolors: 1.0.0
-      vite: 5.2.10(@types/node@18.16.9)
+      vite: 5.2.10(@types/node@18.19.31)
     transitivePeerDependencies:
       - '@types/node'
       - less
@@ -5112,7 +5116,16 @@ snapshots:
       '@types/node': 18.16.9
       fsevents: 2.3.3
 
-  vitest@1.5.0(@types/node@18.16.9):
+  vite@5.2.10(@types/node@18.19.31):
+    dependencies:
+      esbuild: 0.20.2
+      postcss: 8.4.38
+      rollup: 4.16.0
+    optionalDependencies:
+      '@types/node': 18.19.31
+      fsevents: 2.3.3
+
+  vitest@1.5.0(@types/node@18.19.31):
     dependencies:
       '@vitest/expect': 1.5.0
       '@vitest/runner': 1.5.0
@@ -5131,11 +5144,11 @@ snapshots:
       strip-literal: 2.1.0
       tinybench: 2.7.0
       tinypool: 0.8.4
-      vite: 5.2.10(@types/node@18.16.9)
-      vite-node: 1.5.0(@types/node@18.16.9)
+      vite: 5.2.10(@types/node@18.19.31)
+      vite-node: 1.5.0(@types/node@18.19.31)
       why-is-node-running: 2.2.2
     optionalDependencies:
-      '@types/node': 18.16.9
+      '@types/node': 18.19.31
     transitivePeerDependencies:
       - less
       - lightningcss
