@@ -6,11 +6,30 @@
       "script": "start-server",
       "label": "Run HTTP Apex Parsing Server",
       "isBackground": true,
-      "problemMatcher": [],
+      "problemMatcher": {
+        "owner": "custom",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "INFO org.eclipse.jetty.server.Server",
+          "endsPattern": "Server listening on"
+        }
+      },
       "path": "packages/prettier-plugin-apex",
       "runOptions": {
         "runOn": "folderOpen"
       }
+    },
+    {
+      "type": "npm",
+      "script": "dev",
+      "label": "Playground Dev",
+      "isBackground": true,
+      "problemMatcher": [],
+      "path": "packages/playground",
+      "dependsOn": ["Run HTTP Apex Parsing Server"]
     }
   ]
 }
