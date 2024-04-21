@@ -16,6 +16,7 @@ export function insertPragma(text: string): string {
     comments: parsedDocblock.comments.replace(/^(\s+?\r?\n)+/, ""), // remove leading newlines
   }).replace(/(\r\n|\r)/g, "\n"); // normalise newlines (mitigate use of os.EOL by jest-docblock)
   const strippedText = strip(text);
+  /* v8 ignore next 1 */
   const separatingNewlines = strippedText.startsWith("\n") ? "\n" : "\n\n";
   return newDocblock + separatingNewlines + strippedText;
 }

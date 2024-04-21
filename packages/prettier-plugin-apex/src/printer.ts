@@ -415,6 +415,7 @@ function handleLiteralExpression(
       node.loc.endIndex,
     );
     let lastCharacter = literal[literal.length - 1];
+    /* v8 ignore next 3 */
     if (lastCharacter === undefined) {
       lastCharacter = "";
     }
@@ -917,10 +918,12 @@ function handleStatement(
     case "apex.jorje.data.ast.Stmnt$DmlUndeleteStmnt":
       doc = "undelete";
       break;
+    /* v8 ignore start */
     default:
       throw new Error(
         `Statement ${childClass} is not supported. Please file a bug report.`,
       );
+    /* v8 ignore stop */
   }
   const node = path.getNode();
   const parts: Doc[] = [];
@@ -2390,6 +2393,7 @@ function handleWhereQueryLiteral(
   if (doc) {
     return doc;
   }
+  /* v8 ignore next 1 */
   return "";
 }
 
@@ -2658,12 +2662,14 @@ function handleUsingType(path: AstPath, print: printFn): Doc {
 }
 
 function handleModifier(childClass: string): Doc {
-  const modifierValue = MODIFIER[childClass as jorje.Modifier["@class"]] || "";
-  if (!modifierValue) {
+  /* v8 ignore start */
+  if (!(childClass in MODIFIER)) {
     throw new Error(
       `Modifier ${childClass} is not supported. Please file a bug report.`,
     );
   }
+  /* v8 ignore stop */
+  const modifierValue = MODIFIER[childClass as jorje.Modifier["@class"]];
   return [modifierValue, " "];
 }
 
@@ -3202,9 +3208,11 @@ function genericPrint(
       );
     }
   }
+  /* v8 ignore start */
   throw new Error(
     `No handler found for ${apexClass}. Please file a bug report.`,
   );
+  /* v8 ignore stop */
 }
 
 let options: prettier.ParserOptions;

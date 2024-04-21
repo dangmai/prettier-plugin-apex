@@ -15,6 +15,6 @@
     "outDir": "./dist",
     "sourceMap": true,
     "inlineSourceMap": false,
-    "types": ["vite/client", "jest"]
+    "types": ["vite/client"]
   }
 }

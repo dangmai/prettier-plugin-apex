@@ -1,0 +1,3 @@
+class ClassDeclarationWithInlineComment {
+}
+// Test comment

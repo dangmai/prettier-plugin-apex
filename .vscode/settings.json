@@ -12,5 +12,10 @@
     "./packages/playground",
     "./packages/prettier-plugin-apex"
   ],
-  "java.configuration.updateBuildConfiguration": "automatic"
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "vitest.rootConfig": "packages/prettier-plugin-apex/vite.config.ts",
+  "vitest.nodeEnv": {
+    "AST_COMPARE": "1",
+    "APEX_PARSER": "built-in"
+  }
 }

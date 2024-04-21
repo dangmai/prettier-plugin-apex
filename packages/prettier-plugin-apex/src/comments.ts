@@ -89,6 +89,7 @@ export function printDanglingComment(
   let fromPos = skipWhitespace(sourceCode, loc.startIndex - 1, {
     backwards: true,
   });
+  /* v8 ignore next 3 */
   if (fromPos === false) {
     return "";
   }
@@ -96,7 +97,8 @@ export function printDanglingComment(
   const leadingSpace = sourceCode.slice(fromPos, loc.startIndex);
   const numberOfNewLines = isFirstComment
     ? 0
-    : (leadingSpace.match(/\n/g) || []).length;
+    : /* v8 ignore next 1 */
+      (leadingSpace.match(/\n/g) || []).length;
 
   if (numberOfNewLines > 0) {
     // If the leading space contains newlines, then add at most 2 new lines

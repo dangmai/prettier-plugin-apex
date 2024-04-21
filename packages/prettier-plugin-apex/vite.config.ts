@@ -1,6 +1,8 @@
 import { resolve } from "path";
-// eslint-disable-next-line import/no-extraneous-dependencies -- use shared vite in root dir
-import { defineConfig } from "vite";
+// eslint-disable-next-line import/extensions -- eslint thinks this is a file
+import { defineConfig } from "vitest/config";
+
+const ENABLE_COVERAGE = !!process.env["CI"];
 
 export default defineConfig({
   build: {
@@ -26,5 +28,12 @@ export default defineConfig({
         },
       },
     },
+  },
+  test: {
+    coverage: {
+      enabled: ENABLE_COVERAGE,
+      include: ["src/**/*.ts"],
+    },
+    setupFiles: ["tests_config/run-spec.ts"],
   },
 });

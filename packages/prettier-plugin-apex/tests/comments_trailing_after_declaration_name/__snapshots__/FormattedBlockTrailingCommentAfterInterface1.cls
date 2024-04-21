@@ -1,0 +1,3 @@
+interface InlineTrailingCommentAfterInterface {
+  // Inline Comment
+}
