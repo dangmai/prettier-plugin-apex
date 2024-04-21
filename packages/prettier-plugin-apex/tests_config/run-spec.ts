@@ -84,7 +84,7 @@ function runSpec(
       mergedOptions.forEach((mergedOpts, index) => {
         let output: string;
         test.concurrent(
-          `Format ${mergedOpts.parser}: ${filename}`,
+          `Format ${mergedOpts.parser}: ${filename} ${index + 1}`,
           async ({ expect }) => {
             output = await prettyPrint(source, path, mergedOpts);
             expect(output).toMatchFileSnapshot(
@@ -97,14 +97,16 @@ function runSpec(
         );
 
         if (AST_COMPARE) {
-          test(`Verify AST: ${filename}`, async ({ expect }) => {
+          test(`Verify AST: ${filename} ${index + 1}`, async ({ expect }) => {
             const ast = await parse(source, mergedOpts);
             const ppast = await parse(output, mergedOpts);
             expect(ppast).toBeDefined();
             expect(ast).toEqual(ppast);
           });
 
-          test(`Stable format: ${filename}`, async ({ expect }) => {
+          test(`Stable format: ${filename} ${index + 1}`, async ({
+            expect,
+          }) => {
             const secondOutput = await prettyPrint(output, path, mergedOpts);
             expect(secondOutput).toEqual(output);
           });
