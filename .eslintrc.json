@@ -22,7 +22,7 @@
         "devDependencies": ["tests*/**/*.ts", "vite.config.ts"]
       }
     ],
-    "import/extensions": [2, "always"],
+    "import/extensions": [2, "ignorePackages"],
     "default-case": 0
   },
   "globals": {
