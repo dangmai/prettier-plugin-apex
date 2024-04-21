@@ -1,7 +1,7 @@
 {
   "recommendations": [
     "esbenp.prettier-vscode",
-    "alesforce.salesforcedx-vscode",
+    "salesforce.salesforcedx-vscode",
     "vitest.explorer",
     "dbaeumer.vscode-eslint",
     "vscjava.vscode-java-pack",
