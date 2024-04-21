@@ -3,7 +3,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import prettier from "prettier";
-// eslint-disable-next-line import/no-extraneous-dependencies -- use shared vite in root dir
+// eslint-disable-next-line import/no-extraneous-dependencies -- this file is only used in dev mode
 import { describe, expect, it } from "vitest";
 import * as prettierApex from "../../src/index.js";
 

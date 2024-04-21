@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { basename, extname, join } from "node:path";
 import prettier from "prettier";
-// eslint-disable-next-line import/no-extraneous-dependencies -- use shared vite in root dir
+// eslint-disable-next-line import/no-extraneous-dependencies -- this file is only used in dev mode
 import { test } from "vitest";
 
 import * as prettierApex from "../src/index.js";

@@ -1,5 +1,5 @@
 import { resolve } from "path";
-// eslint-disable-next-line import/no-extraneous-dependencies, import/extensions -- use shared vite in root dir
+// eslint-disable-next-line import/no-extraneous-dependencies, import/extensions -- vitest is in devDependencies and it's fine
 import { defineConfig } from "vitest/config";
 
 const ENABLE_COVERAGE = !!process.env["CI"];
