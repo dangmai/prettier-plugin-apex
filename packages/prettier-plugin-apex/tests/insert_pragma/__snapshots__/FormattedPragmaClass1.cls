@@ -1,0 +1,4 @@
+/** @format */
+
+class PragmaClass {
+}

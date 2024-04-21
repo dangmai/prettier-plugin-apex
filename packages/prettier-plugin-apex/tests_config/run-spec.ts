@@ -1,7 +1,10 @@
-import fs from "fs";
-import { wrap } from "jest-snapshot-serializer-raw";
-import { extname } from "path";
+import fs from "node:fs";
+import { basename, extname, join } from "node:path";
 import prettier from "prettier";
+// eslint-disable-next-line import/no-extraneous-dependencies -- use shared vite in root dir
+import { test } from "vitest";
+
+import * as prettierApex from "../src/index.js";
 
 const { AST_COMPARE, APEX_PARSER } = process.env;
 
@@ -54,8 +57,9 @@ function runSpec(
 
   fs.readdirSync(dirname).forEach((filename: string) => {
     const path = `${dirname}${filename}`;
+    const extension = extname(filename);
+    const baseName = basename(filename, extension);
     if (
-      extname(filename) !== ".snap" &&
       fs.lstatSync(path).isFile() &&
       filename[0] !== "." &&
       filename !== "jsfmt.spec.ts"
@@ -73,29 +77,35 @@ function runSpec(
         options.push({});
       }
       const mergedOptions = options.map((opts: prettier.Options) => ({
-        plugins: ["./src/index.ts"],
+        plugins: [prettierApex],
         ...opts,
         parser: parsers[0],
       }));
 
-      mergedOptions.forEach((mergedOpts) => {
+      mergedOptions.forEach((mergedOpts, index) => {
         let output: string;
-        test(`Format ${mergedOpts.parser}: ${filename}`, async () => {
-          output = await prettyPrint(source, path, mergedOpts);
-          expect(wrap(`${source}${"~".repeat(80)}\n${output}`)).toMatchSnapshot(
-            filename,
-          );
-        });
+        test.concurrent(
+          `Format ${mergedOpts.parser}: ${filename}`,
+          async ({ expect }) => {
+            output = await prettyPrint(source, path, mergedOpts);
+            expect(output).toMatchFileSnapshot(
+              join(
+                "__snapshots__",
+                `Formatted${baseName}${index + 1}${extension}`,
+              ),
+            );
+          },
+        );
 
         if (AST_COMPARE) {
-          test(`Verify AST: ${filename}`, async () => {
+          test(`Verify AST: ${filename}`, async ({ expect }) => {
             const ast = await parse(source, mergedOpts);
             const ppast = await parse(output, mergedOpts);
             expect(ppast).toBeDefined();
             expect(ast).toEqual(ppast);
           });
 
-          test(`Stable format: ${filename}`, async () => {
+          test(`Stable format: ${filename}`, async ({ expect }) => {
             const secondOutput = await prettyPrint(output, path, mergedOpts);
             expect(secondOutput).toEqual(output);
           });

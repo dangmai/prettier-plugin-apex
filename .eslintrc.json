@@ -28,11 +28,7 @@
   "globals": {
     "runSpec": true
   },
-  "env": {
-    "jest": true
-  },
   "parserOptions": {
     "project": "./tsconfig.json"
-  },
-  "ignorePatterns": ["jest.*.js"]
+  }
 }

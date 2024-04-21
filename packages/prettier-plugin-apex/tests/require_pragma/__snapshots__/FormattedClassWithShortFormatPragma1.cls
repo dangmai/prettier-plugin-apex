@@ -1,0 +1,3 @@
+/** @format */
+class ClassWithShortFormatPragma {
+}

@@ -25,7 +25,7 @@
     "build:standalone": "vite build",
     "clean": "rimraf node_modules dist",
     "pretest": "pnpm run lint",
-    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "test": "vitest run",
     "test:parser:built-in": "cross-env APEX_PARSER=built-in pnpm test",
     "test:parser:native": "cross-env APEX_PARSER=native pnpm test",
     "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c '*'",
