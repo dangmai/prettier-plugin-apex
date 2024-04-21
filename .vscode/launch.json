@@ -10,13 +10,14 @@
       "name": "Jest All",
       "program": "${workspaceFolder}/packages/prettier-plugin-apex/node_modules/jest/bin/jest.js",
       "cwd": "${workspaceFolder}/packages/prettier-plugin-apex",
-      "args": ["-c", "jest.config.standalone.js", "--runInBand"],
+      "args": ["--runInBand"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "env": {
-        "NODE_OPTIONS": "--experimental-vm-modules"
+        "NODE_OPTIONS": "--experimental-vm-modules",
+        "APEX_PARSER": "built-in"
       }
     },
     {
@@ -25,18 +26,14 @@
       "name": "Jest Current File",
       "program": "${workspaceFolder}/packages/prettier-plugin-apex/node_modules/jest/bin/jest.js",
       "cwd": "${workspaceFolder}/packages/prettier-plugin-apex",
-      "args": [
-        "--runTestsByPath",
-        "${file}",
-        "-c",
-        "jest.config.standalone.js"
-      ],
+      "args": ["--runTestsByPath", "${file}"],
       "skipFiles": ["<node_internals>/**"],
       "console": "integratedTerminal",
       "internalConsoleOptions": "neverOpen",
       "disableOptimisticBPs": true,
       "env": {
-        "NODE_OPTIONS": "--experimental-vm-modules"
+        "NODE_OPTIONS": "--experimental-vm-modules",
+        "APEX_PARSER": "built-in"
       }
     }
   ]

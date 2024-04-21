@@ -11,7 +11,7 @@ pnpm install
 pnpm nx run prettier-plugin-apex:lint
 pnpm nx run prettier-plugin-apex:start-server # This spins up the built in HTTP parsing server
 # In another terminal
-pnpm nx run prettier-plugin-apex:test:standalone
+pnpm nx run prettier-plugin-apex:test:parser:built-in
 # When you are done
 pnpm nx run prettier-plugin-apex:stop-server
 ```

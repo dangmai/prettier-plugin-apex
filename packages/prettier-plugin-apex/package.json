@@ -26,7 +26,8 @@
     "clean": "rimraf node_modules dist",
     "pretest": "pnpm run lint",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
-    "test:standalone": "pnpm test -- -c jest.config.standalone.js",
+    "test:parser:built-in": "cross-env APEX_PARSER=built-in pnpm test",
+    "test:parser:native": "cross-env APEX_PARSER=native pnpm test",
     "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c '*'",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
     "stop-server": "tsx bin/stop-apex-server.ts",
@@ -70,16 +71,29 @@
       "test": {
         "dependsOn": [
           "build:dev"
-        ]
+        ],
+        "outputs": [
+          "{projectRoot}/coverage"
+        ],
+        "cache": false
       },
-      "test:standalone": {
+      "test:parser:built-in": {
         "dependsOn": [
           "build:dev"
         ],
         "outputs": [
           "{projectRoot}/coverage"
         ],
-        "cache": true
+        "cache": false
+      },
+      "test:parser:native": {
+        "dependsOn": [
+          "build:dev"
+        ],
+        "outputs": [
+          "{projectRoot}/coverage"
+        ],
+        "cache": false
       },
       "build:dev": {
         "dependsOn": [

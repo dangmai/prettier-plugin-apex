@@ -1,8 +1,20 @@
-import defaultConfig from "./jest.config.standalone.js";
+const ENABLE_COVERAGE = !!process.env.CI;
 
-// This config starts up the standalone parser by default
+// This config does not start up the standalone parser by default
+/** @type {import('ts-jest').JestConfigWithTsJest} */
 export default {
-  ...defaultConfig,
-  globalSetup: "<rootDir>/dist/tests_config/start-test-server.js",
-  globalTeardown: "<rootDir>/dist/tests_config/stop-test-server.js",
+  preset: "ts-jest/presets/default-esm",
+  testEnvironment: "node",
+  testTimeout: 10000,
+  displayName: "test",
+  setupFiles: ["<rootDir>/tests_config/run-spec.ts"],
+  snapshotSerializers: ["jest-snapshot-serializer-raw"],
+  testPathIgnorePatterns: ["<rootDir>/dist/"],
+  collectCoverage: ENABLE_COVERAGE,
+  coveragePathIgnorePatterns: ["/node_modules/", "/tests/", "/tests_config/"],
+  extensionsToTreatAsEsm: [".ts"],
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
+  transform: {},
 };

@@ -3,14 +3,14 @@ import { wrap } from "jest-snapshot-serializer-raw";
 import { extname } from "path";
 import prettier from "prettier";
 
-const { AST_COMPARE } = process.env;
+const { AST_COMPARE, APEX_PARSER } = process.env;
 
 function read(filename: string): string {
   return fs.readFileSync(filename, "utf8");
 }
 
 const PARSER_OPTIONS = {
-  apexStandaloneParser: "built-in",
+  apexStandaloneParser: APEX_PARSER ?? "none",
   apexStandalonePort: 2117,
   apexStandaloneHost: "localhost",
 };

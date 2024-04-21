@@ -5,6 +5,8 @@
 - Native executable location has been moved to be under the `vendor` directory.
   This should not affect any usage of the library,
   unless you are referencing this location from a custom script.
+- Our internal testing structure has changed.
+  Please follow [CONTRIBUTING.md](CONTRIBUTING.md) to set up your environment again.
 
 # 2.1.1
 
