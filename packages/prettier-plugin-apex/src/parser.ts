@@ -548,6 +548,7 @@ function getLineIndexes(sourceCode: string) {
       break;
     }
     const lastLineIndex = lineIndexes[lineIndex - 1];
+    /* v8 ignore next 3 */
     if (lastLineIndex === undefined) {
       return lineIndexes;
     }

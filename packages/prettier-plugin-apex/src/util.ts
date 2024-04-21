@@ -234,9 +234,11 @@ const PRECEDENCE: { [key: string]: number } = {};
 
 export function getPrecedence(op: string): number {
   const precedence = PRECEDENCE[op];
+  /* v8 ignore start */
   if (precedence === undefined) {
     throw new Error(`Failed to get precedence for operator ${op}`);
   }
+  /* v8 ignore start */
   return precedence;
 }
 
@@ -255,12 +257,14 @@ export async function getSerializerBinDirectory(): Promise<string> {
     url.fileURLToPath(new URL(".", import.meta.url)),
     "../vendor/apex-ast-serializer/bin",
   );
+  /* v8 ignore start */
   if (!(await doesFileExist(serializerBin))) {
     serializerBin = nodePath.join(
       url.fileURLToPath(new URL(".", import.meta.url)),
       "../../vendor/apex-ast-serializer/bin",
     );
   }
+  /* v8 ignore stop */
   return serializerBin;
 }
 
