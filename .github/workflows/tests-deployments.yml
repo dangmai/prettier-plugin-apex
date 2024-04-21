@@ -74,6 +74,15 @@ jobs:
       - name: Test Apex AST Serializer
         run: pnpm nx run apex-ast-serializer:test
 
+      - name: Upload Apex AST Serializer code coverage
+        if: matrix.ENABLE_CODE_COVERAGE
+        uses: codecov/codecov-action@v4
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        with:
+          flags: apex-ast-serializer
+          directory: packages/apex-ast-serializer
+
       - name: Run Apex parsing server
         run: pnpm nx run prettier-plugin-apex:start-server &
 
@@ -83,14 +92,14 @@ jobs:
       - name: Run functional tests
         run: AST_COMPARE=true pnpm nx run prettier-plugin-apex:test:parser:built-in
 
-      - name: Upload code coverage
+      - name: Upload Prettier Plugin Apex code coverage
         if: matrix.ENABLE_CODE_COVERAGE
         uses: codecov/codecov-action@v4
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
           flags: prettier-plugin-apex
-          directory: packages/prettier-plugin-apex/coverage
+          directory: packages/prettier-plugin-apex
 
       - name: Install integration test suite dependencies
         if: env.RUN_INTEGRATION_TESTS == 'true'

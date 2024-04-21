@@ -2,6 +2,7 @@ plugins {
   id 'java-library'
   id "java-test-fixtures"
   id 'application'
+  id 'jacoco'
   id 'org.graalvm.buildtools.native' version '0.10.1'
 }
 
@@ -35,8 +36,6 @@ java {
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
 }
-
-
 
 repositories {
   flatDir {
@@ -89,6 +88,16 @@ tasks.withType(Test) {
   useJUnitPlatform()
   jvmArgs += application.applicationDefaultJvmArgs
   testLogging.showStandardStreams = true
+}
+
+test {
+  finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+  reports {
+    xml.required = true
+  }
+  dependsOn test
 }
 
 // This task can be used to run tests under native instrumentation

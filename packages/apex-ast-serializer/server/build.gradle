@@ -8,6 +8,7 @@ buildscript {
 plugins {
   id 'java'
   id 'application'
+  id 'jacoco'
 }
 apply plugin: 'cz.habarta.typescript-generator'
 
@@ -159,6 +160,13 @@ dependencies {
 
 test {
   useJUnitPlatform()
+  finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+  reports {
+    xml.required = true
+  }
+  dependsOn test
 }
 
 generateTypeScript {
@@ -195,4 +203,3 @@ generateTypeScript {
   sortDeclarations = true
   noFileComment = true
 }
-
