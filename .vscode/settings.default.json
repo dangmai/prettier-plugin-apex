@@ -3,6 +3,10 @@
     {
       "fileMatch": ["/renovate.json5"],
       "url": "https://docs.renovatebot.com/renovate-schema.json"
+    },
+    {
+      "fileMatch": ["/.vscode/settings.default.json"],
+      "url": "vscode://schemas/settings/folder"
     }
   ],
   "npm.packageManager": "pnpm",

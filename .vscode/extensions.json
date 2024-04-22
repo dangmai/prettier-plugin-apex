@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "dangmai.workspace-default-settings",
     "esbenp.prettier-vscode",
     "salesforce.salesforcedx-vscode",
     "vitest.explorer",

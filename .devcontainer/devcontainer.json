@@ -21,6 +21,7 @@
       // In the future there may be a way to eliminate this duplication.
       // See this thread: https://github.com/microsoft/vscode-remote-release/issues/6364
       "extensions": [
+        "dangmai.workspace-default-settings",
         "esbenp.prettier-vscode",
         "salesforce.salesforcedx-vscode",
         "vitest.explorer",

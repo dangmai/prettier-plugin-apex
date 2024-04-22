@@ -9,6 +9,7 @@ dist
 .gradle
 build
 out
+.vscode/settings.json
 packages/prettier-plugin-apex/vendor
 
 .nx/cache
