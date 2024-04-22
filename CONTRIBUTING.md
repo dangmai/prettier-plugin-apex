@@ -1,5 +1,7 @@
 # Contributing to Prettier Apex
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/dangmai/prettier-plugin-apex?quickstart=1)
+
 This repository is a monolithic repository with all the moving parts that are necessary to run Prettier Apex.
 You will most likely only have to deal with the `prettier-plugin-apex` package,
 which resides inside `packages/prettier-plugin-apex/`.
@@ -24,6 +26,10 @@ you can explicit build that project by running:
 ```bash
 pnpm nx run apex-ast-serializer:build
 ```
+
+You could also use GitHub Codespaces or VSCode Dev Container to have all the
+tools pre-provisioned in your workspace, because this repository is compliant
+with the [Development Containers](https://containers.dev/) standard.
 
 Here's what you need to know about the Prettier Apex tests:
 
