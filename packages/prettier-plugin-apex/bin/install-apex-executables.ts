@@ -11,13 +11,7 @@ import { doesFileExist, getNativeExecutable } from "../src/util.js";
 
 const { arch, platform } = process;
 
-const SUPPORTED_ARCHITECTURES = ["win32-x64", "linux-x64", "darwin-arm64"];
-
-const currentArch = `${platform}-${arch}`;
-if (!SUPPORTED_ARCHITECTURES.includes(currentArch)) {
-  console.warn("Unsupported OS or architecture");
-  process.exit(1);
-}
+const PREBUILT_ARCHITECTURES = ["win32-x64", "linux-x64", "darwin-arm64"];
 
 const {
   values: { dev, force },
@@ -70,6 +64,14 @@ const downloadExecutable = async (
   filename: string,
   version: string,
 ) => {
+  const currentArch = `${platform}-${arch}`;
+  if (!PREBUILT_ARCHITECTURES.includes(currentArch)) {
+    console.warn(
+      `We currently do not have prebuilt binaries for ${currentArch}. You can either build the binary from source, or open an issue to request it.`,
+    );
+    process.exit(1);
+  }
+
   const artifactUrl = `https://github.com/dangmai/prettier-plugin-apex/releases/download/v${version}/${filename}`;
   console.log(
     `Downloading Apex AST Serializer native executable from ${artifactUrl}`,
