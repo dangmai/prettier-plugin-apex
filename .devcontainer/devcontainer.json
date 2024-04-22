@@ -13,6 +13,7 @@
 
   // Use 'postCreateCommand' to run commands after the container is created.
   "postCreateCommand": "/asdf-post-create.sh && ./.devcontainer/setup.sh",
+  "postStartCommand": "./.devcontainer/set-java-home.sh",
 
   // Configure tool-specific properties.
   "customizations": {
