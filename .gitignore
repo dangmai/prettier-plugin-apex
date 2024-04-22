@@ -12,3 +12,5 @@ out
 packages/prettier-plugin-apex/vendor
 
 .nx/cache
+.pnpm-store
+.DS_Store
