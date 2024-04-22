@@ -29,6 +29,12 @@
         "vscjava.vscode-gradle",
         "tintinweb.vscode-decompiler"
       ]
+    },
+    "codespaces": {
+      "openFiles": [
+        "CONTRIBUTING.md",
+        "packages/prettier-plugin-apex/README.md"
+      ]
     }
   }
 
