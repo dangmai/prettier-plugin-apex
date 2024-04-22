@@ -26,6 +26,7 @@
         "vitest.explorer",
         "dbaeumer.vscode-eslint",
         "vscjava.vscode-java-pack",
+        "vscjava.vscode-gradle",
         "tintinweb.vscode-decompiler"
       ]
     }
