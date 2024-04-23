@@ -33,7 +33,7 @@ async function parseTextWithSpawn(
     args.push("-a");
   }
   return new Promise((resolve, reject) => {
-    const process = childProcess.spawn(executable, args);
+    const process = childProcess.spawn(executable, args, { shell: true });
     process.stdin.write(text);
     process.stdin.end();
 
