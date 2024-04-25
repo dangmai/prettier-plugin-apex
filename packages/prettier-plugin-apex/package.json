@@ -47,12 +47,12 @@
     "@tsconfig/node18": "18.2.4",
     "@types/node": "18.19.31",
     "@types/wait-on": "5.3.4",
-    "@vitest/coverage-v8": "1.5.1",
+    "@vitest/coverage-v8": "1.5.2",
     "rimraf": "5.0.5",
     "tsx": "4.7.3",
     "typescript": "5.4.5",
     "vite": "5.2.10",
-    "vitest": "1.5.1"
+    "vitest": "1.5.2"
   },
   "peerDependencies": {
     "prettier": "^3.0.0"
