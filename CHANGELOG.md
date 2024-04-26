@@ -1,9 +1,6 @@
-# Unreleased
+# 2.1.3
 
-- Spawn Apex AST Serializer server process with shell turned on.
-  This is a workaround for new version of NodeJS that disallows calling `.bat` file without this option.
-  See this [blog post](https://nodejs.org/en/blog/vulnerability/april-2024-security-releases-2) for more details
-  ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1347)).
+- Spawn Apex AST Serializer server process with shell turned on (missed in `v2.1.2`).
   Thanks to @mwcm for their contribution!
 
 # 2.1.2
