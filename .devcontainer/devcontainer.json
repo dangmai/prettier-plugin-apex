@@ -15,6 +15,10 @@
   "postCreateCommand": "/asdf-post-create.sh && ./.devcontainer/setup.sh",
   "postStartCommand": "./.devcontainer/set-java-home.sh",
 
+  "containerEnv": {
+    "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
+  },
+
   // Configure tool-specific properties.
   "customizations": {
     "vscode": {
