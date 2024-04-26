@@ -9,6 +9,7 @@ which resides inside `packages/prettier-plugin-apex/`.
 To get up and running, install the dependencies and run the tests:
 
 ```bash
+corepack enable # This step is optional but highly recommended to make sure you're running the correct PNPM version
 pnpm install
 pnpm nx run prettier-plugin-apex:lint
 pnpm nx run prettier-plugin-apex:start-server # This spins up the built in HTTP parsing server
