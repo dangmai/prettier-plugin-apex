@@ -24,6 +24,7 @@ export async function start(
     args.push("-c", allowedOrigins);
   }
   const command = spawn(serializerBin, args, {
+    shell: true,
     stdio: "inherit",
   });
 
