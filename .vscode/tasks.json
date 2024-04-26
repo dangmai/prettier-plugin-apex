@@ -30,6 +30,13 @@
       "problemMatcher": [],
       "path": "packages/playground",
       "dependsOn": ["Run HTTP Apex Parsing Server"]
+    },
+    {
+      "type": "npm",
+      "script": "build:native",
+      "label": "Build native executable",
+      "isBackground": true,
+      "problemMatcher": []
     }
   ]
 }
