@@ -3,6 +3,7 @@
 ## Internal Changes
 
 - Prettier Apex should now throw an error with details when it fails to call Apex AST Serializer executable.
+- NPM package tests are now run on multiple platforms to catch any platform-dependent regressions.
 
 # 2.1.3
 
