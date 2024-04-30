@@ -5,6 +5,7 @@
     "bin/**/*",
     "scripts/**/*",
     "tests_config/**/*",
+    "tests_integration/package/*",
     "tests/**/*",
     "typings/global.d.ts",
     "typings/test-global.d.ts",
