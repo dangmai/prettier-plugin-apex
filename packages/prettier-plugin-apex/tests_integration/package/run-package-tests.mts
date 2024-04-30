@@ -31,5 +31,6 @@ await within(async () => {
   await $`npm run prettier:anonymous | grep Hello`;
   await $`npm run prettier:named:debug`;
   await $`npm run prettier:anonymous:debug`;
+  await cd("..");
 });
-await fs.remove(path.join(process.cwd(), "..", "test-npm-module"));
+await fs.remove(path.join(process.cwd(), "test-npm-module"));
