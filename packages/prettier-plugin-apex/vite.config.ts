@@ -29,6 +29,7 @@ export default defineConfig({
     },
   },
   test: {
+    testTimeout: 30 * 1000, // It's very slow to run tests with the default parser, so we use a very generous timeout here
     coverage: {
       enabled: ENABLE_COVERAGE,
       include: ["src/**/*.ts"],
