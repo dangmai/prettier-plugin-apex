@@ -1,3 +1,9 @@
+# Unreleased
+
+## Internal Changes
+
+- Prettier Apex should now throw an error with details when it fails to call Apex AST Serializer executable.
+
 # 2.1.3
 
 - Spawn Apex AST Serializer server process with shell turned on (missed in `v2.1.2`).

@@ -46,8 +46,12 @@ async function parseTextWithSpawn(
       stderr += chunk;
     });
 
-    process.on("close", () => {
-      resolve(stdout);
+    process.on("close", (code) => {
+      if (code === 0) {
+        resolve(stdout);
+      } else {
+        reject(stderr);
+      }
     });
     process.on("error", () => {
       reject(stderr);
