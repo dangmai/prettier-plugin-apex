@@ -1,0 +1,42 @@
+name: 🤔 Support Question
+description: Issues with running Prettier Apex
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: checkboxes
+    id: checkboxes
+    attributes:
+      label: Self-Troubleshooting Checklist
+      options:
+        - label: Are you running Prettier Apex >= 2.0.0? If Yes, have you gone through the [Upgrade Guide](https://github.com/dangmai/prettier-plugin-apex/wiki/Upgrading-to-Prettier-Apex-v2)?
+          required: true
+        - label: Are you running Java < 11? If Yes, you need to install a newer Java version.
+          required: true
+        - label: Are you running VSCode and recently upgraded Prettier or Prettier Apex? If Yes, have you restarted VSCode after the upgrade?.
+          required: true
+  - type: textarea
+    id: issue-description
+    attributes:
+      label: Describe your issue
+      description: A clear and concise description of what the issue is.
+      placeholder: Issue with running Prettier Apex
+    validations:
+      required: true
+  - type: textarea
+    id: prettier-options
+    attributes:
+      label: Prettier options (if any)
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Info
+      description: Output of `npx envinfo --system --npmPackages 'prettier*' --binaries --npmGlobalPackages 'prettier*' --languages`
+      render: shell
+      placeholder: System, Binaries, Browsers
+    validations:
+      required: true
