@@ -1,0 +1,50 @@
+name: ✨ Formatting
+description: Issues for ugly or incorrect code
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: textarea
+    id: input-code
+    attributes:
+      label: Initial Apex code
+      render: apex
+    validations:
+      required: true
+  - type: textarea
+    id: output-code
+    attributes:
+      label: Formatted Apex code
+      render: apex
+    validations:
+      required: true
+  - type: textarea
+    id: expected-code
+    attributes:
+      label: Expected Apex code
+      render: apex
+    validations:
+      required: true
+  - type: textarea
+    id: prettier-options
+    attributes:
+      label: Prettier options (if any)
+      render: shell
+    validations:
+      required: false
+  - type: input
+    id: playground-link
+    attributes:
+      label: Playground link
+      description: Link to a [Prettier Apex Playground](https://apex.dangmai.net) snippet. Click `Copy Link` in the Playground, then paste the URL here.
+      placeholder: https://apex.dangmai.net/#N4Ig9gDgLglmB2BnEAuUEwCcqoCy4GYAaEACzERxRAEMIBTADwFobKA6BTe+AE3szsAxmAC2IEhExgoYEQBtUZKFAjJJNTIgFK6TCSCkx4UAOoxeUUqgAcABhJQaAI3OXrKAEwkArtoAqLsgoAGY08tokeowAkkgCUABixuEAcvQA7vLG9KhQmD70AL4kIvxKQvJsiAAEABL08vJgpljyvDXAADrwNTUAbmAWNaSNzQAUAJSdPX19AIJCIj4mANoAujU0S2ArULUAvDWr2vL0QlA1wyHSols7e+sA3LNzAMoAnpT0ouz8zj4AObjbbLEyISYvXo1Io9IogIpAA
+  - type: textarea
+    id: system-info
+    attributes:
+      label: System Info
+      description: Output of `npx envinfo --system --npmPackages 'prettier*' --binaries --npmGlobalPackages 'prettier*' --languages`
+      render: shell
+      placeholder: System, Binaries, Browsers
+    validations:
+      required: false
