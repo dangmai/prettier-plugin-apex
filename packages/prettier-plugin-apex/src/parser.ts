@@ -23,11 +23,15 @@ type MinimalLocation = {
   endIndex: number;
 };
 
+interface SpawnOutput {
+  stdout: string;
+  stderr: string;
+}
 async function parseTextWithSpawn(
   executable: string,
   text: string,
   anonymous: boolean,
-): Promise<string> {
+): Promise<SpawnOutput> {
   const args = ["-f", "json", "-i"];
   if (anonymous) {
     args.push("-a");
@@ -48,13 +52,13 @@ async function parseTextWithSpawn(
 
     process.on("close", (code) => {
       if (code === 0) {
-        resolve(stdout);
+        resolve({ stdout, stderr });
       } else {
-        reject(stderr);
+        reject(new Error(stdout + stderr));
       }
     });
     process.on("error", () => {
-      reject(stderr);
+      reject(new Error(stdout + stderr));
     });
   });
 }
@@ -586,6 +590,7 @@ export default async function parse(
 ): Promise<SerializedAst | Record<string, never>> {
   const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst: string;
+  let stderr: string = "";
   if (options.apexStandaloneParser === "built-in") {
     serializedAst = await parseTextWithHttp(
       sourceCode,
@@ -601,13 +606,15 @@ export default async function parse(
         "Native executable does not exist. Please download with `npx install-apex-executables`",
       );
     }
-    serializedAst = await parseTextWithSpawn(
+    const result = await parseTextWithSpawn(
       serializerBin,
       sourceCode,
       options.parser === "apex-anonymous",
     );
+    serializedAst = result.stdout;
+    stderr = result.stderr;
   } else {
-    serializedAst = await parseTextWithSpawn(
+    const result = await parseTextWithSpawn(
       path.join(
         await getSerializerBinDirectory(),
         `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`,
@@ -615,6 +622,8 @@ export default async function parse(
       sourceCode,
       options.parser === "apex-anonymous",
     );
+    serializedAst = result.stdout;
+    stderr = result.stderr;
   }
   if (serializedAst) {
     let ast: SerializedAst = JSON.parse(serializedAst);
@@ -648,5 +657,5 @@ export default async function parse(
       );
     return ast;
   }
-  return {};
+  throw new Error(`Failed to parse Apex code: ${stderr}`);
 }
