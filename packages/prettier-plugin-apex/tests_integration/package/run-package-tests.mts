@@ -3,7 +3,7 @@
 import assert from "node:assert";
 
 // eslint-disable-next-line import/no-extraneous-dependencies -- we will use shared zx from the root
-import { $, cd, fs, path, usePowerShell } from "zx";
+import { $, argv, cd, fs, path, usePowerShell } from "zx";
 
 if (process.platform === "win32") {
   usePowerShell();
@@ -11,9 +11,14 @@ if (process.platform === "win32") {
 
 $.verbose = true;
 
-await $`mkdir test-npm-module`;
+let moduleName = "test-npm-module";
+if (argv["module"]) {
+  moduleName = argv["module"];
+}
 
-cd("test-npm-module");
+await $`mkdir ${moduleName}`;
+
+cd(moduleName);
 await $`npm init -y`;
 await $`npm install --save-dev prettier prettier-plugin-apex`;
 await $`cp ../tests/anonymous/AnonymousBlock.cls ./AnonymousBlock.apex`;
@@ -44,4 +49,4 @@ await $`npm run prettier:anonymous:debug`;
 // Get out of the directory since Windows can't delete it if we're in it
 cd("..");
 
-await fs.remove(path.join(process.cwd(), "test-npm-module"));
+await fs.remove(path.join(process.cwd(), moduleName));
