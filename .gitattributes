@@ -5,6 +5,8 @@
 *.yaml text eol=lf
 *.js text eol=lf
 *.ts text eol=lf
+*.mjs text eol=lf
+*.mts text eol=lf
 *.md text eol=lf
 *.sh text eol=lf
 *.txt text eol=lf
@@ -18,7 +20,6 @@
 *.properties text eol=lf
 *.html text eol=lf
 *.css text eol=lf
-*.js text eol=lf
 packages/prettier-plugin-apex/vendor/apex-ast-serializer/bin/apex-ast-serializer text eof=lf
 packages/prettier-plugin-apex/vendor/apex-ast-serializer/bin/apex-ast-serializer-http text eof=lf
 
