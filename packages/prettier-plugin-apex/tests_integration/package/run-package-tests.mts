@@ -1,7 +1,13 @@
 #!/usr/bin/env -S tsx
 
+import assert from "node:assert";
+
 // eslint-disable-next-line import/no-extraneous-dependencies -- we will use shared zx from the root
-import { $, cd, fs, path } from "zx";
+import { $, cd, fs, path, usePowerShell } from "zx";
+
+if (process.platform === "win32") {
+  usePowerShell();
+}
 
 $.verbose = true;
 
@@ -28,8 +34,10 @@ await fs.writeJSON(
 );
 
 // Assertions
-await $`npm run prettier:named | grep TestClass`;
-await $`npm run prettier:anonymous | grep Hello`;
+let result = await $`npm run prettier:named`;
+assert(result.stdout.includes("TestClass"));
+result = await $`npm run prettier:anonymous`;
+assert(result.stdout.includes("Hello"));
 await $`npm run prettier:named:debug`;
 await $`npm run prettier:anonymous:debug`;
 
