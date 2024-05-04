@@ -2,6 +2,7 @@
 
 ## Internal Changes
 
+- Fix `install-apex-executables` script hanging unnecessarily ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1368)).
 - Prettier Apex should now throw an error with details when it fails to call Apex AST Serializer executable.
 - NPM package tests are now run on multiple platforms to catch any platform-dependent regressions.
 

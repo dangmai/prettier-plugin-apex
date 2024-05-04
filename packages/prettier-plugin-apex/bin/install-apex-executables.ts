@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 
 /* eslint-disable no-console -- this is a NodeJS script so console usage is expected */
-import { createWriteStream } from "node:fs";
-import { chmod, copyFile, unlink } from "node:fs/promises";
-import https from "node:https";
+import { chmod, copyFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { Readable } from "node:stream";
+import type { ReadableStream } from "node:stream/web";
 import { fileURLToPath } from "node:url";
 import { parseArgs } from "node:util";
 import { doesFileExist, getNativeExecutable } from "../src/util.js";
@@ -28,36 +28,12 @@ const {
   },
 });
 
-const downloadFile = (url: string, dest: string) =>
-  new Promise<void>((resolve, reject) => {
-    const file = createWriteStream(dest);
-    https
-      .get(url, async (response) => {
-        if (
-          response.statusCode &&
-          response.statusCode >= 200 &&
-          response.statusCode < 300
-        ) {
-          response.pipe(file);
-          file.on("finish", () => {
-            file.close();
-            resolve();
-          });
-        } else if (response.headers.location) {
-          resolve(downloadFile(response.headers.location, dest));
-        } else {
-          console.log(response.statusCode);
-          file.close();
-          await unlink(dest);
-          reject(new Error(response.statusMessage));
-        }
-      })
-      .on("error", async (error) => {
-        file.close();
-        await unlink(dest);
-        reject(new Error(error.message));
-      });
-  });
+const downloadFile = async (url: string, dest: string) => {
+  const response = await fetch(url);
+  // See this discussion for why we need to typecast: https://github.com/DefinitelyTyped/DefinitelyTyped/discussions/65542#discussioncomment-6071004
+  const body = Readable.fromWeb(response.body as ReadableStream<Uint8Array>);
+  await writeFile(dest, body);
+};
 
 const downloadExecutable = async (
   path: string,
