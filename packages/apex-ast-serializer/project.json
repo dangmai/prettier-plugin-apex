@@ -17,7 +17,7 @@
       ],
       "options": {
         "cwd": "packages/apex-ast-serializer",
-        "command": "./gradlew clean :server:installDist"
+        "command": "node tools/run-gradle.mjs clean :server:installDist"
       }
     },
     "build:native": {
@@ -26,14 +26,14 @@
       "outputs": ["{projectRoot}/parser/build"],
       "options": {
         "cwd": "packages/apex-ast-serializer",
-        "command": "./gradlew clean :parser:buildNative"
+        "command": "node tools/run-gradle.mjs clean :parser:buildNative"
       }
     },
     "test": {
       "executor": "nx:run-commands",
       "options": {
         "cwd": "packages/apex-ast-serializer",
-        "command": "./gradlew clean test"
+        "command": "node tools/run-gradle.mjs clean test"
       }
     },
     "prettier": {
