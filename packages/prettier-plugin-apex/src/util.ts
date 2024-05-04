@@ -264,8 +264,10 @@ export async function getSerializerBinDirectory(): Promise<string> {
       "../../vendor/apex-ast-serializer/bin",
     );
   }
+  // NodeJS struggles to spawn Windows processes with path having special characters,
+  // like `=`, so we try to minimize that by using relative paths.
   /* v8 ignore stop */
-  return serializerBin;
+  return nodePath.relative(process.cwd(), serializerBin);
 }
 
 interface NativeExecutable {
@@ -279,9 +281,13 @@ export async function getNativeExecutable(): Promise<NativeExecutable> {
   const version = "2.1.3";
   const filename = `apex-ast-serializer-${version}-${platform}-${arch}${platform === "win32" ? ".exe" : ""}`;
   const serializerBin = await getSerializerBinDirectory();
+  const executableBin = nodePath.relative(
+    process.cwd(),
+    nodePath.join(serializerBin, "..", "..", filename),
+  );
   return {
     version,
-    path: nodePath.join(serializerBin, "..", "..", filename),
+    path: executableBin,
     filename,
   };
 }
