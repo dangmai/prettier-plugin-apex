@@ -50,7 +50,7 @@
     "@types/wait-on": "5.3.4",
     "@vitest/coverage-v8": "1.6.0",
     "rimraf": "5.0.6",
-    "tsx": "4.9.4",
+    "tsx": "4.10.0",
     "typescript": "5.4.5",
     "vite": "5.2.11",
     "vitest": "1.6.0"
