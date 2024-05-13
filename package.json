@@ -30,7 +30,7 @@
     "prettier-plugin-java": "2.6.0",
     "prettier-plugin-organize-imports": "3.2.4",
     "rimraf": "5.0.7",
-    "zx": "8.0.2"
+    "zx": "8.1.0"
   },
   "keywords": [],
   "author": "Dang Mai <contact@dangmai.net>",
