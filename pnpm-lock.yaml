@@ -54,8 +54,8 @@ importers:
         specifier: 5.0.7
         version: 5.0.7
       zx:
-        specifier: 8.1.1
-        version: 8.1.1
+        specifier: 8.1.2
+        version: 8.1.2
 
   packages/playground:
     dependencies:
@@ -2480,8 +2480,8 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
 
-  zx@8.1.1:
-    resolution: {integrity: sha512-JYAyM06wK+KLy07MkipBTghtd3zsYBxTH44Fh3p932ntDKdT5jxziEK51siPG+rqT+MWV1yK9mCM1/CB92PV7Q==}
+  zx@8.1.2:
+    resolution: {integrity: sha512-zkCiXKh8D/eo6r58OmJvO5mc2NthcSRvysb3fuS6VQlHPbEPBcxduRwM3m6ZfHj+7cLHcrahCnuO2TDAbW+6xw==}
     engines: {node: '>= 12.17.0'}
     hasBin: true
 
@@ -4992,7 +4992,7 @@ snapshots:
 
   yocto-queue@1.0.0: {}
 
-  zx@8.1.1:
+  zx@8.1.2:
     optionalDependencies:
       '@types/fs-extra': 11.0.4
       '@types/node': 20.12.12
