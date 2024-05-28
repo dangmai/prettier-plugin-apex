@@ -97,8 +97,8 @@ importers:
         specifier: 5.2.11
         version: 5.2.11(@types/node@20.12.12)
       vite-plugin-radar:
-        specifier: 0.9.4
-        version: 0.9.4(vite@5.2.11(@types/node@20.12.12))
+        specifier: 0.9.6
+        version: 0.9.6(vite@5.2.11(@types/node@20.12.12))
 
   packages/prettier-plugin-apex:
     dependencies:
@@ -2359,8 +2359,8 @@ packages:
     engines: {node: ^18.0.0 || >=20.0.0}
     hasBin: true
 
-  vite-plugin-radar@0.9.4:
-    resolution: {integrity: sha512-JhUP3yODDLGsAmz+PVRaxLyJYzC3PWTnAezbhuaRONvo7gFHDTU7AcY6+6tOgyDstOJjG2Qb3oUdiEorPVxl4A==}
+  vite-plugin-radar@0.9.6:
+    resolution: {integrity: sha512-tLvUt7+iZznxYa8GmCrZBV3Q0fLQApsyg9EIJgaen8DjGky3vFIq9KoDWAoVMs9FZ5qbsSBb3YfSvoqwVV+5xw==}
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
 
@@ -4862,7 +4862,7 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-radar@0.9.4(vite@5.2.11(@types/node@20.12.12)):
+  vite-plugin-radar@0.9.6(vite@5.2.11(@types/node@20.12.12)):
     dependencies:
       vite: 5.2.11(@types/node@20.12.12)
 

@@ -27,7 +27,7 @@
     "@types/react-dom": "18.3.0",
     "@vitejs/plugin-react": "4.3.0",
     "vite": "5.2.11",
-    "vite-plugin-radar": "0.9.4"
+    "vite-plugin-radar": "0.9.6"
   },
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT"
