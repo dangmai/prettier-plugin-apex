@@ -18,7 +18,7 @@ To integrate Prettier Apex in your workflow, please follow the [Usage](#-usage) 
 
 ## ✨ Status
 
-This project is production ready, and have been tested on multiple projects,
+This project is production ready, and has been tested on multiple projects,
 including a mix of open source/proprietary/Salesforce internal code bases.
 
 ## 📖 Usage
