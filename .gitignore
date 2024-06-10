@@ -13,6 +13,6 @@ out
 .vscode/settings.json
 packages/prettier-plugin-apex/vendor
 
-.nx/cache
+.nx
 .pnpm-store
 .DS_Store
