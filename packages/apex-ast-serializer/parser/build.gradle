@@ -51,7 +51,7 @@ run {
 }
 
 ext {
-  junitVersion = '5.10.2'
+  junitVersion = '5.10.3'
 }
 
 dependencies {
@@ -68,7 +68,7 @@ dependencies {
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.3'
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20240303'
