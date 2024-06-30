@@ -2,6 +2,7 @@
 
 set -euxo pipefail
 
+asdf install
 corepack enable
 asdf reshim
 pnpm install --frozen-lockfile
