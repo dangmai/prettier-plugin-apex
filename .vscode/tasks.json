@@ -3,6 +3,19 @@
   "tasks": [
     {
       "type": "npm",
+      "script": "install",
+      "label": "Install NodeJS dependencies",
+      "isBackground": false
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "label": "Build libraries",
+      "isBackground": false,
+      "dependsOn": ["Install NodeJS dependencies"]
+    },
+    {
+      "type": "npm",
       "script": "start-server",
       "label": "Run HTTP Apex Parsing Server",
       "isBackground": true,
@@ -20,7 +33,8 @@
       "path": "packages/prettier-plugin-apex",
       "runOptions": {
         "runOn": "folderOpen"
-      }
+      },
+      "dependsOn": ["Build libraries"]
     },
     {
       "type": "npm",
@@ -36,7 +50,8 @@
       "script": "build:native",
       "label": "Build native executable",
       "isBackground": true,
-      "problemMatcher": []
+      "problemMatcher": [],
+      "dependsOn": ["Install NodeJS dependencies"]
     }
   ]
 }

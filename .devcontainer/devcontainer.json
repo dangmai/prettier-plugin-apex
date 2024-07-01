@@ -16,7 +16,7 @@
   "forwardPorts": [2117, 5173],
 
   // Use 'postCreateCommand' to run commands after the container is created.
-  "postCreateCommand": "./.devcontainer/setup.sh",
+  // "postCreateCommand": "",
   "postStartCommand": "./.devcontainer/set-java-home.sh",
 
   "containerEnv": {
