@@ -39,8 +39,4 @@ COPY --chown=vscode:vscode pnpm-lock.yaml /home/vscode/project/pnpm-lock.yaml
 COPY --chown=vscode:vscode pnpm-workspace.yaml /home/vscode/project/pnpm-workspace.yaml
 COPY --chown=vscode:vscode packages/prettier-plugin-apex/package.json /home/vscode/project/packages/prettier-plugin-apex/package.json
 COPY --chown=vscode:vscode packages/playground/package.json /home/vscode/project/packages/playground/package.json
-RUN cd project && pnpm i --frozen-lockfile && pnpm all:clean
-
-# Prime Gradle cache
-COPY --chown=vscode:vscode packages/apex-ast-serializer /home/vscode/project/packages/apex-ast-serializer
-RUN cd project/packages/apex-ast-serializer && ./gradlew --no-daemon 
+RUN cd project && pnpm i --frozen-lockfile && cd .. && rm -rf project
