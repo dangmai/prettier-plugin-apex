@@ -29,12 +29,3 @@ RUN corepack enable
 RUN asdf reshim nodejs
 RUN pnpm completion bash > ~/completion-for-pnpm.bash
 RUN echo 'source ~/completion-for-pnpm.bash' >> ~/.bashrc
-
-# Prime PNPM cache store
-RUN mkdir /home/vscode/project
-COPY --chown=vscode:vscode package.json /home/vscode/project/package.json
-COPY --chown=vscode:vscode pnpm-lock.yaml /home/vscode/project/pnpm-lock.yaml
-COPY --chown=vscode:vscode pnpm-workspace.yaml /home/vscode/project/pnpm-workspace.yaml
-COPY --chown=vscode:vscode packages/prettier-plugin-apex/package.json /home/vscode/project/packages/prettier-plugin-apex/package.json
-COPY --chown=vscode:vscode packages/playground/package.json /home/vscode/project/packages/playground/package.json
-RUN cd project && pnpm i --frozen-lockfile && cd .. && rm -rf project
