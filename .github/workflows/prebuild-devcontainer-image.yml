@@ -1,0 +1,29 @@
+name: Prebuild Devcontainer Image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4.1.7
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3.2.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pre-build dev container image
+        uses: devcontainers/ci@v0.3.1900000328
+        with:
+          subFolder: .github
+          imageName: ghcr.io/dangmai/prettier-plugin-apex-devcontainer
+          cacheFrom: ghcr.io/dangmai/prettier-plugin-apex-devcontainer
+          push: always

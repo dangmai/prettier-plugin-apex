@@ -3,11 +3,7 @@
 {
   "name": "Prettier Plugin Apex",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  // "image": "iloveitaly/asdf-devcontainer:0-ubuntu-22.04",
-  "build": {
-    "dockerfile": "Dockerfile.dev-container",
-    "context": ".."
-  },
+  "image": "dangmai/prettier-plugin-apex-devcontainer:latest",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {},
