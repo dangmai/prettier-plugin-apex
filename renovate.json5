@@ -4,9 +4,6 @@
   "lockFileMaintenance": {
     "enabled": true
   },
-  "asdf": {
-    "enabled": false
-  },
   "customManagers": [
     // From https://docs.renovatebot.com/modules/manager/regex/#advanced-capture
     {
