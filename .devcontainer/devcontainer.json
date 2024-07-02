@@ -3,7 +3,7 @@
 {
   "name": "Prettier Plugin Apex",
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "dangmai/prettier-plugin-apex-devcontainer:latest",
+  "image": "ghcr.io/dangmai/prettier-plugin-apex-devcontainer:latest",
 
   // Features to add to the dev container. More info: https://containers.dev/features.
   "features": {},
