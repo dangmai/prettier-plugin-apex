@@ -4,7 +4,8 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:1.1.1-ubuntu24.04
 
 # needs to be declared *after* FROM to be available in shell scripts
-ARG ASDF_BRANCH="v0.14.0"
+# renovate: datasource=github-releases depName=asdf packageName=asdf-vm/asdf
+ARG ASDF_VERSION="v0.14.0"
 
 LABEL org.opencontainers.image.authors="Dang Mai <contact@dangmai.net>" \
       org.opencontainers.image.source=https://github.com/dangmai/prettier-plugin-apex \
@@ -13,7 +14,7 @@ LABEL org.opencontainers.image.authors="Dang Mai <contact@dangmai.net>" \
       org.opencontainers.image.description="A Docker image for use with VS Code's Remote Containers extension or GitHub codespaces."
 
 USER vscode
-RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_BRANCH}
+RUN git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch ${ASDF_VERSION}
 
 # including the asdf source in sh + bash profiles make it easier to run boostrap scripts
 # which expect `asdf` to be available
