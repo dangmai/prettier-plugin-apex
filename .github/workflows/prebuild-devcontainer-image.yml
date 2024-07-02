@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/prebuild-devcontainer-image.yml'
+      - '.github/.devcontainer/*'
+      - '.tool-versions'
   workflow_dispatch:
 
 jobs:
