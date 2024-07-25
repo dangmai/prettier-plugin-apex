@@ -1,6 +1,7 @@
 /* eslint no-param-reassign: 0 */
-import childProcess from "child_process";
-import path from "path";
+import childProcess from "node:child_process";
+import path from "node:path";
+import process from "node:process";
 import prettier from "prettier";
 
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
@@ -37,27 +38,36 @@ async function parseTextWithSpawn(
     args.push("-a");
   }
   return new Promise((resolve, reject) => {
-    const process = childProcess.spawn(executable, args, { shell: true });
-    process.stdin.write(text);
-    process.stdin.end();
+    const spawnedProcess = childProcess.spawn(executable, args, {
+      shell: true,
+      env: {
+        ...process.env,
+        // #1513 - Gradle's generated Windows application wrapper checks for
+        // the DEBUG environment variable and will output verbose logs if it is set,
+        // which will break the parser output.
+        DEBUG: "",
+      },
+    });
+    spawnedProcess.stdin.write(text);
+    spawnedProcess.stdin.end();
 
     let stdout = "";
     let stderr = "";
-    process.stdout.on("data", (chunk) => {
+    spawnedProcess.stdout.on("data", (chunk) => {
       stdout += chunk;
     });
-    process.stderr.on("data", (chunk) => {
+    spawnedProcess.stderr.on("data", (chunk) => {
       stderr += chunk;
     });
 
-    process.on("close", (code) => {
+    spawnedProcess.on("close", (code) => {
       if (code === 0) {
         resolve({ stdout, stderr });
       } else {
         reject(new Error(stdout + stderr));
       }
     });
-    process.on("error", () => {
+    spawnedProcess.on("error", () => {
       reject(new Error(stdout + stderr));
     });
   });
