@@ -60,7 +60,7 @@ dependencies {
   api group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
-  api group: 'commons-cli', name: 'commons-cli', version: '1.8.0'
+  api group: 'commons-cli', name: 'commons-cli', version: '1.9.0'
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
   api group: 'commons-io', name: 'commons-io', version: '2.16.1'
