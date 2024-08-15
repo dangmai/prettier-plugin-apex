@@ -133,7 +133,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - flyci-macos-large-latest-m1
+          - macos-14
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4.1.7
@@ -161,7 +161,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
-          - flyci-macos-large-latest-m1
+          - macos-14
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
@@ -171,7 +171,7 @@ jobs:
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
             ARTIFACT_NAME: apex-ast-serializer-linux-x64
-          - os: flyci-macos-large-latest-m1
+          - os: macos-14
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
             ARTIFACT_NAME: apex-ast-serializer-darwin-arm64
