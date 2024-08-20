@@ -60,7 +60,7 @@
   },
   "dependencies": {
     "jest-docblock": "^29.0.0",
-    "wait-on": "^7.2.0"
+    "wait-on": "^8.0.0"
   },
   "nx": {
     "implicitDependencies": [
