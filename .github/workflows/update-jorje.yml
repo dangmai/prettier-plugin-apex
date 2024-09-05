@@ -23,7 +23,7 @@ jobs:
       - name: Run create-jorje-jar.sh
         run: ./packages/apex-ast-serializer/tools/create-jorje-jar.sh
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7.0.0
+        uses: peter-evans/create-pull-request@v7.0.1
         with:
           commit-message: Updated jorje
           title: "Update jorje dependency"
