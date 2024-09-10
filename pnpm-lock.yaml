@@ -110,7 +110,7 @@ importers:
         version: 3.3.3
       wait-on:
         specifier: ^8.0.0
-        version: 8.0.0
+        version: 8.0.1
     devDependencies:
       '@tsconfig/node18':
         specifier: 18.2.4
@@ -2558,8 +2558,8 @@ packages:
       jsdom:
         optional: true
 
-  wait-on@8.0.0:
-    resolution: {integrity: sha512-fNE5SXinLr2Bt7cJvjvLg2PcXfqznlqRvtE3f8AqYdRZ9BhE+XpsCp1mwQbRoO7s1q7uhAuCw0Ro3mG/KdZjEw==}
+  wait-on@8.0.1:
+    resolution: {integrity: sha512-1wWQOyR2LVVtaqrcIL2+OM+x7bkpmzVROa0Nf6FryXkS+er5Sa1kzFGjzZRqLnHa3n1rACFLeTwUqE1ETL9Mig==}
     engines: {node: '>=12.0.0'}
     hasBin: true
 
@@ -5146,7 +5146,7 @@ snapshots:
       - supports-color
       - terser
 
-  wait-on@8.0.0:
+  wait-on@8.0.1:
     dependencies:
       axios: 1.7.7
       joi: 17.13.3
