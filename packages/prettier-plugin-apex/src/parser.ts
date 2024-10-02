@@ -526,26 +526,28 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
     // The location node that we manually generate do not contain startLine
     // information, so we will create them here.
     nodeLoc.startLine =
-      lineIndexes.findIndex((index: number) => index > nodeLoc.startIndex) - 1;
+      nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
   }
+
   if (nodeLoc && !("endLine" in nodeLoc)) {
-    nodeLoc.endLine =
-      lineIndexes.findIndex((index: number) => index > nodeLoc.endIndex) - 1;
+    nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
 
     // Edge case: root node
     if (nodeLoc.endLine < 0) {
       nodeLoc.endLine = lineIndexes.length - 1;
     }
   }
+
   if (nodeLoc && !("column" in nodeLoc)) {
     const nodeStartLineIndex =
       lineIndexes[
-        lineIndexes.findIndex((index: number) => index > nodeLoc.startIndex) - 1
+        nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
       ];
     if (nodeStartLineIndex !== undefined) {
       nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
     }
   }
+
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
@@ -554,12 +556,31 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
   return node;
 }
 
+function getLineNumber(lineIndexes: number[], charIndex: number) {
+  let low = 0;
+  let high = lineIndexes.length - 1;
+  while (low <= high) {
+    let mid = Math.floor((low + high) / 2);
+    const midIndex = lineIndexes[mid] ?? 0;
+    const beforeMidIndex = lineIndexes[mid - 1] ?? 0;
+
+    if (midIndex >= charIndex && beforeMidIndex < charIndex) {
+      return mid;
+    } else if (midIndex < charIndex) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return -1;
+}
+
 // Get a map of line number to the index of its first character
 function getLineIndexes(sourceCode: string) {
   // First line always start with index 0
-  const lineIndexes = [0, 0];
+  const lineIndexes = [0];
   let characterIndex = 0;
-  let lineIndex = 2;
+  let lineIndex = 1;
   while (characterIndex < sourceCode.length) {
     const eolIndex = sourceCode.indexOf("\n", characterIndex);
     if (eolIndex < 0) {
@@ -570,11 +591,11 @@ function getLineIndexes(sourceCode: string) {
     if (lastLineIndex === undefined) {
       return lineIndexes;
     }
-    lineIndexes[lineIndex] =
-      lastLineIndex + sourceCode.substring(characterIndex, eolIndex).length + 1;
+    lineIndexes[lineIndex] = lastLineIndex + (eolIndex - characterIndex) + 1;
     characterIndex = eolIndex + 1;
     lineIndex += 1;
   }
+  lineIndexes[lineIndex] = sourceCode.length;
   return lineIndexes;
 }
 
@@ -598,7 +619,6 @@ export default async function parse(
   sourceCode: string,
   options: prettier.RequiredOptions,
 ): Promise<SerializedAst | Record<string, never>> {
-  const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst: string;
   let stderr: string = "";
   if (options.apexStandaloneParser === "built-in") {
@@ -655,6 +675,7 @@ export default async function parse(
       );
     ast = resolveAstReferences(ast, {});
     handleNodeLocation(ast, sourceCode, commentNodes);
+    const lineIndexes = getLineIndexes(sourceCode);
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
