@@ -1,6 +1,7 @@
 # Unreleased
 
 - Fix Windows application not being able to get output from parser when `DEBUG` environment variable is set ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1513)).
+- Parsing up to 60% faster.
 
 # 2.1.4
 
