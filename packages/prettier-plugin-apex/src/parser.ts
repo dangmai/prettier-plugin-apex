@@ -461,12 +461,13 @@ function generateExtraMetadata(
     });
   }
 
-  Object.keys(node).forEach((key) => {
-    if (key === "inputParameters" && Array.isArray(node.inputParameters)) {
-      node.inputParameters.forEach((inputParameter: any) => {
-        inputParameter.insideParenthesis = true;
-      });
+  if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
+    for (let inputParameter of node.inputParameters) {
+      inputParameter.insideParenthesis = true;
     }
+  }
+
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
