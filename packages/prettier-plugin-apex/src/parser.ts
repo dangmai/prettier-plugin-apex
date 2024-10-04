@@ -467,7 +467,7 @@ function generateExtraMetadata(
     }
   }
 
-  Object.keys(node).forEach((key) => {
+  for (let key of Object.keys(node)) {
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
@@ -492,29 +492,31 @@ function generateExtraMetadata(
             currentChildNode.loc &&
             nextChildNode.loc.startLine === currentChildNode.loc.endLine
           ) {
-            node[keyInt].isNextStatementOnSameLine = true;
+            currentChildNode.isNextStatementOnSameLine = true;
           }
         }
       }
+
       generateExtraMetadata(
         node[key],
         emptyLineLocations,
         allowTrailingEmptyLineWithin,
       );
     }
-  });
+  }
 
   const nodeLoc = getNodeLocation(node);
   if (
     apexClass &&
     nodeLoc &&
     allowTrailingEmptyLine &&
+    trailingEmptyLineAllowed &&
     !node.isLastNodeInArray &&
     !node.isNextStatementOnSameLine
   ) {
     const nextLine = nodeLoc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-    if (trailingEmptyLineAllowed && nextEmptyLine !== -1) {
+    if (nextEmptyLine !== -1) {
       node.trailingEmptyLine = true;
     }
   }
@@ -553,11 +555,11 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
     }
   }
 
-  Object.keys(node).forEach((key) => {
+  for (let key of Object.keys(node)) {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
     }
-  });
+  }
   return node;
 }
 
