@@ -2,7 +2,6 @@ node_modules
 .idea
 *.iml
 coverage
-tests/local_only
 repo
 dist
 *.tgz
@@ -11,6 +10,7 @@ build
 out
 .sfdx
 .vscode/settings.json
+packages/prettier-plugin-apex/tests/local_only
 packages/prettier-plugin-apex/vendor
 
 .nx
