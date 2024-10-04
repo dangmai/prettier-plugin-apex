@@ -364,17 +364,19 @@ function handleNodeLocation(
   const apexClass = node["@class"];
   let handlerFn;
   if (apexClass) {
-    const separatorIndex = apexClass.indexOf("$");
-    if (separatorIndex !== -1) {
-      const parentClass = apexClass.substring(0, separatorIndex);
-      if (parentClass in locationGenerationHandler) {
-        handlerFn = locationGenerationHandler[parentClass];
-      }
-    }
     if (apexClass in locationGenerationHandler) {
       handlerFn = locationGenerationHandler[apexClass];
+    } else {
+      const separatorIndex = apexClass.indexOf("$");
+      if (separatorIndex !== -1) {
+        const parentClass = apexClass.slice(0, separatorIndex);
+        if (parentClass in locationGenerationHandler) {
+          handlerFn = locationGenerationHandler[parentClass];
+        }
+      }
     }
   }
+
   if (handlerFn && currentLocation) {
     node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
   } else if (handlerFn && node.loc) {
