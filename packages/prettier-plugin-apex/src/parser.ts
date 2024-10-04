@@ -345,8 +345,9 @@ function handleNodeLocation(
 ) {
   let currentLocation: MinimalLocation | undefined;
   Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      const location = handleNodeLocation(node[key], sourceCode, commentNodes);
+    const value = node[key];
+    if (typeof value === "object") {
+      const location = handleNodeLocation(value, sourceCode, commentNodes);
       if (location && currentLocation) {
         if (currentLocation.startIndex > location.startIndex) {
           currentLocation.startIndex = location.startIndex;
@@ -354,8 +355,7 @@ function handleNodeLocation(
         if (currentLocation.endIndex < location.endIndex) {
           currentLocation.endIndex = location.endIndex;
         }
-      }
-      if (location && !currentLocation) {
+      } else if (location && !currentLocation) {
         currentLocation = location;
       }
     }
