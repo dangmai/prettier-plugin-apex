@@ -382,27 +382,31 @@ function handleNodeLocation(
   } else if (handlerFn && node.loc) {
     node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
   }
-  if (!node.loc) {
+
+  const nodeLoc = node.loc;
+  if (!nodeLoc) {
     delete node.loc;
-  } else if (node.loc && currentLocation) {
-    if (node.loc.startIndex > currentLocation.startIndex) {
-      node.loc.startIndex = currentLocation.startIndex;
+  } else if (nodeLoc && currentLocation) {
+    if (nodeLoc.startIndex > currentLocation.startIndex) {
+      nodeLoc.startIndex = currentLocation.startIndex;
     } else {
-      currentLocation.startIndex = node.loc.startIndex;
+      currentLocation.startIndex = nodeLoc.startIndex;
     }
-    if (node.loc.endIndex < currentLocation.endIndex) {
-      node.loc.endIndex = currentLocation.endIndex;
+    if (nodeLoc.endIndex < currentLocation.endIndex) {
+      nodeLoc.endIndex = currentLocation.endIndex;
     } else {
-      currentLocation.endIndex = node.loc.endIndex;
+      currentLocation.endIndex = nodeLoc.endIndex;
     }
   }
+
   if (currentLocation) {
     return { ...currentLocation };
   }
-  if (node.loc) {
+
+  if (nodeLoc) {
     return {
-      startIndex: node.loc.startIndex,
-      endIndex: node.loc.endIndex,
+      startIndex: nodeLoc.startIndex,
+      endIndex: nodeLoc.endIndex,
     };
   }
   return null;
