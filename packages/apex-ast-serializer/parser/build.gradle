@@ -4,6 +4,7 @@ plugins {
   id 'application'
   id 'jacoco'
   id 'org.graalvm.buildtools.native' version '0.10.3'
+  id "org.teavm" version "0.10.2"
 }
 
 sourceSets {
@@ -148,4 +149,11 @@ task buildNative {
   dependsOn 'nativeInstrumentedTest'
   dependsOn 'nativeCompile'
   tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
+}
+
+teavm.js {
+  mainClass = "net.dangmai.serializer.DirectApex"
+
+  // this is also optional, default value is <project name>.js
+  targetFileName = "apex.js"
 }
