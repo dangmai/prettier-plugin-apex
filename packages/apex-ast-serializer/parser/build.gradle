@@ -66,6 +66,9 @@ dependencies {
   // https://mvnrepository.com/artifact/commons-io/commons-io
   api group: 'commons-io', name: 'commons-io', version: '2.17.0'
 
+  api teavm.libs.jsoApis
+
+
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
@@ -156,4 +159,8 @@ teavm.js {
 
   // this is also optional, default value is <project name>.js
   targetFileName = "apex.js"
+  obfuscated = false
+
+  sourceMap.set(true)
+  debugInformation.set(true)
 }
