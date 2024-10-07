@@ -462,12 +462,12 @@ function generateExtraMetadata(
   }
 
   if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
-    for (let inputParameter of node.inputParameters) {
+    for (const inputParameter of node.inputParameters) {
       inputParameter.insideParenthesis = true;
     }
   }
 
-  for (let key of Object.keys(node)) {
+  for (const key of Object.keys(node)) {
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
@@ -523,6 +523,27 @@ function generateExtraMetadata(
   return nodeLoc;
 }
 
+function getLineNumber(lineIndexes: number[], charIndex: number) {
+  let low = 0;
+  let high = lineIndexes.length - 1;
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const midIndex = lineIndexes[mid] ?? 0;
+    const beforeMidIndex = lineIndexes[mid - 1] ?? 0;
+
+    if (midIndex >= charIndex && beforeMidIndex < charIndex) {
+      return mid;
+    }
+
+    if (midIndex < charIndex) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return -1;
+}
+
 // For each node, the jorje compiler gives us its line and its index within
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
@@ -555,31 +576,12 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
     }
   }
 
-  for (let key of Object.keys(node)) {
+  for (const key of Object.keys(node)) {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
     }
   }
   return node;
-}
-
-function getLineNumber(lineIndexes: number[], charIndex: number) {
-  let low = 0;
-  let high = lineIndexes.length - 1;
-  while (low <= high) {
-    let mid = Math.floor((low + high) / 2);
-    const midIndex = lineIndexes[mid] ?? 0;
-    const beforeMidIndex = lineIndexes[mid - 1] ?? 0;
-
-    if (midIndex >= charIndex && beforeMidIndex < charIndex) {
-      return mid;
-    } else if (midIndex < charIndex) {
-      low = mid + 1;
-    } else {
-      high = mid - 1;
-    }
-  }
-  return -1;
 }
 
 // Get a map of line number to the index of its first character
