@@ -462,12 +462,12 @@ function generateExtraMetadata(
   }
 
   if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
-    for (const inputParameter of node.inputParameters) {
+    node.inputParameters.forEach((inputParameter: any) => {
       inputParameter.insideParenthesis = true;
-    }
+    });
   }
 
-  for (const key of Object.keys(node)) {
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
@@ -503,7 +503,7 @@ function generateExtraMetadata(
         allowTrailingEmptyLineWithin,
       );
     }
-  }
+  });
 
   const nodeLoc = getNodeLocation(node);
   if (
@@ -576,11 +576,11 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
     }
   }
 
-  for (const key of Object.keys(node)) {
+  Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
     }
-  }
+  });
   return node;
 }
 
