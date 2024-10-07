@@ -13,10 +13,14 @@ public class TAtomicReferenceArray<E> {
   }
 
   public E get(int i) {
-    return (E) this.array[i].get();
+    TAtomicReference<E> item = this.array[i];
+    if (item == null) {
+      return null;
+    }
+    return item.get();
   }
 
   public void set(int i, E newValue) {
-    this.array[i].set(newValue);
+    this.array[i] = new TAtomicReference(newValue);
   }
 }
