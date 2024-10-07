@@ -6,6 +6,7 @@ import apex.jorje.semantic.compiler.parser.ParserOutput;
 import apex.jorje.semantic.compiler.parser.StandaloneParserEngine;
 import java.io.IOException;
 import org.teavm.jso.JSBody;
+import org.teavm.jso.JSExport;
 
 public class DirectApex {
 
@@ -15,11 +16,10 @@ public class DirectApex {
   )
   public static native void stringify(String message);
 
-  public static void getAST(String sourceCode, Boolean anonymous)
+  @JSExport
+  public static ParserOutput getAST(String sourceCode, boolean anonymous)
     throws IOException {
-    DirectApex.stringify("1");
     SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
-    DirectApex.stringify("2");
     StandaloneParserEngine engine;
     if (anonymous) {
       engine = StandaloneParserEngine.get(
@@ -29,14 +29,8 @@ public class DirectApex {
       engine = StandaloneParserEngine.get(StandaloneParserEngine.Type.NAMED);
     }
     Locations.useIndexFactory(); // without this, comments won't be retained correctly
-    // DirectApex.stringify(engine.parse(sourceFile));
-    // DirectApex.stringify("Hello here");
     ParserOutput output = engine.parse(sourceFile);
     DirectApex.stringify(output.getUnit().toString());
-  }
-
-  public static void main(String[] args) throws IOException {
-    String sourceCode = "public class Test { static void main() {} }";
-    getAST(sourceCode, false);
+    return output;
   }
 }
