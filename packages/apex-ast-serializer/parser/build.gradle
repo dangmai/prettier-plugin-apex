@@ -160,6 +160,7 @@ teavm.js {
   // this is also optional, default value is <project name>.js
   targetFileName = "apex.js"
   obfuscated = false
+  moduleType = org.teavm.gradle.api.JSModuleType.ES2015
 
   sourceMap.set(true)
   debugInformation.set(true)
