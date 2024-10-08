@@ -77,9 +77,7 @@ public class Apex {
     ParserOutput output = engine.parse(
       sourceFile,
       ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS,
-      // The new SoqlPaserType handles quotes strings differently, leading to test failures.
-      // TODO: change printing process to take that into account.
-      ParserEngine.SoqlParserType.OLD
+      ParserEngine.SoqlParserType.NEW
     );
 
     // Serializing the output
