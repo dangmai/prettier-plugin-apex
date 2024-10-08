@@ -76,7 +76,8 @@ public class Apex {
     Locations.useIndexFactory(); // without this, comments won't be retained correctly
     ParserOutput output = engine.parse(
       sourceFile,
-      ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS
+      ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS,
+      ParserEngine.SoqlParserType.NEW
     );
 
     // Serializing the output
