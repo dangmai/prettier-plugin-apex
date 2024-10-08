@@ -156,12 +156,9 @@ task buildNative {
 
 teavm.js {
   mainClass = "net.dangmai.serializer.DirectApex"
-
-  // this is also optional, default value is <project name>.js
-  targetFileName = "apex.js"
+  targetFileName = "jorje.js"
+  outputDir = file("../../prettier-plugin-apex/src")
+  relativePathInOutputDir = ""
   obfuscated = false
   moduleType = org.teavm.gradle.api.JSModuleType.ES2015
-
-  sourceMap.set(true)
-  debugInformation.set(true)
 }

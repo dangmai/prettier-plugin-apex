@@ -12,6 +12,7 @@ out
 .vscode/settings.json
 packages/prettier-plugin-apex/tests/local_only
 packages/prettier-plugin-apex/vendor
+packages/prettier-plugin-apex/src/jorje.js
 
 .nx
 .pnpm-store

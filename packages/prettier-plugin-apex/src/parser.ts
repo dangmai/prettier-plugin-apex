@@ -10,6 +10,7 @@ import {
   APEX_TYPES,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
+import { getApexAst } from "./jorje.js";
 import {
   GenericComment,
   SerializedAst,
@@ -695,6 +696,7 @@ export default async function parse(
           node["@class"] === APEX_TYPES.INLINE_COMMENT ||
           node["@class"] === APEX_TYPES.BLOCK_COMMENT,
       );
+    const a = getApexAst(sourceCode, options.parser === "apex-anonymous");
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);

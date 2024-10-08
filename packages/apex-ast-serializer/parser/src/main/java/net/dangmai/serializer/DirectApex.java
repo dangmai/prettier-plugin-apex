@@ -17,7 +17,7 @@ public class DirectApex {
   public static native void stringify(String message);
 
   @JSExport
-  public static ParserOutput getAST(String sourceCode, boolean anonymous)
+  public static ParserOutput getApexAst(String sourceCode, boolean anonymous)
     throws IOException {
     SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
     StandaloneParserEngine engine;
