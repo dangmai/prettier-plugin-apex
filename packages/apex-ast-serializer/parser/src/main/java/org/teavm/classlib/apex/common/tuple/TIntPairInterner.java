@@ -1,4 +1,4 @@
-package net.dangmai.serializer.tuple;
+package org.teavm.classlib.apex.common.tuple;
 
 import apex.common.tuple.IntPairFactory;
 
