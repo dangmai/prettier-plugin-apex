@@ -345,8 +345,9 @@ function handleNodeLocation(
 ) {
   let currentLocation: MinimalLocation | undefined;
   Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      const location = handleNodeLocation(node[key], sourceCode, commentNodes);
+    const value = node[key];
+    if (typeof value === "object") {
+      const location = handleNodeLocation(value, sourceCode, commentNodes);
       if (location && currentLocation) {
         if (currentLocation.startIndex > location.startIndex) {
           currentLocation.startIndex = location.startIndex;
@@ -354,8 +355,7 @@ function handleNodeLocation(
         if (currentLocation.endIndex < location.endIndex) {
           currentLocation.endIndex = location.endIndex;
         }
-      }
-      if (location && !currentLocation) {
+      } else if (location && !currentLocation) {
         currentLocation = location;
       }
     }
@@ -364,44 +364,49 @@ function handleNodeLocation(
   const apexClass = node["@class"];
   let handlerFn;
   if (apexClass) {
-    const separatorIndex = apexClass.indexOf("$");
-    if (separatorIndex !== -1) {
-      const parentClass = apexClass.substring(0, separatorIndex);
-      if (parentClass in locationGenerationHandler) {
-        handlerFn = locationGenerationHandler[parentClass];
-      }
-    }
     if (apexClass in locationGenerationHandler) {
       handlerFn = locationGenerationHandler[apexClass];
+    } else {
+      const separatorIndex = apexClass.indexOf("$");
+      if (separatorIndex !== -1) {
+        const parentClass = apexClass.slice(0, separatorIndex);
+        if (parentClass in locationGenerationHandler) {
+          handlerFn = locationGenerationHandler[parentClass];
+        }
+      }
     }
   }
+
   if (handlerFn && currentLocation) {
     node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
   } else if (handlerFn && node.loc) {
     node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
   }
-  if (!node.loc) {
+
+  const nodeLoc = node.loc;
+  if (!nodeLoc) {
     delete node.loc;
-  }
-  if (node.loc && currentLocation) {
-    if (node.loc.startIndex > currentLocation.startIndex) {
-      node.loc.startIndex = currentLocation.startIndex;
+  } else if (nodeLoc && currentLocation) {
+    if (nodeLoc.startIndex > currentLocation.startIndex) {
+      nodeLoc.startIndex = currentLocation.startIndex;
     } else {
-      currentLocation.startIndex = node.loc.startIndex;
+      currentLocation.startIndex = nodeLoc.startIndex;
     }
-    if (node.loc.endIndex < currentLocation.endIndex) {
-      node.loc.endIndex = currentLocation.endIndex;
+    if (nodeLoc.endIndex < currentLocation.endIndex) {
+      nodeLoc.endIndex = currentLocation.endIndex;
     } else {
-      currentLocation.endIndex = node.loc.endIndex;
+      currentLocation.endIndex = nodeLoc.endIndex;
     }
   }
+
   if (currentLocation) {
     return { ...currentLocation };
   }
-  if (node.loc) {
+
+  if (nodeLoc) {
     return {
-      startIndex: node.loc.startIndex,
-      endIndex: node.loc.endIndex,
+      startIndex: nodeLoc.startIndex,
+      endIndex: nodeLoc.endIndex,
     };
   }
   return null;
@@ -448,21 +453,21 @@ function generateExtraMetadata(
   if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
     node.forcedHardline = node.loc.startLine !== node.loc.endLine;
   }
-
   // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
   // `ifBlockIndex` into the node for handling code to differentiate them.
-  if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
+  else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
     node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
       (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
     });
   }
 
+  if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
+    node.inputParameters.forEach((inputParameter: any) => {
+      inputParameter.insideParenthesis = true;
+    });
+  }
+
   Object.keys(node).forEach((key) => {
-    if (key === "inputParameters" && Array.isArray(node.inputParameters)) {
-      node.inputParameters.forEach((inputParameter: any) => {
-        inputParameter.insideParenthesis = true;
-      });
-    }
     if (typeof node[key] === "object") {
       if (Array.isArray(node)) {
         const keyInt = parseInt(key, 10);
@@ -487,10 +492,11 @@ function generateExtraMetadata(
             currentChildNode.loc &&
             nextChildNode.loc.startLine === currentChildNode.loc.endLine
           ) {
-            node[keyInt].isNextStatementOnSameLine = true;
+            currentChildNode.isNextStatementOnSameLine = true;
           }
         }
       }
+
       generateExtraMetadata(
         node[key],
         emptyLineLocations,
@@ -504,16 +510,38 @@ function generateExtraMetadata(
     apexClass &&
     nodeLoc &&
     allowTrailingEmptyLine &&
+    trailingEmptyLineAllowed &&
     !node.isLastNodeInArray &&
     !node.isNextStatementOnSameLine
   ) {
     const nextLine = nodeLoc.endLine + 1;
     const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-    if (trailingEmptyLineAllowed && nextEmptyLine !== -1) {
+    if (nextEmptyLine !== -1) {
       node.trailingEmptyLine = true;
     }
   }
   return nodeLoc;
+}
+
+function getLineNumber(lineIndexes: number[], charIndex: number) {
+  let low = 0;
+  let high = lineIndexes.length - 1;
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2);
+    const midIndex = lineIndexes[mid] ?? 0;
+    const beforeMidIndex = lineIndexes[mid - 1] ?? 0;
+
+    if (midIndex >= charIndex && beforeMidIndex < charIndex) {
+      return mid;
+    }
+
+    if (midIndex < charIndex) {
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  return -1;
 }
 
 // For each node, the jorje compiler gives us its line and its index within
@@ -526,26 +554,28 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
     // The location node that we manually generate do not contain startLine
     // information, so we will create them here.
     nodeLoc.startLine =
-      lineIndexes.findIndex((index: number) => index > nodeLoc.startIndex) - 1;
+      nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
   }
+
   if (nodeLoc && !("endLine" in nodeLoc)) {
-    nodeLoc.endLine =
-      lineIndexes.findIndex((index: number) => index > nodeLoc.endIndex) - 1;
+    nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
 
     // Edge case: root node
     if (nodeLoc.endLine < 0) {
       nodeLoc.endLine = lineIndexes.length - 1;
     }
   }
+
   if (nodeLoc && !("column" in nodeLoc)) {
     const nodeStartLineIndex =
       lineIndexes[
-        lineIndexes.findIndex((index: number) => index > nodeLoc.startIndex) - 1
+        nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
       ];
     if (nodeStartLineIndex !== undefined) {
       nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
     }
   }
+
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       node[key] = resolveLineIndexes(node[key], lineIndexes);
@@ -557,9 +587,9 @@ function resolveLineIndexes(node: any, lineIndexes: number[]) {
 // Get a map of line number to the index of its first character
 function getLineIndexes(sourceCode: string) {
   // First line always start with index 0
-  const lineIndexes = [0, 0];
+  const lineIndexes = [0];
   let characterIndex = 0;
-  let lineIndex = 2;
+  let lineIndex = 1;
   while (characterIndex < sourceCode.length) {
     const eolIndex = sourceCode.indexOf("\n", characterIndex);
     if (eolIndex < 0) {
@@ -570,11 +600,11 @@ function getLineIndexes(sourceCode: string) {
     if (lastLineIndex === undefined) {
       return lineIndexes;
     }
-    lineIndexes[lineIndex] =
-      lastLineIndex + sourceCode.substring(characterIndex, eolIndex).length + 1;
+    lineIndexes[lineIndex] = lastLineIndex + (eolIndex - characterIndex) + 1;
     characterIndex = eolIndex + 1;
     lineIndex += 1;
   }
+  lineIndexes[lineIndex] = sourceCode.length;
   return lineIndexes;
 }
 
@@ -598,7 +628,6 @@ export default async function parse(
   sourceCode: string,
   options: prettier.RequiredOptions,
 ): Promise<SerializedAst | Record<string, never>> {
-  const lineIndexes = getLineIndexes(sourceCode);
   let serializedAst: string;
   let stderr: string = "";
   if (options.apexStandaloneParser === "built-in") {
@@ -655,6 +684,7 @@ export default async function parse(
       );
     ast = resolveAstReferences(ast, {});
     handleNodeLocation(ast, sourceCode, commentNodes);
+    const lineIndexes = getLineIndexes(sourceCode);
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
