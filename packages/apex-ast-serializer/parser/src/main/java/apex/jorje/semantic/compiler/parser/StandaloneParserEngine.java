@@ -50,6 +50,7 @@ public class StandaloneParserEngine {
     );
     ApexParser parser = new ApexParser(tokenStream);
     parser.setVersion(source.getVersion());
+    parser.setNewSoqlParserEnabled(true);
     CompilationUnit unit = this.worker.parse(parser);
     return ParserOutput.createFromAntlr(
       parser,
