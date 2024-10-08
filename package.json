@@ -1,6 +1,6 @@
 {
   "name": "monorepo-prettier-plugin-apex",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "Monorepo for the Prettier Apex project",
   "main": "index.js",
   "scripts": {
@@ -26,15 +26,15 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-prettier": "5.2.1",
     "eslint-plugin-prettier-doc": "1.1.0",
-    "nx": "19.8.3",
+    "nx": "20.0.0",
     "prettier": "3.3.3",
     "prettier-plugin-java": "2.6.4",
     "prettier-plugin-organize-imports": "4.1.0",
     "rimraf": "5.0.10",
-    "zx": "8.1.8"
+    "zx": "8.1.9"
   },
   "keywords": [],
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
-  "packageManager": "pnpm@9.12.0"
+  "packageManager": "pnpm@9.12.1"
 }

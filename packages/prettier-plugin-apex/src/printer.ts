@@ -2328,23 +2328,6 @@ function handleWhereOperationExpressions(path: AstPath, print: printFn): Doc {
   return groupConcat(parts);
 }
 
-function escapeSoqlString(text: string, isInLikeExpression: boolean) {
-  let escapedText = text;
-  if (!isInLikeExpression) {
-    // #340 - In a LIKE expression, the string emitted by jorje is already quoted,
-    // so we don't need this step.
-    escapedText = escapedText.replace(/\\/g, "\\\\");
-  }
-  escapedText = escapedText
-    .replace(/\u0008/g, "\\b") // eslint-disable-line no-control-regex
-    .replace(/\t/g, "\\t")
-    .replace(/\n/g, "\\n")
-    .replace(/\f/g, "\\f")
-    .replace(/\r/g, "\\r")
-    .replace(/'/g, "\\'");
-  return escapedText;
-}
-
 function handleWhereQueryLiteral(
   childClass: string,
   path: AstPath,
@@ -2352,19 +2335,11 @@ function handleWhereQueryLiteral(
   options: any,
 ): Doc {
   const node = path.getNode();
-  const grandParentNode = path.getParentNode(1);
 
   let doc: Doc;
-  const isInLikeExpression =
-    grandParentNode &&
-    grandParentNode.op &&
-    grandParentNode.op["@class"] === APEX_TYPES.QUERY_OPERATOR_LIKE;
   switch (childClass as jorje.QueryLiteral["@class"]) {
     case "apex.jorje.data.soql.QueryLiteral$QueryString":
-      // #340 - Query Strings have different properties than normal Apex strings,
-      // so we have to handle them separately. They also behave differently
-      // depending on whether they are in a LIKE expression vs other expressions.
-      doc = ["'", escapeSoqlString(node.literal, isInLikeExpression), "'"];
+      doc = ["'", node.literal, "'"];
       break;
     case "apex.jorje.data.soql.QueryLiteral$QueryNull":
       doc = "NULL";

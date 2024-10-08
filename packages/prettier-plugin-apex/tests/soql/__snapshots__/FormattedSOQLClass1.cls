@@ -152,7 +152,7 @@ class SOQLClass {
         OR Name = '\\Hi'
         OR Name = 'Hello\nWorld'
         OR Name = 'Hello\tWorld'
-        OR Name = 'Hello\r\nWorld'
+        OR Name = 'Hello\R\NWorld'
         OR Name = '\n\n\nHi'
     ];
   }
