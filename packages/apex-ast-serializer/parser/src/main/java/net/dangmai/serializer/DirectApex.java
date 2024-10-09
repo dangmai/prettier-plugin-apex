@@ -30,7 +30,7 @@ public class DirectApex {
     }
     Locations.useIndexFactory(); // without this, comments won't be retained correctly
     ParserOutput output = engine.parse(sourceFile);
-    DirectApex.stringify(output.getUnit().toString());
+    System.out.println(TeaMeta.getClassName(output));
     return output;
   }
 }

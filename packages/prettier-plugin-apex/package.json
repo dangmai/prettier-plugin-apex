@@ -20,7 +20,7 @@
     "/vendor"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc --project tsconfig.prod.json && pnpm run build:standalone",
+    "build": "rimraf dist && tsc --project tsconfig.prod.json && cp src/jorje.js dist/src/jorje.js && pnpm run build:standalone",
     "build:dev": "tsc",
     "build:standalone": "vite build",
     "clean": "rimraf node_modules dist",

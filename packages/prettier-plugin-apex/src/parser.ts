@@ -10,6 +10,7 @@ import {
   APEX_TYPES,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
+// @ts-expect-error temporary
 import { getApexAst } from "./jorje.js";
 import {
   GenericComment,
@@ -696,6 +697,7 @@ export default async function parse(
           node["@class"] === APEX_TYPES.INLINE_COMMENT ||
           node["@class"] === APEX_TYPES.BLOCK_COMMENT,
       );
+    // @ts-expect-error temporary
     const a = getApexAst(sourceCode, options.parser === "apex-anonymous");
     return ast;
   }
