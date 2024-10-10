@@ -104,7 +104,7 @@ function handleReturnStatement(path: AstPath, print: printFn): Doc {
 
 function handleTriggerUsage(path: AstPath): Doc {
   const node: jorje.TriggerDeclUnit["usages"][number] = path.getNode();
-  return TRIGGER_USAGE[node.$];
+  return TRIGGER_USAGE[node.$ as keyof typeof TRIGGER_USAGE];
 }
 
 function getOperator(node: jorje.BinaryExpr | jorje.BooleanExpr): string {
