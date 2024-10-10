@@ -5,10 +5,11 @@ import java.util.stream.Collectors;
 import javassist.*;
 import javassist.bytecode.*;
 import javassist.bytecode.annotation.Annotation;
+import javassist.bytecode.annotation.StringMemberValue;
 
 public class Annotations {
 
-  private static AnnotationsAttribute getAnnotationsAttribute(
+  private static AnnotationsAttribute getMethodAnnotationsAttribute(
     ConstPool constPool
   ) {
     AnnotationsAttribute attr = new AnnotationsAttribute(
@@ -25,6 +26,38 @@ public class Annotations {
     );
     attr.addAnnotation(jsExportAnnotation);
     attr.addAnnotation(jsPropertyAnnotation);
+    return attr;
+  }
+
+  private static AnnotationsAttribute getClassAnnotationsAttribute(
+    ConstPool constPool
+  ) {
+    AnnotationsAttribute attr = new AnnotationsAttribute(
+      constPool,
+      AnnotationsAttribute.visibleTag
+    );
+    String fullClassName = constPool.getClassName();
+    String simpleName = fullClassName.substring(
+      fullClassName.lastIndexOf('.') + 1
+    );
+    System.out.println(simpleName);
+    if (simpleName.contains("$")) {
+      String parentClassName = simpleName.substring(0, simpleName.indexOf('$'));
+      String ownName = simpleName.substring(simpleName.indexOf('$') + 1);
+      System.out.println(parentClassName);
+      simpleName = parentClassName + ownName;
+    }
+    Annotation classNameAnnotation = new Annotation(
+      "org.teavm.jso.JSClass",
+      constPool
+    );
+    System.out.println(fullClassName);
+    System.out.println(simpleName);
+    classNameAnnotation.addMemberValue(
+      "name",
+      new StringMemberValue(simpleName, constPool)
+    );
+    attr.addAnnotation(classNameAnnotation);
     return attr;
   }
 
@@ -49,6 +82,11 @@ public class Annotations {
     CtClass[] ctClasses = pool.get(classes);
     for (CtClass ctClass : ctClasses) {
       System.out.println("Patching " + ctClass.getName());
+
+      AnnotationsAttribute classAnnotationAttribute =
+        getClassAnnotationsAttribute(ctClass.getClassFile().getConstPool());
+      ctClass.getClassFile().addAttribute(classAnnotationAttribute);
+
       CtField[] ctFields = ctClass.getDeclaredFields();
       for (CtField ctField : ctFields) {
         if (ctField.getName().equals("serialVersionUID")) {
@@ -64,9 +102,6 @@ public class Annotations {
           ctField.getName().substring(0, 1).toUpperCase() +
           ctField.getName().substring(1);
 
-        // if (!Modifier.isPublic(ctField.getModifiers())) {
-        //   continue;
-        // }
         CtMethod getter = CtNewMethod.make(
           "public " +
           ctField.getType().getName() +
@@ -88,7 +123,7 @@ public class Annotations {
           // Method does not exist, we can add it
         }
 
-        AnnotationsAttribute attr = getAnnotationsAttribute(
+        AnnotationsAttribute attr = getMethodAnnotationsAttribute(
           ctClass.getClassFile().getConstPool()
         );
         getter.getMethodInfo().addAttribute(attr);
