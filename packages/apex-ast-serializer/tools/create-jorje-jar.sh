@@ -47,8 +47,6 @@ function minimize() {
   rm -rf ./apex/jorje/lsp
 
   popd
-  java -cp "javassist-3.30.2-GA.jar:classgraph-4.8.177.jar:temp" Annotations.java
-  rsync -a generated/ temp/
   jar -cf ${FILENAME_MINIMIZED} -C temp/ .
   rm -rf temp generated
 }
@@ -57,13 +55,13 @@ function cleanup() {
   rm ${FILENAME}
 }
 
-# download
-# NEW_MD5="$(md5sum ${FILENAME} | awk '{ print $1 }')"
-# if [[ "${NEW_MD5}" == "${CURRENT_MD5}" ]]; then
-#   cleanup
-# else
+download
+NEW_MD5="$(md5sum ${FILENAME} | awk '{ print $1 }')"
+if [[ "${NEW_MD5}" == "${CURRENT_MD5}" ]]; then
+  cleanup
+else
   minimize
   install
-#   cleanup
-#   echo "${NEW_MD5}" > "${CURRENT_DIR}/${CURRENT_MD5_FILENAME}"
-# fi
+  cleanup
+  echo "${NEW_MD5}" > "${CURRENT_DIR}/${CURRENT_MD5_FILENAME}"
+fi
