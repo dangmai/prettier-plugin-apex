@@ -11,14 +11,14 @@ import {
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
 // @ts-expect-error temporary
-import { getApexAst } from "./jorje.js";
+import { getApexAst, ParserOutput } from "./jorje.js";
 import {
-  GenericComment,
-  SerializedAst,
   doesFileExist,
   findNextUncommentedCharacter,
+  GenericComment,
   getNativeExecutable,
   getSerializerBinDirectory,
+  SerializedAst,
 } from "./util.js";
 
 type MinimalLocation = {
