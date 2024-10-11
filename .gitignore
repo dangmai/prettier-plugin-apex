@@ -5,6 +5,7 @@ coverage
 repo
 dist
 *.tgz
+*.log
 .gradle
 build
 out
