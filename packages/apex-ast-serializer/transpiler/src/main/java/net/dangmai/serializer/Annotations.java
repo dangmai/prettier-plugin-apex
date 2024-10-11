@@ -79,8 +79,8 @@ public class Annotations {
     return foundTypes.toArray(new String[foundTypes.size()]);
   }
 
-  public static void main(String[] args) throws Exception {
-    ClassPool pool = ClassPool.getDefault();
+  private static void annotateJorjeClasses(ClassPool pool, String generatedDir)
+    throws Exception {
     String[] classes = getClassNamesContainsPattern("apex");
     CtClass[] ctClasses = pool.get(classes);
     for (CtClass ctClass : ctClasses) {
@@ -134,9 +134,12 @@ public class Annotations {
           ctClass.addMethod(getter);
         }
       }
-      ctClass.writeFile(args[0]);
+      ctClass.writeFile(generatedDir);
     }
+  }
 
+  private static void annotateTeaVmClasses(ClassPool pool, String generatedDir)
+    throws Exception {
     CtClass ctClass = pool.get("org.teavm.classlib.java.util.TArrayList");
     AnnotationsAttribute classAnnotationAttribute =
       getClassAnnotationsAttribute(ctClass.getClassFile().getConstPool());
@@ -151,6 +154,18 @@ public class Annotations {
     );
     getter.getMethodInfo().addAttribute(attr);
     ctClass.addMethod(getter);
-    ctClass.writeFile("generated");
+    ctClass.writeFile(generatedDir);
+  }
+
+  public static void main(String[] args) throws Exception {
+    String generatedDir = args[0];
+    ClassPool pool = ClassPool.getDefault();
+    // TeaVM requires that properties that are exposed to JS are annotated
+    // with annotations. Since we don't have access to jorje source code,
+    // we need to add these annotations by manipulating the bytecode.
+    annotateJorjeClasses(pool, generatedDir);
+    // TeaVM classlib also doesn't have these annotations by default, so
+    // we need to add them as well.
+    annotateTeaVmClasses(pool, generatedDir);
   }
 }
