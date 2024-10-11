@@ -146,7 +146,7 @@ public class Annotations {
     ctClass.getClassFile().addAttribute(classAnnotationAttribute);
 
     CtMethod getter = CtNewMethod.make(
-      "public Object[] getData() { return this.array; }",
+      "public Object[] getData() { this.trimToSize(); return this.array; }",
       ctClass
     );
     AnnotationsAttribute attr = getMethodAnnotationsAttribute(
