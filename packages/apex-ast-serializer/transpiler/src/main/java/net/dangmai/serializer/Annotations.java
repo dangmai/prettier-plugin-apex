@@ -1,9 +1,17 @@
-import io.github.classgraph.*;
-import java.util.Arrays;
+package net.dangmai.serializer;
+
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ScanResult;
 import java.util.List;
 import java.util.stream.Collectors;
-import javassist.*;
-import javassist.bytecode.*;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtField;
+import javassist.CtMethod;
+import javassist.CtNewMethod;
+import javassist.NotFoundException;
+import javassist.bytecode.AnnotationsAttribute;
+import javassist.bytecode.ConstPool;
 import javassist.bytecode.annotation.Annotation;
 import javassist.bytecode.annotation.StringMemberValue;
 
