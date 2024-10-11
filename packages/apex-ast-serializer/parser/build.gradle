@@ -4,7 +4,6 @@ plugins {
   id 'application'
   id 'jacoco'
   id 'org.graalvm.buildtools.native' version '0.10.3'
-  id "org.teavm" version "0.10.2"
 }
 
 sourceSets {
@@ -65,10 +64,6 @@ dependencies {
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
   api group: 'commons-io', name: 'commons-io', version: '2.17.0'
-
-  api teavm.libs.jsoApis
-  api teavm.libs.metaprogramming
-
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
@@ -153,13 +148,4 @@ task buildNative {
   dependsOn 'nativeInstrumentedTest'
   dependsOn 'nativeCompile'
   tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
-}
-
-teavm.js {
-  mainClass = "net.dangmai.serializer.DirectApex"
-  targetFileName = "jorje.js"
-  outputDir = file("../../prettier-plugin-apex/src")
-  relativePathInOutputDir = ""
-  obfuscated = false
-  moduleType = org.teavm.gradle.api.JSModuleType.ES2015
 }

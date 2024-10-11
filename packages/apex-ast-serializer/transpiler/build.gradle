@@ -1,0 +1,42 @@
+plugins {
+  id 'java-library'
+  id "org.teavm" version "0.10.2"
+}
+
+java {
+  group 'net.dangmai'
+  version '1.0-SNAPSHOT'
+
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+  flatDir {
+    dirs '../libs'
+  }
+  mavenCentral()
+  gradlePluginPortal()
+}
+
+dependencies {
+  implementation name: 'apex-jorje-lsp'
+
+  implementation teavm.libs.jsoApis
+  implementation teavm.libs.metaprogramming
+
+  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
+  implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.177'
+
+  // https://mvnrepository.com/artifact/org.javassist/javassist
+  implementation group: 'org.javassist', name: 'javassist', version: '3.30.2-GA'
+}
+
+teavm.js {
+  mainClass = "net.dangmai.serializer.DirectApex"
+  targetFileName = "jorje.js"
+  outputDir = file("../../prettier-plugin-apex/src")
+  relativePathInOutputDir = ""
+  obfuscated = true
+  moduleType = org.teavm.gradle.api.JSModuleType.ES2015
+}
