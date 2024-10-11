@@ -5,16 +5,9 @@ import apex.jorje.semantic.compiler.SourceFile;
 import apex.jorje.semantic.compiler.parser.ParserOutput;
 import apex.jorje.semantic.compiler.parser.StandaloneParserEngine;
 import java.io.IOException;
-import org.teavm.jso.JSBody;
 import org.teavm.jso.JSExport;
 
 public class DirectApex {
-
-  @JSBody(
-    params = { "message" },
-    script = "console.log(JSON.stringify(message))"
-  )
-  public static native void stringify(String message);
 
   @JSExport
   public static ParserOutput getApexAst(String sourceCode, boolean anonymous)
@@ -30,7 +23,6 @@ public class DirectApex {
     }
     Locations.useIndexFactory(); // without this, comments won't be retained correctly
     ParserOutput output = engine.parse(sourceFile);
-    System.out.println(TeaMeta.getClassName(output));
     return output;
   }
 }

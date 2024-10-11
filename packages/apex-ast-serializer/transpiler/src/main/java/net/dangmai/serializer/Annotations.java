@@ -134,7 +134,7 @@ public class Annotations {
           ctClass.addMethod(getter);
         }
       }
-      ctClass.writeFile("generated");
+      ctClass.writeFile(args[0]);
     }
 
     CtClass ctClass = pool.get("org.teavm.classlib.java.util.TArrayList");
