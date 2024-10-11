@@ -46,6 +46,10 @@ teavm.js {
   moduleType = org.teavm.gradle.api.JSModuleType.ES2015
 }
 
+generateJavaScript {
+  dependsOn "addAnnotations"
+}
+
 clean {
   dependsOn "cleanGeneratedClasses"
 }
