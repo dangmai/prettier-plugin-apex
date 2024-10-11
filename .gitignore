@@ -10,6 +10,7 @@ build
 out
 .sfdx
 .vscode/settings.json
+packages/apex-ast-serializer/transpiler/generated
 packages/prettier-plugin-apex/tests/local_only
 packages/prettier-plugin-apex/vendor
 packages/prettier-plugin-apex/src/jorje.js
