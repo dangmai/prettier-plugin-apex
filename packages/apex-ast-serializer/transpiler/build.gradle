@@ -25,11 +25,16 @@ dependencies {
   implementation teavm.libs.jsoApis
   implementation teavm.libs.metaprogramming
 
+  // https://mvnrepository.com/artifact/org.teavm/teavm-classlib
+  implementation group: 'org.teavm', name: 'teavm-classlib', version: '0.10.2'
+
   // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
   implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.177'
 
   // https://mvnrepository.com/artifact/org.javassist/javassist
   implementation group: 'org.javassist', name: 'javassist', version: '3.30.2-GA'
+
+  implementation files("generated")
 }
 
 teavm.js {
@@ -39,4 +44,19 @@ teavm.js {
   relativePathInOutputDir = ""
   obfuscated = true
   moduleType = org.teavm.gradle.api.JSModuleType.ES2015
+}
+
+clean {
+  dependsOn "cleanGeneratedClasses"
+}
+
+task cleanGeneratedClasses(type: Delete) {
+  delete files("generated")
+}
+
+task addAnnotations(type: JavaExec) {
+  dependsOn "cleanGeneratedClasses"
+  group = "Execution"
+  classpath = sourceSets.main.runtimeClasspath
+  main = "net.dangmai.serializer.Annotations"
 }

@@ -48,19 +48,15 @@ public class Annotations {
     String simpleName = fullClassName.substring(
       fullClassName.lastIndexOf('.') + 1
     );
-    System.out.println(simpleName);
     if (simpleName.contains("$")) {
       String parentClassName = simpleName.substring(0, simpleName.indexOf('$'));
       String ownName = simpleName.substring(simpleName.indexOf('$') + 1);
-      System.out.println(parentClassName);
       simpleName = parentClassName + ownName;
     }
     Annotation classNameAnnotation = new Annotation(
       "org.teavm.jso.JSClass",
       constPool
     );
-    System.out.println(fullClassName);
-    System.out.println(simpleName);
     classNameAnnotation.addMemberValue(
       "name",
       new StringMemberValue(simpleName, constPool)
@@ -86,7 +82,6 @@ public class Annotations {
   public static void main(String[] args) throws Exception {
     ClassPool pool = ClassPool.getDefault();
     String[] classes = getClassNamesContainsPattern("apex");
-    System.out.println(classes.length);
     CtClass[] ctClasses = pool.get(classes);
     for (CtClass ctClass : ctClasses) {
       System.out.println("Patching " + ctClass.getName());
@@ -141,5 +136,21 @@ public class Annotations {
       }
       ctClass.writeFile("generated");
     }
+
+    CtClass ctClass = pool.get("org.teavm.classlib.java.util.TArrayList");
+    AnnotationsAttribute classAnnotationAttribute =
+      getClassAnnotationsAttribute(ctClass.getClassFile().getConstPool());
+    ctClass.getClassFile().addAttribute(classAnnotationAttribute);
+
+    CtMethod getter = CtNewMethod.make(
+      "public Object[] getData() { return this.array; }",
+      ctClass
+    );
+    AnnotationsAttribute attr = getMethodAnnotationsAttribute(
+      ctClass.getClassFile().getConstPool()
+    );
+    getter.getMethodInfo().addAttribute(attr);
+    ctClass.addMethod(getter);
+    ctClass.writeFile("generated");
   }
 }
