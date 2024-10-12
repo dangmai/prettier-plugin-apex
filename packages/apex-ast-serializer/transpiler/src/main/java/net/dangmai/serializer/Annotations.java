@@ -78,6 +78,20 @@ public class Annotations {
     for (CtClass ctClass : ctClasses) {
       System.out.println("Patching " + ctClass.getName());
 
+      if (ctClass.getName().equals("apex.jorje.services.datetimes.DateTimeFormats")) {
+        // We need to patch the way the formatter works in this class, because
+        // it relies on different behavior of the JDK vs the threeten library
+        // that TeaVM uses.
+
+        ctClass.removeField(ctClass.getField("TIME_OFFSET"));
+        var newField = CtField.make(
+            "private static java.time.format.DateTimeFormatter TIME_OFFSET = (new java.time.format.DateTimeFormatterBuilder()).appendOptional(new java.time.format.DateTimeFormatterBuilder().appendOffset(\"+HH:MM\", \"Z\").toFormatter())"
+                +
+                ".appendOptional(new java.time.format.DateTimeFormatterBuilder().appendOffset(\"+HHMM\", \"Z\").toFormatter()).toFormatter();",
+            ctClass);
+        ctClass.addField(newField);
+      }
+
       AnnotationsAttribute classAnnotationAttribute = getClassAnnotationsAttribute(
           ctClass.getClassFile().getConstPool());
       ctClass.getClassFile().addAttribute(classAnnotationAttribute);
