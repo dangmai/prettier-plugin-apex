@@ -98,12 +98,17 @@ class SOQLClass {
   }
 
   void dateSoql() {
+    // The date/time format literals supported by Salesforce are documented here:
+    // https://developer.salesforce.com/docs/atlas.en-us.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_dateformats.htm
+    // However, it's missing the use case of using a +HHMM offset. We test that here for completeness sake.
     AggregateResult[] literals = [
       SELECT Id, UPPER(CALENDAR_YEAR(CreatedDate))
       FROM Contact
       WHERE CreatedDate > 2018-01-01T00:00:00Z
       OR CreatedDate < 2017-01-01T05:00:00+01:00
       OR CreatedDate < 2016-01-01T01:00:00-02:00
+      OR CreatedDate < 2016-01-01T01:00:00+0200
+      OR CreatedDate < 2016-01-01T01:00:00-0200
       GROUP BY CALENDAR_YEAR(CreatedDate)
     ];
     AggregateResult[] longMultiFunctions = [
