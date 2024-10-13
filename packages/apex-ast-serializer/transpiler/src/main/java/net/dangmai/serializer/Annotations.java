@@ -3,6 +3,8 @@ package net.dangmai.serializer;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
@@ -170,21 +172,31 @@ public class Annotations {
 
   private static void annotateTeaVmClasses(ClassPool pool, String generatedDir)
     throws Exception {
-    CtClass ctClass = pool.get("org.teavm.classlib.java.util.TArrayList");
-    AnnotationsAttribute classAnnotationAttribute =
-      getClassAnnotationsAttribute(ctClass.getClassFile().getConstPool());
-    ctClass.getClassFile().addAttribute(classAnnotationAttribute);
-
-    CtMethod getter = CtNewMethod.make(
-      "public Object[] getData() { this.trimToSize(); return this.array; }",
-      ctClass
+    // CtClass ctClass = pool.get("org.teavm.classlib.java.util.TArrayList");
+    Map<String, Supplier<String[]>> getters = Map.of(
+      "org.teavm.classlib.java.util.TArrayList",
+      () ->
+        new String[] {
+          "public Object[] getData() { this.trimToSize(); return this.array; }",
+        },
+      "org.teavm.classlib.java.util.TOptional",
+      () ->
+        new String[] {
+          "public Object getData() { if (this.isPresent()) { return this.value; } else { return null; } }",
+        }
     );
-    AnnotationsAttribute attr = getMethodAnnotationsAttribute(
-      ctClass.getClassFile().getConstPool()
-    );
-    getter.getMethodInfo().addAttribute(attr);
-    ctClass.addMethod(getter);
-    ctClass.writeFile(generatedDir);
+    for (String className : getters.keySet()) {
+      CtClass ctClass = pool.get(className);
+      for (String getter : getters.get(className).get()) {
+        CtMethod method = CtNewMethod.make(getter, ctClass);
+        AnnotationsAttribute attr = getMethodAnnotationsAttribute(
+          ctClass.getClassFile().getConstPool()
+        );
+        method.getMethodInfo().addAttribute(attr);
+        ctClass.addMethod(method);
+      }
+      ctClass.writeFile(generatedDir);
+    }
   }
 
   public static void main(String[] args) throws Exception {
