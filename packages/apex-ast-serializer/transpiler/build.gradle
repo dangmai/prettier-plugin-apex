@@ -37,12 +37,15 @@ dependencies {
   implementation files("generated")
 }
 
+def isDebug = System.getenv("DEBUG_JAVASCRIPT") == "true"
+
 teavm.js {
   mainClass = "net.dangmai.serializer.DirectApex"
   targetFileName = "jorje.js"
   outputDir = file("../../prettier-plugin-apex/src")
   relativePathInOutputDir = ""
-  obfuscated = true
+  obfuscated = !isDebug
+  optimization = isDebug ? org.teavm.gradle.api.OptimizationLevel.BALANCED : org.teavm.gradle.api.OptimizationLevel.NONE
   moduleType = org.teavm.gradle.api.JSModuleType.ES2015
 }
 
