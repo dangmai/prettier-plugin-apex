@@ -22,9 +22,6 @@ sourceSets {
   }
 }
 
-group 'net.dangmai'
-version '1.0-SNAPSHOT'
-
 task parserStartScripts(type: CreateStartScripts) {
   mainClass.set('net.dangmai.serializer.Apex')
   applicationName = 'apex-ast-serializer'
@@ -58,6 +55,9 @@ application {
 }
 
 java {
+  group 'net.dangmai'
+  version '2.1.5'
+
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
 }
