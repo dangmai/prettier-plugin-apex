@@ -195,8 +195,8 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build native executable
-        run: ./gradlew clean :parser:buildNative
+      - name: Build native instrumented executable
+        run: ./gradlew clean :parser:buildInstrumentedNative
       - name: Set version
         run: echo "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" >> $GITHUB_ENV
         if: env.OS != 'windows-latest'

@@ -136,26 +136,18 @@ graalvmNative {
   }
 }
 
-// A copy of the `nativeCompile` task, but with pgo instrumentation enabled.
-task nativeInstrumentedCompile(type: org.graalvm.buildtools.gradle.tasks.BuildNativeImageTask) {
-  description = tasks.nativeCompile.description
-  group = tasks.nativeCompile.group
-  options = tasks.nativeCompile.options
-  useArgFile = tasks.nativeCompile.useArgFile
-
-  overridePgoInstrument()
-}
-
-// This is the task that builds native executable for the host platform.
-// Run it: `gradle buildNative`
+// This is the task that builds native instrumented executable for the host platform.
+// Run it: `./gradlew buildInstrumentedNative`
 // It contains multiple steps in order to achive this goal:
 // - It runs the entire test suite, and uses native-image-agent
 // to figure out what reflections/proxies are used as part of that run.
-// - Then it uses native-image to compile the final artifacts, using the information
+// - Then it uses native-image to compile the artifacts, using the information
 // in the previous step (which is stored in `build/native/agent-output/`)
-// - The final artifact is produced and stored in `build/native/nativeCompile`
-task buildNative {
+// - The instrumented artifact is produced and stored in `build/native/nativeCompile`
+// - This artifact, when run, will generate profiles that can be used to build
+// the final artifact with `./gradlew nativeCompile`.
+task buildInstrumentedNative {
   dependsOn 'nativeInstrumentedTest'
-  dependsOn 'nativeInstrumentedCompile'
-  tasks.findByName('nativeInstrumentedCompile').mustRunAfter 'nativeInstrumentedTest'
+  dependsOn 'nativeCompile'
+  tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
 }
