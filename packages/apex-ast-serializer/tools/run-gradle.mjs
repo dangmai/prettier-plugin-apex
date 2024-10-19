@@ -9,6 +9,7 @@ let command = "./gradlew";
 
 if (process.platform === "win32") {
   usePowerShell();
+  $.prefix = "";
   command += ".bat";
 }
 const args = process.argv.slice(2);

@@ -21,6 +21,7 @@ $.verbose = false;
 let gradle = "./gradlew";
 if (process.platform === "win32") {
   usePowerShell();
+  $.prefix = "";
   gradle += ".bat";
 }
 
