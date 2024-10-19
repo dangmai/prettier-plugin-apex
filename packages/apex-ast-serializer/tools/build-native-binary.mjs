@@ -16,7 +16,7 @@
 import { join } from "path";
 import { $, fs, usePowerShell } from "zx";
 
-$.verbose = true;
+$.verbose = false;
 
 let gradle = "./gradlew";
 if (process.platform === "win32") {
@@ -43,8 +43,10 @@ async function getFilesWithSuffix(rootDir, suffix) {
   return result;
 }
 
-$.sync`${gradle} :parser:nativeInstrumentedTest`;
-$.sync`${gradle} :parser:nativeCompile --pgo-instrument`;
+console.log("Running nativeInstrumentedTest");
+await $`${gradle} :parser:nativeInstrumentedTest`.pipe(process.stdout);
+console.log("Running nativeCompile with PGO instrumentation");
+await $`{gradle} :parser:nativeCompile --pgo-instrument`.pipe(process.stdout);
 const classFiles = await getFilesWithSuffix(
   "./parser/build/resources/test",
   ".cls",
@@ -60,9 +62,11 @@ for (const classFile of classFiles) {
   console.log(`Processing ${classFile}`);
   const isAnonymous = classFile.includes("anonymous");
 
-  $.sync({
+  await $({
     input: await fs.readFile(classFile),
-  })`./parser/build/native/nativeCompile/apex-ast-serializer-instrumented -f json -i ${isAnonymous ? "--anonymous" : ""}`;
+  })`./parser/build/native/nativeCompile/apex-ast-serializer-instrumented -f json -i ${isAnonymous ? "--anonymous" : ""}`.pipe(
+    process.stdout,
+  );
 
   await fs.move(
     "./default.iprof",
@@ -72,7 +76,9 @@ for (const classFile of classFiles) {
   i++;
 }
 console.log("Merging profiles");
-$.sync`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`;
+await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`.pipe(
+  process.stdout,
+);
 await fs.remove("./parser/src/pgo-profiles/main");
 await fs.ensureDir("./parser/src/pgo-profiles/main");
 await fs.move(
@@ -82,4 +88,4 @@ await fs.move(
 );
 
 console.log("Running nativeCompile for final artifact");
-$.sync`${gradle} :parser:nativeCompile`;
+await $`${gradle} :parser:nativeCompile`.pipe(process.stdout);
