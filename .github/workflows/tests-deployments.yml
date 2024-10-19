@@ -203,10 +203,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-        # Without this step, the Windows build will fail, probably because of some
-        # issue with the gradle wrapper needing to download its binary, and
-        # causing hangs
-      - run: node ./tools/run-gradle.mjs -v
       - name: Build native instrumented executable
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Set version
