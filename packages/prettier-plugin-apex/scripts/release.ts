@@ -5,6 +5,16 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+async function updateGradleBuild(buildFilePath: string, version: string) {
+  const buildFileContent = await fs.promises.readFile(buildFilePath, "utf-8");
+
+  const updatedContent = buildFileContent.replace(
+    /java {([\s\S]+)version '\S+'([\s\S]+)}/m,
+    `java {$1version '${version}'$2}`,
+  );
+  await fs.promises.writeFile(buildFilePath, updatedContent, "utf-8");
+}
+
 async function release() {
   // We use readFileSync instead of import here, because with import we have to turn
   // on resolveJsonModule in tsconfig, which messes up the dev build.
@@ -35,6 +45,21 @@ async function release() {
 
   // Write the updated content back to the file
   await fs.promises.writeFile(utilFilePath, updatedContent, "utf-8");
+
+  await updateGradleBuild(
+    path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "../../apex-ast-serializer/parser/build.gradle",
+    ),
+    version,
+  );
+  await updateGradleBuild(
+    path.join(
+      path.dirname(fileURLToPath(import.meta.url)),
+      "../../apex-ast-serializer/server/build.gradle",
+    ),
+    version,
+  );
 }
 
 release();

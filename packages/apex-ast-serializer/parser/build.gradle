@@ -31,7 +31,7 @@ application {
 
 java {
   group 'net.dangmai'
-  version '1.0-SNAPSHOT'
+  version '2.1.5'
 
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
