@@ -20,13 +20,13 @@
         "command": "node tools/run-gradle.mjs clean :server:installDist"
       }
     },
-    "build:native:instrumented": {
+    "build:native": {
       "executor": "nx:run-commands",
       "inputs": ["gradle", "default"],
       "outputs": ["{projectRoot}/parser/build"],
       "options": {
         "cwd": "packages/apex-ast-serializer",
-        "command": "node tools/run-gradle.mjs clean :parser:buildInstrumentedNative"
+        "command": "node tools/build-native-binary.mjs"
       }
     },
     "test": {

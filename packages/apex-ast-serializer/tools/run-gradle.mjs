@@ -1,5 +1,6 @@
 #!/usr/bin/env zx
 import { $, usePowerShell } from "zx";
+$.verbose = false;
 
 // This script runs Gradle with the given arguments in a cross-platform way.
 // It's meant to be called from nx run-commands.
@@ -11,4 +12,4 @@ if (process.platform === "win32") {
   command += ".bat";
 }
 const args = process.argv.slice(2);
-await $`${command} ${args}`;
+await $`${command} ${args}`.pipe(process.stdout);
