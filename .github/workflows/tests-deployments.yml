@@ -159,9 +159,9 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
+          # - ubuntu-latest
+          # - macos-14
           - windows-latest
-          - macos-14
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
