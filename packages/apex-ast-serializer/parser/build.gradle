@@ -135,19 +135,3 @@ graalvmNative {
     }
   }
 }
-
-// This is the task that builds native instrumented executable for the host platform.
-// Run it: `./gradlew buildInstrumentedNative`
-// It contains multiple steps in order to achive this goal:
-// - It runs the entire test suite, and uses native-image-agent
-// to figure out what reflections/proxies are used as part of that run.
-// - Then it uses native-image to compile the artifacts, using the information
-// in the previous step (which is stored in `build/native/agent-output/`)
-// - The instrumented artifact is produced and stored in `build/native/nativeCompile`
-// - This artifact, when run, will generate profiles that can be used to build
-// the final artifact with `./gradlew nativeCompile`.
-task buildInstrumentedNative {
-  dependsOn 'nativeInstrumentedTest'
-  dependsOn 'nativeCompile'
-  tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
-}
