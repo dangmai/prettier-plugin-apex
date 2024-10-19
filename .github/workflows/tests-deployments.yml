@@ -203,7 +203,7 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - run: node ./tools/run-gradle.mjs :parser:build
+      - run: ./gradlew.bat :parser:build
       - name: Build native instrumented executable
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Set version
