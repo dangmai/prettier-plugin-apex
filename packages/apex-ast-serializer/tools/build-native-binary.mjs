@@ -1,5 +1,18 @@
 #!/usr/bin/env zx
 
+// This is the script that builds native executable for the host platform.
+// It contains multiple steps in order to achive this goal:
+// - It runs the entire test suite, and uses native-image-agent
+// to figure out what reflections/proxies are used as part of that run.
+// - Then it uses native-image to compile an instrumented binary, using the information
+// in the previous step (which is stored in `build/native/agent-output/`)
+// - This artifact is produced and stored in `build/native/nativeCompile`
+// - Then it runs the instrumented binary with all the test classes,
+// in order to produce profiles that will be used later to optimize the binary.
+// - Then it merges all the profiles into a single one.
+// - Finally, it runs the nativeCompile task again, but this time with the merged profile,
+// and produces the final artifact.
+
 import { join } from "path";
 import { $, fs, usePowerShell } from "zx";
 
