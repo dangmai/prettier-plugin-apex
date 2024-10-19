@@ -5,8 +5,10 @@ import { $, fs, usePowerShell } from "zx";
 
 $.verbose = false;
 
+let gradle = "./gradlew";
 if (process.platform === "win32") {
   usePowerShell();
+  gradle += ".bat";
 }
 
 async function getFilesWithSuffix(rootDir, suffix) {
@@ -29,13 +31,9 @@ async function getFilesWithSuffix(rootDir, suffix) {
 }
 
 console.log("Running nativeInstrumentedTest");
-await $`node ./tools/run-gradle.mjs :parser:nativeInstrumentedTest`.pipe(
-  process.stdout,
-);
+await $`${gradle} :parser:nativeInstrumentedTest`.pipe(process.stdout);
 console.log("Running nativeCompile with instrumentation");
-await $`node ./tools/run-gradle.mjs :parser:nativeCompile --pgo-instrument`.pipe(
-  process.stdout,
-);
+await $`${gradle} :parser:nativeCompile --pgo-instrument`.pipe(process.stdout);
 const classFiles = await getFilesWithSuffix(
   "./parser/build/resources/test",
   ".cls",
@@ -75,4 +73,4 @@ await fs.move(
 );
 
 console.log("Running nativeCompile for final artifact");
-await $`node ./tools/run-gradle.mjs :parser:nativeCompile`.pipe(process.stdout);
+await $`${gradle} :parser:nativeCompile`.pipe(process.stdout);
