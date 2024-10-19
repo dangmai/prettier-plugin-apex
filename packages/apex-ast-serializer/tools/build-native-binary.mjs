@@ -5,6 +5,10 @@ import { $, fs } from "zx";
 
 $.verbose = false;
 
+if (process.platform === "win32") {
+  usePowerShell();
+}
+
 async function getFilesWithSuffix(rootDir, suffix) {
   let result = [];
 
