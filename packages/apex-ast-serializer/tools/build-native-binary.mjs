@@ -1,7 +1,7 @@
 #!/usr/bin/env zx
 
 import { join } from "path";
-import { $, fs } from "zx";
+import { $, fs, usePowerShell } from "zx";
 
 $.verbose = false;
 
@@ -28,9 +28,11 @@ async function getFilesWithSuffix(rootDir, suffix) {
   return result;
 }
 
+console.log("Running nativeInstrumentedTest");
 await $`node ./tools/run-gradle.mjs :parser:nativeInstrumentedTest`.pipe(
   process.stdout,
 );
+console.log("Running nativeCompile with instrumentation");
 await $`node ./tools/run-gradle.mjs :parser:nativeCompile --pgo-instrument`.pipe(
   process.stdout,
 );
@@ -60,6 +62,7 @@ for (const classFile of classFiles) {
   );
   i++;
 }
+console.log("Merging profiles");
 await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`.pipe(
   process.stdout,
 );
@@ -71,4 +74,5 @@ await fs.move(
   { overwrite: true },
 );
 
+console.log("Running nativeCompile for final artifact");
 await $`node ./tools/run-gradle.mjs :parser:nativeCompile`.pipe(process.stdout);
