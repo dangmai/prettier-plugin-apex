@@ -3,7 +3,7 @@
 import { join } from "path";
 import { $, fs, usePowerShell } from "zx";
 
-$.verbose = false;
+$.verbose = true;
 
 let gradle = "./gradlew";
 if (process.platform === "win32") {
@@ -30,10 +30,8 @@ async function getFilesWithSuffix(rootDir, suffix) {
   return result;
 }
 
-console.log("Running nativeInstrumentedTest");
-await $`${gradle} :parser:nativeInstrumentedTest`.pipe(process.stdout);
-console.log("Running nativeCompile with instrumentation");
-await $`${gradle} :parser:nativeCompile --pgo-instrument`.pipe(process.stdout);
+await $`${gradle} :parser:nativeInstrumentedTest`;
+await $`${gradle} :parser:nativeCompile --pgo-instrument`;
 const classFiles = await getFilesWithSuffix(
   "./parser/build/resources/test",
   ".cls",
@@ -61,9 +59,7 @@ for (const classFile of classFiles) {
   i++;
 }
 console.log("Merging profiles");
-await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`.pipe(
-  process.stdout,
-);
+await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`;
 await fs.remove("./parser/src/pgo-profiles/main");
 await fs.ensureDir("./parser/src/pgo-profiles/main");
 await fs.move(
@@ -73,4 +69,4 @@ await fs.move(
 );
 
 console.log("Running nativeCompile for final artifact");
-await $`${gradle} :parser:nativeCompile`.pipe(process.stdout);
+await $`${gradle} :parser:nativeCompile`;
