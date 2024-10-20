@@ -88,7 +88,7 @@ public class Apex {
     );
 
     // Serializing the output
-    int mode = XStream.ID_REFERENCES;
+    int mode = XStream.NO_REFERENCES;
     Mapper defaultMapper = (new XStream()).getMapper();
     XStream xstream;
     xstream = new XStream(
