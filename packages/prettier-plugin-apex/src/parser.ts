@@ -117,27 +117,6 @@ function getNodeLocation(node: any) {
   return null;
 }
 
-// The serialized string given back contains references (to avoid circular references),
-// which need to be resolved. This method recursively walks through the
-// deserialized object and resolve those references.
-function resolveAstReferences(node: any, referenceMap: { [key: string]: any }) {
-  const nodeId = node["@id"];
-  const nodeReference = node["@reference"];
-  if (nodeId) {
-    referenceMap[nodeId] = node;
-  }
-  if (nodeReference) {
-    // If it has a reference attribute, that means it's a leaf node
-    return referenceMap[nodeReference];
-  }
-  Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      node[key] = resolveAstReferences(node[key], referenceMap);
-    }
-  });
-  return node;
-}
-
 function handleNodeSurroundedByCharacters(
   startCharacter: string,
   endCharacter: string,
