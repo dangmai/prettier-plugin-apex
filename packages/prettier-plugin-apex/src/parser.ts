@@ -33,7 +33,7 @@ async function parseTextWithSpawn(
   text: string,
   anonymous: boolean,
 ): Promise<SpawnOutput> {
-  const args = ["-f", "json", "-i"];
+  const args: string[] = [];
   if (anonymous) {
     args.push("-a");
   }
@@ -91,8 +91,6 @@ async function parseTextWithHttp(
         body: JSON.stringify({
           sourceCode: text,
           anonymous,
-          outputFormat: "json",
-          idRef: true,
           prettyPrint: false,
         }),
       },
