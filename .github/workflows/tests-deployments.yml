@@ -159,22 +159,22 @@ jobs:
     strategy:
       matrix:
         os:
-          # - ubuntu-latest
-          # - macos-14
+          - ubuntu-latest
+          - macos-14
           - windows-latest
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
             OUTPUT_NAME: apex-ast-serializer-${env:version}-win32-x64.exe
             ARTIFACT_NAME: apex-ast-serializer-win32-x64
-          # - os: ubuntu-latest
-          #   ASSET_NAME: apex-ast-serializer
-          #   OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
-          #   ARTIFACT_NAME: apex-ast-serializer-linux-x64
-          # - os: macos-14
-          #   ASSET_NAME: apex-ast-serializer
-          #   OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
-          #   ARTIFACT_NAME: apex-ast-serializer-darwin-arm64
+          - os: ubuntu-latest
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
+            ARTIFACT_NAME: apex-ast-serializer-linux-x64
+          - os: macos-14
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
+            ARTIFACT_NAME: apex-ast-serializer-darwin-arm64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
@@ -203,7 +203,6 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      # - run: ./gradlew.bat :parser:build
       - name: Build native instrumented executable
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Set version
