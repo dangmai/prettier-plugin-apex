@@ -26,7 +26,6 @@ public class CliTest {
             runCli(null, new String[] { file.getAbsolutePath() });
 
             String content = byteArrayOutputStream.toString();
-            System.out.println(content);
             assertNotNull(content, "There should be content");
             assertTrue(
               TestUtilities.isJSONValid(content),
