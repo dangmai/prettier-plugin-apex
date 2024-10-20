@@ -94,9 +94,7 @@ public class TestUtilities {
   ) throws IOException {
     return new JSONObject()
       .put("anonymous", anonymous)
-      .put("idRef", true)
       .put("prettyPrint", false)
-      .put("outputFormat", format)
       .put(
         "sourceCode",
         FileUtils.readFileToString(file, StandardCharsets.UTF_8)

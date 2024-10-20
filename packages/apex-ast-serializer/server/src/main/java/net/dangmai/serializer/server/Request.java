@@ -22,16 +22,6 @@ public class Request {
 
   private String sourceCode;
 
-  public Boolean getIdRef() {
-    return idRef;
-  }
-
-  public void setIdRef(Boolean idRef) {
-    this.idRef = idRef;
-  }
-
-  private Boolean idRef;
-
   public Boolean getPrettyPrint() {
     return prettyPrint;
   }
@@ -41,14 +31,4 @@ public class Request {
   }
 
   private Boolean prettyPrint;
-
-  public String getOutputFormat() {
-    return outputFormat;
-  }
-
-  public void setOutputFormat(String outputFormat) {
-    this.outputFormat = outputFormat;
-  }
-
-  private String outputFormat;
 }
