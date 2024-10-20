@@ -23,7 +23,7 @@ public class CliTest {
         .forEach(file -> {
           try {
             byteArrayOutputStream = new ByteArrayOutputStream();
-            runCli(null, new String[] { file.getAbsolutePath() });
+            runCli(null, new String[] { "-l", file.getAbsolutePath() });
 
             String content = byteArrayOutputStream.toString();
             assertNotNull(content, "There should be content");
