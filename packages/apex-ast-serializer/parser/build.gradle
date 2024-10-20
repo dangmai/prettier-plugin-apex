@@ -136,16 +136,6 @@ graalvmNative {
   }
 }
 
-// This is the task that builds native executable for the host platform.
-// Run it: `gradle buildNative`
-// It contains multiple steps in order to achive this goal:
-// - It runs the entire test suite, and uses native-image-agent
-// to figure out what reflections/proxies are used as part of that run.
-// - Then it uses native-image to compile the final artifacts, using the information
-// in the previous step (which is stored in `build/native/agent-output/`)
-// - The final artifact is produced and stored in `build/native/nativeCompile`
-task buildNative {
-  dependsOn 'nativeInstrumentedTest'
-  dependsOn 'nativeCompile'
-  tasks.findByName('nativeCompile').mustRunAfter 'nativeInstrumentedTest'
+nativeCompile {
+  mustRunAfter nativeInstrumentedTest
 }

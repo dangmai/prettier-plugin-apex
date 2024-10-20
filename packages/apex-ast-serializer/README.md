@@ -23,7 +23,7 @@ The package will be built and installed directly under `packages/prettier-plugin
 For native image, run:
 
 ```bash
-./gradlew buildNative
+pnpm nx run apex-ast-serializer:build:native
 ```
 
 ## Running

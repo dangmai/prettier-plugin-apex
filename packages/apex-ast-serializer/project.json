@@ -26,7 +26,7 @@
       "outputs": ["{projectRoot}/parser/build"],
       "options": {
         "cwd": "packages/apex-ast-serializer",
-        "command": "node tools/run-gradle.mjs clean :parser:buildNative"
+        "command": "node tools/build-native-binary.mjs"
       }
     },
     "test": {
