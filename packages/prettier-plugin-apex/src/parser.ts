@@ -682,7 +682,6 @@ export default async function parse(
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
-    ast = resolveAstReferences(ast, {});
     handleNodeLocation(ast, sourceCode, commentNodes);
     const lineIndexes = getLineIndexes(sourceCode);
     ast = resolveLineIndexes(ast, lineIndexes);
