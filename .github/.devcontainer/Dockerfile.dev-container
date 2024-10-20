@@ -24,7 +24,6 @@ COPY --chown=vscode:vscode .tool-versions /home/vscode/.tool-versions
 ENV PATH=$PATH:/home/vscode/.asdf/bin:/home/vscode/.asdf/shims
 WORKDIR /home/vscode
 RUN cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add {} && asdf install
-RUN gu install native-image
 RUN corepack enable
 RUN asdf reshim nodejs
 RUN pnpm completion bash > ~/completion-for-pnpm.bash
