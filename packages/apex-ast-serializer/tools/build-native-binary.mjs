@@ -65,7 +65,7 @@ for (const classFile of classFiles) {
 
   await $({
     input: await fs.readFile(classFile),
-  })`./parser/build/native/nativeCompile/apex-ast-serializer-instrumented -f json -i ${isAnonymous ? "--anonymous" : ""}`.stdio(
+  })`./parser/build/native/nativeCompile/apex-ast-serializer-instrumented ${isAnonymous ? "--anonymous" : ""}`.stdio(
     "ignore",
   );
 
