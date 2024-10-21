@@ -1,6 +1,16 @@
 # Unreleased
 
 - Improve native executable performance by utilizing Profile-Guided Optimization.
+- Improve parsing performance by directly serializing object references.
+
+## Breaking Changes
+
+- Apex AST Serializer no longer supports outputting XML, or object references.
+  This reduces code paths that are not absolutely necessary for the operation of Prettier Apex,
+  leading to performance increases and binary size reduction.
+  This should not affect end users' experience with Prettier Apex,
+  but if you are using Apex AST Serializer directly,
+  the `-i` and `-f` flags have been removed.
 
 # 2.1.5
 
