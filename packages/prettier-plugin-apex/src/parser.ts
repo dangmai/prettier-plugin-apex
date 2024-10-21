@@ -664,13 +664,7 @@ export default async function parse(
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
-    (ast as any).comments = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
-      .map((token: any) => token[1])
-      .filter(
-        (node: any) =>
-          node["@class"] === APEX_TYPES.INLINE_COMMENT ||
-          node["@class"] === APEX_TYPES.BLOCK_COMMENT,
-      );
+    ast.comments = commentNodes;
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);

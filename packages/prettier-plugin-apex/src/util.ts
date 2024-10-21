@@ -9,6 +9,7 @@ import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants.js";
 
 export type SerializedAst = {
   [APEX_TYPES.PARSER_OUTPUT]: jorje.ParserOutput;
+  comments: jorje.HiddenToken[];
 };
 
 export type GenericComment = jorje.HiddenToken;
