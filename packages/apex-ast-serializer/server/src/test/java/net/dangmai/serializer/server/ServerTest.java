@@ -38,21 +38,6 @@ public class ServerTest {
   }
 
   @Test
-  void shouldGetXmlFromNamedApexFile() {
-    assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      String content = TestUtilities.postRequest(
-        TestUtilities.createJsonRequest("xml", false, file)
-      );
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isXmlValid(content),
-        "Content should be valid XML"
-      );
-    });
-  }
-
-  @Test
   void shouldGetJsonFromAnonymousApexFile() {
     assertDoesNotThrow(() -> {
       File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
@@ -63,21 +48,6 @@ public class ServerTest {
       assertTrue(
         TestUtilities.isJSONValid(content),
         "Content should be valid JSON"
-      );
-    });
-  }
-
-  @Test
-  void shouldGetXmlFromAnonymousApexFile() {
-    assertDoesNotThrow(() -> {
-      File file = TestUtilities.getApexTestFile("AnnotatedClass.cls");
-      String content = TestUtilities.postRequest(
-        TestUtilities.createJsonRequest("xml", true, file)
-      );
-      assertNotNull(content, "There should be content");
-      assertTrue(
-        TestUtilities.isXmlValid(content),
-        "Content should be valid XML"
       );
     });
   }

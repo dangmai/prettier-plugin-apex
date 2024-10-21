@@ -15,15 +15,29 @@ import com.thoughtworks.xstream.io.ExtendedHierarchicalStreamWriterHelper;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
 import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.json.JsonWriter;
-import com.thoughtworks.xstream.io.xml.CompactWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import java.util.logging.LogManager;
-import org.apache.commons.cli.*;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 
 public class Apex {
@@ -51,16 +65,9 @@ public class Apex {
     );
   }
 
-  public enum OutputFormat {
-    XML,
-    JSON,
-  }
-
   public static void getAST(
-    OutputFormat format,
     Boolean anonymous,
     Boolean prettyPrint,
-    Boolean idRef,
     Reader reader,
     Writer writer
   ) throws IOException {
@@ -81,49 +88,33 @@ public class Apex {
     );
 
     // Serializing the output
-    int mode;
-    if (idRef) {
-      mode = XStream.ID_REFERENCES;
-    } else {
-      mode = XStream.XPATH_ABSOLUTE_REFERENCES;
-    }
+    int mode = XStream.NO_REFERENCES;
     Mapper defaultMapper = (new XStream()).getMapper();
     XStream xstream;
-    if (format == OutputFormat.JSON) {
-      xstream = new XStream(
-        null,
-        new JsonHierarchicalStreamDriver() {
-          @Override
-          public HierarchicalStreamWriter createWriter(Writer writer) {
-            if (prettyPrint) {
-              // By default, JSON is pretty printed
-              return super.createWriter(writer);
-            }
-            JsonWriter.Format format = new JsonWriter.Format(
-              new char[0],
-              "".toCharArray(),
-              JsonWriter.Format.SPACE_AFTER_LABEL |
-              JsonWriter.Format.COMPACT_EMPTY_ELEMENT
-            );
-            return new CustomJsonWriter(writer, format);
+    xstream = new XStream(
+      null,
+      new JsonHierarchicalStreamDriver() {
+        @Override
+        public HierarchicalStreamWriter createWriter(Writer writer) {
+          if (prettyPrint) {
+            // By default, JSON is pretty printed
+            return super.createWriter(writer);
           }
-        },
-        new ClassLoaderReference(new CompositeClassLoader()),
-        new WithClassMapper(defaultMapper)
-      );
-      setUpXStream(xstream, mode);
+          JsonWriter.Format format = new JsonWriter.Format(
+            new char[0],
+            "".toCharArray(),
+            JsonWriter.Format.SPACE_AFTER_LABEL |
+            JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+          );
+          return new CustomJsonWriter(writer, format);
+        }
+      },
+      new ClassLoaderReference(new CompositeClassLoader()),
+      new WithClassMapper(defaultMapper)
+    );
+    setUpXStream(xstream, mode);
 
-      xstream.toXML(output, writer);
-    } else {
-      xstream = new XStream();
-      setUpXStream(xstream, mode);
-
-      if (prettyPrint) {
-        xstream.toXML(output, writer);
-      } else {
-        xstream.marshal(output, new CompactWriter(writer));
-      }
-    }
+    xstream.toXML(output, writer);
   }
 
   public static void main(String[] args) throws ParseException, IOException {
@@ -139,38 +130,21 @@ public class Apex {
       "Parse Anonymous Apex code. If not specify, it will be parsed in Named mode."
     );
     cliOptions.addOption(
-      "f",
-      "format",
-      true,
-      "Format of the output. Possible options: json, xml."
-    );
-    cliOptions.addOption(
       "l",
       "location",
       true,
       "Location of Apex class file. If not specified, the Apex content will be read from stdin."
     );
     cliOptions.addOption("p", "pretty", false, "Pretty print output.");
-    cliOptions.addOption(
-      "i",
-      "id-ref",
-      false,
-      "Use ID reference rather than XPath."
-    );
     cliOptions.addOption("h", "help", false, "Print help information.");
 
     CommandLineParser cliParser = new DefaultParser();
     CommandLine cmd = cliParser.parse(cliOptions, args);
     Reader apexReader;
 
-    Set<String> acceptedFormats = new HashSet<>(Arrays.asList("xml", "json"));
-    String chosenFormat = cmd.getOptionValue("f");
-
     if (cmd.hasOption("h")) {
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp("apex-ast-serializer", cliOptions);
-    } else if (!cmd.hasOption("f") || !acceptedFormats.contains(chosenFormat)) {
-      System.out.println("Format not specified or not supported.");
     } else {
       if (cmd.hasOption("l")) {
         apexReader = new FileReader(
@@ -186,14 +160,10 @@ public class Apex {
         System.out,
         StandardCharsets.UTF_8
       );
-      OutputFormat format = chosenFormat.equals("json")
-        ? OutputFormat.JSON
-        : OutputFormat.XML;
       Boolean anonymous = cmd.hasOption("a");
-      Boolean idRef = cmd.hasOption("i");
       Boolean prettyPrint = cmd.hasOption("p");
 
-      getAST(format, anonymous, prettyPrint, idRef, apexReader, writer);
+      getAST(anonymous, prettyPrint, apexReader, writer);
     }
   }
 
