@@ -652,19 +652,18 @@ export default async function parse(
       );
       throw new Error(errors.join("\r\n"));
     }
-    const commentNodes = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
+    ast.comments = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
       .map((item) => item[1])
       .filter(
         (node) =>
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
-    handleNodeLocation(ast, sourceCode, commentNodes);
+    handleNodeLocation(ast, sourceCode, ast.comments);
     const lineIndexes = getLineIndexes(sourceCode);
     ast = resolveLineIndexes(ast, lineIndexes);
 
     generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
-    ast.comments = commentNodes;
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);
