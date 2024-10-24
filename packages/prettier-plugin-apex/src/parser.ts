@@ -303,6 +303,36 @@ locationGenerationHandler[APEX_TYPES.ANNOTATION] = handleAnnotationLocation;
 locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
   handleMethodDeclarationLocation;
 
+type AnyNode = any;
+type ApplyFn<T> = (node: AnyNode, accumulatedResult: T) => T;
+type DfsApply<T> = {
+  accumulator?: (entry: T, accumulated: T) => T;
+  post: ApplyFn<T>;
+};
+function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
+  const accumulators = fns.map((fn) => fn.accumulator ?? ((t: any) => t));
+  const currentChildResults = Array.from({ length: fns.length }, () => null);
+  Object.keys(node).forEach((key) => {
+    if (typeof node[key] === "object") {
+      const childResults = dfsPostOrderApply(node[key], fns);
+      // eslint-disable-next-line no-plusplus
+      for (let i = 0; i < fns.length; i++) {
+        currentChildResults[i] = accumulators[i]?.(
+          childResults[i],
+          currentChildResults[i],
+        );
+      }
+    }
+  });
+  // eslint-disable-next-line no-restricted-syntax -- looping is most performant
+  const result = [];
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < fns.length; i++) {
+    result.push(fns[i]?.post(node, currentChildResults[i]));
+  }
+  return result;
+}
+
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
  * wrong location information or a node, or doesn't provide any information at
@@ -310,84 +340,81 @@ locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
  * We will fix it here by enforcing that a parent node start
  * index is always <= any child node start index, and a parent node end index
  * is always >= any child node end index.
- * @param node the node being visited.
- * @param sourceCode the entire source code.
- * @param commentNodes all the comment nodes.
- * @return the corrected node.
  */
-function handleNodeLocation(
-  node: any,
+const nodeLocationDfs: (
   sourceCode: string,
   commentNodes: GenericComment[],
-) {
-  let currentLocation: MinimalLocation | undefined;
-  Object.keys(node).forEach((key) => {
-    const value = node[key];
-    if (typeof value === "object") {
-      const location = handleNodeLocation(value, sourceCode, commentNodes);
-      if (location && currentLocation) {
-        if (currentLocation.startIndex > location.startIndex) {
-          currentLocation.startIndex = location.startIndex;
+) => DfsApply<MinimalLocation | null> = (sourceCode, commentNodes) => ({
+  accumulator: (
+    entry: MinimalLocation | null,
+    accumulated: MinimalLocation | null,
+  ) => {
+    if (!accumulated) {
+      return entry;
+    }
+    if (!entry) {
+      return accumulated;
+    }
+    if (accumulated.startIndex > entry.startIndex) {
+      accumulated.startIndex = entry.startIndex;
+    }
+    if (accumulated.endIndex < entry.endIndex) {
+      accumulated.endIndex = entry.endIndex;
+    }
+    return accumulated;
+  },
+  post: (node: AnyNode, currentLocation: MinimalLocation | null) => {
+    const apexClass = node["@class"];
+    let handlerFn;
+    if (apexClass) {
+      if (apexClass in locationGenerationHandler) {
+        handlerFn = locationGenerationHandler[apexClass];
+      } else {
+        const separatorIndex = apexClass.indexOf("$");
+        if (separatorIndex !== -1) {
+          const parentClass = apexClass.slice(0, separatorIndex);
+          if (parentClass in locationGenerationHandler) {
+            handlerFn = locationGenerationHandler[parentClass];
+          }
         }
-        if (currentLocation.endIndex < location.endIndex) {
-          currentLocation.endIndex = location.endIndex;
-        }
-      } else if (location && !currentLocation) {
-        currentLocation = location;
       }
     }
-  });
 
-  const apexClass = node["@class"];
-  let handlerFn;
-  if (apexClass) {
-    if (apexClass in locationGenerationHandler) {
-      handlerFn = locationGenerationHandler[apexClass];
-    } else {
-      const separatorIndex = apexClass.indexOf("$");
-      if (separatorIndex !== -1) {
-        const parentClass = apexClass.slice(0, separatorIndex);
-        if (parentClass in locationGenerationHandler) {
-          handlerFn = locationGenerationHandler[parentClass];
-        }
+    if (handlerFn && currentLocation) {
+      node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
+    } else if (handlerFn && node.loc) {
+      node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
+    }
+
+    const nodeLoc = node.loc;
+    if (!nodeLoc) {
+      delete node.loc;
+    } else if (nodeLoc && currentLocation) {
+      if (nodeLoc.startIndex > currentLocation.startIndex) {
+        nodeLoc.startIndex = currentLocation.startIndex;
+      } else {
+        currentLocation.startIndex = nodeLoc.startIndex;
+      }
+      if (nodeLoc.endIndex < currentLocation.endIndex) {
+        nodeLoc.endIndex = currentLocation.endIndex;
+      } else {
+        currentLocation.endIndex = nodeLoc.endIndex;
       }
     }
-  }
 
-  if (handlerFn && currentLocation) {
-    node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
-  } else if (handlerFn && node.loc) {
-    node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
-  }
-
-  const nodeLoc = node.loc;
-  if (!nodeLoc) {
-    delete node.loc;
-  } else if (nodeLoc && currentLocation) {
-    if (nodeLoc.startIndex > currentLocation.startIndex) {
-      nodeLoc.startIndex = currentLocation.startIndex;
-    } else {
-      currentLocation.startIndex = nodeLoc.startIndex;
+    if (currentLocation) {
+      return { ...currentLocation };
     }
-    if (nodeLoc.endIndex < currentLocation.endIndex) {
-      nodeLoc.endIndex = currentLocation.endIndex;
-    } else {
-      currentLocation.endIndex = nodeLoc.endIndex;
+
+    if (nodeLoc) {
+      return {
+        startIndex: nodeLoc.startIndex,
+        endIndex: nodeLoc.endIndex,
+      };
     }
-  }
-
-  if (currentLocation) {
-    return { ...currentLocation };
-  }
-
-  if (nodeLoc) {
-    return {
-      startIndex: nodeLoc.startIndex,
-      endIndex: nodeLoc.endIndex,
-    };
-  }
-  return null;
-}
+    return null;
+  },
+});
 
 export type EnrichedIfBlock = jorje.IfBlock & {
   ifBlockIndex: number;
@@ -659,11 +686,12 @@ export default async function parse(
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
-    handleNodeLocation(ast, sourceCode, ast.comments);
+    dfsPostOrderApply(ast, [nodeLocationDfs(sourceCode, ast.comments)]);
     const lineIndexes = getLineIndexes(sourceCode);
     ast = resolveLineIndexes(ast, lineIndexes);
 
-    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
+    const emptyLineLocations = getEmptyLineLocations(sourceCode);
+    generateExtraMetadata(ast, emptyLineLocations, true);
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);
