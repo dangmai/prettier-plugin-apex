@@ -310,7 +310,7 @@ type DfsApply<T> = {
   post: ApplyFn<T>;
 };
 function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
-  const currentChildResults = Array.from({ length: fns.length }, () => null);
+  const currentChildResults = new Array(fns.length).fill(null);
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       const childResults = dfsPostOrderApply(node[key], fns);
@@ -323,7 +323,6 @@ function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
       }
     }
   });
-  // eslint-disable-next-line no-restricted-syntax -- looping is most performant
   const result = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
