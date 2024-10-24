@@ -306,18 +306,17 @@ locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
 type AnyNode = any;
 type ApplyFn<T> = (node: AnyNode, accumulatedResult: T) => T;
 type DfsApply<T> = {
-  accumulator?: (entry: T, accumulated: T) => T;
+  accumulator: (entry: T, accumulated: T) => T;
   post: ApplyFn<T>;
 };
 function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
-  const accumulators = fns.map((fn) => fn.accumulator ?? ((t: any) => t));
   const currentChildResults = Array.from({ length: fns.length }, () => null);
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       const childResults = dfsPostOrderApply(node[key], fns);
       // eslint-disable-next-line no-plusplus
       for (let i = 0; i < fns.length; i++) {
-        currentChildResults[i] = accumulators[i]?.(
+        currentChildResults[i] = fns[i]?.accumulator(
           childResults[i],
           currentChildResults[i],
         );
@@ -686,7 +685,9 @@ export default async function parse(
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
+    console.time("DFS");
     dfsPostOrderApply(ast, [nodeLocationDfs(sourceCode, ast.comments)]);
+    console.timeEnd("DFS");
     const lineIndexes = getLineIndexes(sourceCode);
     ast = resolveLineIndexes(ast, lineIndexes);
 
