@@ -305,11 +305,11 @@ locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
 
 type AnyNode = any;
 type ApplyFn<T> = (node: AnyNode, accumulatedResult: T) => T;
-type DfsApply<T> = {
+type DfsVisitor<T> = {
   accumulator: (entry: T, accumulated: T) => T;
   apply: ApplyFn<T>;
 };
-function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
+function dfsPostOrderApply(node: AnyNode, fns: DfsVisitor<any>[]): AnyNode {
   const finalChildResults = new Array(fns.length);
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
@@ -339,10 +339,10 @@ function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
  * index is always <= any child node start index, and a parent node end index
  * is always >= any child node end index.
  */
-const nodeLocationDfs: (
+const nodeLocationVisitor: (
   sourceCode: string,
   commentNodes: GenericComment[],
-) => DfsApply<MinimalLocation | null> = (sourceCode, commentNodes) => ({
+) => DfsVisitor<MinimalLocation | null> = (sourceCode, commentNodes) => ({
   accumulator: (
     entry: MinimalLocation | null,
     accumulated: MinimalLocation | null,
@@ -550,41 +550,39 @@ function getLineNumber(lineIndexes: number[], charIndex: number) {
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
 // utility methods.
-function resolveLineIndexes(node: any, lineIndexes: number[]) {
-  const nodeLoc = getNodeLocation(node);
-  if (nodeLoc && !("startLine" in nodeLoc)) {
-    // The location node that we manually generate do not contain startLine
-    // information, so we will create them here.
-    nodeLoc.startLine =
-      nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
-  }
-
-  if (nodeLoc && !("endLine" in nodeLoc)) {
-    nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
-
-    // Edge case: root node
-    if (nodeLoc.endLine < 0) {
-      nodeLoc.endLine = lineIndexes.length - 1;
+const lineIndexVisitor: (lineIndexes: number[]) => DfsVisitor<undefined> = (
+  lineIndexes,
+) => ({
+  accumulator: () => undefined,
+  apply: (node: AnyNode) => {
+    const nodeLoc = getNodeLocation(node);
+    if (nodeLoc && !("startLine" in nodeLoc)) {
+      // The location node that we manually generate do not contain startLine
+      // information, so we will create them here.
+      nodeLoc.startLine =
+        nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
     }
-  }
 
-  if (nodeLoc && !("column" in nodeLoc)) {
-    const nodeStartLineIndex =
-      lineIndexes[
-        nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
-      ];
-    if (nodeStartLineIndex !== undefined) {
-      nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
-    }
-  }
+    if (nodeLoc && !("endLine" in nodeLoc)) {
+      nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
 
-  Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      node[key] = resolveLineIndexes(node[key], lineIndexes);
+      // Edge case: root node
+      if (nodeLoc.endLine < 0) {
+        nodeLoc.endLine = lineIndexes.length - 1;
+      }
     }
-  });
-  return node;
-}
+
+    if (nodeLoc && !("column" in nodeLoc)) {
+      const nodeStartLineIndex =
+        lineIndexes[
+          nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
+        ];
+      if (nodeStartLineIndex !== undefined) {
+        nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
+      }
+    }
+  },
+});
 
 // Get a map of line number to the index of its first character
 function getLineIndexes(sourceCode: string) {
@@ -667,7 +665,7 @@ export default async function parse(
     stderr = result.stderr;
   }
   if (serializedAst) {
-    let ast: SerializedAst = JSON.parse(serializedAst);
+    const ast: SerializedAst = JSON.parse(serializedAst);
     if (
       ast[APEX_TYPES.PARSER_OUTPUT] &&
       ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
@@ -685,10 +683,11 @@ export default async function parse(
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
     console.time("DFS");
-    dfsPostOrderApply(ast, [nodeLocationDfs(sourceCode, ast.comments)]);
+    dfsPostOrderApply(ast, [
+      nodeLocationVisitor(sourceCode, ast.comments),
+      lineIndexVisitor(getLineIndexes(sourceCode)),
+    ]);
     console.timeEnd("DFS");
-    const lineIndexes = getLineIndexes(sourceCode);
-    ast = resolveLineIndexes(ast, lineIndexes);
 
     const emptyLineLocations = getEmptyLineLocations(sourceCode);
     generateExtraMetadata(ast, emptyLineLocations, true);
