@@ -315,18 +315,18 @@ type DfsVisitor<AccumulatedResult, Context> = {
     accumulated: AccumulatedResult,
   ) => AccumulatedResult;
   apply: ApplyFn<AccumulatedResult, Context>;
-  gatherContext: (node: AnyNode) => Context;
+  gatherContext: (node: AnyNode, currentContext?: Context) => Context;
 };
 function dfsPostOrderApply(
   node: AnyNode,
   fns: DfsVisitor<any, any>[],
-  currentContext?: any,
+  currentContexts?: any,
 ): AnyNode {
   const finalChildrenResults = new Array(fns.length);
   const childrenContexts = new Array(fns.length);
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
-    childrenContexts[i] = fns[i]?.gatherContext(node);
+    childrenContexts[i] = fns[i]?.gatherContext(node, currentContexts);
   }
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
@@ -348,7 +348,11 @@ function dfsPostOrderApply(
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
     results.push(
-      fns[i]?.apply(node, finalChildrenResults[i], currentContext ?? {}),
+      fns[i]?.apply(
+        node,
+        finalChildrenResults[i],
+        currentContexts ? currentContexts[i] : undefined,
+      ),
     );
   }
   return results;
@@ -445,6 +449,106 @@ const nodeLocationVisitor: (
 export type EnrichedIfBlock = jorje.IfBlock & {
   ifBlockIndex: number;
 };
+
+type MetadataVisitorContext = {
+  allowTrailingEmptyLine: boolean;
+};
+const metadataVisitor: (
+  emptyLineLocations: number[],
+) => DfsVisitor<undefined, MetadataVisitorContext> = (emptyLineLocations) => ({
+  accumulator: () => undefined,
+  apply: (node: any, _accumulated, context) => {
+    const apexClass = node["@class"];
+    // #511 - If the user manually specify linebreaks in their original query,
+    // we will use that as a heuristic to manually add hardlines to the result
+    // query as well.
+    if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
+      node.forcedHardline = node.loc.startLine !== node.loc.endLine;
+    }
+    // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
+    // `ifBlockIndex` into the node for handling code to differentiate them.
+    else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
+      node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
+        (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
+      });
+    }
+
+    if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
+      node.inputParameters.forEach((inputParameter: any) => {
+        inputParameter.insideParenthesis = true;
+      });
+    }
+
+    Object.keys(node).forEach((key) => {
+      if (typeof node[key] === "object") {
+        if (Array.isArray(node)) {
+          const keyInt = parseInt(key, 10);
+          if (keyInt === node.length - 1) {
+            // @ts-expect-error ts-migrate(7015) FIXME: Element implicitly has an 'any' type because index... Remove this comment to see the full error message
+            node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
+          } else {
+            // Here we flag a node if its next sibling is on the same line.
+            // The reasoning is that for a block of code like this:
+            // ```
+            // Integer a = 1; Integer c = 2; Integer c = 3;
+            //
+            // Integer d = 4;
+            // ```
+            // We don't want a trailing empty line after `Integer a = 1;`
+            // so we need to mark it as a special node.
+            const currentChildNode = node[keyInt];
+            const nextChildNode = node[keyInt + 1];
+            if (
+              nextChildNode &&
+              nextChildNode.loc &&
+              currentChildNode.loc &&
+              nextChildNode.loc.startLine === currentChildNode.loc.endLine
+            ) {
+              currentChildNode.isNextStatementOnSameLine = true;
+            }
+          }
+        }
+      }
+    });
+
+    const trailingEmptyLineAllowed =
+      ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+    const nodeLoc = getNodeLocation(node);
+    if (
+      apexClass &&
+      nodeLoc &&
+      context.allowTrailingEmptyLine &&
+      trailingEmptyLineAllowed &&
+      !node.isLastNodeInArray &&
+      !node.isNextStatementOnSameLine
+    ) {
+      const nextLine = nodeLoc.endLine + 1;
+      const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
+      if (nextEmptyLine !== -1) {
+        node.trailingEmptyLine = true;
+      }
+    }
+  },
+  gatherContext: (node, currentContext) => {
+    const apexClass = node["@class"];
+    let allowTrailingEmptyLineWithin: boolean;
+    const isSpecialClass =
+      TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+    const trailingEmptyLineAllowed =
+      ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+    if (isSpecialClass) {
+      allowTrailingEmptyLineWithin = false;
+    } else if (trailingEmptyLineAllowed) {
+      allowTrailingEmptyLineWithin = true;
+    } else {
+      // currentContext is undefined for the root node, we hardcode
+      // allowTrailingEmptyLine to true for it
+      allowTrailingEmptyLineWithin =
+        currentContext?.allowTrailingEmptyLine ?? true;
+    }
+    return { allowTrailingEmptyLine: allowTrailingEmptyLineWithin };
+  },
+});
 
 /**
  * Generate extra metadata (e.g. empty lines) for nodes.
@@ -715,11 +819,12 @@ export default async function parse(
     dfsPostOrderApply(ast, [
       nodeLocationVisitor(sourceCode, ast.comments),
       lineIndexVisitor(getLineIndexes(sourceCode)),
+      metadataVisitor(getEmptyLineLocations(sourceCode)),
     ]);
     console.timeEnd("DFS");
 
-    const emptyLineLocations = getEmptyLineLocations(sourceCode);
-    generateExtraMetadata(ast, emptyLineLocations, true);
+    // const emptyLineLocations = getEmptyLineLocations(sourceCode);
+    // generateExtraMetadata(ast, emptyLineLocations, true);
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);
