@@ -304,21 +304,42 @@ locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
   handleMethodDeclarationLocation;
 
 type AnyNode = any;
-type ApplyFn<T> = (node: AnyNode, accumulatedResult: T) => T;
-type DfsVisitor<T> = {
-  accumulator: (entry: T, accumulated: T) => T;
-  apply: ApplyFn<T>;
+type ApplyFn<AccumulatedResult, Context> = (
+  node: AnyNode,
+  accumulatedResult: AccumulatedResult,
+  context: Context,
+) => AccumulatedResult;
+type DfsVisitor<AccumulatedResult, Context> = {
+  accumulator: (
+    entry: AccumulatedResult,
+    accumulated: AccumulatedResult,
+  ) => AccumulatedResult;
+  apply: ApplyFn<AccumulatedResult, Context>;
+  gatherContext: (node: AnyNode) => Context;
 };
-function dfsPostOrderApply(node: AnyNode, fns: DfsVisitor<any>[]): AnyNode {
-  const finalChildResults = new Array(fns.length);
+function dfsPostOrderApply(
+  node: AnyNode,
+  fns: DfsVisitor<any, any>[],
+  currentContext?: any,
+): AnyNode {
+  const finalChildrenResults = new Array(fns.length);
+  const childrenContexts = new Array(fns.length);
+  // eslint-disable-next-line no-plusplus
+  for (let i = 0; i < fns.length; i++) {
+    childrenContexts[i] = fns[i]?.gatherContext(node);
+  }
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
-      const childResults = dfsPostOrderApply(node[key], fns);
+      const childrenResults = dfsPostOrderApply(
+        node[key],
+        fns,
+        childrenContexts,
+      );
       // eslint-disable-next-line no-plusplus
       for (let i = 0; i < fns.length; i++) {
-        finalChildResults[i] = fns[i]?.accumulator(
-          childResults[i],
-          finalChildResults[i],
+        finalChildrenResults[i] = fns[i]?.accumulator(
+          childrenResults[i],
+          finalChildrenResults[i],
         );
       }
     }
@@ -326,7 +347,9 @@ function dfsPostOrderApply(node: AnyNode, fns: DfsVisitor<any>[]): AnyNode {
   const results = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
-    results.push(fns[i]?.apply(node, finalChildResults[i]));
+    results.push(
+      fns[i]?.apply(node, finalChildrenResults[i], currentContext ?? {}),
+    );
   }
   return results;
 }
@@ -342,7 +365,10 @@ function dfsPostOrderApply(node: AnyNode, fns: DfsVisitor<any>[]): AnyNode {
 const nodeLocationVisitor: (
   sourceCode: string,
   commentNodes: GenericComment[],
-) => DfsVisitor<MinimalLocation | null> = (sourceCode, commentNodes) => ({
+) => DfsVisitor<MinimalLocation | null, undefined> = (
+  sourceCode,
+  commentNodes,
+) => ({
   accumulator: (
     entry: MinimalLocation | null,
     accumulated: MinimalLocation | null,
@@ -412,6 +438,8 @@ const nodeLocationVisitor: (
     }
     return null;
   },
+
+  gatherContext: () => undefined,
 });
 
 export type EnrichedIfBlock = jorje.IfBlock & {
@@ -550,9 +578,9 @@ function getLineNumber(lineIndexes: number[], charIndex: number) {
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
 // utility methods.
-const lineIndexVisitor: (lineIndexes: number[]) => DfsVisitor<undefined> = (
-  lineIndexes,
-) => ({
+const lineIndexVisitor: (
+  lineIndexes: number[],
+) => DfsVisitor<undefined, undefined> = (lineIndexes) => ({
   accumulator: () => undefined,
   apply: (node: AnyNode) => {
     const nodeLoc = getNodeLocation(node);
@@ -582,6 +610,7 @@ const lineIndexVisitor: (lineIndexes: number[]) => DfsVisitor<undefined> = (
       }
     }
   },
+  gatherContext: () => undefined,
 });
 
 // Get a map of line number to the index of its first character
