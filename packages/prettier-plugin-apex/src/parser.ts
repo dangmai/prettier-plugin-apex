@@ -307,28 +307,28 @@ type AnyNode = any;
 type ApplyFn<T> = (node: AnyNode, accumulatedResult: T) => T;
 type DfsApply<T> = {
   accumulator: (entry: T, accumulated: T) => T;
-  post: ApplyFn<T>;
+  apply: ApplyFn<T>;
 };
 function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
-  const currentChildResults = new Array(fns.length);
+  const finalChildResults = new Array(fns.length);
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       const childResults = dfsPostOrderApply(node[key], fns);
       // eslint-disable-next-line no-plusplus
       for (let i = 0; i < fns.length; i++) {
-        currentChildResults[i] = fns[i]?.accumulator(
+        finalChildResults[i] = fns[i]?.accumulator(
           childResults[i],
-          currentChildResults[i],
+          finalChildResults[i],
         );
       }
     }
   });
-  const result = [];
+  const results = [];
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
-    result.push(fns[i]?.post(node, currentChildResults[i]));
+    results.push(fns[i]?.apply(node, finalChildResults[i]));
   }
-  return result;
+  return results;
 }
 
 /**
@@ -361,7 +361,7 @@ const nodeLocationDfs: (
     }
     return accumulated;
   },
-  post: (node: AnyNode, currentLocation: MinimalLocation | null) => {
+  apply: (node: AnyNode, currentLocation: MinimalLocation | null) => {
     const apexClass = node["@class"];
     let handlerFn;
     if (apexClass) {
