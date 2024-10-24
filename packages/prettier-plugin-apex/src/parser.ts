@@ -326,7 +326,10 @@ function dfsPostOrderApply(
   const childrenContexts = new Array(fns.length);
   // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
-    childrenContexts[i] = fns[i]?.gatherContext(node, currentContexts);
+    childrenContexts[i] = fns[i]?.gatherContext(
+      node,
+      currentContexts ? currentContexts[i] : undefined,
+    );
   }
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
