@@ -310,7 +310,7 @@ type DfsApply<T> = {
   post: ApplyFn<T>;
 };
 function dfsPostOrderApply(node: AnyNode, fns: DfsApply<any>[]): AnyNode {
-  const currentChildResults = new Array(fns.length).fill(null);
+  const currentChildResults = new Array(fns.length);
   Object.keys(node).forEach((key) => {
     if (typeof node[key] === "object") {
       const childResults = dfsPostOrderApply(node[key], fns);
