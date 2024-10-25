@@ -742,8 +742,6 @@ export default async function parse(
     ]);
     console.timeEnd("DFS");
 
-    // const emptyLineLocations = getEmptyLineLocations(sourceCode);
-    // generateExtraMetadata(ast, emptyLineLocations, true);
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);
