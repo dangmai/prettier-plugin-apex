@@ -25,8 +25,6 @@ export type Node = AstNode | ReferenceNode;
 
 export type AnnotatedAstNode = AstNode & {
   trailingEmptyLine?: boolean;
-  isNextStatementOnSameLine?: boolean;
-  isLastNodeInArray?: boolean;
 };
 
 export type AnnotatedComment = AnnotatedAstNode &
@@ -113,9 +111,6 @@ const METADATA_TO_IGNORE = [
   "trailing",
   "hiddenTokenMap",
   "trailingEmptyLine",
-  "isLastNodeInArray",
-  "numberOfDottedExpressions",
-  "isNextStatementOnSameLine",
   "forcedHardline",
 ];
 

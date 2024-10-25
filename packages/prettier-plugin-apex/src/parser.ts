@@ -308,6 +308,7 @@ type ApplyFn<AccumulatedResult, Context> = (
   node: AnyNode,
   accumulatedResult: AccumulatedResult,
   context: Context,
+  childrenContext: Context,
 ) => AccumulatedResult;
 type DfsVisitor<AccumulatedResult, Context> = {
   accumulator: (
@@ -324,37 +325,37 @@ function dfsPostOrderApply(
 ): AnyNode {
   const finalChildrenResults = new Array(fns.length);
   const childrenContexts = new Array(fns.length);
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
     childrenContexts[i] = fns[i]?.gatherContext(
       node,
       currentContexts ? currentContexts[i] : undefined,
     );
   }
-  Object.keys(node).forEach((key) => {
+  const keys = Object.keys(node);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i] as string;
     if (typeof node[key] === "object") {
       const childrenResults = dfsPostOrderApply(
         node[key],
         fns,
         childrenContexts,
       );
-      // eslint-disable-next-line no-plusplus
-      for (let i = 0; i < fns.length; i++) {
-        finalChildrenResults[i] = fns[i]?.accumulator(
-          childrenResults[i],
-          finalChildrenResults[i],
+      for (let j = 0; j < fns.length; j++) {
+        finalChildrenResults[j] = fns[j]?.accumulator(
+          childrenResults[j],
+          finalChildrenResults[j],
         );
       }
     }
-  });
+  }
   const results = [];
-  // eslint-disable-next-line no-plusplus
   for (let i = 0; i < fns.length; i++) {
     results.push(
       fns[i]?.apply(
         node,
         finalChildrenResults[i],
         currentContexts ? currentContexts[i] : undefined,
+        childrenContexts[i],
       ),
     );
   }
@@ -453,14 +454,22 @@ export type EnrichedIfBlock = jorje.IfBlock & {
   ifBlockIndex: number;
 };
 
+/**
+ * Generate extra metadata for nodes, e.g. trailing empty lines, forced hard lines.
+ * ifBlockIndex, etc.
+ * These metadata are helpful to clearly deliniate between the parsing and
+ * printing phases, i.e. during the printing phase, we only need to worry about
+ * how to format the code using the metadata generated here.
+ */
 type MetadataVisitorContext = {
   allowTrailingEmptyLine: boolean;
+  arraySiblings?: any[];
 };
 const metadataVisitor: (
   emptyLineLocations: number[],
 ) => DfsVisitor<undefined, MetadataVisitorContext> = (emptyLineLocations) => ({
   accumulator: () => undefined,
-  apply: (node: any, _accumulated, context) => {
+  apply: (node: any, _accumulated, context, childrenContext) => {
     const apexClass = node["@class"];
     // #511 - If the user manually specify linebreaks in their original query,
     // we will use that as a heuristic to manually add hardlines to the result
@@ -482,48 +491,55 @@ const metadataVisitor: (
       });
     }
 
-    Object.keys(node).forEach((key) => {
-      if (typeof node[key] === "object") {
-        if (Array.isArray(node)) {
-          const keyInt = parseInt(key, 10);
-          if (keyInt === node.length - 1) {
-            // @ts-expect-error ts-migrate(7015) FIXME: Element implicitly has an 'any' type because index... Remove this comment to see the full error message
-            node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
-          } else {
-            // Here we flag a node if its next sibling is on the same line.
-            // The reasoning is that for a block of code like this:
-            // ```
-            // Integer a = 1; Integer c = 2; Integer c = 3;
-            //
-            // Integer d = 4;
-            // ```
-            // We don't want a trailing empty line after `Integer a = 1;`
-            // so we need to mark it as a special node.
-            const currentChildNode = node[keyInt];
-            const nextChildNode = node[keyInt + 1];
-            if (
-              nextChildNode &&
-              nextChildNode.loc &&
-              currentChildNode.loc &&
-              nextChildNode.loc.startLine === currentChildNode.loc.endLine
-            ) {
-              currentChildNode.isNextStatementOnSameLine = true;
-            }
-          }
-        }
-      }
-    });
-
     const trailingEmptyLineAllowed =
       ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
     const nodeLoc = getNodeLocation(node);
+    let isLastNodeInArray = false;
+
+    // Here we flag the current node as the last node in the array, because
+    // we don't want a trailing empty line after it.
+    if (context?.arraySiblings) {
+      isLastNodeInArray =
+        context.arraySiblings.indexOf(node) ===
+        context.arraySiblings.length - 1;
+    }
+
+    // Here we turn off trailing empty line for a child node when its next
+    // sibling is on the same line.
+    // The reasoning is that for a block of code like this:
+    // ```
+    // Integer a = 1; Integer c = 2; Integer c = 3;
+    //
+    // Integer d = 4;
+    // ```
+    // We don't want a trailing empty line after `Integer a = 1;`
+    // so we need to mark it as a special node.
+    // We are doing this at the parent node level, because when we run the
+    // Depth-First search, we don't have enough context at the child node level
+    // to determine if its next sibling is on the same line or not.
+    if (childrenContext.arraySiblings) {
+      for (let i = 0; i < childrenContext.arraySiblings.length; i++) {
+        const currentChild = childrenContext.arraySiblings[i];
+        const nextChildIndex = i + 1;
+        if (nextChildIndex < childrenContext.arraySiblings.length) {
+          const nextChild = childrenContext.arraySiblings[nextChildIndex];
+          if (
+            currentChild.trailingEmptyLine &&
+            currentChild.loc &&
+            nextChild.loc &&
+            currentChild.loc.endLine === nextChild.loc.startLine
+          ) {
+            currentChild.trailingEmptyLine = false;
+          }
+        }
+      }
+    }
     if (
       apexClass &&
       nodeLoc &&
       context.allowTrailingEmptyLine &&
       trailingEmptyLineAllowed &&
-      !node.isLastNodeInArray &&
-      !node.isNextStatementOnSameLine
+      !isLastNodeInArray
     ) {
       const nextLine = nodeLoc.endLine + 1;
       const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
@@ -549,116 +565,16 @@ const metadataVisitor: (
       allowTrailingEmptyLineWithin =
         currentContext?.allowTrailingEmptyLine ?? true;
     }
-    return { allowTrailingEmptyLine: allowTrailingEmptyLineWithin };
+    let arraySiblings;
+    if (Array.isArray(node) && node.length > 0) {
+      arraySiblings = node;
+    }
+    return {
+      allowTrailingEmptyLine: allowTrailingEmptyLineWithin,
+      arraySiblings,
+    };
   },
 });
-
-/**
- * Generate extra metadata (e.g. empty lines) for nodes.
- * This method is called recursively while visiting each node in the tree.
- *
- * @param node the node being visited
- * @param emptyLineLocations a list of lines that are empty in the source code
- * @param allowTrailingEmptyLine whether trailing empty line is allowed
- * for this node. This helps when dealing with statements that contain other
- * statements. For example, we turn this to `false` for the block statements
- * inside an IfElseBlock
- *
- */
-function generateExtraMetadata(
-  node: any,
-  emptyLineLocations: number[],
-  allowTrailingEmptyLine: boolean,
-) {
-  const apexClass = node["@class"];
-  let allowTrailingEmptyLineWithin: boolean;
-  const isSpecialClass =
-    TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
-  const trailingEmptyLineAllowed =
-    ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
-  if (isSpecialClass) {
-    allowTrailingEmptyLineWithin = false;
-  } else if (trailingEmptyLineAllowed) {
-    allowTrailingEmptyLineWithin = true;
-  } else {
-    allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
-  }
-
-  // #511 - If the user manually specify linebreaks in their original query,
-  // we will use that as a heuristic to manually add hardlines to the result
-  // query as well.
-  if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
-    node.forcedHardline = node.loc.startLine !== node.loc.endLine;
-  }
-  // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
-  // `ifBlockIndex` into the node for handling code to differentiate them.
-  else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
-    node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
-      (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
-    });
-  }
-
-  if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
-    node.inputParameters.forEach((inputParameter: any) => {
-      inputParameter.insideParenthesis = true;
-    });
-  }
-
-  Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      if (Array.isArray(node)) {
-        const keyInt = parseInt(key, 10);
-        if (keyInt === node.length - 1) {
-          // @ts-expect-error ts-migrate(7015) FIXME: Element implicitly has an 'any' type because index... Remove this comment to see the full error message
-          node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
-        } else {
-          // Here we flag a node if its next sibling is on the same line.
-          // The reasoning is that for a block of code like this:
-          // ```
-          // Integer a = 1; Integer c = 2; Integer c = 3;
-          //
-          // Integer d = 4;
-          // ```
-          // We don't want a trailing empty line after `Integer a = 1;`
-          // so we need to mark it as a special node.
-          const currentChildNode = node[keyInt];
-          const nextChildNode = node[keyInt + 1];
-          if (
-            nextChildNode &&
-            nextChildNode.loc &&
-            currentChildNode.loc &&
-            nextChildNode.loc.startLine === currentChildNode.loc.endLine
-          ) {
-            currentChildNode.isNextStatementOnSameLine = true;
-          }
-        }
-      }
-
-      generateExtraMetadata(
-        node[key],
-        emptyLineLocations,
-        allowTrailingEmptyLineWithin,
-      );
-    }
-  });
-
-  const nodeLoc = getNodeLocation(node);
-  if (
-    apexClass &&
-    nodeLoc &&
-    allowTrailingEmptyLine &&
-    trailingEmptyLineAllowed &&
-    !node.isLastNodeInArray &&
-    !node.isNextStatementOnSameLine
-  ) {
-    const nextLine = nodeLoc.endLine + 1;
-    const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-    if (nextEmptyLine !== -1) {
-      node.trailingEmptyLine = true;
-    }
-  }
-  return nodeLoc;
-}
 
 function getLineNumber(lineIndexes: number[], charIndex: number) {
   let low = 0;
