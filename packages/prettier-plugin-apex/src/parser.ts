@@ -303,8 +303,19 @@ type DfsVisitor<AccumulatedResult, Context> = {
     accumulated: AccumulatedResult,
   ) => AccumulatedResult;
   apply: ApplyFn<AccumulatedResult, Context>;
-  gatherContext?: (node: AnyNode, currentContext?: Context) => Context;
+  gatherChildrenContext?: (node: AnyNode, currentContext?: Context) => Context;
 };
+/*
+ * Generic Depth-First Search algorithm that applies a list of functions to each
+ * node in the tree.
+ * Each function can hook into various parts of the DFS process:
+ * - gatherChildrenContext: gathering contexts for children nodes. When the
+ * children nodes are visited, they will be passed this context.
+ * - accumulator: accumulating results from children nodes. This is run after
+ * every individual child node is visited.
+ * - apply: applying the function to the current node. This is run after all
+ * children nodes have been visited.
+ */
 function dfsPostOrderApply(
   node: AnyNode,
   fns: DfsVisitor<any, any>[],
@@ -313,7 +324,7 @@ function dfsPostOrderApply(
   const finalChildrenResults = new Array(fns.length);
   const childrenContexts = new Array(fns.length);
   for (let i = 0; i < fns.length; i++) {
-    childrenContexts[i] = fns[i]?.gatherContext?.(
+    childrenContexts[i] = fns[i]?.gatherChildrenContext?.(
       node,
       currentContexts ? currentContexts[i] : undefined,
     );
@@ -528,7 +539,7 @@ const metadataVisitor: (
       }
     }
   },
-  gatherContext: (node, currentContext) => {
+  gatherChildrenContext: (node, currentContext) => {
     const apexClass = node["@class"];
     let allowTrailingEmptyLineWithin: boolean;
     const isSpecialClass =
@@ -712,13 +723,11 @@ export default async function parse(
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
-    console.time("DFS");
     dfsPostOrderApply(ast, [
       nodeLocationVisitor(sourceCode, ast.comments),
       lineIndexVisitor(getLineIndexes(sourceCode)),
       metadataVisitor(getEmptyLineLocations(sourceCode)),
     ]);
-    console.timeEnd("DFS");
 
     return ast;
   }
