@@ -28,7 +28,7 @@
     "eslint-plugin-prettier-doc": "1.1.0",
     "nx": "20.0.5",
     "prettier": "3.3.3",
-    "prettier-plugin-java": "2.6.4",
+    "prettier-plugin-java": "2.6.5",
     "prettier-plugin-organize-imports": "4.1.0",
     "rimraf": "5.0.10",
     "zx": "8.1.9"
