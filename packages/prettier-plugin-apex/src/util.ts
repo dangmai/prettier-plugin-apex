@@ -214,7 +214,7 @@ export function findNextUncommentedCharacter(
 // Optimization to look up parent types faster
 const PARENT_TYPES = [
   ...Object.values(APEX_TYPES),
-  ...Object.values(DATA_CATEGORY),
+  ...Object.keys(DATA_CATEGORY),
   ...Object.keys(MODIFIER),
   ...Object.keys(QUERY),
   ...Object.keys(QUERY_WHERE),

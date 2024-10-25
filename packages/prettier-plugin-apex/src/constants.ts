@@ -65,6 +65,12 @@ export const APEX_TYPES = {
   REQUEST_VERSION: "apex.jorje.data.ast.VersionRef$RequestVersion" as const,
   STRUCTURED_VERSION:
     "apex.jorje.data.ast.VersionRef$StructuredVersion" as const,
+  TRUE_ANNOTATION_VALUE:
+    "apex.jorje.data.ast.AnnotationValue$TrueAnnotationValue" as const,
+  FALSE_ANNOTATION_VALUE:
+    "apex.jorje.data.ast.AnnotationValue$FalseAnnotationValue" as const,
+  STRING_ANNOTATION_VALUE:
+    "apex.jorje.data.ast.AnnotationValue$StringAnnotationValue" as const,
 
   // Operators
   BINARY_OPERATOR: "apex.jorje.data.ast.BinaryOp" as const,
@@ -158,14 +164,28 @@ export const APEX_TYPES = {
   SEARCH: "apex.jorje.data.sosl.Search" as const,
   FIND_CLAUSE: "apex.jorje.data.sosl.FindClause" as const,
   FIND_VALUE: "apex.jorje.data.sosl.FindValue" as const,
+  FIND_VALUE_STRING: "apex.jorje.data.sosl.FindValue$FindString" as const,
+  FIND_VALUE_EXPRESSION: "apex.jorje.data.sosl.FindValue$FindExpr" as const,
   IN_CLAUSE: "apex.jorje.data.sosl.InClause" as const,
   WITH_DIVISION_CLAUSE: "apex.jorje.data.sosl.WithDivisionClause" as const,
   DIVISION_VALUE: "apex.jorje.data.sosl.DivisionValue" as const,
+  DIVISION_VALUE_LITERAL:
+    "apex.jorje.data.sosl.DivisionValue$DivisionLiteral" as const,
+  DIVISION_VALUE_EXPRESSION:
+    "apex.jorje.data.sosl.DivisionValue$DivisionExpr" as const,
   WITH_DATA_CATEGORY_CLAUSE:
     "apex.jorje.data.sosl.WithDataCategoryClause" as const,
   SEARCH_WITH_CLAUSE: "apex.jorje.data.sosl.SearchWithClause" as const,
   SEARCH_WITH_CLAUSE_VALUE:
     "apex.jorje.data.sosl.SearchWithClauseValue" as const,
+  SEARCH_WITH_CLAUSE_VALUE_STRING:
+    "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithStringValue" as const,
+  SEARCH_WITH_CLAUSE_VALUE_TARGET:
+    "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithTargetValue" as const,
+  SEARCH_WITH_CLAUSE_VALUE_TRUE:
+    "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithTrueValue" as const,
+  SEARCH_WITH_CLAUSE_VALUE_FALSE:
+    "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithFalseValue" as const,
   RETURNING_CLAUSE: "apex.jorje.data.sosl.ReturningClause" as const,
   RETURNING_EXPRESSION: "apex.jorje.data.sosl.ReturningExpr" as const,
   RETURNING_SELECT_EXPRESSION:
@@ -207,9 +227,16 @@ export const APEX_TYPES = {
   COLON_EXPRESSION: "apex.jorje.data.soql.ColonExpr" as const,
   ORDER_BY_CLAUSE: "apex.jorje.data.soql.OrderByClause" as const,
   ORDER_BY_EXPRESSION: "apex.jorje.data.soql.OrderByExpr" as const,
+  ORDER_BY_EXPRESSION_DISTANCE:
+    "apex.jorje.data.soql.OrderByExpr$OrderByDistance" as const,
+  ORDER_BY_EXPRESSION_VALUE:
+    "apex.jorje.data.soql.OrderByExpr$OrderByValue" as const,
   GROUP_BY_CLAUSE: "apex.jorje.data.soql.GroupByClause" as const,
   GROUP_BY_EXPRESSION: "apex.jorje.data.soql.GroupByExpr" as const,
   GROUP_BY_TYPE: "apex.jorje.data.soql.GroupByType" as const,
+  GROUP_BY_TYPE_ROLL_UP:
+    "apex.jorje.data.soql.GroupByType$GroupByRollUp" as const,
+  GROUP_BY_TYPE_CUBE: "apex.jorje.data.soql.GroupByType$GroupByCube" as const,
   HAVING_CLAUSE: "apex.jorje.data.soql.HavingClause" as const,
   LIMIT_VALUE: "apex.jorje.data.soql.LimitClause$LimitValue" as const,
   LIMIT_EXPRESSION: "apex.jorje.data.soql.LimitClause$LimitExpr" as const,
@@ -249,18 +276,38 @@ export const APEX_TYPES = {
   QUERY_LITERAL_FALSE: "apex.jorje.data.soql.QueryLiteral$QueryFalse" as const,
   QUERY_LITERAL_NUMBER:
     "apex.jorje.data.soql.QueryLiteral$QueryNumber" as const,
+  QUERY_LITERAL_DATE: "apex.jorje.data.soql.QueryLiteral$QueryDate" as const,
+  QUERY_LITERAL_DATE_TIME:
+    "apex.jorje.data.soql.QueryLiteral$QueryDateTime" as const,
+  QUERY_LITERAL_TIME: "apex.jorje.data.soql.QueryLiteral$QueryTime" as const,
   QUERY_LITERAL_DATE_FORMULA:
     "apex.jorje.data.soql.QueryLiteral$QueryDateFormula" as const,
+  QUERY_LITERAL_MULTI_CURRENCY:
+    "apex.jorje.data.soql.QueryLiteral$QueryMultiCurrency" as const,
   QUERY_OPERATOR: "apex.jorje.data.soql.QueryOp" as const,
   QUERY_OPERATOR_LIKE: "apex.jorje.data.soql.QueryOp$QueryLike" as const,
   SOQL_ORDER: "apex.jorje.data.soql.Order" as const,
   SOQL_ORDER_NULL: "apex.jorje.data.soql.OrderNull" as const,
   TRACKING_TYPE: "apex.jorje.data.soql.TrackingType" as const,
+  TRACKING_TYPE_FOR_VIEW: "apex.jorje.data.soql.TrackingType$ForView" as const,
+  TRACKING_TYPE_FOR_REFERENCE:
+    "apex.jorje.data.soql.TrackingType$ForReference" as const,
   QUERY_OPTION: "apex.jorje.data.soql.QueryOption" as const,
+  QUERY_OPTION_LOCK_ROWS: "apex.jorje.data.soql.QueryOption$LockRows" as const,
+  QUERY_OPTION_INCLUDE_DELETED:
+    "apex.jorje.data.soql.QueryOption$IncludeDeleted" as const,
   QUERY_USING_CLAUSE: "apex.jorje.data.soql.QueryUsingClause" as const,
   USING_EXPRESSION: "apex.jorje.data.soql.UsingExpr" as const,
+  USING_EXPRESSION_USING: "apex.jorje.data.soql.UsingExpr$Using" as const,
+  USING_EXPRESSION_USING_EQUALS:
+    "apex.jorje.data.soql.UsingExpr$UsingEquals" as const,
+  USING_EXPRESSION_USING_ID: "apex.jorje.data.soql.UsingExpr$UsingId" as const,
   UPDATE_STATS_CLAUSE: "apex.jorje.data.soql.UpdateStatsClause" as const,
   UPDATE_STATS_OPTION: "apex.jorje.data.soql.UpdateStatsOption" as const,
+  UPDATE_STATS_OPTION_TRACKING:
+    "apex.jorje.data.soql.UpdateStatsOption$UpdateTracking" as const,
+  UPDATE_STATS_OPTION_VIEW_STAT:
+    "apex.jorje.data.soql.UpdateStatsOption$UpdateViewStat" as const,
   WITH_VALUE: "apex.jorje.data.soql.WithClause$WithValue" as const,
   WITH_DATA_CATEGORIES:
     "apex.jorje.data.soql.WithClause$WithDataCategories" as const,

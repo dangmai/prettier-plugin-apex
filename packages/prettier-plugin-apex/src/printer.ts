@@ -729,13 +729,13 @@ function handleAnnotationValue(
 ): Doc {
   const parts: Doc[] = [];
   switch (childClass as jorje.AnnotationValue["@class"]) {
-    case "apex.jorje.data.ast.AnnotationValue$TrueAnnotationValue":
+    case APEX_TYPES.TRUE_ANNOTATION_VALUE:
       parts.push("true");
       break;
-    case "apex.jorje.data.ast.AnnotationValue$FalseAnnotationValue":
+    case APEX_TYPES.FALSE_ANNOTATION_VALUE:
       parts.push("false");
       break;
-    case "apex.jorje.data.ast.AnnotationValue$StringAnnotationValue":
+    case APEX_TYPES.STRING_ANNOTATION_VALUE:
       parts.push("'");
       parts.push(path.call(print, "value"));
       parts.push("'");
@@ -904,19 +904,19 @@ function handleStatement(
 ): Doc {
   let doc;
   switch (childClass as jorje.Stmnt["@class"]) {
-    case "apex.jorje.data.ast.Stmnt$DmlInsertStmnt":
+    case APEX_TYPES.DML_INSERT_STATEMENT:
       doc = "insert";
       break;
-    case "apex.jorje.data.ast.Stmnt$DmlUpdateStmnt":
+    case APEX_TYPES.DML_UPDATE_STATEMENT:
       doc = "update";
       break;
-    case "apex.jorje.data.ast.Stmnt$DmlUpsertStmnt":
+    case APEX_TYPES.DML_UPSERT_STATEMENT:
       doc = "upsert";
       break;
-    case "apex.jorje.data.ast.Stmnt$DmlDeleteStmnt":
+    case APEX_TYPES.DML_DELETE_STATEMENT:
       doc = "delete";
       break;
-    case "apex.jorje.data.ast.Stmnt$DmlUndeleteStmnt":
+    case APEX_TYPES.DML_UNDELETE_STATEMENT:
       doc = "undelete";
       break;
     /* v8 ignore start */
@@ -1834,10 +1834,10 @@ function handleFindValue(
 ): Doc {
   let doc: Doc;
   switch (childClass as jorje.FindValue["@class"]) {
-    case "apex.jorje.data.sosl.FindValue$FindString":
+    case APEX_TYPES.FIND_VALUE_STRING:
       doc = ["'", path.call(print, "value"), "'"];
       break;
-    case "apex.jorje.data.sosl.FindValue$FindExpr":
+    case APEX_TYPES.FIND_VALUE_EXPRESSION:
       doc = path.call(print, "expr");
       break;
   }
@@ -1868,10 +1868,10 @@ function handleDivisionValue(
 ): Doc {
   let doc: Doc;
   switch (childClass as jorje.DivisionValue["@class"]) {
-    case "apex.jorje.data.sosl.DivisionValue$DivisionLiteral":
+    case APEX_TYPES.DIVISION_VALUE_LITERAL:
       doc = ["'", path.call(print, "literal"), "'"];
       break;
-    case "apex.jorje.data.sosl.DivisionValue$DivisionExpr":
+    case APEX_TYPES.DIVISION_VALUE_EXPRESSION:
       doc = path.call(print, "expr");
       break;
   }
@@ -1895,7 +1895,7 @@ function handleSearchWithClauseValue(
   const parts: Doc[] = [];
   let valueDocs: Doc[];
   switch (childClass as jorje.SearchWithClauseValue["@class"]) {
-    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithStringValue":
+    case APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE_STRING:
       valueDocs = path.map(print, "values");
       if (valueDocs.length === 1 && valueDocs[0] !== undefined) {
         parts.push(" = ");
@@ -1909,18 +1909,18 @@ function handleSearchWithClauseValue(
         parts.push(")");
       }
       break;
-    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithTargetValue":
+    case APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE_TARGET:
       parts.push("(");
       parts.push(path.call(print, "target"));
       parts.push(" = ");
       parts.push(path.call(print, "value"));
       parts.push(")");
       break;
-    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithTrueValue":
+    case APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE_TRUE:
       parts.push(" = ");
       parts.push("true");
       break;
-    case "apex.jorje.data.sosl.SearchWithClauseValue$SearchWithFalseValue":
+    case APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE_FALSE:
       parts.push(" = ");
       parts.push("false");
       break;
@@ -2339,30 +2339,30 @@ function handleWhereQueryLiteral(
 
   let doc: Doc;
   switch (childClass as jorje.QueryLiteral["@class"]) {
-    case "apex.jorje.data.soql.QueryLiteral$QueryString":
+    case APEX_TYPES.QUERY_LITERAL_STRING:
       doc = ["'", node.literal, "'"];
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryNull":
+    case APEX_TYPES.QUERY_LITERAL_NULL:
       doc = "NULL";
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryTrue":
+    case APEX_TYPES.QUERY_LITERAL_TRUE:
       doc = "TRUE";
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryFalse":
+    case APEX_TYPES.QUERY_LITERAL_FALSE:
       doc = "FALSE";
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryNumber":
+    case APEX_TYPES.QUERY_LITERAL_NUMBER:
       doc = path.call(print, "literal", "$");
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryDateTime":
-    case "apex.jorje.data.soql.QueryLiteral$QueryTime":
+    case APEX_TYPES.QUERY_LITERAL_DATE_TIME:
+    case APEX_TYPES.QUERY_LITERAL_TIME:
       doc = options.originalText.slice(node.loc.startIndex, node.loc.endIndex);
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryDateFormula":
+    case APEX_TYPES.QUERY_LITERAL_DATE_FORMULA:
       doc = path.call(print, "dateFormula");
       break;
-    case "apex.jorje.data.soql.QueryLiteral$QueryDate":
-    case "apex.jorje.data.soql.QueryLiteral$QueryMultiCurrency":
+    case APEX_TYPES.QUERY_LITERAL_DATE:
+    case APEX_TYPES.QUERY_LITERAL_MULTI_CURRENCY:
       doc = path.call(print, "literal");
       break;
   }
@@ -2437,10 +2437,10 @@ function handleOrderByExpression(
   const parts: Doc[] = [];
   let expressionField;
   switch (childClass as jorje.OrderByExpr["@class"]) {
-    case "apex.jorje.data.soql.OrderByExpr$OrderByDistance":
+    case APEX_TYPES.ORDER_BY_EXPRESSION_DISTANCE:
       expressionField = "distance";
       break;
-    case "apex.jorje.data.soql.OrderByExpr$OrderByValue":
+    case APEX_TYPES.ORDER_BY_EXPRESSION_VALUE:
       expressionField = "field";
       break;
   }
@@ -2517,10 +2517,10 @@ function handleGroupByClause(path: AstPath, print: printFn): Doc {
 function handleGroupByType(childClass: string): Doc {
   let doc;
   switch (childClass as jorje.GroupByType["@class"]) {
-    case "apex.jorje.data.soql.GroupByType$GroupByRollUp":
+    case APEX_TYPES.GROUP_BY_TYPE_ROLL_UP:
       doc = "ROLLUP";
       break;
-    case "apex.jorje.data.soql.GroupByType$GroupByCube":
+    case APEX_TYPES.GROUP_BY_TYPE_CUBE:
       doc = "CUBE";
       break;
   }
@@ -2552,21 +2552,21 @@ function handleUsingExpression(
 ): Doc {
   let doc;
   switch (childClass as jorje.UsingExpr["@class"]) {
-    case "apex.jorje.data.soql.UsingExpr$Using":
+    case APEX_TYPES.USING_EXPRESSION_USING:
       doc = [
         path.call(print, "name", "value"),
         " ",
         path.call(print, "field", "value"),
       ];
       break;
-    case "apex.jorje.data.soql.UsingExpr$UsingEquals":
+    case APEX_TYPES.USING_EXPRESSION_USING_EQUALS:
       doc = [
         path.call(print, "name", "value"),
         " = ",
         path.call(print, "field", "value"),
       ];
       break;
-    case "apex.jorje.data.soql.UsingExpr$UsingId":
+    case APEX_TYPES.USING_EXPRESSION_USING_ID:
       doc = [
         path.call(print, "name"),
         "(",
@@ -2583,10 +2583,10 @@ function handleUsingExpression(
 function handleTrackingType(childClass: string): Doc {
   let doc;
   switch (childClass as jorje.TrackingType["@class"]) {
-    case "apex.jorje.data.soql.TrackingType$ForView":
+    case APEX_TYPES.TRACKING_TYPE_FOR_VIEW:
       doc = "FOR VIEW";
       break;
-    case "apex.jorje.data.soql.TrackingType$ForReference":
+    case APEX_TYPES.TRACKING_TYPE_FOR_REFERENCE:
       doc = "FOR REFERENCE";
       break;
   }
@@ -2596,10 +2596,10 @@ function handleTrackingType(childClass: string): Doc {
 function handleQueryOption(childClass: string): Doc {
   let doc;
   switch (childClass as jorje.QueryOption["@class"]) {
-    case "apex.jorje.data.soql.QueryOption$LockRows":
+    case APEX_TYPES.QUERY_OPTION_LOCK_ROWS:
       doc = "FOR UPDATE";
       break;
-    case "apex.jorje.data.soql.QueryOption$IncludeDeleted":
+    case APEX_TYPES.QUERY_OPTION_INCLUDE_DELETED:
       doc = "ALL ROWS";
       break;
   }
@@ -2619,10 +2619,10 @@ function handleUpdateStatsClause(path: AstPath, print: printFn): Doc {
 function handleUpdateStatsOption(childClass: string): Doc {
   let doc;
   switch (childClass as jorje.UpdateStatsOption["@class"]) {
-    case "apex.jorje.data.soql.UpdateStatsOption$UpdateTracking":
+    case APEX_TYPES.UPDATE_STATS_OPTION_TRACKING:
       doc = "TRACKING";
       break;
-    case "apex.jorje.data.soql.UpdateStatsOption$UpdateViewStat":
+    case APEX_TYPES.UPDATE_STATS_OPTION_VIEW_STAT:
       doc = "VIEWSTAT";
       break;
   }
