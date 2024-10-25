@@ -2856,265 +2856,250 @@ type childNodeHandler = (
   options: prettier.ParserOptions,
 ) => Doc;
 
-const nodeHandler: { [key: string]: childNodeHandler | singleNodeHandler } = {};
-nodeHandler[APEX_TYPES.IF_ELSE_BLOCK] = handleIfElseBlock;
-nodeHandler[APEX_TYPES.IF_BLOCK] = handleIfBlock;
-nodeHandler[APEX_TYPES.ELSE_BLOCK] = handleElseBlock;
-nodeHandler[APEX_TYPES.EXPRESSION_STATEMENT] = handleExpressionStatement;
-nodeHandler[APEX_TYPES.RETURN_STATEMENT] = handleReturnStatement;
-nodeHandler[APEX_TYPES.TRIGGER_USAGE] = handleTriggerUsage;
-nodeHandler[APEX_TYPES.JAVA_TYPE_REF] = handleJavaTypeRef;
-nodeHandler[APEX_TYPES.CLASS_TYPE_REF] = handleClassTypeRef;
-nodeHandler[APEX_TYPES.ARRAY_TYPE_REF] = handleArrayTypeRef;
-nodeHandler[APEX_TYPES.LOCATION_IDENTIFIER] = handlePassthroughCall("value");
-nodeHandler[APEX_TYPES.MODIFIER_PARAMETER_REF] = handleModifierParameterRef;
-nodeHandler[APEX_TYPES.EMPTY_MODIFIER_PARAMETER_REF] =
-  handleEmptyModifierParameterRef;
-nodeHandler[APEX_TYPES.BLOCK_STATEMENT] = handleBlockStatement;
-nodeHandler[APEX_TYPES.VARIABLE_DECLARATION_STATEMENT] =
-  handlePassthroughCall("variableDecls");
-nodeHandler[APEX_TYPES.VARIABLE_DECLARATIONS] = handleVariableDeclarations;
-nodeHandler[APEX_TYPES.NAME_VALUE_PARAMETER] = handleNameValueParameter;
-nodeHandler[APEX_TYPES.ANNOTATION] = handleAnnotation;
-nodeHandler[APEX_TYPES.ANNOTATION_KEY_VALUE] = handleAnnotationKeyValue;
-nodeHandler[APEX_TYPES.ANNOTATION_VALUE] = handleAnnotationValue;
-nodeHandler[APEX_TYPES.ANNOTATION_STRING] = handleAnnotationString;
-nodeHandler[APEX_TYPES.MODIFIER] = handleModifier;
-nodeHandler[APEX_TYPES.RUN_AS_BLOCK] = handleRunAsBlock;
-nodeHandler[APEX_TYPES.DO_LOOP] = handleDoLoop;
-nodeHandler[APEX_TYPES.WHILE_LOOP] = handleWhileLoop;
-nodeHandler[APEX_TYPES.FOR_LOOP] = handleForLoop;
-nodeHandler[APEX_TYPES.FOR_C_STYLE_CONTROL] = handleForCStyleControl;
-nodeHandler[APEX_TYPES.FOR_ENHANCED_CONTROL] = handleForEnhancedControl;
-nodeHandler[APEX_TYPES.FOR_INITS] = handleForInits;
-nodeHandler[APEX_TYPES.FOR_INIT] = handleForInit;
-nodeHandler[APEX_TYPES.BREAK_STATEMENT] = () => "break;";
-nodeHandler[APEX_TYPES.CONTINUE_STATEMENT] = () => "continue;";
-nodeHandler[APEX_TYPES.THROW_STATEMENT] = (path: AstPath, print: printFn) => [
-  "throw",
-  " ",
-  path.call(print, "expr"),
-  ";",
-];
-nodeHandler[APEX_TYPES.TRY_CATCH_FINALLY_BLOCK] = handleTryCatchFinallyBlock;
-nodeHandler[APEX_TYPES.CATCH_BLOCK] = handleCatchBlock;
-nodeHandler[APEX_TYPES.FINALLY_BLOCK] = handleFinallyBlock;
-nodeHandler[APEX_TYPES.STATEMENT] = handleStatement;
-nodeHandler[APEX_TYPES.DML_MERGE_STATEMENT] = handleDmlMergeStatement;
-nodeHandler[APEX_TYPES.SWITCH_STATEMENT] = handleSwitchStatement;
-nodeHandler[APEX_TYPES.VALUE_WHEN] = handleValueWhen;
-nodeHandler[APEX_TYPES.ELSE_WHEN] = handleElseWhen;
-nodeHandler[APEX_TYPES.TYPE_WHEN] = handleTypeWhen;
-nodeHandler[APEX_TYPES.ENUM_CASE] = handleEnumCase;
-nodeHandler[APEX_TYPES.LITERAL_CASE] = handlePassthroughCall("expr");
-nodeHandler[APEX_TYPES.PROPERTY_DECLATION] = handlePropertyDeclaration;
-nodeHandler[APEX_TYPES.PROPERTY_GETTER] = handlePropertyGetterSetter("get");
-nodeHandler[APEX_TYPES.PROPERTY_SETTER] = handlePropertyGetterSetter("set");
-nodeHandler[APEX_TYPES.STRUCTURED_VERSION] = handleStructuredVersion;
-nodeHandler[APEX_TYPES.REQUEST_VERSION] = () => "Request";
-nodeHandler["int"] = (path: AstPath, print: printFn) => path.call(print, "$");
-nodeHandler["string"] = (path: AstPath, print: printFn) => [
-  "'",
-  path.call(print, "$"),
-  "'",
-];
+const nodeHandler: { [key: string]: childNodeHandler | singleNodeHandler } = {
+  [APEX_TYPES.IF_ELSE_BLOCK]: handleIfElseBlock,
+  [APEX_TYPES.IF_BLOCK]: handleIfBlock,
+  [APEX_TYPES.ELSE_BLOCK]: handleElseBlock,
+  [APEX_TYPES.EXPRESSION_STATEMENT]: handleExpressionStatement,
+  [APEX_TYPES.RETURN_STATEMENT]: handleReturnStatement,
+  [APEX_TYPES.TRIGGER_USAGE]: handleTriggerUsage,
+  [APEX_TYPES.JAVA_TYPE_REF]: handleJavaTypeRef,
+  [APEX_TYPES.CLASS_TYPE_REF]: handleClassTypeRef,
+  [APEX_TYPES.ARRAY_TYPE_REF]: handleArrayTypeRef,
+  [APEX_TYPES.LOCATION_IDENTIFIER]: handlePassthroughCall("value"),
+  [APEX_TYPES.MODIFIER_PARAMETER_REF]: handleModifierParameterRef,
+  [APEX_TYPES.EMPTY_MODIFIER_PARAMETER_REF]: handleEmptyModifierParameterRef,
+  [APEX_TYPES.BLOCK_STATEMENT]: handleBlockStatement,
+  [APEX_TYPES.VARIABLE_DECLARATION_STATEMENT]:
+    handlePassthroughCall("variableDecls"),
+  [APEX_TYPES.VARIABLE_DECLARATIONS]: handleVariableDeclarations,
+  [APEX_TYPES.NAME_VALUE_PARAMETER]: handleNameValueParameter,
+  [APEX_TYPES.ANNOTATION]: handleAnnotation,
+  [APEX_TYPES.ANNOTATION_KEY_VALUE]: handleAnnotationKeyValue,
+  [APEX_TYPES.ANNOTATION_VALUE]: handleAnnotationValue,
+  [APEX_TYPES.ANNOTATION_STRING]: handleAnnotationString,
+  [APEX_TYPES.MODIFIER]: handleModifier,
+  [APEX_TYPES.RUN_AS_BLOCK]: handleRunAsBlock,
+  [APEX_TYPES.DO_LOOP]: handleDoLoop,
+  [APEX_TYPES.WHILE_LOOP]: handleWhileLoop,
+  [APEX_TYPES.FOR_LOOP]: handleForLoop,
+  [APEX_TYPES.FOR_C_STYLE_CONTROL]: handleForCStyleControl,
+  [APEX_TYPES.FOR_ENHANCED_CONTROL]: handleForEnhancedControl,
+  [APEX_TYPES.FOR_INITS]: handleForInits,
+  [APEX_TYPES.FOR_INIT]: handleForInit,
+  [APEX_TYPES.BREAK_STATEMENT]: () => "break;",
+  [APEX_TYPES.CONTINUE_STATEMENT]: () => "continue;",
+  [APEX_TYPES.THROW_STATEMENT]: (path: AstPath, print: printFn) => [
+    "throw",
+    " ",
+    path.call(print, "expr"),
+    ";",
+  ],
+  [APEX_TYPES.TRY_CATCH_FINALLY_BLOCK]: handleTryCatchFinallyBlock,
+  [APEX_TYPES.CATCH_BLOCK]: handleCatchBlock,
+  [APEX_TYPES.FINALLY_BLOCK]: handleFinallyBlock,
+  [APEX_TYPES.STATEMENT]: handleStatement,
+  [APEX_TYPES.DML_MERGE_STATEMENT]: handleDmlMergeStatement,
+  [APEX_TYPES.SWITCH_STATEMENT]: handleSwitchStatement,
+  [APEX_TYPES.VALUE_WHEN]: handleValueWhen,
+  [APEX_TYPES.ELSE_WHEN]: handleElseWhen,
+  [APEX_TYPES.TYPE_WHEN]: handleTypeWhen,
+  [APEX_TYPES.ENUM_CASE]: handleEnumCase,
+  [APEX_TYPES.LITERAL_CASE]: handlePassthroughCall("expr"),
+  [APEX_TYPES.PROPERTY_DECLATION]: handlePropertyDeclaration,
+  [APEX_TYPES.PROPERTY_GETTER]: handlePropertyGetterSetter("get"),
+  [APEX_TYPES.PROPERTY_SETTER]: handlePropertyGetterSetter("set"),
+  [APEX_TYPES.STRUCTURED_VERSION]: handleStructuredVersion,
+  [APEX_TYPES.REQUEST_VERSION]: () => "Request",
+  int: (path: AstPath, print: printFn) => path.call(print, "$"),
+  string: (path: AstPath, print: printFn) => ["'", path.call(print, "$"), "'"],
 
-// Operator
-nodeHandler[APEX_TYPES.ASSIGNMENT_OPERATOR] = handleAssignmentOperation;
-nodeHandler[APEX_TYPES.BINARY_OPERATOR] = handleBinaryOperation;
-nodeHandler[APEX_TYPES.BOOLEAN_OPERATOR] = handleBooleanOperation;
-nodeHandler[APEX_TYPES.POSTFIX_OPERATOR] = handlePostfixOperator;
-nodeHandler[APEX_TYPES.PREFIX_OPERATOR] = handlePrefixOperator;
+  // Operator
+  [APEX_TYPES.ASSIGNMENT_OPERATOR]: handleAssignmentOperation,
+  [APEX_TYPES.BINARY_OPERATOR]: handleBinaryOperation,
+  [APEX_TYPES.BOOLEAN_OPERATOR]: handleBooleanOperation,
+  [APEX_TYPES.POSTFIX_OPERATOR]: handlePostfixOperator,
+  [APEX_TYPES.PREFIX_OPERATOR]: handlePrefixOperator,
 
-// Declaration
-nodeHandler[APEX_TYPES.CLASS_DECLARATION] = handleClassDeclaration;
-nodeHandler[APEX_TYPES.INTERFACE_DECLARATION] = handleInterfaceDeclaration;
-nodeHandler[APEX_TYPES.METHOD_DECLARATION] = handleMethodDeclaration;
-nodeHandler[APEX_TYPES.VARIABLE_DECLARATION] = handleVariableDeclaration;
-nodeHandler[APEX_TYPES.ENUM_DECLARATION] = handleEnumDeclaration;
+  // Declaration
+  [APEX_TYPES.CLASS_DECLARATION]: handleClassDeclaration,
+  [APEX_TYPES.INTERFACE_DECLARATION]: handleInterfaceDeclaration,
+  [APEX_TYPES.METHOD_DECLARATION]: handleMethodDeclaration,
+  [APEX_TYPES.VARIABLE_DECLARATION]: handleVariableDeclaration,
+  [APEX_TYPES.ENUM_DECLARATION]: handleEnumDeclaration,
 
-// Compilation Unit: we're not handling  InvalidDeclUnit
-nodeHandler[APEX_TYPES.TRIGGER_DECLARATION_UNIT] = handleTriggerDeclarationUnit;
-nodeHandler[APEX_TYPES.CLASS_DECLARATION_UNIT] = handlePassthroughCall("body");
-nodeHandler[APEX_TYPES.ENUM_DECLARATION_UNIT] = handlePassthroughCall("body");
-nodeHandler[APEX_TYPES.INTERFACE_DECLARATION_UNIT] =
-  handlePassthroughCall("body");
-nodeHandler[APEX_TYPES.ANONYMOUS_BLOCK_UNIT] = handleAnonymousBlockUnit;
+  // Compilation Unit: we're not handling InvalidDeclUnit
+  [APEX_TYPES.TRIGGER_DECLARATION_UNIT]: handleTriggerDeclarationUnit,
+  [APEX_TYPES.CLASS_DECLARATION_UNIT]: handlePassthroughCall("body"),
+  [APEX_TYPES.ENUM_DECLARATION_UNIT]: handlePassthroughCall("body"),
+  [APEX_TYPES.INTERFACE_DECLARATION_UNIT]: handlePassthroughCall("body"),
+  [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousBlockUnit,
 
-// Block Member
-nodeHandler[APEX_TYPES.PROPERTY_MEMBER] = handlePassthroughCall("propertyDecl");
-nodeHandler[APEX_TYPES.FIELD_MEMBER] = handlePassthroughCall("variableDecls");
-nodeHandler[APEX_TYPES.STATEMENT_BLOCK_MEMBER] = handleStatementBlockMember();
-nodeHandler[APEX_TYPES.STATIC_STATEMENT_BLOCK_MEMBER] =
-  handleStatementBlockMember("static");
-nodeHandler[APEX_TYPES.METHOD_MEMBER] = handlePassthroughCall("methodDecl");
-nodeHandler[APEX_TYPES.INNER_CLASS_MEMBER] = handlePassthroughCall("body");
-nodeHandler[APEX_TYPES.INNER_ENUM_MEMBER] = handlePassthroughCall("body");
-nodeHandler[APEX_TYPES.INNER_INTERFACE_MEMBER] = handlePassthroughCall("body");
+  // Block Member
+  [APEX_TYPES.PROPERTY_MEMBER]: handlePassthroughCall("propertyDecl"),
+  [APEX_TYPES.FIELD_MEMBER]: handlePassthroughCall("variableDecls"),
+  [APEX_TYPES.STATEMENT_BLOCK_MEMBER]: handleStatementBlockMember(),
+  [APEX_TYPES.STATIC_STATEMENT_BLOCK_MEMBER]:
+    handleStatementBlockMember("static"),
+  [APEX_TYPES.METHOD_MEMBER]: handlePassthroughCall("methodDecl"),
+  [APEX_TYPES.INNER_CLASS_MEMBER]: handlePassthroughCall("body"),
+  [APEX_TYPES.INNER_ENUM_MEMBER]: handlePassthroughCall("body"),
+  [APEX_TYPES.INNER_INTERFACE_MEMBER]: handlePassthroughCall("body"),
 
-// Expression
-nodeHandler[APEX_TYPES.TERNARY_EXPRESSION] = handleTernaryExpression;
-nodeHandler[APEX_TYPES.BOOLEAN_EXPRESSION] = handleBinaryishExpression;
-nodeHandler[APEX_TYPES.ASSIGNMENT_EXPRESSION] = handleAssignmentExpression;
-nodeHandler[APEX_TYPES.NESTED_EXPRESSION] = handleNestedExpression;
-nodeHandler[APEX_TYPES.VARIABLE_EXPRESSION] = handleVariableExpression;
-nodeHandler[APEX_TYPES.JAVA_VARIABLE_EXPRESSION] = handleJavaVariableExpression;
-nodeHandler[APEX_TYPES.LITERAL_EXPRESSION] = handleLiteralExpression;
-nodeHandler[APEX_TYPES.BINARY_EXPRESSION] = handleBinaryishExpression;
-nodeHandler[APEX_TYPES.TRIGGER_VARIABLE_EXPRESSION] = (
-  path: AstPath,
-  print: printFn,
-) => ["Trigger", ".", path.call(print, "variable")];
-nodeHandler[APEX_TYPES.NEW_EXPRESSION] = handleNewExpression;
-nodeHandler[APEX_TYPES.METHOD_CALL_EXPRESSION] = handleMethodCallExpression;
-nodeHandler[APEX_TYPES.JAVA_METHOD_CALL_EXPRESSION] =
-  handleJavaMethodCallExpression;
-nodeHandler[APEX_TYPES.THIS_VARIABLE_EXPRESSION] = () => "this";
-nodeHandler[APEX_TYPES.SUPER_VARIABLE_EXPRESSION] = () => "super";
-nodeHandler[APEX_TYPES.POSTFIX_EXPRESSION] = handlePostfixExpression;
-nodeHandler[APEX_TYPES.PREFIX_EXPRESSION] = handlePrefixExpression;
-nodeHandler[APEX_TYPES.CAST_EXPRESSION] = handleCastExpression;
-nodeHandler[APEX_TYPES.INSTANCE_OF_EXPRESSION] = handleInstanceOfExpression;
-nodeHandler[APEX_TYPES.PACKAGE_VERSION_EXPRESSION] =
-  handlePackageVersionExpression;
-nodeHandler[APEX_TYPES.ARRAY_EXPRESSION] = handleArrayExpression;
-nodeHandler[APEX_TYPES.CLASS_REF_EXPRESSION] = (
-  path: AstPath,
-  print: printFn,
-) => [path.call(print, "type"), ".", "class"];
-nodeHandler[APEX_TYPES.THIS_METHOD_CALL_EXPRESSION] =
-  handleThisMethodCallExpression;
-nodeHandler[APEX_TYPES.SUPER_METHOD_CALL_EXPRESSION] =
-  handleSuperMethodCallExpression;
-nodeHandler[APEX_TYPES.SOQL_EXPRESSION] = handleSoqlExpression;
-nodeHandler[APEX_TYPES.SOSL_EXPRESSION] = handleSoslExpression;
-nodeHandler[APEX_TYPES.NULL_COALESCING_EXPRESSION] =
-  handleNullCoalescingExpression;
+  // Expression
+  [APEX_TYPES.TERNARY_EXPRESSION]: handleTernaryExpression,
+  [APEX_TYPES.BOOLEAN_EXPRESSION]: handleBinaryishExpression,
+  [APEX_TYPES.ASSIGNMENT_EXPRESSION]: handleAssignmentExpression,
+  [APEX_TYPES.NESTED_EXPRESSION]: handleNestedExpression,
+  [APEX_TYPES.VARIABLE_EXPRESSION]: handleVariableExpression,
+  [APEX_TYPES.JAVA_VARIABLE_EXPRESSION]: handleJavaVariableExpression,
+  [APEX_TYPES.LITERAL_EXPRESSION]: handleLiteralExpression,
+  [APEX_TYPES.BINARY_EXPRESSION]: handleBinaryishExpression,
+  [APEX_TYPES.TRIGGER_VARIABLE_EXPRESSION]: (path: AstPath, print: printFn) => [
+    "Trigger",
+    ".",
+    path.call(print, "variable"),
+  ],
+  [APEX_TYPES.NEW_EXPRESSION]: handleNewExpression,
+  [APEX_TYPES.METHOD_CALL_EXPRESSION]: handleMethodCallExpression,
+  [APEX_TYPES.JAVA_METHOD_CALL_EXPRESSION]: handleJavaMethodCallExpression,
+  [APEX_TYPES.THIS_VARIABLE_EXPRESSION]: () => "this",
+  [APEX_TYPES.SUPER_VARIABLE_EXPRESSION]: () => "super",
+  [APEX_TYPES.POSTFIX_EXPRESSION]: handlePostfixExpression,
+  [APEX_TYPES.PREFIX_EXPRESSION]: handlePrefixExpression,
+  [APEX_TYPES.CAST_EXPRESSION]: handleCastExpression,
+  [APEX_TYPES.INSTANCE_OF_EXPRESSION]: handleInstanceOfExpression,
+  [APEX_TYPES.PACKAGE_VERSION_EXPRESSION]: handlePackageVersionExpression,
+  [APEX_TYPES.ARRAY_EXPRESSION]: handleArrayExpression,
+  [APEX_TYPES.CLASS_REF_EXPRESSION]: (path: AstPath, print: printFn) => [
+    path.call(print, "type"),
+    ".",
+    "class",
+  ],
+  [APEX_TYPES.THIS_METHOD_CALL_EXPRESSION]: handleThisMethodCallExpression,
+  [APEX_TYPES.SUPER_METHOD_CALL_EXPRESSION]: handleSuperMethodCallExpression,
+  [APEX_TYPES.SOQL_EXPRESSION]: handleSoqlExpression,
+  [APEX_TYPES.SOSL_EXPRESSION]: handleSoslExpression,
+  [APEX_TYPES.NULL_COALESCING_EXPRESSION]: handleNullCoalescingExpression,
 
-// New Object Init
-nodeHandler[APEX_TYPES.NEW_SET_INIT] = handleNewSetInit;
-nodeHandler[APEX_TYPES.NEW_SET_LITERAL] = handleNewSetLiteral;
-nodeHandler[APEX_TYPES.NEW_LIST_INIT] = handleNewListInit;
-nodeHandler[APEX_TYPES.NEW_MAP_INIT] = handleNewMapInit;
-nodeHandler[APEX_TYPES.NEW_MAP_LITERAL] = handleNewMapLiteral;
-nodeHandler[APEX_TYPES.MAP_LITERAL_KEY_VALUE] = handleMapLiteralKeyValue;
-nodeHandler[APEX_TYPES.NEW_LIST_LITERAL] = handleNewListLiteral;
-nodeHandler[APEX_TYPES.NEW_STANDARD] = handleNewStandard;
-nodeHandler[APEX_TYPES.NEW_KEY_VALUE] = handleNewKeyValue;
+  // New Object Init
+  [APEX_TYPES.NEW_SET_INIT]: handleNewSetInit,
+  [APEX_TYPES.NEW_SET_LITERAL]: handleNewSetLiteral,
+  [APEX_TYPES.NEW_LIST_INIT]: handleNewListInit,
+  [APEX_TYPES.NEW_MAP_INIT]: handleNewMapInit,
+  [APEX_TYPES.NEW_MAP_LITERAL]: handleNewMapLiteral,
+  [APEX_TYPES.MAP_LITERAL_KEY_VALUE]: handleMapLiteralKeyValue,
+  [APEX_TYPES.NEW_LIST_LITERAL]: handleNewListLiteral,
+  [APEX_TYPES.NEW_STANDARD]: handleNewStandard,
+  [APEX_TYPES.NEW_KEY_VALUE]: handleNewKeyValue,
 
-// SOSL
-nodeHandler[APEX_TYPES.SEARCH] = handleSearch;
-nodeHandler[APEX_TYPES.FIND_CLAUSE] = handleFindClause;
-nodeHandler[APEX_TYPES.FIND_VALUE] = handleFindValue;
-nodeHandler[APEX_TYPES.IN_CLAUSE] = handleInClause;
-nodeHandler[APEX_TYPES.WITH_DIVISION_CLAUSE] = handleDivisionClause;
-nodeHandler[APEX_TYPES.DIVISION_VALUE] = handleDivisionValue;
-nodeHandler[APEX_TYPES.WITH_DATA_CATEGORY_CLAUSE] = handleWithDataCategories;
-nodeHandler[APEX_TYPES.SEARCH_WITH_CLAUSE] = handleSearchWithClause;
-nodeHandler[APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE] = handleSearchWithClauseValue;
-nodeHandler[APEX_TYPES.RETURNING_CLAUSE] = handleReturningClause;
-nodeHandler[APEX_TYPES.RETURNING_EXPRESSION] = handleReturningExpression;
-nodeHandler[APEX_TYPES.RETURNING_SELECT_EXPRESSION] =
-  handleReturningSelectExpression;
+  // SOSL
+  [APEX_TYPES.SEARCH]: handleSearch,
+  [APEX_TYPES.FIND_CLAUSE]: handleFindClause,
+  [APEX_TYPES.FIND_VALUE]: handleFindValue,
+  [APEX_TYPES.IN_CLAUSE]: handleInClause,
+  [APEX_TYPES.WITH_DIVISION_CLAUSE]: handleDivisionClause,
+  [APEX_TYPES.DIVISION_VALUE]: handleDivisionValue,
+  [APEX_TYPES.WITH_DATA_CATEGORY_CLAUSE]: handleWithDataCategories,
+  [APEX_TYPES.SEARCH_WITH_CLAUSE]: handleSearchWithClause,
+  [APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE]: handleSearchWithClauseValue,
+  [APEX_TYPES.RETURNING_CLAUSE]: handleReturningClause,
+  [APEX_TYPES.RETURNING_EXPRESSION]: handleReturningExpression,
+  [APEX_TYPES.RETURNING_SELECT_EXPRESSION]: handleReturningSelectExpression,
 
-// SOQL
-nodeHandler[APEX_TYPES.QUERY] = handleQuery;
-nodeHandler[APEX_TYPES.SELECT_COLUMN_CLAUSE] = handleColumnClause;
-nodeHandler[APEX_TYPES.SELECT_COUNT_CLAUSE] = () => ["SELECT", " ", "COUNT()"];
-nodeHandler[APEX_TYPES.SELECT_COLUMN_EXPRESSION] = handleColumnExpression;
-nodeHandler[APEX_TYPES.SELECT_INNER_QUERY] = handleSelectInnerQuery;
-nodeHandler[APEX_TYPES.SELECT_CASE_EXPRESSION] = handlePassthroughCall("expr");
-nodeHandler[APEX_TYPES.CASE_EXPRESSION] = handleCaseExpression;
-nodeHandler[APEX_TYPES.WHEN_OPERATOR] = handlePassthroughCall("identifier");
-nodeHandler[APEX_TYPES.WHEN_EXPRESSION] = handleWhenExpression;
-nodeHandler[APEX_TYPES.CASE_OPERATOR] = handlePassthroughCall("identifier");
-nodeHandler[APEX_TYPES.ELSE_EXPRESSION] = handleElseExpression;
-nodeHandler[APEX_TYPES.FIELD] = handleField;
-nodeHandler[APEX_TYPES.FIELD_IDENTIFIER] = handleFieldIdentifier;
-nodeHandler[APEX_TYPES.FROM_CLAUSE] = handleFromClause;
-nodeHandler[APEX_TYPES.FROM_EXPRESSION] = handleFromExpression;
-nodeHandler[APEX_TYPES.GROUP_BY_CLAUSE] = handleGroupByClause;
-nodeHandler[APEX_TYPES.GROUP_BY_EXPRESSION] = handlePassthroughCall("field");
-nodeHandler[APEX_TYPES.GROUP_BY_TYPE] = handleGroupByType;
-nodeHandler[APEX_TYPES.HAVING_CLAUSE] = handleHavingClause;
-nodeHandler[APEX_TYPES.WHERE_CLAUSE] = handleWhereClause;
-nodeHandler[APEX_TYPES.WHERE_INNER_EXPRESSION] = handleWhereInnerExpression;
-nodeHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSION] =
-  handleWhereOperationExpression;
-nodeHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSIONS] =
-  handleWhereOperationExpressions;
-nodeHandler[APEX_TYPES.WHERE_COMPOUND_EXPRESSION] =
-  handleWhereCompoundExpression;
-nodeHandler[APEX_TYPES.WHERE_UNARY_EXPRESSION] = handleWhereUnaryExpression;
-nodeHandler[APEX_TYPES.WHERE_UNARY_OPERATOR] = () => "NOT";
-nodeHandler[APEX_TYPES.SELECT_DISTANCE_EXPRESSION] =
-  handleSelectDistanceExpression;
-nodeHandler[APEX_TYPES.WHERE_DISTANCE_EXPRESSION] =
-  handleWhereDistanceExpression;
-nodeHandler[APEX_TYPES.DISTANCE_FUNCTION_EXPRESSION] =
-  handleDistanceFunctionExpression;
-nodeHandler[APEX_TYPES.GEOLOCATION_LITERAL] = handleGeolocationLiteral;
-nodeHandler[APEX_TYPES.GEOLOCATION_EXPRESSION] = handlePassthroughCall("expr");
-nodeHandler[APEX_TYPES.NUMBER_LITERAL] = handlePassthroughCall("number", "$");
-nodeHandler[APEX_TYPES.NUMBER_EXPRESSION] = handlePassthroughCall("expr");
-nodeHandler[APEX_TYPES.QUERY_LITERAL_EXPRESSION] =
-  handlePassthroughCall("literal");
-nodeHandler[APEX_TYPES.QUERY_LITERAL] = handleWhereQueryLiteral;
-nodeHandler[APEX_TYPES.APEX_EXPRESSION] = handlePassthroughCall("expr");
-nodeHandler[APEX_TYPES.COLON_EXPRESSION] = handleColonExpression;
-nodeHandler[APEX_TYPES.ORDER_BY_CLAUSE] = handleOrderByClause;
-nodeHandler[APEX_TYPES.ORDER_BY_EXPRESSION] = handleOrderByExpression;
-nodeHandler[APEX_TYPES.WITH_VALUE] = handleWithValue;
-nodeHandler[APEX_TYPES.WITH_DATA_CATEGORIES] = handleWithDataCategories;
-nodeHandler[APEX_TYPES.DATA_CATEGORY] = handleDataCategory;
-nodeHandler[APEX_TYPES.DATA_CATEGORY_OPERATOR] = handleDataCategoryOperator;
-nodeHandler[APEX_TYPES.LIMIT_VALUE] = (path: AstPath, print: printFn) => [
-  "LIMIT",
-  " ",
-  path.call(print, "i"),
-];
-nodeHandler[APEX_TYPES.LIMIT_EXPRESSION] = (path: AstPath, print: printFn) => [
-  "LIMIT",
-  " ",
-  path.call(print, "expr"),
-];
-nodeHandler[APEX_TYPES.OFFSET_VALUE] = (path: AstPath, print: printFn) => [
-  "OFFSET",
-  " ",
-  path.call(print, "i"),
-];
-nodeHandler[APEX_TYPES.OFFSET_EXPRESSION] = (path: AstPath, print: printFn) => [
-  "OFFSET",
-  " ",
-  path.call(print, "expr"),
-];
-nodeHandler[APEX_TYPES.QUERY_OPERATOR] = (childClass: string) =>
-  QUERY[childClass as jorje.QueryOp["@class"]];
-nodeHandler[APEX_TYPES.SOQL_ORDER] = handleOrderOperation;
-nodeHandler[APEX_TYPES.SOQL_ORDER_NULL] = handleNullOrderOperation;
-nodeHandler[APEX_TYPES.TRACKING_TYPE] = handleTrackingType;
-nodeHandler[APEX_TYPES.QUERY_OPTION] = handleQueryOption;
-nodeHandler[APEX_TYPES.QUERY_USING_CLAUSE] = handleQueryUsingClause;
-nodeHandler[APEX_TYPES.USING_EXPRESSION] = handleUsingExpression;
-nodeHandler[APEX_TYPES.UPDATE_STATS_CLAUSE] = handleUpdateStatsClause;
-nodeHandler[APEX_TYPES.UPDATE_STATS_OPTION] = handleUpdateStatsOption;
-nodeHandler[APEX_TYPES.WHERE_CALC_EXPRESSION] = handleWhereCalcExpression;
-nodeHandler[APEX_TYPES.WHERE_CALC_OPERATOR_PLUS] = () => "+";
-nodeHandler[APEX_TYPES.WHERE_CALC_OPERATOR_MINUS] = () => "-";
-nodeHandler[APEX_TYPES.WHERE_COMPOUND_OPERATOR] = (childClass: string) =>
-  QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]];
-nodeHandler[APEX_TYPES.SEARCH_USING_CLAUSE] = (
-  path: AstPath,
-  print: printFn,
-) => ["USING", " ", path.call(print, "type")];
-nodeHandler[APEX_TYPES.USING_TYPE] = handleUsingType;
-nodeHandler[APEX_TYPES.BIND_CLAUSE] = handleBindClause;
-nodeHandler[APEX_TYPES.BIND_EXPRESSION] = handleBindExpression;
-nodeHandler[APEX_TYPES.WITH_IDENTIFIER] = (path: AstPath, print: printFn) => [
-  "WITH",
-  " ",
-  path.call(print, "identifier"),
-];
+  // SOQL
+  [APEX_TYPES.QUERY]: handleQuery,
+  [APEX_TYPES.SELECT_COLUMN_CLAUSE]: handleColumnClause,
+  [APEX_TYPES.SELECT_COUNT_CLAUSE]: () => ["SELECT", " ", "COUNT()"],
+  [APEX_TYPES.SELECT_COLUMN_EXPRESSION]: handleColumnExpression,
+  [APEX_TYPES.SELECT_INNER_QUERY]: handleSelectInnerQuery,
+  [APEX_TYPES.SELECT_CASE_EXPRESSION]: handlePassthroughCall("expr"),
+  [APEX_TYPES.CASE_EXPRESSION]: handleCaseExpression,
+  [APEX_TYPES.WHEN_OPERATOR]: handlePassthroughCall("identifier"),
+  [APEX_TYPES.WHEN_EXPRESSION]: handleWhenExpression,
+  [APEX_TYPES.CASE_OPERATOR]: handlePassthroughCall("identifier"),
+  [APEX_TYPES.ELSE_EXPRESSION]: handleElseExpression,
+  [APEX_TYPES.FIELD]: handleField,
+  [APEX_TYPES.FIELD_IDENTIFIER]: handleFieldIdentifier,
+  [APEX_TYPES.FROM_CLAUSE]: handleFromClause,
+  [APEX_TYPES.FROM_EXPRESSION]: handleFromExpression,
+  [APEX_TYPES.GROUP_BY_CLAUSE]: handleGroupByClause,
+  [APEX_TYPES.GROUP_BY_EXPRESSION]: handlePassthroughCall("field"),
+  [APEX_TYPES.GROUP_BY_TYPE]: handleGroupByType,
+  [APEX_TYPES.HAVING_CLAUSE]: handleHavingClause,
+  [APEX_TYPES.WHERE_CLAUSE]: handleWhereClause,
+  [APEX_TYPES.WHERE_INNER_EXPRESSION]: handleWhereInnerExpression,
+  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]: handleWhereOperationExpression,
+  [APEX_TYPES.WHERE_OPERATION_EXPRESSIONS]: handleWhereOperationExpressions,
+  [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: handleWhereCompoundExpression,
+  [APEX_TYPES.WHERE_UNARY_EXPRESSION]: handleWhereUnaryExpression,
+  [APEX_TYPES.WHERE_UNARY_OPERATOR]: () => "NOT",
+  [APEX_TYPES.SELECT_DISTANCE_EXPRESSION]: handleSelectDistanceExpression,
+  [APEX_TYPES.WHERE_DISTANCE_EXPRESSION]: handleWhereDistanceExpression,
+  [APEX_TYPES.DISTANCE_FUNCTION_EXPRESSION]: handleDistanceFunctionExpression,
+  [APEX_TYPES.GEOLOCATION_LITERAL]: handleGeolocationLiteral,
+  [APEX_TYPES.GEOLOCATION_EXPRESSION]: handlePassthroughCall("expr"),
+  [APEX_TYPES.NUMBER_LITERAL]: handlePassthroughCall("number", "$"),
+  [APEX_TYPES.NUMBER_EXPRESSION]: handlePassthroughCall("expr"),
+  [APEX_TYPES.QUERY_LITERAL_EXPRESSION]: handlePassthroughCall("literal"),
+  [APEX_TYPES.QUERY_LITERAL]: handleWhereQueryLiteral,
+  [APEX_TYPES.APEX_EXPRESSION]: handlePassthroughCall("expr"),
+  [APEX_TYPES.COLON_EXPRESSION]: handleColonExpression,
+  [APEX_TYPES.ORDER_BY_CLAUSE]: handleOrderByClause,
+  [APEX_TYPES.ORDER_BY_EXPRESSION]: handleOrderByExpression,
+  [APEX_TYPES.WITH_VALUE]: handleWithValue,
+  [APEX_TYPES.WITH_DATA_CATEGORIES]: handleWithDataCategories,
+  [APEX_TYPES.DATA_CATEGORY]: handleDataCategory,
+  [APEX_TYPES.DATA_CATEGORY_OPERATOR]: handleDataCategoryOperator,
+  [APEX_TYPES.LIMIT_VALUE]: (path: AstPath, print: printFn) => [
+    "LIMIT",
+    " ",
+    path.call(print, "i"),
+  ],
+  [APEX_TYPES.LIMIT_EXPRESSION]: (path: AstPath, print: printFn) => [
+    "LIMIT",
+    " ",
+    path.call(print, "expr"),
+  ],
+  [APEX_TYPES.OFFSET_VALUE]: (path: AstPath, print: printFn) => [
+    "OFFSET",
+    " ",
+    path.call(print, "i"),
+  ],
+  [APEX_TYPES.OFFSET_EXPRESSION]: (path: AstPath, print: printFn) => [
+    "OFFSET",
+    " ",
+    path.call(print, "expr"),
+  ],
+  [APEX_TYPES.QUERY_OPERATOR]: (childClass: string) =>
+    QUERY[childClass as jorje.QueryOp["@class"]],
+  [APEX_TYPES.SOQL_ORDER]: handleOrderOperation,
+  [APEX_TYPES.SOQL_ORDER_NULL]: handleNullOrderOperation,
+  [APEX_TYPES.TRACKING_TYPE]: handleTrackingType,
+  [APEX_TYPES.QUERY_OPTION]: handleQueryOption,
+  [APEX_TYPES.QUERY_USING_CLAUSE]: handleQueryUsingClause,
+  [APEX_TYPES.USING_EXPRESSION]: handleUsingExpression,
+  [APEX_TYPES.UPDATE_STATS_CLAUSE]: handleUpdateStatsClause,
+  [APEX_TYPES.UPDATE_STATS_OPTION]: handleUpdateStatsOption,
+  [APEX_TYPES.WHERE_CALC_EXPRESSION]: handleWhereCalcExpression,
+  [APEX_TYPES.WHERE_CALC_OPERATOR_PLUS]: () => "+",
+  [APEX_TYPES.WHERE_CALC_OPERATOR_MINUS]: () => "-",
+  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: (childClass: string) =>
+    QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]],
+  [APEX_TYPES.SEARCH_USING_CLAUSE]: (path: AstPath, print: printFn) => [
+    "USING",
+    " ",
+    path.call(print, "type"),
+  ],
+  [APEX_TYPES.USING_TYPE]: handleUsingType,
+  [APEX_TYPES.BIND_CLAUSE]: handleBindClause,
+  [APEX_TYPES.BIND_EXPRESSION]: handleBindExpression,
+  [APEX_TYPES.WITH_IDENTIFIER]: (path: AstPath, print: printFn) => [
+    "WITH",
+    " ",
+    path.call(print, "identifier"),
+  ],
+};
 
 function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
   let insertNewLine = false;
