@@ -229,16 +229,6 @@ function handleAnnotationLocation(
   );
 }
 
-// We need to generate the location for a node differently based on the node
-// type. This object holds a String => Function mapping in order to do that.
-const locationGenerationHandler: {
-  [key: string]: (
-    location: MinimalLocation,
-    sourceCode: string,
-    commentNodes: GenericComment[],
-    node: any,
-  ) => MinimalLocation | null;
-} = {};
 const identityFunction = (location: MinimalLocation): MinimalLocation =>
   location;
 // Sometimes we need to delete a location node. For example, a WhereCompoundOp
@@ -250,59 +240,55 @@ const identityFunction = (location: MinimalLocation): MinimalLocation =>
 // If we keep those locations, a comment might be duplicated since it is
 // attached to one WhereCompoundOp, and that operator is printed multiple times.
 const removeFunction = () => null;
-locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
-locationGenerationHandler[APEX_TYPES.SEARCH] = identityFunction;
-locationGenerationHandler[APEX_TYPES.FOR_INIT] = identityFunction;
-locationGenerationHandler[APEX_TYPES.FOR_ENHANCED_CONTROL] = identityFunction;
-locationGenerationHandler[APEX_TYPES.TERNARY_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.VARIABLE_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.INNER_CLASS_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.INNER_INTERFACE_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.INNER_ENUM_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.METHOD_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.IF_ELSE_BLOCK] = identityFunction;
-locationGenerationHandler[APEX_TYPES.NAME_VALUE_PARAMETER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.BINARY_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.BOOLEAN_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.ASSIGNMENT_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.FIELD_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.VALUE_WHEN] = identityFunction;
-locationGenerationHandler[APEX_TYPES.ELSE_WHEN] = identityFunction;
-locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_OPERATOR] = removeFunction;
-locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION_STATEMENT] =
-  identityFunction;
-locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_EXPRESSION] =
-  identityFunction;
-locationGenerationHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSION] =
-  identityFunction;
-locationGenerationHandler[APEX_TYPES.SELECT_INNER_QUERY] =
-  handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[APEX_TYPES.ANONYMOUS_BLOCK_UNIT] =
-  handleAnonymousUnitLocation;
-locationGenerationHandler[APEX_TYPES.NESTED_EXPRESSION] =
-  handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[APEX_TYPES.PROPERTY_MEMBER] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.SWITCH_STATEMENT] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_LIST_LITERAL] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_SET_LITERAL] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_MAP_LITERAL] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_STANDARD] =
-  handleNodeEndedWithCharacter(")");
-locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATIONS] =
-  handleNodeEndedWithCharacter(";");
-locationGenerationHandler[APEX_TYPES.NEW_KEY_VALUE] =
-  handleNodeEndedWithCharacter(")");
-locationGenerationHandler[APEX_TYPES.METHOD_CALL_EXPRESSION] =
-  handleNodeEndedWithCharacter(")");
-locationGenerationHandler[APEX_TYPES.ANNOTATION] = handleAnnotationLocation;
-locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
-  handleMethodDeclarationLocation;
+
+// We need to generate the location for a node differently based on the node
+// type. This object holds a String => Function mapping in order to do that.
+const locationGenerationHandler: {
+  [key: string]: (
+    location: MinimalLocation,
+    sourceCode: string,
+    commentNodes: GenericComment[],
+    node: any,
+  ) => MinimalLocation | null;
+} = {
+  [APEX_TYPES.QUERY]: identityFunction,
+  [APEX_TYPES.SEARCH]: identityFunction,
+  [APEX_TYPES.FOR_INIT]: identityFunction,
+  [APEX_TYPES.FOR_ENHANCED_CONTROL]: identityFunction,
+  [APEX_TYPES.TERNARY_EXPRESSION]: identityFunction,
+  [APEX_TYPES.VARIABLE_EXPRESSION]: identityFunction,
+  [APEX_TYPES.INNER_CLASS_MEMBER]: identityFunction,
+  [APEX_TYPES.INNER_INTERFACE_MEMBER]: identityFunction,
+  [APEX_TYPES.INNER_ENUM_MEMBER]: identityFunction,
+  [APEX_TYPES.METHOD_MEMBER]: identityFunction,
+  [APEX_TYPES.IF_ELSE_BLOCK]: identityFunction,
+  [APEX_TYPES.NAME_VALUE_PARAMETER]: identityFunction,
+  [APEX_TYPES.VARIABLE_DECLARATION]: identityFunction,
+  [APEX_TYPES.BINARY_EXPRESSION]: identityFunction,
+  [APEX_TYPES.BOOLEAN_EXPRESSION]: identityFunction,
+  [APEX_TYPES.ASSIGNMENT_EXPRESSION]: identityFunction,
+  [APEX_TYPES.FIELD_MEMBER]: identityFunction,
+  [APEX_TYPES.VALUE_WHEN]: identityFunction,
+  [APEX_TYPES.ELSE_WHEN]: identityFunction,
+  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: removeFunction,
+  [APEX_TYPES.VARIABLE_DECLARATION_STATEMENT]: identityFunction,
+  [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: identityFunction,
+  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]: identityFunction,
+  [APEX_TYPES.SELECT_INNER_QUERY]: handleNodeSurroundedByCharacters("(", ")"),
+  [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousUnitLocation,
+  [APEX_TYPES.NESTED_EXPRESSION]: handleNodeSurroundedByCharacters("(", ")"),
+  [APEX_TYPES.PROPERTY_MEMBER]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.SWITCH_STATEMENT]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_LIST_LITERAL]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_SET_LITERAL]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_MAP_LITERAL]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_STANDARD]: handleNodeEndedWithCharacter(")"),
+  [APEX_TYPES.VARIABLE_DECLARATIONS]: handleNodeEndedWithCharacter(";"),
+  [APEX_TYPES.NEW_KEY_VALUE]: handleNodeEndedWithCharacter(")"),
+  [APEX_TYPES.METHOD_CALL_EXPRESSION]: handleNodeEndedWithCharacter(")"),
+  [APEX_TYPES.ANNOTATION]: handleAnnotationLocation,
+  [APEX_TYPES.METHOD_DECLARATION]: handleMethodDeclarationLocation,
+};
 
 type AnyNode = any;
 type ApplyFn<AccumulatedResult, Context> = (
