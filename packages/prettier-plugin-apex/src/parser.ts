@@ -311,12 +311,12 @@ type ApplyFn<AccumulatedResult, Context> = (
   childrenContext: Context,
 ) => AccumulatedResult;
 type DfsVisitor<AccumulatedResult, Context> = {
-  accumulator: (
+  accumulator?: (
     entry: AccumulatedResult,
     accumulated: AccumulatedResult,
   ) => AccumulatedResult;
   apply: ApplyFn<AccumulatedResult, Context>;
-  gatherContext: (node: AnyNode, currentContext?: Context) => Context;
+  gatherContext?: (node: AnyNode, currentContext?: Context) => Context;
 };
 function dfsPostOrderApply(
   node: AnyNode,
@@ -326,7 +326,7 @@ function dfsPostOrderApply(
   const finalChildrenResults = new Array(fns.length);
   const childrenContexts = new Array(fns.length);
   for (let i = 0; i < fns.length; i++) {
-    childrenContexts[i] = fns[i]?.gatherContext(
+    childrenContexts[i] = fns[i]?.gatherContext?.(
       node,
       currentContexts ? currentContexts[i] : undefined,
     );
@@ -341,7 +341,7 @@ function dfsPostOrderApply(
         childrenContexts,
       );
       for (let j = 0; j < fns.length; j++) {
-        finalChildrenResults[j] = fns[j]?.accumulator(
+        finalChildrenResults[j] = fns[j]?.accumulator?.(
           childrenResults[j],
           finalChildrenResults[j],
         );
@@ -446,8 +446,6 @@ const nodeLocationVisitor: (
     }
     return null;
   },
-
-  gatherContext: () => undefined,
 });
 
 export type EnrichedIfBlock = jorje.IfBlock & {
@@ -468,7 +466,6 @@ type MetadataVisitorContext = {
 const metadataVisitor: (
   emptyLineLocations: number[],
 ) => DfsVisitor<undefined, MetadataVisitorContext> = (emptyLineLocations) => ({
-  accumulator: () => undefined,
   apply: (node: any, _accumulated, context, childrenContext) => {
     const apexClass = node["@class"];
     // #511 - If the user manually specify linebreaks in their original query,
@@ -604,7 +601,6 @@ function getLineNumber(lineIndexes: number[], charIndex: number) {
 const lineIndexVisitor: (
   lineIndexes: number[],
 ) => DfsVisitor<undefined, undefined> = (lineIndexes) => ({
-  accumulator: () => undefined,
   apply: (node: AnyNode) => {
     const nodeLoc = getNodeLocation(node);
     if (nodeLoc && !("startLine" in nodeLoc)) {
@@ -633,7 +629,6 @@ const lineIndexVisitor: (
       }
     }
   },
-  gatherContext: () => undefined,
 });
 
 // Get a map of line number to the index of its first character
