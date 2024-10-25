@@ -16,6 +16,7 @@ import {
   doesFileExist,
   findNextUncommentedCharacter,
   getNativeExecutable,
+  getParentType,
   getSerializerBinDirectory,
 } from "./util.js";
 
@@ -402,12 +403,9 @@ const nodeLocationVisitor: (
       if (apexClass in locationGenerationHandler) {
         handlerFn = locationGenerationHandler[apexClass];
       } else {
-        const separatorIndex = apexClass.indexOf("$");
-        if (separatorIndex !== -1) {
-          const parentClass = apexClass.slice(0, separatorIndex);
-          if (parentClass in locationGenerationHandler) {
-            handlerFn = locationGenerationHandler[parentClass];
-          }
+        const parentClass = getParentType(apexClass);
+        if (parentClass && parentClass in locationGenerationHandler) {
+          handlerFn = locationGenerationHandler[parentClass];
         }
       }
     }

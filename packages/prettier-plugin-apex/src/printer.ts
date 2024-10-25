@@ -26,6 +26,7 @@ import { EnrichedIfBlock } from "./parser.js";
 import {
   AnnotatedComment,
   checkIfParentIsDottedExpression,
+  getParentType,
   getPrecedence,
   isBinaryish,
 } from "./util.js";
@@ -3171,17 +3172,14 @@ function genericPrint(
   if (apexClass in nodeHandler) {
     return (nodeHandler[apexClass] as singleNodeHandler)(path, print, options);
   }
-  const separatorIndex = apexClass.indexOf("$");
-  if (separatorIndex !== -1) {
-    const parentClass = apexClass.substring(0, separatorIndex);
-    if (parentClass in nodeHandler) {
-      return (nodeHandler[parentClass] as childNodeHandler)(
-        apexClass,
-        path,
-        print,
-        options,
-      );
-    }
+  const parentClass = getParentType(apexClass);
+  if (parentClass && parentClass in nodeHandler) {
+    return (nodeHandler[parentClass] as childNodeHandler)(
+      apexClass,
+      path,
+      print,
+      options,
+    );
   }
   /* v8 ignore start */
   throw new Error(
