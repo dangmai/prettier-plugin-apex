@@ -386,11 +386,10 @@ const nodeLocationVisitor: (
     const apexClass = node["@class"];
     let handlerFn;
     if (apexClass) {
-      if (apexClass in locationGenerationHandler) {
-        handlerFn = locationGenerationHandler[apexClass];
-      } else {
+      handlerFn = locationGenerationHandler[apexClass];
+      if (!handlerFn) {
         const parentClass = getParentType(apexClass);
-        if (parentClass && parentClass in locationGenerationHandler) {
+        if (parentClass) {
           handlerFn = locationGenerationHandler[parentClass];
         }
       }
