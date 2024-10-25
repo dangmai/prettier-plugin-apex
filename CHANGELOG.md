@@ -2,6 +2,7 @@
 
 - Improve native executable performance by utilizing Profile-Guided Optimization.
 - Improve parsing performance by directly serializing object references.
+- Improve parsing performance by using one-pass Depth-First Search to enrich AST.
 
 ## Breaking Changes
 
