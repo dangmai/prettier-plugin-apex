@@ -23,7 +23,8 @@
       }
     ],
     "import/extensions": [2, "ignorePackages"],
-    "default-case": 0
+    "default-case": 0,
+    "no-plusplus": ["error", { "allowForLoopAfterthoughts": true }]
   },
   "globals": {
     "runSpec": true

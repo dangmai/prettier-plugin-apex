@@ -16,6 +16,7 @@ import {
   doesFileExist,
   findNextUncommentedCharacter,
   getNativeExecutable,
+  getParentType,
   getSerializerBinDirectory,
 } from "./util.js";
 
@@ -228,16 +229,6 @@ function handleAnnotationLocation(
   );
 }
 
-// We need to generate the location for a node differently based on the node
-// type. This object holds a String => Function mapping in order to do that.
-const locationGenerationHandler: {
-  [key: string]: (
-    location: MinimalLocation,
-    sourceCode: string,
-    commentNodes: GenericComment[],
-    node: any,
-  ) => MinimalLocation | null;
-} = {};
 const identityFunction = (location: MinimalLocation): MinimalLocation =>
   location;
 // Sometimes we need to delete a location node. For example, a WhereCompoundOp
@@ -249,59 +240,125 @@ const identityFunction = (location: MinimalLocation): MinimalLocation =>
 // If we keep those locations, a comment might be duplicated since it is
 // attached to one WhereCompoundOp, and that operator is printed multiple times.
 const removeFunction = () => null;
-locationGenerationHandler[APEX_TYPES.QUERY] = identityFunction;
-locationGenerationHandler[APEX_TYPES.SEARCH] = identityFunction;
-locationGenerationHandler[APEX_TYPES.FOR_INIT] = identityFunction;
-locationGenerationHandler[APEX_TYPES.FOR_ENHANCED_CONTROL] = identityFunction;
-locationGenerationHandler[APEX_TYPES.TERNARY_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.VARIABLE_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.INNER_CLASS_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.INNER_INTERFACE_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.INNER_ENUM_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.METHOD_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.IF_ELSE_BLOCK] = identityFunction;
-locationGenerationHandler[APEX_TYPES.NAME_VALUE_PARAMETER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.BINARY_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.BOOLEAN_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.ASSIGNMENT_EXPRESSION] = identityFunction;
-locationGenerationHandler[APEX_TYPES.FIELD_MEMBER] = identityFunction;
-locationGenerationHandler[APEX_TYPES.VALUE_WHEN] = identityFunction;
-locationGenerationHandler[APEX_TYPES.ELSE_WHEN] = identityFunction;
-locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_OPERATOR] = removeFunction;
-locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATION_STATEMENT] =
-  identityFunction;
-locationGenerationHandler[APEX_TYPES.WHERE_COMPOUND_EXPRESSION] =
-  identityFunction;
-locationGenerationHandler[APEX_TYPES.WHERE_OPERATION_EXPRESSION] =
-  identityFunction;
-locationGenerationHandler[APEX_TYPES.SELECT_INNER_QUERY] =
-  handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[APEX_TYPES.ANONYMOUS_BLOCK_UNIT] =
-  handleAnonymousUnitLocation;
-locationGenerationHandler[APEX_TYPES.NESTED_EXPRESSION] =
-  handleNodeSurroundedByCharacters("(", ")");
-locationGenerationHandler[APEX_TYPES.PROPERTY_MEMBER] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.SWITCH_STATEMENT] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_LIST_LITERAL] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_SET_LITERAL] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_MAP_LITERAL] =
-  handleNodeEndedWithCharacter("}");
-locationGenerationHandler[APEX_TYPES.NEW_STANDARD] =
-  handleNodeEndedWithCharacter(")");
-locationGenerationHandler[APEX_TYPES.VARIABLE_DECLARATIONS] =
-  handleNodeEndedWithCharacter(";");
-locationGenerationHandler[APEX_TYPES.NEW_KEY_VALUE] =
-  handleNodeEndedWithCharacter(")");
-locationGenerationHandler[APEX_TYPES.METHOD_CALL_EXPRESSION] =
-  handleNodeEndedWithCharacter(")");
-locationGenerationHandler[APEX_TYPES.ANNOTATION] = handleAnnotationLocation;
-locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
-  handleMethodDeclarationLocation;
+
+// We need to generate the location for a node differently based on the node
+// type. This object holds a String => Function mapping in order to do that.
+const locationGenerationHandler: {
+  [key: string]: (
+    location: MinimalLocation,
+    sourceCode: string,
+    commentNodes: GenericComment[],
+    node: any,
+  ) => MinimalLocation | null;
+} = {
+  [APEX_TYPES.QUERY]: identityFunction,
+  [APEX_TYPES.SEARCH]: identityFunction,
+  [APEX_TYPES.FOR_INIT]: identityFunction,
+  [APEX_TYPES.FOR_ENHANCED_CONTROL]: identityFunction,
+  [APEX_TYPES.TERNARY_EXPRESSION]: identityFunction,
+  [APEX_TYPES.VARIABLE_EXPRESSION]: identityFunction,
+  [APEX_TYPES.INNER_CLASS_MEMBER]: identityFunction,
+  [APEX_TYPES.INNER_INTERFACE_MEMBER]: identityFunction,
+  [APEX_TYPES.INNER_ENUM_MEMBER]: identityFunction,
+  [APEX_TYPES.METHOD_MEMBER]: identityFunction,
+  [APEX_TYPES.IF_ELSE_BLOCK]: identityFunction,
+  [APEX_TYPES.NAME_VALUE_PARAMETER]: identityFunction,
+  [APEX_TYPES.VARIABLE_DECLARATION]: identityFunction,
+  [APEX_TYPES.BINARY_EXPRESSION]: identityFunction,
+  [APEX_TYPES.BOOLEAN_EXPRESSION]: identityFunction,
+  [APEX_TYPES.ASSIGNMENT_EXPRESSION]: identityFunction,
+  [APEX_TYPES.FIELD_MEMBER]: identityFunction,
+  [APEX_TYPES.VALUE_WHEN]: identityFunction,
+  [APEX_TYPES.ELSE_WHEN]: identityFunction,
+  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: removeFunction,
+  [APEX_TYPES.VARIABLE_DECLARATION_STATEMENT]: identityFunction,
+  [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: identityFunction,
+  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]: identityFunction,
+  [APEX_TYPES.SELECT_INNER_QUERY]: handleNodeSurroundedByCharacters("(", ")"),
+  [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousUnitLocation,
+  [APEX_TYPES.NESTED_EXPRESSION]: handleNodeSurroundedByCharacters("(", ")"),
+  [APEX_TYPES.PROPERTY_MEMBER]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.SWITCH_STATEMENT]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_LIST_LITERAL]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_SET_LITERAL]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_MAP_LITERAL]: handleNodeEndedWithCharacter("}"),
+  [APEX_TYPES.NEW_STANDARD]: handleNodeEndedWithCharacter(")"),
+  [APEX_TYPES.VARIABLE_DECLARATIONS]: handleNodeEndedWithCharacter(";"),
+  [APEX_TYPES.NEW_KEY_VALUE]: handleNodeEndedWithCharacter(")"),
+  [APEX_TYPES.METHOD_CALL_EXPRESSION]: handleNodeEndedWithCharacter(")"),
+  [APEX_TYPES.ANNOTATION]: handleAnnotationLocation,
+  [APEX_TYPES.METHOD_DECLARATION]: handleMethodDeclarationLocation,
+};
+
+type AnyNode = any;
+type ApplyFn<AccumulatedResult, Context> = (
+  node: AnyNode,
+  accumulatedResult: AccumulatedResult,
+  context: Context,
+  childrenContext: Context,
+) => AccumulatedResult;
+type DfsVisitor<AccumulatedResult, Context> = {
+  accumulator?: (
+    entry: AccumulatedResult,
+    accumulated: AccumulatedResult,
+  ) => AccumulatedResult;
+  apply: ApplyFn<AccumulatedResult, Context>;
+  gatherChildrenContext?: (node: AnyNode, currentContext?: Context) => Context;
+};
+/*
+ * Generic Depth-First Search algorithm that applies a list of functions to each
+ * node in the tree.
+ * Each function can hook into various parts of the DFS process:
+ * - gatherChildrenContext: gathering contexts for children nodes. When the
+ * children nodes are visited, they will be passed this context.
+ * - accumulator: accumulating results from children nodes. This is run after
+ * every individual child node is visited.
+ * - apply: applying the function to the current node. This is run after all
+ * children nodes have been visited.
+ */
+function dfsPostOrderApply(
+  node: AnyNode,
+  fns: DfsVisitor<any, any>[],
+  currentContexts?: any,
+): AnyNode {
+  const finalChildrenResults = new Array(fns.length);
+  const childrenContexts = new Array(fns.length);
+  for (let i = 0; i < fns.length; i++) {
+    childrenContexts[i] = fns[i]?.gatherChildrenContext?.(
+      node,
+      currentContexts ? currentContexts[i] : undefined,
+    );
+  }
+  const keys = Object.keys(node);
+  for (let i = 0; i < keys.length; i++) {
+    const key = keys[i] as string;
+    if (typeof node[key] === "object") {
+      const childrenResults = dfsPostOrderApply(
+        node[key],
+        fns,
+        childrenContexts,
+      );
+      for (let j = 0; j < fns.length; j++) {
+        finalChildrenResults[j] = fns[j]?.accumulator?.(
+          childrenResults[j],
+          finalChildrenResults[j],
+        );
+      }
+    }
+  }
+  const results = [];
+  for (let i = 0; i < fns.length; i++) {
+    results.push(
+      fns[i]?.apply(
+        node,
+        finalChildrenResults[i],
+        currentContexts ? currentContexts[i] : undefined,
+        childrenContexts[i],
+      ),
+    );
+  }
+  return results;
+}
 
 /**
  * Generate and/or fix node locations, because jorje sometimes either provides
@@ -310,195 +367,205 @@ locationGenerationHandler[APEX_TYPES.METHOD_DECLARATION] =
  * We will fix it here by enforcing that a parent node start
  * index is always <= any child node start index, and a parent node end index
  * is always >= any child node end index.
- * @param node the node being visited.
- * @param sourceCode the entire source code.
- * @param commentNodes all the comment nodes.
- * @return the corrected node.
  */
-function handleNodeLocation(
-  node: any,
+const nodeLocationVisitor: (
   sourceCode: string,
   commentNodes: GenericComment[],
-) {
-  let currentLocation: MinimalLocation | undefined;
-  Object.keys(node).forEach((key) => {
-    const value = node[key];
-    if (typeof value === "object") {
-      const location = handleNodeLocation(value, sourceCode, commentNodes);
-      if (location && currentLocation) {
-        if (currentLocation.startIndex > location.startIndex) {
-          currentLocation.startIndex = location.startIndex;
-        }
-        if (currentLocation.endIndex < location.endIndex) {
-          currentLocation.endIndex = location.endIndex;
-        }
-      } else if (location && !currentLocation) {
-        currentLocation = location;
-      }
+) => DfsVisitor<MinimalLocation | null, undefined> = (
+  sourceCode,
+  commentNodes,
+) => ({
+  accumulator: (
+    entry: MinimalLocation | null,
+    accumulated: MinimalLocation | null,
+  ) => {
+    if (!accumulated) {
+      return entry;
     }
-  });
-
-  const apexClass = node["@class"];
-  let handlerFn;
-  if (apexClass) {
-    if (apexClass in locationGenerationHandler) {
+    if (!entry) {
+      return accumulated;
+    }
+    if (accumulated.startIndex > entry.startIndex) {
+      accumulated.startIndex = entry.startIndex;
+    }
+    if (accumulated.endIndex < entry.endIndex) {
+      accumulated.endIndex = entry.endIndex;
+    }
+    return accumulated;
+  },
+  apply: (node: AnyNode, currentLocation: MinimalLocation | null) => {
+    const apexClass = node["@class"];
+    let handlerFn;
+    if (apexClass) {
       handlerFn = locationGenerationHandler[apexClass];
-    } else {
-      const separatorIndex = apexClass.indexOf("$");
-      if (separatorIndex !== -1) {
-        const parentClass = apexClass.slice(0, separatorIndex);
-        if (parentClass in locationGenerationHandler) {
+      if (!handlerFn) {
+        const parentClass = getParentType(apexClass);
+        if (parentClass) {
           handlerFn = locationGenerationHandler[parentClass];
         }
       }
     }
-  }
 
-  if (handlerFn && currentLocation) {
-    node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
-  } else if (handlerFn && node.loc) {
-    node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
-  }
-
-  const nodeLoc = node.loc;
-  if (!nodeLoc) {
-    delete node.loc;
-  } else if (nodeLoc && currentLocation) {
-    if (nodeLoc.startIndex > currentLocation.startIndex) {
-      nodeLoc.startIndex = currentLocation.startIndex;
-    } else {
-      currentLocation.startIndex = nodeLoc.startIndex;
+    if (handlerFn && currentLocation) {
+      node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
+    } else if (handlerFn && node.loc) {
+      node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
     }
-    if (nodeLoc.endIndex < currentLocation.endIndex) {
-      nodeLoc.endIndex = currentLocation.endIndex;
-    } else {
-      currentLocation.endIndex = nodeLoc.endIndex;
+
+    const nodeLoc = node.loc;
+    if (!nodeLoc) {
+      delete node.loc;
+    } else if (nodeLoc && currentLocation) {
+      if (nodeLoc.startIndex > currentLocation.startIndex) {
+        nodeLoc.startIndex = currentLocation.startIndex;
+      } else {
+        currentLocation.startIndex = nodeLoc.startIndex;
+      }
+      if (nodeLoc.endIndex < currentLocation.endIndex) {
+        nodeLoc.endIndex = currentLocation.endIndex;
+      } else {
+        currentLocation.endIndex = nodeLoc.endIndex;
+      }
     }
-  }
 
-  if (currentLocation) {
-    return { ...currentLocation };
-  }
+    if (currentLocation) {
+      return { ...currentLocation };
+    }
 
-  if (nodeLoc) {
-    return {
-      startIndex: nodeLoc.startIndex,
-      endIndex: nodeLoc.endIndex,
-    };
-  }
-  return null;
-}
+    if (nodeLoc) {
+      return {
+        startIndex: nodeLoc.startIndex,
+        endIndex: nodeLoc.endIndex,
+      };
+    }
+    return null;
+  },
+});
 
 export type EnrichedIfBlock = jorje.IfBlock & {
   ifBlockIndex: number;
 };
 
 /**
- * Generate extra metadata (e.g. empty lines) for nodes.
- * This method is called recursively while visiting each node in the tree.
- *
- * @param node the node being visited
- * @param emptyLineLocations a list of lines that are empty in the source code
- * @param allowTrailingEmptyLine whether trailing empty line is allowed
- * for this node. This helps when dealing with statements that contain other
- * statements. For example, we turn this to `false` for the block statements
- * inside an IfElseBlock
- *
+ * Generate extra metadata for nodes, e.g. trailing empty lines, forced hard lines.
+ * ifBlockIndex, etc.
+ * These metadata are helpful to clearly deliniate between the parsing and
+ * printing phases, i.e. during the printing phase, we only need to worry about
+ * how to format the code using the metadata generated here.
  */
-function generateExtraMetadata(
-  node: any,
+type MetadataVisitorContext = {
+  allowTrailingEmptyLine: boolean;
+  arraySiblings?: any[];
+};
+const metadataVisitor: (
   emptyLineLocations: number[],
-  allowTrailingEmptyLine: boolean,
-) {
-  const apexClass = node["@class"];
-  let allowTrailingEmptyLineWithin: boolean;
-  const isSpecialClass =
-    TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
-  const trailingEmptyLineAllowed =
-    ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
-  if (isSpecialClass) {
-    allowTrailingEmptyLineWithin = false;
-  } else if (trailingEmptyLineAllowed) {
-    allowTrailingEmptyLineWithin = true;
-  } else {
-    allowTrailingEmptyLineWithin = allowTrailingEmptyLine;
-  }
+) => DfsVisitor<undefined, MetadataVisitorContext> = (emptyLineLocations) => ({
+  apply: (node: any, _accumulated, context, childrenContext) => {
+    const apexClass = node["@class"];
+    // #511 - If the user manually specify linebreaks in their original query,
+    // we will use that as a heuristic to manually add hardlines to the result
+    // query as well.
+    if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
+      node.forcedHardline = node.loc.startLine !== node.loc.endLine;
+    }
+    // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
+    // `ifBlockIndex` into the node for handling code to differentiate them.
+    else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
+      node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
+        (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
+      });
+    }
 
-  // #511 - If the user manually specify linebreaks in their original query,
-  // we will use that as a heuristic to manually add hardlines to the result
-  // query as well.
-  if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
-    node.forcedHardline = node.loc.startLine !== node.loc.endLine;
-  }
-  // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
-  // `ifBlockIndex` into the node for handling code to differentiate them.
-  else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
-    node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
-      (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
-    });
-  }
+    if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
+      node.inputParameters.forEach((inputParameter: any) => {
+        inputParameter.insideParenthesis = true;
+      });
+    }
 
-  if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
-    node.inputParameters.forEach((inputParameter: any) => {
-      inputParameter.insideParenthesis = true;
-    });
-  }
+    const trailingEmptyLineAllowed =
+      ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+    const nodeLoc = getNodeLocation(node);
+    let isLastNodeInArray = false;
 
-  Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      if (Array.isArray(node)) {
-        const keyInt = parseInt(key, 10);
-        if (keyInt === node.length - 1) {
-          // @ts-expect-error ts-migrate(7015) FIXME: Element implicitly has an 'any' type because index... Remove this comment to see the full error message
-          node[key].isLastNodeInArray = true; // So that we don't apply trailing empty line after this node
-        } else {
-          // Here we flag a node if its next sibling is on the same line.
-          // The reasoning is that for a block of code like this:
-          // ```
-          // Integer a = 1; Integer c = 2; Integer c = 3;
-          //
-          // Integer d = 4;
-          // ```
-          // We don't want a trailing empty line after `Integer a = 1;`
-          // so we need to mark it as a special node.
-          const currentChildNode = node[keyInt];
-          const nextChildNode = node[keyInt + 1];
+    // Here we flag the current node as the last node in the array, because
+    // we don't want a trailing empty line after it.
+    if (context?.arraySiblings) {
+      isLastNodeInArray =
+        context.arraySiblings.indexOf(node) ===
+        context.arraySiblings.length - 1;
+    }
+
+    // Here we turn off trailing empty line for a child node when its next
+    // sibling is on the same line.
+    // The reasoning is that for a block of code like this:
+    // ```
+    // Integer a = 1; Integer c = 2; Integer c = 3;
+    //
+    // Integer d = 4;
+    // ```
+    // We don't want a trailing empty line after `Integer a = 1;`
+    // so we need to mark it as a special node.
+    // We are doing this at the parent node level, because when we run the
+    // Depth-First search, we don't have enough context at the child node level
+    // to determine if its next sibling is on the same line or not.
+    if (childrenContext.arraySiblings) {
+      for (let i = 0; i < childrenContext.arraySiblings.length; i++) {
+        const currentChild = childrenContext.arraySiblings[i];
+        const nextChildIndex = i + 1;
+        if (nextChildIndex < childrenContext.arraySiblings.length) {
+          const nextChild = childrenContext.arraySiblings[nextChildIndex];
           if (
-            nextChildNode &&
-            nextChildNode.loc &&
-            currentChildNode.loc &&
-            nextChildNode.loc.startLine === currentChildNode.loc.endLine
+            currentChild.trailingEmptyLine &&
+            currentChild.loc &&
+            nextChild.loc &&
+            currentChild.loc.endLine === nextChild.loc.startLine
           ) {
-            currentChildNode.isNextStatementOnSameLine = true;
+            currentChild.trailingEmptyLine = false;
           }
         }
       }
-
-      generateExtraMetadata(
-        node[key],
-        emptyLineLocations,
-        allowTrailingEmptyLineWithin,
-      );
     }
-  });
-
-  const nodeLoc = getNodeLocation(node);
-  if (
-    apexClass &&
-    nodeLoc &&
-    allowTrailingEmptyLine &&
-    trailingEmptyLineAllowed &&
-    !node.isLastNodeInArray &&
-    !node.isNextStatementOnSameLine
-  ) {
-    const nextLine = nodeLoc.endLine + 1;
-    const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-    if (nextEmptyLine !== -1) {
-      node.trailingEmptyLine = true;
+    if (
+      apexClass &&
+      nodeLoc &&
+      context.allowTrailingEmptyLine &&
+      trailingEmptyLineAllowed &&
+      !isLastNodeInArray
+    ) {
+      const nextLine = nodeLoc.endLine + 1;
+      const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
+      if (nextEmptyLine !== -1) {
+        node.trailingEmptyLine = true;
+      }
     }
-  }
-  return nodeLoc;
-}
+  },
+  gatherChildrenContext: (node, currentContext) => {
+    const apexClass = node["@class"];
+    let allowTrailingEmptyLineWithin: boolean;
+    const isSpecialClass =
+      TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+    const trailingEmptyLineAllowed =
+      ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+    if (isSpecialClass) {
+      allowTrailingEmptyLineWithin = false;
+    } else if (trailingEmptyLineAllowed) {
+      allowTrailingEmptyLineWithin = true;
+    } else {
+      // currentContext is undefined for the root node, we hardcode
+      // allowTrailingEmptyLine to true for it
+      allowTrailingEmptyLineWithin =
+        currentContext?.allowTrailingEmptyLine ?? true;
+    }
+    let arraySiblings;
+    if (Array.isArray(node) && node.length > 0) {
+      arraySiblings = node;
+    }
+    return {
+      allowTrailingEmptyLine: allowTrailingEmptyLineWithin,
+      arraySiblings,
+    };
+  },
+});
 
 function getLineNumber(lineIndexes: number[], charIndex: number) {
   let low = 0;
@@ -525,41 +592,38 @@ function getLineNumber(lineIndexes: number[], charIndex: number) {
 // that line; however we use this method to resolve that line index to a global
 // index of that node within the source code. That allows us to use prettier
 // utility methods.
-function resolveLineIndexes(node: any, lineIndexes: number[]) {
-  const nodeLoc = getNodeLocation(node);
-  if (nodeLoc && !("startLine" in nodeLoc)) {
-    // The location node that we manually generate do not contain startLine
-    // information, so we will create them here.
-    nodeLoc.startLine =
-      nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
-  }
-
-  if (nodeLoc && !("endLine" in nodeLoc)) {
-    nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
-
-    // Edge case: root node
-    if (nodeLoc.endLine < 0) {
-      nodeLoc.endLine = lineIndexes.length - 1;
+const lineIndexVisitor: (
+  lineIndexes: number[],
+) => DfsVisitor<undefined, undefined> = (lineIndexes) => ({
+  apply: (node: AnyNode) => {
+    const nodeLoc = getNodeLocation(node);
+    if (nodeLoc && !("startLine" in nodeLoc)) {
+      // The location node that we manually generate do not contain startLine
+      // information, so we will create them here.
+      nodeLoc.startLine =
+        nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
     }
-  }
 
-  if (nodeLoc && !("column" in nodeLoc)) {
-    const nodeStartLineIndex =
-      lineIndexes[
-        nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
-      ];
-    if (nodeStartLineIndex !== undefined) {
-      nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
-    }
-  }
+    if (nodeLoc && !("endLine" in nodeLoc)) {
+      nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
 
-  Object.keys(node).forEach((key) => {
-    if (typeof node[key] === "object") {
-      node[key] = resolveLineIndexes(node[key], lineIndexes);
+      // Edge case: root node
+      if (nodeLoc.endLine < 0) {
+        nodeLoc.endLine = lineIndexes.length - 1;
+      }
     }
-  });
-  return node;
-}
+
+    if (nodeLoc && !("column" in nodeLoc)) {
+      const nodeStartLineIndex =
+        lineIndexes[
+          nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
+        ];
+      if (nodeStartLineIndex !== undefined) {
+        nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
+      }
+    }
+  },
+});
 
 // Get a map of line number to the index of its first character
 function getLineIndexes(sourceCode: string) {
@@ -642,7 +706,7 @@ export default async function parse(
     stderr = result.stderr;
   }
   if (serializedAst) {
-    let ast: SerializedAst = JSON.parse(serializedAst);
+    const ast: SerializedAst = JSON.parse(serializedAst);
     if (
       ast[APEX_TYPES.PARSER_OUTPUT] &&
       ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
@@ -659,11 +723,12 @@ export default async function parse(
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
-    handleNodeLocation(ast, sourceCode, ast.comments);
-    const lineIndexes = getLineIndexes(sourceCode);
-    ast = resolveLineIndexes(ast, lineIndexes);
+    dfsPostOrderApply(ast, [
+      nodeLocationVisitor(sourceCode, ast.comments),
+      lineIndexVisitor(getLineIndexes(sourceCode)),
+      metadataVisitor(getEmptyLineLocations(sourceCode)),
+    ]);
 
-    generateExtraMetadata(ast, getEmptyLineLocations(sourceCode), true);
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);

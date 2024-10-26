@@ -5,7 +5,16 @@ import * as url from "node:url";
 import { AstPath } from "prettier";
 
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
-import { APEX_TYPES, APEX_TYPES as apexTypes } from "./constants.js";
+import {
+  APEX_TYPES,
+  APEX_TYPES as apexTypes,
+  DATA_CATEGORY,
+  MODIFIER,
+  ORDER,
+  ORDER_NULL,
+  QUERY,
+  QUERY_WHERE,
+} from "./constants.js";
 
 export type SerializedAst = {
   [APEX_TYPES.PARSER_OUTPUT]: jorje.ParserOutput;
@@ -25,8 +34,6 @@ export type Node = AstNode | ReferenceNode;
 
 export type AnnotatedAstNode = AstNode & {
   trailingEmptyLine?: boolean;
-  isNextStatementOnSameLine?: boolean;
-  isLastNodeInArray?: boolean;
 };
 
 export type AnnotatedComment = AnnotatedAstNode &
@@ -113,9 +120,6 @@ const METADATA_TO_IGNORE = [
   "trailing",
   "hiddenTokenMap",
   "trailingEmptyLine",
-  "isLastNodeInArray",
-  "numberOfDottedExpressions",
-  "isNextStatementOnSameLine",
   "forcedHardline",
 ];
 
@@ -205,6 +209,32 @@ export function findNextUncommentedCharacter(
     }
   }
   return index;
+}
+
+// Optimization to look up parent types faster
+const PARENT_TYPES = [
+  ...Object.values(APEX_TYPES),
+  ...Object.keys(DATA_CATEGORY),
+  ...Object.keys(MODIFIER),
+  ...Object.keys(QUERY),
+  ...Object.keys(QUERY_WHERE),
+  ...Object.keys(ORDER),
+  ...Object.keys(ORDER_NULL),
+]
+  .filter((type) => type.includes("$"))
+  .reduce(
+    (acc, type) => {
+      const [parentType] = type.split("$");
+      if (parentType) {
+        acc[type] = parentType;
+      }
+      return acc;
+    },
+    {} as Record<string, string>,
+  );
+
+export function getParentType(type: string): string | undefined {
+  return PARENT_TYPES[type];
 }
 
 // One big difference between our precedence list vs Prettier's core
