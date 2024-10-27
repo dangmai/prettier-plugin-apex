@@ -26,11 +26,9 @@ import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.Properties;
 import java.util.logging.LogManager;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -137,6 +135,7 @@ public class Apex {
     );
     cliOptions.addOption("p", "pretty", false, "Pretty print output.");
     cliOptions.addOption("h", "help", false, "Print help information.");
+    cliOptions.addOption("v", "version", false, "Print version information.");
 
     CommandLineParser cliParser = new DefaultParser();
     CommandLine cmd = cliParser.parse(cliOptions, args);
@@ -145,6 +144,21 @@ public class Apex {
     if (cmd.hasOption("h")) {
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp("apex-ast-serializer", cliOptions);
+    } else if (cmd.hasOption("v")) {
+      try (
+        InputStreamReader reader = new InputStreamReader(
+          Apex.class.getResourceAsStream("/parser.properties"),
+          StandardCharsets.UTF_8
+        )
+      ) {
+        Properties properties = new Properties();
+        properties.load(reader);
+        String version = properties.getProperty("version");
+        System.out.println("v" + version);
+      } catch (IOException e) {
+        System.err.println("Failed to read version information.");
+        e.printStackTrace();
+      }
     } else {
       if (cmd.hasOption("l")) {
         apexReader = new FileReader(

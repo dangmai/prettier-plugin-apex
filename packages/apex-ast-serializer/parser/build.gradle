@@ -46,6 +46,14 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
+processResources {
+  filesMatching('**/parser.properties') {
+    filter {
+      it.replace('0.0.0-DEV', version)
+    }
+  }
+}
+
 repositories {
   flatDir {
     dirs '../libs'
@@ -129,7 +137,7 @@ graalvmNative {
     // Weird syntax: https://github.com/graalvm/native-build-tools/issues/303
     // This is here because we don't want to set up the full native-image
     // system while running tests in CI/CD.
-    java.util.function.Predicate predicate = { t -> t.name != 'test' }
+    java.util.function.Predicate predicate = { t -> t.name != 'test' && t.name != 'run' }
     tasksToInstrumentPredicate = predicate
   }
   binaries {

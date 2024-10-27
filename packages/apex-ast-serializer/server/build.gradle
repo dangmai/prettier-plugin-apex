@@ -65,6 +65,14 @@ java {
   targetCompatibility = JavaVersion.VERSION_11
 }
 
+processResources {
+  filesMatching('**/server.properties') {
+    filter {
+      it.replace('0.0.0-DEV', version)
+    }
+  }
+}
+
 repositories {
   flatDir {
     dirs '../libs'
