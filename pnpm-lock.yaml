@@ -57,6 +57,14 @@ importers:
         specifier: 8.1.9
         version: 8.1.9
 
+  packages/@prettier-apex/apex-ast-serializer-darwin-arm64: {}
+
+  packages/@prettier-apex/apex-ast-serializer-darwin-x64: {}
+
+  packages/@prettier-apex/apex-ast-serializer-linux-x64: {}
+
+  packages/@prettier-apex/apex-ast-serializer-win32-x64: {}
+
   packages/playground:
     dependencies:
       '@monaco-editor/react':

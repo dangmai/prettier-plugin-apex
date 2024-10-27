@@ -1,0 +1,21 @@
+{
+  "name": "@prettier-apex/apex-ast-serializer-linux-x64",
+  "version": "2.1.5",
+  "description": "The Linux x64 binary of Apex AST Serializer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dangmai/prettier-plugin-apex.git"
+  },
+  "keywords": [
+    "apex",
+    "prettier"
+  ],
+  "author": "Dang Mai <contact@dangmai.net>",
+  "license": "MIT",
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ]
+}
