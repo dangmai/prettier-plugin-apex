@@ -18,6 +18,7 @@
   ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.gradle.buildServer.enabled": "on",
+  "gradle.nestedProjects": true,
   "vitest.rootConfig": "packages/prettier-plugin-apex/vite.config.ts",
   "vitest.nodeEnv": {
     "AST_COMPARE": "1",
