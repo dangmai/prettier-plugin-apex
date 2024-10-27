@@ -119,6 +119,19 @@ importers:
       wait-on:
         specifier: ^8.0.0
         version: 8.0.1
+    optionalDependencies:
+      '@prettier-apex/apex-ast-serializer-darwin-arm64':
+        specifier: workspace:*
+        version: link:../@prettier-apex/apex-ast-serializer-darwin-arm64
+      '@prettier-apex/apex-ast-serializer-darwin-x64':
+        specifier: workspace:*
+        version: link:../@prettier-apex/apex-ast-serializer-darwin-x64
+      '@prettier-apex/apex-ast-serializer-linux-x64':
+        specifier: workspace:*
+        version: link:../@prettier-apex/apex-ast-serializer-linux-x64
+      '@prettier-apex/apex-ast-serializer-win32-x64':
+        specifier: workspace:*
+        version: link:../@prettier-apex/apex-ast-serializer-win32-x64
     devDependencies:
       '@tsconfig/node18':
         specifier: 18.2.4

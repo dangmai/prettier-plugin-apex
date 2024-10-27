@@ -62,6 +62,12 @@
     "jest-docblock": "^29.0.0",
     "wait-on": "^8.0.0"
   },
+  "optionalDependencies": {
+    "@prettier-apex/apex-ast-serializer-darwin-arm64": "workspace:*",
+    "@prettier-apex/apex-ast-serializer-darwin-x64": "workspace:*",
+    "@prettier-apex/apex-ast-serializer-linux-x64": "workspace:*",
+    "@prettier-apex/apex-ast-serializer-win32-x64": "workspace:*"
+  },
   "nx": {
     "implicitDependencies": [
       "apex-ast-serializer"
