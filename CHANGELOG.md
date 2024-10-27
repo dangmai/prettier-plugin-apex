@@ -1,5 +1,6 @@
 # Unreleased
 
+- Support Apex AST Serializer native executable for macOS x64.
 - Improve native executable performance by utilizing Profile-Guided Optimization.
 - Improve parsing performance by directly serializing object references.
 - Improve parsing performance by using one-pass Depth-First Search to enrich AST.
