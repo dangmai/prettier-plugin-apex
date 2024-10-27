@@ -1,3 +1,12 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
+    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '4.0.23'
+  }
+}
 plugins {
   id 'java-library'
   id "java-test-fixtures"
@@ -31,7 +40,7 @@ application {
 
 java {
   group 'net.dangmai'
-  version '2.1.5'
+  version = new groovy.json.JsonSlurper().parse(file('../../../package.json')).version
 
   sourceCompatibility = JavaVersion.VERSION_11
   targetCompatibility = JavaVersion.VERSION_11
