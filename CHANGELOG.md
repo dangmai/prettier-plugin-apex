@@ -13,6 +13,8 @@
   This should not affect end users' experience with Prettier Apex,
   but if you are using Apex AST Serializer directly,
   the `-i` and `-f` flags have been removed.
+- The `install-apex-executables` is removed,
+  since native executables are now distributed as optional dependencies to the main package.
 
 # 2.1.5
 

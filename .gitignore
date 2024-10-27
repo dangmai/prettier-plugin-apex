@@ -13,6 +13,7 @@ out
 packages/prettier-plugin-apex/tests/local_only
 packages/prettier-plugin-apex/vendor
 packages/apex-ast-serializer/parser/src/pgo-profiles
+packages/@prettier-apex/apex-ast-serializer*/apex-ast-serializer*
 
 .nx
 .pnpm-store
