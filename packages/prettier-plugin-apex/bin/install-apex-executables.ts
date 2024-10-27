@@ -11,7 +11,12 @@ import { doesFileExist, getNativeExecutable } from "../src/util.js";
 
 const { arch, platform } = process;
 
-const PREBUILT_ARCHITECTURES = ["win32-x64", "linux-x64", "darwin-arm64"];
+const PREBUILT_ARCHITECTURES = [
+  "win32-x64",
+  "linux-x64",
+  "darwin-arm64",
+  "darwin-x64",
+];
 
 const {
   values: { dev, force },

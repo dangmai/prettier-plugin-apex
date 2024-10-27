@@ -171,10 +171,16 @@ jobs:
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
             ARTIFACT_NAME: apex-ast-serializer-linux-x64
+          # macOS 14 and above are ARM64 by default, see this link for more info:
+          # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
           - os: macos-14
             ASSET_NAME: apex-ast-serializer
             OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
             ARTIFACT_NAME: apex-ast-serializer-darwin-arm64
+          - os: macos-13
+            ASSET_NAME: apex-ast-serializer
+            OUTPUT_NAME: apex-ast-serializer-${version}-darwin-x64
+            ARTIFACT_NAME: apex-ast-serializer-darwin-x64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
       OUTPUT_NAME: ${{ matrix.OUTPUT_NAME }}
