@@ -19,7 +19,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["tests*/**/*.ts", "vite.config.ts"]
+        "devDependencies": ["tests*/**/*.ts", "vite.config.ts", "**/*.zx.mts"]
       }
     ],
     "import/extensions": [2, "ignorePackages"],

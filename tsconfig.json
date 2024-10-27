@@ -1,0 +1,10 @@
+{
+  "extends": "@tsconfig/node18/tsconfig.json",
+  "include": ["scripts/**/*.mts"],
+  "compilerOptions": {
+    "outDir": "./dist",
+    "module": "node16",
+    "moduleResolution": "node16",
+    "esModuleInterop": true
+  }
+}
