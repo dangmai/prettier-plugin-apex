@@ -189,8 +189,21 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+      - name: Restore NX cache
+        id: nx-cache-restore
+        uses: actions/cache/restore@v4.1.2
+        with:
+          path: |
+            .nx/cache
+          key: ${{ runner.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle') }}
       - name: Build native executable
         run: pnpm nx run apex-ast-serializer:build:native
+      - name: Save NX Cache
+        uses: actions/cache/save@v4.1.2
+        with:
+          path: |
+            .nx/cache
+          key: ${{ steps.nx-cache-restore.outputs.cache-primary-key }}
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
       - name: Upload artifact
