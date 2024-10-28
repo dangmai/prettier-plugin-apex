@@ -198,6 +198,9 @@ jobs:
             .nx/cache
           key: ${{ matrix.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle') }}
       - name: Build native executable
+        env:
+          # https://nx.dev/troubleshooting/unknown-local-cache
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: "0"
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
         uses: actions/cache/save@v4.1.2
