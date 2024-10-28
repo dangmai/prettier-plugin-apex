@@ -310,6 +310,12 @@ export const NATIVE_PACKAGES: Record<string, string> = {
 export const NATIVE_EXECUTABLE_NAME = `apex-ast-serializer-${process.platform}-${process.arch}${process.platform === "win32" ? ".exe" : ""}`;
 export const JAVA_EXECUTABLE_NAME = `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`;
 
+export function getNativeExecutableNameForPlatform(
+  fullPlatform: string,
+): string {
+  return `apex-ast-serializer-${fullPlatform}${fullPlatform.startsWith("win32") ? ".exe" : ""}`;
+}
+
 export async function getNativeExecutableWithFallback(): Promise<string> {
   const { arch, platform } = process;
   const packageName = NATIVE_PACKAGES[`${platform}-${arch}`];
