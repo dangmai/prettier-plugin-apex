@@ -6,6 +6,11 @@
     "type": "git",
     "url": "git+https://github.com/dangmai/prettier-plugin-apex.git"
   },
+  "publishConfig": {
+    "executableFiles": [
+      "./apex-ast-serializer-darwin-x64"
+    ]
+  },
   "keywords": [
     "apex",
     "prettier"
