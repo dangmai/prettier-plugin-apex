@@ -141,6 +141,7 @@ jobs:
         os:
           - ubuntu-latest
           - macos-14
+          - macos-13
           - windows-latest
         include:
           - os: windows-latest
