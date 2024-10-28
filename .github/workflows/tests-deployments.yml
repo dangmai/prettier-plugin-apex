@@ -248,7 +248,10 @@ jobs:
       - name: Copy artifacts to correct packages
         run: pnpm run install:native:ci /tmp/artifacts
 
-      - name: Deploy packages
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --dry-run
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+      - name: Deploy packages
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --access public --dry-run
