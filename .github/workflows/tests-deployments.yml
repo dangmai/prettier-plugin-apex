@@ -195,7 +195,7 @@ jobs:
         with:
           path: |
             .nx/cache
-          key: ${{ runner.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle') }}
+          key: ${{ matrix.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle') }}
       - name: Build native executable
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
