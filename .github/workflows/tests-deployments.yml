@@ -248,11 +248,11 @@ jobs:
 
       - name: Deploy packages
         if: steps.check_prerelease.outcome == 'success'
-        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --no-git-checks --access public --dry-run
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --no-git-checks --access public
 
       - name: Deploy pre-release packages
         if: steps.check_prerelease.outcome != 'success'
-        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --tag next --no-git-checks --access public --dry-run
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --tag next --no-git-checks --access public
 
       - name: Create GitHub Release
         if: steps.check_prerelease.outcome == 'success'
