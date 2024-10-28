@@ -325,7 +325,16 @@ export async function getNativeExecutableWithFallback(): Promise<string> {
     }
     const nativeBin = nodePath.join(packageName, NATIVE_EXECUTABLE_NAME);
     return require.resolve(nativeBin);
-  } catch (e) {
+  } catch (e: any) {
+    if ("code" in e && e.code === "MODULE_NOT_FOUND") {
+      console.warn(
+        `Your platform ${platform}-${arch} is natively supported by Prettier Apex, but the executable cannot be found.`,
+      );
+      console.warn(
+        `If you didn't intentionally install Prettier Apex with ignore-optional flag, please file a bug report.`,
+      );
+      console.warn(`Falling back to Java-based serializer.`);
+    }
     return nodePath.join(
       await getSerializerBinDirectory(),
       JAVA_EXECUTABLE_NAME,
