@@ -254,4 +254,4 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - name: Deploy packages
-        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --access public --dry-run
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --publish-branch native-packages --no-git-checks --access public --dry-run
