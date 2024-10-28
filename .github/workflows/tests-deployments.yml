@@ -203,7 +203,7 @@ jobs:
       - name: Build native executable
         env:
           # https://nx.dev/troubleshooting/unknown-local-cache
-          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: "false"
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
         uses: actions/cache/save@v4.1.2
