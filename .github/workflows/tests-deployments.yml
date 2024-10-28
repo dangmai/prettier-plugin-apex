@@ -198,16 +198,18 @@ jobs:
         uses: actions/cache/restore@v4.1.2
         with:
           path: |
-            .nx/cache
+            .nx
           key: ${{ matrix.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle') }}
       - name: Build native executable
-        # https://nx.dev/troubleshooting/unknown-local-cache
-        run: NX_REJECT_UNKNOWN_LOCAL_CACHE=0 pnpm nx run apex-ast-serializer:build:native
+        env:
+          # https://nx.dev/troubleshooting/unknown-local-cache
+          NX_REJECT_UNKNOWN_LOCAL_CACHE: 0
+        run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
         uses: actions/cache/save@v4.1.2
         with:
           path: |
-            .nx/cache
+            .nx
           key: ${{ steps.nx-cache-restore.outputs.cache-primary-key }}
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
