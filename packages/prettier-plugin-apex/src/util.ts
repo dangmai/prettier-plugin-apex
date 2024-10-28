@@ -307,6 +307,8 @@ export const NATIVE_PACKAGES: Record<string, string> = {
   "linux-x64": "@prettier-apex/apex-ast-serializer-linux-x64",
   "win32-x64": "@prettier-apex/apex-ast-serializer-win32-x64",
 };
+export const NATIVE_EXECUTABLE_NAME = `apex-ast-serializer-${process.platform}-${process.arch}${process.platform === "win32" ? ".exe" : ""}`;
+export const JAVA_EXECUTABLE_NAME = `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`;
 
 export async function getNativeExecutableWithFallback(): Promise<string> {
   const { arch, platform } = process;
@@ -315,15 +317,12 @@ export async function getNativeExecutableWithFallback(): Promise<string> {
     if (!packageName) {
       throw new Error("No prebuilt binary available for this platform");
     }
-    let nativeBin = `${packageName}/apex-ast-serializer`;
-    if (platform === "win32") {
-      nativeBin += ".exe";
-    }
+    const nativeBin = nodePath.join(packageName, NATIVE_EXECUTABLE_NAME);
     return require.resolve(nativeBin);
   } catch (e) {
     return nodePath.join(
       await getSerializerBinDirectory(),
-      `apex-ast-serializer${platform === "win32" ? ".bat" : ""}`,
+      JAVA_EXECUTABLE_NAME,
     );
   }
 }
