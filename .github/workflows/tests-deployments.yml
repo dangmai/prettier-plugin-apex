@@ -35,13 +35,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4.1.0
         with:
           node-version: ${{ matrix.node }}
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+          cache: pnpm
 
       - uses: actions/setup-java@v4.5.0
         with:
@@ -117,17 +118,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
       - name: Setup Node.js
         uses: actions/setup-node@v4.1.0
         with:
           node-version: "18"
+          cache: pnpm
       - uses: actions/setup-java@v4.5.0
         with:
           distribution: temurin
           java-version: "17"
           cache: gradle
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Run package tests
@@ -174,18 +176,19 @@ jobs:
         working-directory: ./packages/apex-ast-serializer
     steps:
       - uses: actions/checkout@v4.2.2
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
       - name: Setup Node.js
         uses: actions/setup-node@v4.1.0
         with:
           node-version: 18
+          cache: pnpm
       - name: Set up JDK
         uses: graalvm/setup-graalvm@v1.2.4.1
         with:
           java-version: "23"
           distribution: "graalvm"
           github-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Grant execute permission for gradlew
@@ -227,13 +230,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4.2.2
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.0.0
+
       - name: Setup Node.js
         uses: actions/setup-node@v4.1.0
         with:
           node-version: 22
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v3
+          cache: pnpm
 
       - uses: actions/setup-java@v4.5.0
         with:
