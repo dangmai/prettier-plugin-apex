@@ -227,6 +227,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Build the project
+        run: pnpm run build
+
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
