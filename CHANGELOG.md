@@ -1,5 +1,6 @@
 # Unreleased
 
+- Native parsing is now the default parser for supported platforms, with fallback to Java parser for unsupported platforms.
 - Support Apex AST Serializer native executable for macOS x64.
 - Improve native executable performance by utilizing Profile-Guided Optimization.
 - Improve parsing performance by directly serializing object references.
@@ -13,7 +14,7 @@
   This should not affect end users' experience with Prettier Apex,
   but if you are using Apex AST Serializer directly,
   the `-i` and `-f` flags have been removed.
-- The `install-apex-executables` is removed,
+- The `install-apex-executables` command is removed,
   since native executables are now distributed as optional dependencies to the main package.
 
 # 2.1.5
