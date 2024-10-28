@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "nx run-many -t build",
-    "build:native": "nx run apex-ast-serializer:build:native && node packages/prettier-plugin-apex/dist/bin/install-apex-executables.js --dev --force",
+    "build:native": "nx run apex-ast-serializer:build:native",
     "install:native:dev": "tsx scripts/install-dev-executable.zx.mts",
     "install:native:ci": "tsx scripts/install-ci-executables.zx.mts",
     "clean": "rimraf node_modules",
