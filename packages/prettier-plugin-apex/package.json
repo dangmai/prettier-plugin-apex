@@ -1,6 +1,6 @@
 {
   "name": "prettier-plugin-apex",
-  "version": "2.2.0-beta.1",
+  "version": "2.2.0-beta.2",
   "description": "Salesforce Apex plugin for Prettier",
   "type": "module",
   "exports": "./dist/src/index.js",
