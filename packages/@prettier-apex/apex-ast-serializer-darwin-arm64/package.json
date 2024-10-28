@@ -1,0 +1,21 @@
+{
+  "name": "@prettier-apex/apex-ast-serializer-darwin-arm64",
+  "version": "2.1.5",
+  "description": "The macOS ARM 64-bit binary of Apex AST Serializer",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dangmai/prettier-plugin-apex.git"
+  },
+  "keywords": [
+    "apex",
+    "prettier"
+  ],
+  "author": "Dang Mai <contact@dangmai.net>",
+  "license": "MIT",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}

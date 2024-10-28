@@ -6,16 +6,21 @@
   "scripts": {
     "build": "nx run-many -t build",
     "build:native": "nx run apex-ast-serializer:build:native && node packages/prettier-plugin-apex/dist/bin/install-apex-executables.js --dev --force",
+    "install:native:dev": "tsx scripts/install-dev-executable.zx.mts",
+    "install:native:ci": "tsx scripts/install-ci-executables.zx.mts",
     "clean": "rimraf node_modules",
     "all:clean": "pnpm run -r clean && pnpm run clean",
     "release": "npm version --force",
-    "version": "cd packages/prettier-plugin-apex && npm version ----no-git-tag-version $(npx tsx scripts/release.ts) && git add ."
+    "version": "tsx scripts/release.zx.mts"
   },
   "engines": {
     "node": ">= 18.11.0",
     "pnpm": "^9.0.1"
   },
   "devDependencies": {
+    "@tsconfig/node18": "18.2.4",
+    "@types/node": "18.19.31",
+    "@types/semver": "7.5.8",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "cross-env": "7.0.3",
@@ -31,6 +36,9 @@
     "prettier-plugin-java": "2.6.5",
     "prettier-plugin-organize-imports": "4.1.0",
     "rimraf": "5.0.10",
+    "semver": "7.6.3",
+    "tsx": "4.19.2",
+    "typescript": "5.6.3",
     "zx": "8.1.9"
   },
   "keywords": [],

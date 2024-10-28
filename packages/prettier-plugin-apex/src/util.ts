@@ -301,24 +301,34 @@ export async function getSerializerBinDirectory(): Promise<string> {
   return nodePath.relative(process.cwd(), serializerBin);
 }
 
-interface NativeExecutable {
-  path: string;
-  filename: string;
-  version: string;
+export const NATIVE_PACKAGES: Record<string, string> = {
+  "darwin-x64": "@prettier-apex/apex-ast-serializer-darwin-x64",
+  "darwin-arm64": "@prettier-apex/apex-ast-serializer-darwin-arm64",
+  "linux-x64": "@prettier-apex/apex-ast-serializer-linux-x64",
+  "win32-x64": "@prettier-apex/apex-ast-serializer-win32-x64",
+};
+export const NATIVE_EXECUTABLE_NAME = `apex-ast-serializer-${process.platform}-${process.arch}${process.platform === "win32" ? ".exe" : ""}`;
+export const JAVA_EXECUTABLE_NAME = `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`;
+
+export function getNativeExecutableNameForPlatform(
+  fullPlatform: string,
+): string {
+  return `apex-ast-serializer-${fullPlatform}${fullPlatform.startsWith("win32") ? ".exe" : ""}`;
 }
-export async function getNativeExecutable(): Promise<NativeExecutable> {
+
+export async function getNativeExecutableWithFallback(): Promise<string> {
   const { arch, platform } = process;
-  // This will be bumped automatically when we run the release script for new versions
-  const version = "2.1.5";
-  const filename = `apex-ast-serializer-${version}-${platform}-${arch}${platform === "win32" ? ".exe" : ""}`;
-  const serializerBin = await getSerializerBinDirectory();
-  const executableBin = nodePath.relative(
-    process.cwd(),
-    nodePath.join(serializerBin, "..", "..", filename),
-  );
-  return {
-    version,
-    path: executableBin,
-    filename,
-  };
+  const packageName = NATIVE_PACKAGES[`${platform}-${arch}`];
+  try {
+    if (!packageName) {
+      throw new Error("No prebuilt binary available for this platform");
+    }
+    const nativeBin = nodePath.join(packageName, NATIVE_EXECUTABLE_NAME);
+    return require.resolve(nativeBin);
+  } catch (e) {
+    return nodePath.join(
+      await getSerializerBinDirectory(),
+      JAVA_EXECUTABLE_NAME,
+    );
+  }
 }

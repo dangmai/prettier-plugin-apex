@@ -5,7 +5,7 @@
   "sourceRoot": "packages/apex-ast-serializer",
   "namedInputs": {
     "gradle": ["{projectRoot}/**/build.gradle"],
-    "default": ["{projectRoot}/**/*.java"]
+    "default": ["{projectRoot}/**/*.java", "{projectRoot}/**/*.properties"]
   },
   "targets": {
     "build": {
@@ -23,7 +23,10 @@
     "build:native": {
       "executor": "nx:run-commands",
       "inputs": ["gradle", "default"],
-      "outputs": ["{projectRoot}/parser/build"],
+      "outputs": [
+        "{projectRoot}/parser/build",
+        "{projectRoot}/parser/src/pgo-profiles"
+      ],
       "options": {
         "cwd": "packages/apex-ast-serializer",
         "command": "node tools/build-native-binary.mjs"

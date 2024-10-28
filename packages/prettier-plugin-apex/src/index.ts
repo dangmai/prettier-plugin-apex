@@ -91,7 +91,7 @@ export const options: SupportOptions = {
   apexStandaloneParser: {
     type: "choice",
     category: CATEGORY_APEX,
-    default: "none",
+    default: "native",
     choices: [
       {
         value: "none",
@@ -103,7 +103,8 @@ export const options: SupportOptions = {
       },
       {
         value: "native",
-        description: "Use native executable parser",
+        description:
+          "Use native executable parser, with fallback to Java binaries",
       },
     ],
     description: "Use different methods to speed up parsing. Default to none.",

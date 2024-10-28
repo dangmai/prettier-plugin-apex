@@ -26,13 +26,9 @@ jobs:
             java: "11"
             ENABLE_CODE_COVERAGE: true
             ENABLE_INTEGRATION_TESTS: true
-            ENABLE_DEPLOYMENT: true
-          - node: "18"
-            java: "17"
     env:
       ENABLE_CODE_COVERAGE: ${{ matrix.ENABLE_CODE_COVERAGE }}
       RUN_INTEGRATION_TESTS: ${{ matrix.ENABLE_INTEGRATION_TESTS && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags')) }}
-      RUN_DEPLOYMENT: ${{ matrix.ENABLE_DEPLOYMENT && startsWith(github.ref, 'refs/tags') }}
     name: Run tests on NodeJS ${{ matrix.node }} and Java ${{ matrix.java }}
 
     steps:
@@ -108,23 +104,6 @@ jobs:
         if: env.RUN_INTEGRATION_TESTS == 'true'
         run: ./packages/prettier-plugin-apex/tests_integration/format/run-integration-tests.sh
 
-      # npm-publish no longer automatically runs `prepack`, so we have to build
-      # the Prod bundle manually here
-      - name: Build Production bundle
-        if: env.RUN_DEPLOYMENT == 'true'
-        run: pnpm nx run prettier-plugin-apex:build
-
-      - name: Deploy to NPM
-        if: env.RUN_DEPLOYMENT == 'true'
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          package: packages/prettier-plugin-apex
-
-      - name: Stop Apex parsing server
-        if: ${{ always() }}
-        run: pnpm nx run prettier-plugin-apex:stop-server
-
   package-tests:
     name: Test latest Prettier Apex package
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
@@ -166,21 +145,21 @@ jobs:
         include:
           - os: windows-latest
             ASSET_NAME: apex-ast-serializer.exe
-            OUTPUT_NAME: apex-ast-serializer-${env:version}-win32-x64.exe
-            ARTIFACT_NAME: apex-ast-serializer-win32-x64
+            OUTPUT_NAME: apex-ast-serializer-win32-x64.exe
+            ARTIFACT_NAME: apex-ast-serializer-win32-x64.exe
           - os: ubuntu-latest
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-${version}-linux-x64
+            OUTPUT_NAME: apex-ast-serializer-linux-x64
             ARTIFACT_NAME: apex-ast-serializer-linux-x64
           # macOS 14 and above are ARM64 by default, see this link for more info:
           # https://github.com/actions/runner-images?tab=readme-ov-file#available-images
           - os: macos-14
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-${version}-darwin-arm64
+            OUTPUT_NAME: apex-ast-serializer-darwin-arm64
             ARTIFACT_NAME: apex-ast-serializer-darwin-arm64
           - os: macos-13
             ASSET_NAME: apex-ast-serializer
-            OUTPUT_NAME: apex-ast-serializer-${version}-darwin-x64
+            OUTPUT_NAME: apex-ast-serializer-darwin-x64
             ARTIFACT_NAME: apex-ast-serializer-darwin-x64
     env:
       ASSET_NAME: ${{ matrix.ASSET_NAME }}
@@ -210,43 +189,71 @@ jobs:
         run: pnpm install --frozen-lockfile
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build native instrumented executable
+      - name: Build native executable
         run: pnpm nx run apex-ast-serializer:build:native
-      - name: Set version
-        run: echo "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" >> $GITHUB_ENV
-        if: env.OS != 'windows-latest'
-      - name: Set version
-        run: |
-          "version=$(cat ../prettier-plugin-apex/package.json | jq -r '.version')" | Out-File -FilePath $env:GITHUB_ENV -Append
-        if: env.OS == 'windows-latest'
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
-      - if: env.OS != 'windows-latest'
-        run: echo "ARTIFACT_LOCATION=packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}" >> $GITHUB_ENV
-      - if: env.OS == 'windows-latest'
-        run: |
-          "ARTIFACT_LOCATION=packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}" | Out-File -FilePath $env:GITHUB_ENV -Append
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: ${{ env.ARTIFACT_LOCATION }}
+          name: ${{ env.OUTPUT_NAME }}
+          path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
 
-  create-release-with-artifacts:
+  release-to-registry:
     runs-on: ubuntu-latest
-    name: Create Relase with Artifacts
+    name: Release to Registry
     if: startsWith(github.ref, 'refs/tags')
     needs:
       - functional-tests
       - build-native-executables
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4.2.2
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: 22
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+
+      - uses: actions/setup-java@v4.5.0
+        with:
+          distribution: temurin
+          java-version: 11
+          cache: gradle
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: artifacts
+          path: /tmp/artifacts
           pattern: apex-ast-serializer-*
           merge-multiple: true
-      - name: Create Release
+
+      - name: Copy artifacts to correct packages
+        run: pnpm run install:native:ci /tmp/artifacts
+
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+
+      - name: Check if prerelease
+        id: check_prerelease
+        run: pnpm tsx scripts/check-prerelease.zx.mts
+
+      - name: Deploy packages
+        if: steps.check_prerelease.outcome == 'success'
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --no-git-checks --access public
+
+      - name: Deploy pre-release packages
+        if: steps.check_prerelease.outcome != 'success'
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --tag next --no-git-checks --access public
+
+      - name: Create GitHub Release
+        if: steps.check_prerelease.outcome == 'success'
         uses: softprops/action-gh-release@v2
-        with:
-          files: artifacts/*

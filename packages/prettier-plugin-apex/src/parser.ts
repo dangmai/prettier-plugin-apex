@@ -13,9 +13,8 @@ import {
 import {
   GenericComment,
   SerializedAst,
-  doesFileExist,
   findNextUncommentedCharacter,
-  getNativeExecutable,
+  getNativeExecutableWithFallback,
   getParentType,
   getSerializerBinDirectory,
 } from "./util.js";
@@ -680,12 +679,7 @@ export default async function parse(
       options.parser === "apex-anonymous",
     );
   } else if (options.apexStandaloneParser === "native") {
-    const { path: serializerBin } = await getNativeExecutable();
-    if (!(await doesFileExist(serializerBin))) {
-      throw new Error(
-        "Native executable does not exist. Please download with `npx install-apex-executables`",
-      );
-    }
+    const serializerBin = await getNativeExecutableWithFallback();
     const result = await parseTextWithSpawn(
       serializerBin,
       sourceCode,
