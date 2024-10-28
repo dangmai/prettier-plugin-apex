@@ -1,6 +1,6 @@
 {
   "name": "@prettier-apex/apex-ast-serializer-win32-x64",
-  "version": "2.2.0-beta.6",
+  "version": "2.2.0-beta.7",
   "description": "The Windows x64 binary of Apex AST Serializer",
   "repository": {
     "type": "git",
