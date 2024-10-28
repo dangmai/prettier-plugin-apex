@@ -202,7 +202,7 @@ jobs:
   release-to-registry:
     runs-on: ubuntu-latest
     name: Release to Registry
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags')
+    if: startsWith(github.ref, 'refs/tags')
     needs:
       - functional-tests
       - build-native-executables
@@ -242,8 +242,18 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
+      - name: Check if prerelease
+        id: check_prerelease
+        run: pnpm tsx scripts/check-prerelease.zx.mts
+
       - name: Deploy packages
-        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --publish-branch native-packages --no-git-checks --access public --dry-run
+        if: steps.check_prerelease.outcome == 'success'
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --no-git-checks --access public --dry-run
+
+      - name: Deploy pre-release packages
+        if: steps.check_prerelease.outcome != 'success'
+        run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --tag next --no-git-checks --access public --dry-run
 
       - name: Create GitHub Release
+        if: steps.check_prerelease.outcome == 'success'
         uses: softprops/action-gh-release@v2
