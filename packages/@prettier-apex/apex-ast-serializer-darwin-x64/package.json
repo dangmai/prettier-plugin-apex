@@ -1,6 +1,6 @@
 {
   "name": "@prettier-apex/apex-ast-serializer-darwin-x64",
-  "version": "2.2.0-beta.2",
+  "version": "2.2.0-beta.3",
   "description": "The macOS x64 binary of Apex AST Serializer",
   "repository": {
     "type": "git",
