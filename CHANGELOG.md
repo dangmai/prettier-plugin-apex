@@ -1,4 +1,4 @@
-# Unreleased
+# 2.2.0
 
 - Native parsing is now the default parser for supported platforms, with fallback to Java parser for unsupported platforms.
 - Support Apex AST Serializer native executable for macOS x64.
