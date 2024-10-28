@@ -23,10 +23,8 @@
     "build:native": {
       "executor": "nx:run-commands",
       "inputs": ["gradle", "default"],
-      "outputs": [
-        "{projectRoot}/parser/build",
-        "{projectRoot}/parser/src/pgo-profiles"
-      ],
+      "outputs": ["{projectRoot}/parser/build/native"],
+      "cache": true,
       "options": {
         "cwd": "packages/apex-ast-serializer",
         "command": "node tools/build-native-binary.mjs"
