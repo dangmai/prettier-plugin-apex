@@ -199,17 +199,6 @@ jobs:
           name: ${{ env.OUTPUT_NAME }}
           path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
 
-  create-release-with-artifacts:
-    runs-on: ubuntu-latest
-    name: Create Relase with Artifacts
-    if: startsWith(github.ref, 'refs/tags')
-    needs:
-      - functional-tests
-      - build-native-executables
-    steps:
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-
   release-to-registry:
     runs-on: ubuntu-latest
     name: Release to Registry
@@ -255,3 +244,6 @@ jobs:
 
       - name: Deploy packages
         run: pnpm --filter "prettier-plugin-apex" --filter "@prettier-apex/*" publish --publish-branch native-packages --no-git-checks --access public --dry-run
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
