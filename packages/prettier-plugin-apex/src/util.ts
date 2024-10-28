@@ -1,5 +1,6 @@
 /* eslint no-param-reassign: 0 */
 import fs from "node:fs/promises";
+import { createRequire } from "node:module";
 import nodePath from "node:path";
 import * as url from "node:url";
 import { AstPath } from "prettier";
@@ -324,6 +325,7 @@ export async function getNativeExecutableWithFallback(): Promise<string> {
       throw new Error("No prebuilt binary available for this platform");
     }
     const nativeBin = nodePath.join(packageName, NATIVE_EXECUTABLE_NAME);
+    const require = createRequire(import.meta.url);
     return require.resolve(nativeBin);
   } catch (e: any) {
     if ("code" in e && e.code === "MODULE_NOT_FOUND") {
