@@ -25,6 +25,7 @@ await $`cp ../tests/anonymous/AnonymousBlock.cls ./AnonymousBlock.apex`;
 await $`cp ../tests/annotated_class/AnnotatedClass.cls ./AnnotatedClass.cls`;
 
 const packageJson = await fs.readJSON("package.json");
+console.log(packageJson);
 packageJson.scripts = {
   "prettier:named": "prettier AnnotatedClass.cls",
   "prettier:named:debug": "prettier --debug-check AnnotatedClass.cls",
