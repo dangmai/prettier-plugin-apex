@@ -244,6 +244,7 @@ jobs:
 
       - name: Check if prerelease
         id: check_prerelease
+        continue-on-error: true
         run: pnpm tsx scripts/check-prerelease.zx.mts
 
       - name: Deploy packages
