@@ -35,7 +35,7 @@ body:
     id: system-info
     attributes:
       label: System Info
-      description: Output of `npx envinfo --system --npmPackages 'prettier*' --binaries --npmGlobalPackages 'prettier*' --languages`, run inside your project directory
+      description: Output of `npx envinfo --system --npmPackages '?(@)prettier*/**' --binaries --npmGlobalPackages '?(@)prettier*/**' --fullTree --languages`, run inside your project directory
       render: shell
       placeholder: System, Binaries, Browsers
     validations:
