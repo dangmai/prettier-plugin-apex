@@ -199,7 +199,7 @@ jobs:
         with:
           path: |
             .nx
-          key: ${{ matrix.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle') }}
+          key: ${{ matrix.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle', 'packages/apex-ast-serializer/libs/*.jar') }}
       - name: Build native executable
         env:
           # https://nx.dev/troubleshooting/unknown-local-cache
