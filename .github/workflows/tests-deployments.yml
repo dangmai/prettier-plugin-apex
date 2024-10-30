@@ -206,6 +206,13 @@ jobs:
           NX_REJECT_UNKNOWN_LOCAL_CACHE: "false"
           # We're using Legacy Cache for now, because there's no way to reject
           # unknown local cache in the DB cache system as of now.
+          # The new DB Cache system uses machine-id as the SQLite DB name,
+          # and when run on different hosts, it will create a new DB, and forego
+          # using existing items in the cache.
+          # See this code here: https://github.com/nrwl/nx/blob/62f58ebfee37c6ef45422e5197a120d396d41922/packages/nx/src/native/machine_id/mod.rs#L3
+          # In the future we may be able to spoof machine-id to keep it consistent
+          # between runs. See this link on the Rust docs for the source of machine-id:
+          # https://docs.rs/machine-uid/latest/machine_uid/
           NX_DB_CACHE: "false"
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
