@@ -19,10 +19,10 @@
     "/vendor"
   ],
   "scripts": {
-    "build": "rimraf dist && tsc --project tsconfig.prod.json && pnpm run build:standalone",
+    "build": "del-cli dist && tsc --project tsconfig.prod.json && pnpm run build:standalone",
     "build:dev": "tsc",
     "build:standalone": "vite build",
-    "clean": "rimraf node_modules dist",
+    "clean": "del-cli node_modules dist",
     "pretest": "pnpm run lint",
     "test": "vitest run",
     "test:parser:built-in": "cross-env APEX_PARSER=built-in pnpm test",
@@ -46,7 +46,6 @@
   "devDependencies": {
     "@types/wait-on": "5.3.4",
     "@vitest/coverage-v8": "2.1.4",
-    "rimraf": "5.0.10",
     "vite": "5.4.10",
     "vitest": "2.1.4"
   },

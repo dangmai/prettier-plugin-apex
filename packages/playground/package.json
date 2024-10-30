@@ -4,9 +4,9 @@
   "description": "Prettier Apex Playground Website",
   "main": "index.js",
   "scripts": {
-    "build": "rimraf dist && vite build",
+    "build": "del-cli dist && vite build",
     "build:watch": "vite build --watch",
-    "clean": "rimraf node_modules dist",
+    "clean": "del-cli node_modules dist",
     "lint": "eslint \"src/*.{ts,tsx}\" \"*.ts\"",
     "dev": "vite --open http://localhost:5173/",
     "prettier": "prettier --write \"src/**/*.{ts,tsx,css,html}\" \"./*.{md,ts}\"",
