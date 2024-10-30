@@ -1,49 +1,48 @@
 {
-  "extends": ["config:base"],
-  "assignees": ["dangmai"],
-  "lockFileMaintenance": {
-    "enabled": true
+  extends: ["config:recommended"],
+  assignees: ["dangmai"],
+  lockFileMaintenance: {
+    enabled: true,
   },
-  "customManagers": [
-    // From https://docs.renovatebot.com/modules/manager/regex/#advanced-capture
+  customManagers: [
     {
-      "customType": "regex",
-      "description": "Update _VERSION variables in Dockerfiles",
-      "fileMatch": ["(^|/|\\.)Dockerfile$", "(^|/)Dockerfile\\.[^/]*$"],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
-      ]
-    }
+      customType: "regex",
+      description: "Update _VERSION variables in Dockerfiles",
+      fileMatch: ["(^|/|\\.)Dockerfile$", "(^|/)Dockerfile\\.[^/]*$"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s",
+      ],
+    },
   ],
-  "packageRules": [
+  packageRules: [
     {
-      "matchUpdateTypes": [
+      matchUpdateTypes: [
         "minor",
         "patch",
         "pin",
         "digest",
-        "lockFileMaintenance"
+        "lockFileMaintenance",
       ],
-      "automerge": true
+      automerge: true,
     },
     {
-      "matchPackageNames": ["@types/node"],
-      "enabled": false
+      matchPackageNames: ["@types/node"],
+      enabled: false,
     },
     {
-      "matchPackageNames": ["nodejs"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
+      matchPackageNames: ["nodejs"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
     },
     {
-      "matchPackageNames": ["eclipse-temurin"],
-      "matchUpdateTypes": ["major"],
-      "enabled": false
+      matchPackageNames: ["eclipse-temurin"],
+      matchUpdateTypes: ["major"],
+      enabled: false,
     },
     {
-      "matchPackagePatterns": ["typescript-generator"],
-      "groupName": "typescript-generator",
-      "additionalBranchPrefix": ""
-    }
-  ]
+      groupName: "typescript-generator",
+      additionalBranchPrefix: "",
+      matchPackageNames: ["/typescript-generator/"],
+    },
+  ],
 }
