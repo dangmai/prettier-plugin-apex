@@ -31,7 +31,7 @@
       enabled: false
     },
     {
-      matchPackageNames: ["nodejs"],
+      matchPackageNames: ["node"],
       matchUpdateTypes: ["major"],
       enabled: false
     },
