@@ -204,6 +204,9 @@ jobs:
         env:
           # https://nx.dev/troubleshooting/unknown-local-cache
           NX_REJECT_UNKNOWN_LOCAL_CACHE: "false"
+          # We're using Legacy Cache for now, because there's no way to reject
+          # unknown local cache in the DB cache system as of now.
+          NX_DB_CACHE: "false"
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
         uses: actions/cache/save@v4.1.2
