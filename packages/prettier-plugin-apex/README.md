@@ -11,7 +11,7 @@ It uses the excellent [Prettier](https://prettier.io/) engine for formatting,
 as well as following Prettier's [philosophy](https://prettier.io/docs/en/why-prettier.html).
 
 Prettier Apex allows Salesforce development teams to enforce a consistent code style,
-while being able to focus on writing code instead of formatting it.
+while being able to focus on writing code instead of debating how their code should be formatted.
 
 Since it is built on top of `jorje`, Salesforce's own internal parser,
 it is able to format Apex code with a very high degree of accuracy.
