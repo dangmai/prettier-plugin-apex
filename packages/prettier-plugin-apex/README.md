@@ -4,11 +4,19 @@
 
 ![Prettier Banner](https://raw.githubusercontent.com/prettier/prettier-logo/master/images/prettier-banner-light.png)
 
-This is a code formatter for the Apex Programming Language,
-used on the Salesforce development platform.
+## 🥇 Intro
 
+Prettier Apex is an opinionated code formatter for the Apex programming language that focuses on correctness and consistency of the formatted code.
 It uses the excellent [Prettier](https://prettier.io/) engine for formatting,
-and the language server provided by Salesforce for parsing.
+as well as following Prettier's [philosophy](https://prettier.io/docs/en/why-prettier.html).
+
+Prettier Apex allows Salesforce development teams to enforce a consistent code style,
+while being able to focus on writing code instead of formatting it.
+
+Since it is built on top of `jorje`, Salesforce's own internal parser,
+it is able to format Apex code with a very high degree of accuracy.
+In short, Prettier Apex parses your code the same way that the Salesforce platform does,
+and it has been tested extensively to make sure your code does not change behavior after formatting.
 
 ## ⚡️ Quick start
 
