@@ -14,7 +14,7 @@
 // and produces the final artifact.
 
 import { join } from "path";
-import { $, fs, usePowerShell } from "zx";
+import { $, fs, usePwsh } from "zx";
 
 $.verbose = true;
 
