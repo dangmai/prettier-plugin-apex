@@ -14,13 +14,13 @@
 // and produces the final artifact.
 
 import { join } from "path";
-import { $, fs, usePowerShell } from "zx";
+import { $, fs, usePwsh } from "zx";
 
-$.verbose = false;
+$.verbose = true;
 
 let gradle = "./gradlew";
 if (process.platform === "win32") {
-  usePowerShell();
+  usePwsh();
   gradle += ".bat";
 }
 
@@ -56,6 +56,7 @@ await fs.remove("./parser/src/pgo-profiles/main");
 await fs.ensureDir("./parser/src/pgo-profiles/main");
 
 let i = 1;
+$.verbose = false;
 for (const classFile of classFiles) {
   if (classFile.includes("__snapshots__")) {
     continue;
@@ -76,6 +77,7 @@ for (const classFile of classFiles) {
   );
   i++;
 }
+$.verbose = true;
 console.log("Merging profiles");
 await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`.stdio(
   "ignore",
