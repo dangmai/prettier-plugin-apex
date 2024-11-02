@@ -43,7 +43,7 @@ async function getFilesWithSuffix(rootDir, suffix) {
   return result;
 }
 console.log("Running nativeCompile with PGO instrumentation");
-await $`${gradle} --version`;
+await $`${gradle} --version`.stdio("ignore", process.stdout, process.stderr);
 await $`${gradle} :parser:nativeInstrumentedTest :parser:nativeCompile --pgo-instrument`.stdio(
   "ignore",
   process.stdout,
