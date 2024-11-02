@@ -5,7 +5,10 @@
   "sourceRoot": "packages/apex-ast-serializer",
   "namedInputs": {
     "gradle": ["{projectRoot}/**/build.gradle"],
-    "default": ["{projectRoot}/**/*.java", "{projectRoot}/**/*.properties"]
+    "default": ["{projectRoot}/**/*.java", "{projectRoot}/**/*.properties"],
+    "native": [
+      "{projectRoot}/packages/apex-ast-serializer/tools/build-native-binary.mjs"
+    ]
   },
   "targets": {
     "build": {
@@ -22,7 +25,7 @@
     },
     "build:native": {
       "executor": "nx:run-commands",
-      "inputs": ["gradle", "default"],
+      "inputs": ["gradle", "default", "native"],
       "outputs": ["{projectRoot}/parser/build/native"],
       "cache": true,
       "options": {
