@@ -1,5 +1,5 @@
 #!/usr/bin/env zx
-import { $, usePowerShell } from "zx";
+import { $, usePwsh } from "zx";
 $.verbose = true;
 
 // This script runs Gradle with the given arguments in a cross-platform way.
@@ -8,7 +8,7 @@ $.verbose = true;
 let command = "./gradlew";
 
 if (process.platform === "win32") {
-  usePowerShell();
+  usePwsh();
   command += ".bat";
 }
 const args = process.argv.slice(2);
