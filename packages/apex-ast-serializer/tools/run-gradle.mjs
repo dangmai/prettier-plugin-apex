@@ -12,4 +12,4 @@ if (process.platform === "win32") {
   command += ".bat";
 }
 const args = process.argv.slice(2);
-await $`${command} ${args}`;
+await $`${command} ${args}`.stdio("ignore");

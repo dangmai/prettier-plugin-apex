@@ -43,7 +43,9 @@ async function getFilesWithSuffix(rootDir, suffix) {
   return result;
 }
 console.log("Running nativeCompile with PGO instrumentation");
-await $`${gradle} :parser:nativeInstrumentedTest :parser:nativeCompile --pgo-instrument`;
+await $`${gradle} :parser:nativeInstrumentedTest :parser:nativeCompile --pgo-instrument`.stdio(
+  "ignore",
+);
 const classFiles = await getFilesWithSuffix(
   "./parser/build/resources/test",
   ".cls",
@@ -61,7 +63,9 @@ for (const classFile of classFiles) {
 
   await $({
     input: await fs.readFile(classFile),
-  })`./parser/build/native/nativeCompile/apex-ast-serializer-instrumented ${isAnonymous ? "--anonymous" : ""}`;
+  })`./parser/build/native/nativeCompile/apex-ast-serializer-instrumented ${isAnonymous ? "--anonymous" : ""}`.stdio(
+    "ignore",
+  );
 
   await fs.move(
     "./default.iprof",
@@ -71,7 +75,9 @@ for (const classFile of classFiles) {
   i++;
 }
 console.log("Merging profiles");
-await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`;
+await $`native-image-configure merge-pgo-profiles --input-dir=./parser/src/pgo-profiles/main --output-file=merged_profile.iprof`.stdio(
+  "ignore",
+);
 await fs.remove("./parser/src/pgo-profiles/main");
 await fs.ensureDir("./parser/src/pgo-profiles/main");
 await fs.move(
@@ -81,4 +87,4 @@ await fs.move(
 );
 
 console.log("Running nativeCompile for final artifact");
-await $`${gradle} :parser:nativeCompile`;
+await $`${gradle} :parser:nativeCompile`.stdio("ignore");
