@@ -74,7 +74,7 @@ ext {
 dependencies {
   api name: 'apex-jorje-lsp'
   // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  api group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.20'
+  api group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.21'
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
   api group: 'commons-cli', name: 'commons-cli', version: '1.9.0'
