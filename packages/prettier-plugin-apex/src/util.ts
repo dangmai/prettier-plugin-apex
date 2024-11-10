@@ -327,7 +327,7 @@ export async function getNativeExecutableWithFallback(): Promise<string> {
       getNativeExecutableNameForPlatform(`${platform}-${arch}`),
     );
     const require = module.createRequire(import.meta.url);
-    return require.resolve(nativeBin);
+    return nodePath.relative(process.cwd(), require.resolve(nativeBin));
   } catch (e: any) {
     if ("code" in e && e.code === "MODULE_NOT_FOUND") {
       console.warn(
