@@ -11,7 +11,8 @@ if (process.platform === "win32") {
 
 $.verbose = true;
 
-let moduleName = "test-npm-module";
+// Use whitespace in module name to test resiliency of package
+let moduleName = "test npm module";
 if (argv["module"]) {
   moduleName = argv["module"];
 }
