@@ -46,7 +46,7 @@
   "devDependencies": {
     "@types/wait-on": "5.3.4",
     "@vitest/coverage-v8": "2.1.4",
-    "vite": "5.4.10",
+    "vite": "5.4.11",
     "vitest": "2.1.4"
   },
   "peerDependencies": {
