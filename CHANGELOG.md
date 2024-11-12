@@ -1,4 +1,4 @@
-# Unreleased
+# 2.2.2
 
 - Fix native executable not usable in NixOS Linux environment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1706)).
 
