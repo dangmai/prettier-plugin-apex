@@ -1,3 +1,7 @@
+# Unreleased
+
+- Fix native executable not usable in NixOS Linux environment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1706)).
+
 # 2.2.1
 
 - Fix native executable not spawned correctly in path with special characters ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1702)).
