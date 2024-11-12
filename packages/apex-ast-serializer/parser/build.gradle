@@ -149,6 +149,13 @@ graalvmNative {
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
       buildArgs.addAll(application.applicationDefaultJvmArgs)
+      // Certain Linux distribution doesn't allow dynamic-linked binaries to be
+      // run, for example, NixOS, so we need to build a static binary.
+      if (System.getProperty('os.name').toLowerCase().contains('linux') && System.getProperty('os.arch').contains('amd64')) {
+        environmentVariables.put("PATH", file('../musl-toolchain/bin').absolutePath + ":" + System.getenv("PATH"))
+        buildArgs.add('--static');
+        buildArgs.add('--libc=musl');
+      }
     }
   }
 }

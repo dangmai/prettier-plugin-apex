@@ -200,6 +200,9 @@ jobs:
           path: |
             .nx
           key: ${{ matrix.os }}-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle', 'packages/apex-ast-serializer/libs/*.jar', 'packages/apex-ast-serializer/tools/build-native-binary.mjs') }}
+      - name: Build Linux musl toolchain
+        if: matrix.os == 'ubuntu-latest'
+        run: pnpm nx run apex-ast-serializer:build:musl
       - name: Build native executable
         env:
           # https://nx.dev/troubleshooting/unknown-local-cache

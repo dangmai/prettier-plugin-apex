@@ -6,9 +6,7 @@
   "namedInputs": {
     "gradle": ["{projectRoot}/**/build.gradle"],
     "default": ["{projectRoot}/**/*.java", "{projectRoot}/**/*.properties"],
-    "native": [
-      "{projectRoot}/packages/apex-ast-serializer/tools/build-native-binary.mjs"
-    ]
+    "native": ["{projectRoot}/tools/build-native-binary.mjs"]
   },
   "targets": {
     "build": {
@@ -31,6 +29,16 @@
       "options": {
         "cwd": "packages/apex-ast-serializer",
         "command": "node tools/build-native-binary.mjs"
+      }
+    },
+    "build:musl": {
+      "executor": "nx:run-commands",
+      "inputs": ["{projectRoot}/tools/build-musl-toolchain.sh"],
+      "outputs": ["{projectRoot}/musl-toolchain"],
+      "cache": true,
+      "options": {
+        "cwd": "packages/apex-ast-serializer",
+        "command": "./tools/build-musl-toolchain.sh"
       }
     },
     "test": {
