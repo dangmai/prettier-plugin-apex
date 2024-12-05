@@ -118,13 +118,13 @@ importers:
         version: 18.3.1
       '@vitejs/plugin-react':
         specifier: 4.3.4
-        version: 4.3.4(vite@6.0.2(@types/node@22.10.1)(tsx@4.19.2))
+        version: 4.3.4(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2))
       vite:
-        specifier: 6.0.2
-        version: 6.0.2(@types/node@22.10.1)(tsx@4.19.2)
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)
       vite-plugin-radar:
         specifier: 0.9.6
-        version: 0.9.6(vite@6.0.2(@types/node@22.10.1)(tsx@4.19.2))
+        version: 0.9.6(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2))
 
   packages/prettier-plugin-apex:
     dependencies:
@@ -158,8 +158,8 @@ importers:
         specifier: 2.1.8
         version: 2.1.8(vitest@2.1.8(@types/node@22.10.1))
       vite:
-        specifier: 6.0.2
-        version: 6.0.2(@types/node@22.10.1)(tsx@4.19.2)
+        specifier: 6.0.3
+        version: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)
       vitest:
         specifier: 2.1.8
         version: 2.1.8(@types/node@22.10.1)
@@ -2716,8 +2716,8 @@ packages:
       terser:
         optional: true
 
-  vite@6.0.2:
-    resolution: {integrity: sha512-XdQ+VsY2tJpBsKGs0wf3U/+azx8BBpYRHFAyKm5VeEZNOJZRB63q7Sc8Iup3k0TrN3KO6QgyzFf+opSbfY1y0g==}
+  vite@6.0.3:
+    resolution: {integrity: sha512-Cmuo5P0ENTN6HxLSo6IHsjCLn/81Vgrp81oaiFFMRa8gGDj5xEjIcEpf2ZymZtZR8oU0P2JX5WuUp/rlXcHkAw==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
@@ -3572,14 +3572,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@vitejs/plugin-react@4.3.4(vite@6.0.2(@types/node@22.10.1)(tsx@4.19.2))':
+  '@vitejs/plugin-react@4.3.4(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2))':
     dependencies:
       '@babel/core': 7.26.0
       '@babel/plugin-transform-react-jsx-self': 7.25.9(@babel/core@7.26.0)
       '@babel/plugin-transform-react-jsx-source': 7.25.9(@babel/core@7.26.0)
       '@types/babel__core': 7.20.5
       react-refresh: 0.14.2
-      vite: 6.0.2(@types/node@22.10.1)(tsx@4.19.2)
+      vite: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -5407,9 +5407,9 @@ snapshots:
       - supports-color
       - terser
 
-  vite-plugin-radar@0.9.6(vite@6.0.2(@types/node@22.10.1)(tsx@4.19.2)):
+  vite-plugin-radar@0.9.6(vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2)):
     dependencies:
-      vite: 6.0.2(@types/node@22.10.1)(tsx@4.19.2)
+      vite: 6.0.3(@types/node@22.10.1)(tsx@4.19.2)
 
   vite@5.4.11(@types/node@22.10.1):
     dependencies:
@@ -5420,7 +5420,7 @@ snapshots:
       '@types/node': 22.10.1
       fsevents: 2.3.3
 
-  vite@6.0.2(@types/node@22.10.1)(tsx@4.19.2):
+  vite@6.0.3(@types/node@22.10.1)(tsx@4.19.2):
     dependencies:
       esbuild: 0.24.0
       postcss: 8.4.49
