@@ -195,7 +195,7 @@ jobs:
         run: chmod +x gradlew
       - name: Restore NX cache
         id: nx-cache-restore
-        uses: actions/cache/restore@v4.1.2
+        uses: actions/cache/restore@v4.2.0
         with:
           path: |
             .nx
@@ -219,7 +219,7 @@ jobs:
           NX_DB_CACHE: "false"
         run: pnpm nx run apex-ast-serializer:build:native
       - name: Save NX Cache
-        uses: actions/cache/save@v4.1.2
+        uses: actions/cache/save@v4.2.0
         with:
           path: |
             .nx
