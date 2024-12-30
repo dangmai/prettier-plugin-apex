@@ -86,7 +86,7 @@ function runSpec(
           `Format ${mergedOpts.parser}: ${filename} ${index + 1}`,
           async ({ expect }) => {
             output = await prettyPrint(source, path, mergedOpts);
-            expect(output).toMatchFileSnapshot(
+            await expect(output).toMatchFileSnapshot(
               join(
                 "__snapshots__",
                 `Formatted${baseName}${index + 1}${extension}`,
