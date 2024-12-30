@@ -11,6 +11,7 @@ import {
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
 import {
+  AnnotatedComment,
   GenericComment,
   SerializedAst,
   findNextUncommentedCharacter,
@@ -717,6 +718,12 @@ export default async function parse(
           node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
           node["@class"] === APEX_TYPES.INLINE_COMMENT,
       );
+    const lastComment = ast.comments.at(-1);
+    if (lastComment) {
+      // #1777 - We don't want a trailing empty line after the last comment in
+      // the document, because that will be a duplicate of the final empty line.
+      (lastComment as AnnotatedComment).trailingEmptyLine = false;
+    }
     dfsPostOrderApply(ast, [
       nodeLocationVisitor(sourceCode, ast.comments),
       lineIndexVisitor(getLineIndexes(sourceCode)),

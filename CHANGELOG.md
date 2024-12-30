@@ -1,3 +1,7 @@
+# Unreleased
+
+- Fix duplicate newlines after last trailing comment in document ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1777)).
+
 # 2.2.2
 
 - Fix native executable not usable in NixOS Linux environment ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1706)).
