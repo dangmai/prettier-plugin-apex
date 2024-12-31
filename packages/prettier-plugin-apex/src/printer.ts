@@ -1184,37 +1184,55 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parts: Doc[] = [];
-  let resultDoc;
+type AssignmentLayout =
+  | "break-after-operator"
+  | "no-break-after-operator"
+  | "only-left";
 
-  parts.push(path.call(print, "name"));
-  const assignmentDocs: Doc = path.call(print, "assignment", "value");
+function chooseAssignmentLayout(path: AstPath): AssignmentLayout {
+  const node = path.getNode();
+  if (node.assignment?.value === undefined) {
+    return "only-left";
+  }
   const assignmentComments = node.assignment?.value?.comments;
   const assignmentHasLeadingComment =
     Array.isArray(assignmentComments) &&
     assignmentComments.some((comment) => comment.leading);
 
-  if (
-    assignmentDocs &&
-    (isBinaryish(node.assignment.value) || assignmentHasLeadingComment)
-  ) {
-    parts.push(" ");
-    parts.push("=");
-    parts.push(line);
-    parts.push(assignmentDocs);
-    resultDoc = groupIndentConcat(parts);
-  } else if (assignmentDocs) {
-    parts.push(" ");
-    parts.push("=");
-    parts.push(" ");
-    parts.push(assignmentDocs);
-    resultDoc = groupConcat(parts);
-  } else {
-    resultDoc = groupConcat(parts);
+  if (assignmentHasLeadingComment) {
+    // This is a special case that we need to break, regardless of other
+    // conditions that come afterwards.
+    return "break-after-operator";
   }
-  return resultDoc;
+  if (
+    node.assignment.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    node.assignment.value["@class"] === APEX_TYPES.SOSL_EXPRESSION
+  ) {
+    return "no-break-after-operator";
+  }
+  return "break-after-operator";
+}
+
+function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
+  const layout = chooseAssignmentLayout(path);
+  const leftDoc = path.call(print, "name");
+  switch (layout) {
+    case "only-left":
+      return group(leftDoc);
+    case "no-break-after-operator":
+      return groupConcat([
+        leftDoc,
+        " = ",
+        path.call(print, "assignment", "value"),
+      ]);
+    case "break-after-operator":
+      return groupIndentConcat([
+        leftDoc,
+        " =",
+        line,
+        path.call(print, "assignment", "value"),
+      ]);
+  }
 }
 
 function handleNewStandard(path: AstPath, print: PrintFn): Doc {

@@ -12,6 +12,9 @@
   "rules": {
     "prettier/prettier": ["error"],
     "linebreak-style": 0,
+    // We use noImplicitAny in tsconfig to check for this, which takes type
+    // information into account.
+    "consistent-return": "off",
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/no-var-requires": 0,
     "@typescript-eslint/naming-convention": 0,

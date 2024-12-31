@@ -2,9 +2,14 @@ public class VariableDeclaration {
   public void declareVariables() {
     String firstString, secondString;
     String a = 'aaa', b = 'bbb';
-    List<UnknownClass.InnerClass> nestedList = new List<UnknownClass.InnerClass>();
+    List<UnknownClass.InnerClass> nestedList =
+      new List<UnknownClass.InnerClass>();
     String veryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'tada',
       anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'a';
+    String veryLongVariableNameThatByItselfIsAlreadyABitTooMuch =
+        'veryLongValueThatShouldBreak',
+      anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch =
+        'anotherVeryLongValueThatShouldBreak';
     String c = 'c';
     String d = 'd';
     String e = c, d = a;
