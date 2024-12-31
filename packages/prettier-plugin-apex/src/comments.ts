@@ -34,7 +34,7 @@ function printApexDocComment(comment: jorje.BlockComment): Doc {
           (index > 0 ? " " : "") +
           (index < lines.length - 1
             ? commentLine.trim()
-            : commentLine.trimLeft()),
+            : commentLine.trimStart()),
       ),
     ),
   ];
