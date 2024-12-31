@@ -1187,12 +1187,12 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
 type AssignmentLayout =
   | "break-after-operator"
   | "no-break-after-operator"
-  | "only-left";
+  | "left-doc-only";
 
 function chooseAssignmentLayout(path: AstPath): AssignmentLayout {
   const node = path.getNode();
   if (node.assignment?.value === undefined) {
-    return "only-left";
+    return "left-doc-only";
   }
   const assignmentComments = node.assignment?.value?.comments;
   const assignmentHasLeadingComment =
@@ -1217,7 +1217,7 @@ function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
   const layout = chooseAssignmentLayout(path);
   const leftDoc = path.call(print, "name");
   switch (layout) {
-    case "only-left":
+    case "left-doc-only":
       return group(leftDoc);
     case "no-break-after-operator":
       return groupConcat([
