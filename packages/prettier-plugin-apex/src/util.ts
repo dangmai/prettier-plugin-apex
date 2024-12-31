@@ -8,7 +8,6 @@ import { AstPath } from "prettier";
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   APEX_TYPES,
-  APEX_TYPES as apexTypes,
   DATA_CATEGORY,
   MODIFIER,
   ORDER,
@@ -50,8 +49,8 @@ export type AnnotatedComment = AnnotatedAstNode &
 
 export function isBinaryish(node: jorje.Expr): boolean {
   return (
-    node["@class"] === apexTypes.BOOLEAN_EXPRESSION ||
-    node["@class"] === apexTypes.BINARY_EXPRESSION
+    node["@class"] === APEX_TYPES.BOOLEAN_EXPRESSION ||
+    node["@class"] === APEX_TYPES.BINARY_EXPRESSION
   );
 }
 
@@ -89,8 +88,8 @@ export function checkIfParentIsDottedExpression(path: AstPath): boolean {
   if (parentNodeName === "dottedExpr") {
     result = true;
   } else if (
-    node["@class"] === apexTypes.VARIABLE_EXPRESSION &&
-    parentNode["@class"] === apexTypes.ARRAY_EXPRESSION &&
+    node["@class"] === APEX_TYPES.VARIABLE_EXPRESSION &&
+    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     grandParentNodeName === "dottedExpr"
   ) {
     // a
@@ -134,7 +133,7 @@ export function massageAstNode(ast: any, newObj: any): any {
   // Handling ApexDoc
   if (
     ast["@class"] &&
-    ast["@class"] === apexTypes.BLOCK_COMMENT &&
+    ast["@class"] === APEX_TYPES.BLOCK_COMMENT &&
     isApexDocComment(ast)
   ) {
     newObj.value = ast.value.replace(/\s/g, "");
@@ -148,7 +147,7 @@ export function massageAstNode(ast: any, newObj: any): any {
     ast.dottedExpr &&
     ast.dottedExpr.value &&
     ast.dottedExpr.value.names &&
-    ast.dottedExpr.value["@class"] === apexTypes.VARIABLE_EXPRESSION &&
+    ast.dottedExpr.value["@class"] === APEX_TYPES.VARIABLE_EXPRESSION &&
     ast.names
   ) {
     // This is a workaround for #38 - jorje sometimes groups names with
@@ -158,7 +157,7 @@ export function massageAstNode(ast: any, newObj: any): any {
     newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
   } else if (
     ast["@class"] &&
-    ast["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION
+    ast["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION
   ) {
     // This flattens the SOQL/SOSL Compound Expression, e.g.:
     // SELECT Id FROM Account WHERE Name = 'Name' AND (Status = 'Active' AND City = 'Boston')
@@ -166,7 +165,7 @@ export function massageAstNode(ast: any, newObj: any): any {
     // SELECT Id FROM Account WHERE Name = 'Name' AND Status = 'Active' AND City = 'Boston'
     for (let i = newObj.expr.length - 1; i >= 0; i -= 1) {
       if (
-        newObj.expr[i]["@class"] === apexTypes.WHERE_COMPOUND_EXPRESSION &&
+        newObj.expr[i]["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION &&
         newObj.expr[i].op["@class"] === newObj.op["@class"]
       ) {
         newObj.expr.splice(i, 1, ...newObj.expr[i].expr);

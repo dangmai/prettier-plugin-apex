@@ -3,10 +3,7 @@ import type { AstPath, Doc, ParserOptions } from "prettier";
 import * as prettier from "prettier";
 
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
-import {
-  ALLOW_DANGLING_COMMENTS,
-  APEX_TYPES as apexTypes,
-} from "./constants.js";
+import { ALLOW_DANGLING_COMMENTS, APEX_TYPES } from "./constants.js";
 import {
   AnnotatedComment,
   GenericComment,
@@ -45,7 +42,7 @@ function printApexDocComment(comment: jorje.BlockComment): Doc {
 
 export function isPrettierIgnore(comment: AnnotatedComment): boolean {
   let content;
-  if (comment["@class"] === apexTypes.BLOCK_COMMENT) {
+  if (comment["@class"] === APEX_TYPES.BLOCK_COMMENT) {
     // For simplicity sake we only support this format
     // /* prettier-ignore */
     content = comment.value
@@ -105,7 +102,7 @@ export function printDanglingComment(
     const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
     parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
   }
-  if (comment["@class"] === apexTypes.INLINE_COMMENT) {
+  if (comment["@class"] === APEX_TYPES.INLINE_COMMENT) {
     parts.push(lineSuffix(printComment(commentPath)));
   } else {
     parts.push(printComment(commentPath));
@@ -125,8 +122,8 @@ export function canAttachComment(node: any): boolean {
   return (
     node.loc &&
     node["@class"] &&
-    node["@class"] !== apexTypes.INLINE_COMMENT &&
-    node["@class"] !== apexTypes.BLOCK_COMMENT
+    node["@class"] !== APEX_TYPES.INLINE_COMMENT &&
+    node["@class"] !== APEX_TYPES.BLOCK_COMMENT
   );
 }
 
@@ -138,7 +135,7 @@ export function canAttachComment(node: any): boolean {
  * @returns {boolean} whether it is a block comment.
  */
 export function isBlockComment(comment: GenericComment): boolean {
-  return comment["@class"] === apexTypes.BLOCK_COMMENT;
+  return comment["@class"] === APEX_TYPES.BLOCK_COMMENT;
 }
 
 /**
@@ -149,7 +146,7 @@ export function isBlockComment(comment: GenericComment): boolean {
  */
 export function willPrintOwnComments(path: AstPath): boolean {
   const node = path.getNode();
-  return !node || !node["@class"] || node["@class"] === apexTypes.ANNOTATION;
+  return !node || !node["@class"] || node["@class"] === APEX_TYPES.ANNOTATION;
 }
 
 export function getTrailingComments(node: any): AnnotatedComment[] {
@@ -206,7 +203,7 @@ function handleWhereExpression(
     !followingNode ||
     !precedingNode["@class"] ||
     !followingNode["@class"] ||
-    enclosingNode["@class"] !== apexTypes.WHERE_COMPOUND_EXPRESSION ||
+    enclosingNode["@class"] !== APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
     comment.location === undefined ||
     comment.location.startIndex === undefined
   ) {
@@ -247,7 +244,10 @@ function handleBlockStatementLeadingComment(
   comment: AnnotatedComment,
 ): boolean {
   const { followingNode } = comment;
-  if (!followingNode || followingNode["@class"] !== apexTypes.BLOCK_STATEMENT) {
+  if (
+    !followingNode ||
+    followingNode["@class"] !== APEX_TYPES.BLOCK_STATEMENT
+  ) {
     return false;
   }
   if (followingNode.stmnts.length) {
@@ -303,8 +303,8 @@ function handleLongChainComment(comment: AnnotatedComment): boolean {
     !enclosingNode ||
     !precedingNode ||
     !followingNode ||
-    (enclosingNode["@class"] !== apexTypes.METHOD_CALL_EXPRESSION &&
-      enclosingNode["@class"] !== apexTypes.VARIABLE_EXPRESSION)
+    (enclosingNode["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION &&
+      enclosingNode["@class"] !== APEX_TYPES.VARIABLE_EXPRESSION)
   ) {
     return false;
   }
@@ -333,7 +333,7 @@ function handleModifierPrettierIgnoreComment(
     !enclosingNode ||
     !followingNode ||
     !followingNode["@class"] ||
-    !followingNode["@class"].startsWith(apexTypes.MODIFIER)
+    !followingNode["@class"].startsWith(APEX_TYPES.MODIFIER)
   ) {
     return false;
   }
