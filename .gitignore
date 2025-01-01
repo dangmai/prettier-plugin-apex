@@ -19,3 +19,4 @@ packages/@prettier-apex/apex-ast-serializer*/apex-ast-serializer*
 .nx
 .pnpm-store
 .DS_Store
+*.log
