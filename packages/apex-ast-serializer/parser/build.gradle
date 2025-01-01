@@ -88,7 +88,7 @@ dependencies {
   testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.11.4'
 
   // https://mvnrepository.com/artifact/org.json/json
-  testFixturesImplementation group: 'org.json', name: 'json', version: '20240303'
+  testFixturesImplementation group: 'org.json', name: 'json', version: '20241224'
 
   // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
   graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.179'
