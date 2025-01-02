@@ -1387,6 +1387,7 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
       ? [softline, join([",", line], paramDocs), dedent(softline)]
       : "";
 
+  // The names can't be broken up safely across lines. See #69 for an example.
   const methodCallChainDoc = join(".", nameDocs);
 
   // Handling the array expression index.
