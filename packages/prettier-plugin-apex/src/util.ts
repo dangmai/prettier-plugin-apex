@@ -50,7 +50,15 @@ export type AnnotatedComment = AnnotatedAstNode &
 export function isBinaryish(node: jorje.Expr): boolean {
   return (
     node["@class"] === APEX_TYPES.BOOLEAN_EXPRESSION ||
-    node["@class"] === APEX_TYPES.BINARY_EXPRESSION
+    node["@class"] === APEX_TYPES.BINARY_EXPRESSION ||
+    node["@class"] === APEX_TYPES.NULL_COALESCING_EXPRESSION
+  );
+}
+
+export function isSoqlOrSoslExpression(node: jorje.Expr): boolean {
+  return (
+    node["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    node["@class"] === APEX_TYPES.SOSL_EXPRESSION
   );
 }
 
@@ -257,6 +265,7 @@ const PRECEDENCE: { [key: string]: number } = {};
   [">>", "<<", ">>>"],
   ["+", "-"],
   ["*", "/", "%"],
+  ["??"],
 ].forEach((tier, i) => {
   tier.forEach((op) => {
     PRECEDENCE[op] = i;

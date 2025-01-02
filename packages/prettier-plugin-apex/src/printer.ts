@@ -29,6 +29,7 @@ import {
   getParentType,
   getPrecedence,
   isBinaryish,
+  isSoqlOrSoslExpression,
 } from "./util.js";
 
 const docBuilders = prettier.doc.builders;
@@ -108,7 +109,12 @@ function handleTriggerUsage(path: AstPath): Doc {
   return TRIGGER_USAGE[node.$];
 }
 
-function getOperator(node: jorje.BinaryExpr | jorje.BooleanExpr): string {
+function getOperator(
+  node: jorje.BinaryExpr | jorje.BooleanExpr | jorje.NullCoalescingExpr,
+): string {
+  if (node["@class"] === APEX_TYPES.NULL_COALESCING_EXPRESSION) {
+    return "??";
+  }
   if (node.op["@class"] === APEX_TYPES.BOOLEAN_OPERATOR) {
     return BOOLEAN[node.op.$];
   }
@@ -126,6 +132,7 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const isNestedExpression = isBinaryish(parentNode);
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
+  const isRightExpressionSoqlOrSosl = isSoqlOrSoslExpression(node.right);
 
   const isNodeSamePrecedenceAsLeftChild =
     isLeftNodeBinaryish &&
@@ -136,7 +143,6 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
 
   const docs: Doc[] = [];
   const leftDoc: Doc = path.call(print, "left");
-  const operationDoc: Doc = path.call(print, "op");
   const rightDoc: Doc = path.call(print, "right");
 
   // This variable signifies that this node is a left child with the same
@@ -203,13 +209,13 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   ) {
     docs.push(leftDoc);
     docs.push(" ");
-    docs.push([operationDoc, line, rightDoc]);
+    docs.push([nodeOp, line, rightDoc]);
     return shouldIndentTopMostExpression ? indentConcat(docs) : docs;
   }
   if (hasRightChildNodeWithoutGrouping) {
     docs.push(group(leftDoc));
     docs.push(" ");
-    docs.push([operationDoc, line, rightDoc]);
+    docs.push([nodeOp, line, rightDoc]);
     return docs;
   }
   // At this point we know that this node is not in a binaryish chain, so we
@@ -231,9 +237,13 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
     ).length > 0;
 
   if (leftChildHasEndOfLineComment) {
-    docs.push(groupConcat([operationDoc, hardline, rightDoc]));
+    docs.push(groupConcat([nodeOp, hardline, rightDoc]));
+  } else if (isRightExpressionSoqlOrSosl) {
+    // If right expression is SOQL or SOSL, we want to keep the opening [ on the
+    // same line as the binaryish operator, in order to save on characters used.
+    docs.push(groupConcat([nodeOp, " ", rightDoc]));
   } else {
-    docs.push(groupConcat([operationDoc, line, rightDoc]));
+    docs.push(groupConcat([nodeOp, line, rightDoc]));
   }
   return groupConcat(docs);
 }
@@ -1184,6 +1194,26 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
+function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
+  const node = path.getNode();
+  if (!node) {
+    return false;
+  }
+  if (isSoqlOrSoslExpression(node)) {
+    return true;
+  }
+  if (isBinaryish(node)) {
+    return path.call(shouldHaveNoBreakAfterOperator, "left");
+  }
+  if (
+    node["@class"] === APEX_TYPES.METHOD_CALL_EXPRESSION ||
+    node["@class"] === APEX_TYPES.VARIABLE_EXPRESSION
+  ) {
+    return path.call(shouldHaveNoBreakAfterOperator, "dottedExpr", "value");
+  }
+  return false;
+}
+
 type AssignmentLayout =
   | "break-after-operator"
   | "no-break-after-operator"
@@ -1204,10 +1234,7 @@ function chooseAssignmentLayout(path: AstPath): AssignmentLayout {
     // conditions that come afterwards.
     return "break-after-operator";
   }
-  if (
-    node.assignment.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-    node.assignment.value["@class"] === APEX_TYPES.SOSL_EXPRESSION
-  ) {
+  if (path.call(shouldHaveNoBreakAfterOperator, "assignment", "value")) {
     return "no-break-after-operator";
   }
   return "break-after-operator";
@@ -1809,15 +1836,6 @@ function handleCastExpression(path: AstPath, print: PrintFn): Doc {
   parts.push(")");
   parts.push(" ");
   parts.push(path.call(print, "expr"));
-  return parts;
-}
-
-function handleNullCoalescingExpression(path: AstPath, print: PrintFn): Doc {
-  const parts: Doc[] = [];
-  parts.push(path.call(print, "left"));
-  parts.push(" ");
-  parts.push("??");
-  parts.push(groupIndentConcat([line, path.call(print, "right")]));
   return parts;
 }
 
@@ -2998,7 +3016,7 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.SUPER_METHOD_CALL_EXPRESSION]: handleSuperMethodCallExpression,
   [APEX_TYPES.SOQL_EXPRESSION]: handleSoqlExpression,
   [APEX_TYPES.SOSL_EXPRESSION]: handleSoslExpression,
-  [APEX_TYPES.NULL_COALESCING_EXPRESSION]: handleNullCoalescingExpression,
+  [APEX_TYPES.NULL_COALESCING_EXPRESSION]: handleBinaryishExpression,
 
   // New Object Init
   [APEX_TYPES.NEW_SET_INIT]: handleNewSetInit,

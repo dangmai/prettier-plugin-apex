@@ -19,12 +19,11 @@ class SafeNavigationOperator {
       SELECT Id
       FROM Account
       WHERE Id = '001000000FAKEID'
-    ] ??
-      [
-        SELECT Id
-        FROM Account
-        WHERE Id = '001000001FAKEID' AND Very_Long_Field_Name__c = 'Hello'
-      ];
+    ] ?? [
+      SELECT Id
+      FROM Account
+      WHERE Id = '001000001FAKEID' AND Very_Long_Field_Name__c = 'Hello'
+    ];
 
     string city = [
       SELECT BillingCity

@@ -19,7 +19,11 @@ class Comments {
    */
   void assignmentComments() {
     Integer a /* comment */ = 1;
-    Integer b = 1; // comment
+    Integer b = // comment
+      1;
+    Integer c =
+      // comment
+      1;
 
     Integer a = 1; // Trailing Comment 1
     Integer b = 2;
@@ -89,12 +93,13 @@ class Comments {
       6 => 6 /* Saturday */
     }; /* Final map trailing block comment */
 
-    TestBatch batch = new TestBatch(
-      TestBatch.UPDATE_OPP_REC_TYPE_QUERY, // test 1
-      TestBatch.UPDATE_OPP_REC_TYPE, // test 2
-      ids, // test 3
-      lastVariable // test 4
-    );
+    TestBatch batch =
+      new TestBatch(
+        TestBatch.UPDATE_OPP_REC_TYPE_QUERY, // test 1
+        TestBatch.UPDATE_OPP_REC_TYPE, // test 2
+        ids, // test 3
+        lastVariable // test 4
+      );
   }
 
   void longChainComments() {
@@ -322,14 +327,15 @@ class Comments {
   }
 
   void commentWithSpecialCharacters() {
-    datetime inDateTime = datetime.newInstance(
-      dtEnddate.year(),
-      dtEnddate.month(),
-      dtEnddate.day(),
-      system.now().hour(),
-      system.now().minute(),
-      system.now().second() //DATETIME.VALUEOF(dtEnddate);
-    );
+    datetime inDateTime =
+      datetime.newInstance(
+        dtEnddate.year(),
+        dtEnddate.month(),
+        dtEnddate.day(),
+        system.now().hour(),
+        system.now().minute(),
+        system.now().second() //DATETIME.VALUEOF(dtEnddate);
+      );
 
     switch on s {
       when JANUARY {
@@ -702,22 +708,26 @@ class Comments {
   }
 
   void newObjectComments() {
-    SObject a = new SObject(
-      Field__c = 'Test',
-      Another_Field__c = 'Another Test' // Hello
-    );
-    SObject a = new SObject(
-      Field__c = 'Test', // Hi
-      Another_Field__c = 'Another Test' // World
-    );
-    SObject a = new SObject(
-      Field__c = 'Test',
-      Another_Field__c = 'Another Test' /* Hello */
-    );
-    SObject a = new SObject(
-      Field__c = 'Test' /* Hi */,
-      Another_Field__c = 'Another Test' /* World */
-    );
+    SObject a =
+      new SObject(
+        Field__c = 'Test',
+        Another_Field__c = 'Another Test' // Hello
+      );
+    SObject a =
+      new SObject(
+        Field__c = 'Test', // Hi
+        Another_Field__c = 'Another Test' // World
+      );
+    SObject a =
+      new SObject(
+        Field__c = 'Test',
+        Another_Field__c = 'Another Test' /* Hello */
+      );
+    SObject a =
+      new SObject(
+        Field__c = 'Test' /* Hi */,
+        Another_Field__c = 'Another Test' /* World */
+      );
   }
 
   void tryCatchComments() {
