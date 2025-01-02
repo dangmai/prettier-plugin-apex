@@ -29,7 +29,8 @@ class NewObject {
   void newSetTest() {
     Set<String> a = new Set<String>();
     Set<String> aCopy = new Set<String>(aCopy);
-    Set<String> superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak = new Set<String>();
+    Set<String> superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak =
+      new Set<String>();
     Set<String> aCopy = new Set<String>(
       veryLongVariable.getOneSet().getAnotherSet().getYetAnotherSet()
     );
@@ -53,7 +54,8 @@ class NewObject {
   void newMapTest() {
     Map<String, String> a = new Map<String, String>();
     Map<String, String> aCopy = new Map<String, String>(a);
-    Map<String, String> superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak = new Map<String, String>();
+    Map<String, String> superDuperVeryInsanelyLongVariableNameThatWillSurelyBreak =
+      new Map<String, String>();
     Map<String, String> aCopy = new Map<String, String>(
       veryLongVariable.getOneSet().getAnotherSet().getYetAnotherSet()
     );
@@ -76,11 +78,12 @@ class NewObject {
       'a' => new List<String>{ 'a', 'b' },
       'b' => new List<String>{ 'c', 'd' }
     };
-    Map<String, Decimal> fmaIntegerParameterNameDefaultValue = new Map<string, decimal>{
-      'Parameter1' => 1,
-      'Parameter2' => 0,
-      'Parameter3' => 500
-    };
+    Map<String, Decimal> fmaIntegerParameterNameDefaultValue =
+      new Map<string, decimal>{
+        'Parameter1' => 1,
+        'Parameter2' => 0,
+        'Parameter3' => 500
+      };
   }
 
   void newKeyValueTest() {

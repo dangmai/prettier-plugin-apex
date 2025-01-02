@@ -33,8 +33,17 @@ import {
 } from "./util.js";
 
 const docBuilders = prettier.doc.builders;
-const { align, join, hardline, line, softline, group, indent, dedent } =
-  docBuilders;
+const {
+  align,
+  join,
+  hardline,
+  line,
+  softline,
+  group,
+  indent,
+  dedent,
+  indentIfBreak,
+} = docBuilders;
 
 type PrintFn = (path: AstPath) => Doc;
 
@@ -1215,6 +1224,7 @@ function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
 }
 
 type AssignmentLayout =
+  | "fluid"
   | "break-after-operator"
   | "no-break-after-operator"
   | "left-doc-only";
@@ -1237,12 +1247,16 @@ function chooseAssignmentLayout(path: AstPath): AssignmentLayout {
   if (path.call(shouldHaveNoBreakAfterOperator, "assignment", "value")) {
     return "no-break-after-operator";
   }
-  return "break-after-operator";
+  if (isBinaryish(node.assignment.value)) {
+    return "break-after-operator";
+  }
+  return "fluid";
 }
 
 function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
   const layout = chooseAssignmentLayout(path);
   const leftDoc = path.call(print, "name");
+  const groupId = Symbol.for("assignment");
   switch (layout) {
     case "left-doc-only":
       return group(leftDoc);
@@ -1258,6 +1272,13 @@ function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
         " =",
         line,
         path.call(print, "assignment", "value"),
+      ]);
+    case "fluid":
+      return groupConcat([
+        leftDoc,
+        " =",
+        group(indent(line), { id: groupId }),
+        indentIfBreak(path.call(print, "assignment", "value"), { groupId }),
       ]);
   }
 }
