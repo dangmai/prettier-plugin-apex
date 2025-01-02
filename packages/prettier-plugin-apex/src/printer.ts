@@ -350,7 +350,7 @@ function handleArrayExpressionIndex(
 function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   const node = path.getNode();
   const parentNode = path.getParentNode();
-  const nodeName = path.getName();
+  const nodeName = path.key;
   const { dottedExpr } = node;
   const parts: Doc[] = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
@@ -1362,7 +1362,7 @@ function handleSuperMethodCallExpression(path: AstPath, print: PrintFn): Doc {
 function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   const node = path.getNode();
   const parentNode = path.getParentNode();
-  const nodeName = path.getName();
+  const nodeName = path.key;
   const { dottedExpr } = node;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
