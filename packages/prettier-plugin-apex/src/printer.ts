@@ -1220,6 +1220,9 @@ function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
   ) {
     return path.call(shouldHaveNoBreakAfterOperator, "dottedExpr", "value");
   }
+  if (node["@class"] === APEX_TYPES.ARRAY_EXPRESSION) {
+    return path.call(shouldHaveNoBreakAfterOperator, "expr");
+  }
   return false;
 }
 
