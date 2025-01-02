@@ -302,6 +302,21 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   if (checkIfParentIsDottedExpression(path)) {
     return true;
   }
+  // When using SOQL/SOSL expressions inside method call/variable expressions,
+  // and the the SOQL/SOSL expression breaks, we want to keep the dotted
+  // expression on the same line as the closing ] in order to save on spaces.
+  // For example:
+  // ```
+  // [
+  //   SELECT Id FROM Account
+  // ].size() <-- We want to keep the .size() on the same line as the closing ]
+  // ```
+  // The exception is if the dotted expression is a chain of method calls,
+  // in which case we do want to break. This is already taken care of by the
+  // `checkIfParentIsDottedExpression` conditional check earlier.
+  if (isSoqlOrSoslExpression(node.dottedExpr.value)) {
+    return false;
+  }
   if (
     node.dottedExpr.value &&
     node.dottedExpr.value["@class"] === APEX_TYPES.METHOD_CALL_EXPRESSION
@@ -314,7 +329,28 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
 function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
   const node = path.getNode();
   const dottedExpressionParts: Doc[] = [];
-  const dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
+  let dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
+
+  // If the dotted expression is SOQL/SOQL, the indent from the parent method call/
+  // variable expression is not needed, for example:
+  // ```
+  // Boolean a = [
+  //     SELECT Id FROM Contact // <-- notice the extra indentation here
+  // ].size()
+  // ```
+  // We want this instead:
+  // ```
+  // Boolean a = [
+  //   SELECT Id FROM Contact // <-- no extra indentation
+  // ].size()
+  // ```
+  // In this case, we will dedent that extra indent.
+  // The reason we dedent the extra indent, instead of not inserting that indent
+  // in the first place is because of easier implementation - the logic in
+  // method call/variable expression is already complex enough.
+  if (node.dottedExpr?.value && isSoqlOrSoslExpression(node.dottedExpr.value)) {
+    dottedExpressionDoc = dedent(dottedExpressionDoc);
+  }
 
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
@@ -1365,13 +1401,6 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   const nodeName = path.key;
   const { dottedExpr } = node;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
-  const isDottedExpressionSoqlOrSosl =
-    dottedExpr &&
-    dottedExpr.value &&
-    (isSoqlOrSoslExpression(dottedExpr.value) ||
-      (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-        dottedExpr.value.expr &&
-        isSoqlOrSoslExpression(dottedExpr.value.expr)));
   const isDottedExpressionThisVariableExpression =
     dottedExpr &&
     dottedExpr.value &&
@@ -1432,16 +1461,6 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
     //   .c()  // <- this node here
     //   .d()
     isParentDottedExpression ||
-    // If dotted expression is SOQL/SOQL, we shouldn't group it, otherwise there
-    // will be extraneous indentations, for example:
-    // Boolean a = [
-    //     SELECT Id FROM Contact // <-- notice the extra indentation here
-    // ].size()
-    // We want this instead:
-    // Boolean a = [
-    //   SELECT Id FROM Contact // <-- no extra indentation
-    // ].size()
-    isDottedExpressionSoqlOrSosl ||
     // If dotted expression is a `super` or `this` variable expression, we
     // know that this is only one level deep and there's no need to group, e.g:
     // `this.simpleMethod();` or `super.simpleMethod();`
