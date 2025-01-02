@@ -1365,13 +1365,13 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   const nodeName = path.key;
   const { dottedExpr } = node;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
-  const isDottedExpressionSoqlExpression =
+  const isDottedExpressionSoqlOrSosl =
     dottedExpr &&
     dottedExpr.value &&
-    (dottedExpr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (isSoqlOrSoslExpression(dottedExpr.value) ||
       (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
         dottedExpr.value.expr &&
-        dottedExpr.value.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION));
+        isSoqlOrSoslExpression(dottedExpr.value.expr)));
   const isDottedExpressionThisVariableExpression =
     dottedExpr &&
     dottedExpr.value &&
@@ -1432,14 +1432,16 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
     //   .c()  // <- this node here
     //   .d()
     isParentDottedExpression ||
-    // If dotted expression is SOQL and this in inside a binaryish expression,
-    // we shouldn't group it, otherwise there will be extraneous indentations,
-    // for example:
-    // Boolean a =
-    //   [
-    //     SELECT Id FROM Contact
-    //   ].size() > 0
-    (isDottedExpressionSoqlExpression && isBinaryish(parentNode)) ||
+    // If dotted expression is SOQL/SOQL, we shouldn't group it, otherwise there
+    // will be extraneous indentations, for example:
+    // Boolean a = [
+    //     SELECT Id FROM Contact // <-- notice the extra indentation here
+    // ].size()
+    // We want this instead:
+    // Boolean a = [
+    //   SELECT Id FROM Contact // <-- no extra indentation
+    // ].size()
+    isDottedExpressionSoqlOrSosl ||
     // If dotted expression is a `super` or `this` variable expression, we
     // know that this is only one level deep and there's no need to group, e.g:
     // `this.simpleMethod();` or `super.simpleMethod();`

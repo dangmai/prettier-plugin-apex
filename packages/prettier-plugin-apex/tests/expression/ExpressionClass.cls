@@ -266,8 +266,13 @@ class Conditional extends Object {
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod();
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [SELECT Id FROM Account].callMethod().callAnotherMethod('first param', 'second param', 'thirdParam', 'fourthParam', 'fifthParam', 'sixthParam');
 
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size();
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
+
+    Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size();
+    Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size() > 0;
+    Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][0].size() > 0;
   }
 
   void javaMethodCallExpression_notNeeded() {}
