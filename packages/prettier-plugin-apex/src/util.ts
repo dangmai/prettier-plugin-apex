@@ -92,10 +92,10 @@ export function checkIfParentIsDottedExpression(path: AstPath): boolean {
   let parentNodeName;
   let grandParentNodeName;
   path.callParent((innerPath) => {
-    parentNodeName = innerPath.getName();
+    parentNodeName = innerPath.key;
   });
   path.callParent((innerPath) => {
-    grandParentNodeName = innerPath.getName();
+    grandParentNodeName = innerPath.key;
   }, 1);
   if (parentNodeName === "dottedExpr") {
     result = true;

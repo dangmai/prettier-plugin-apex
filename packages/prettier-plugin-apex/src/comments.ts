@@ -80,7 +80,7 @@ export function printDanglingComment(
   const sourceCode = options.originalText;
   const comment = commentPath.getNode();
   const loc = comment.location;
-  const isFirstComment = commentPath.getName() === 0;
+  const isFirstComment = commentPath.index === 0;
   const parts = [];
 
   let fromPos = skipWhitespace(sourceCode, loc.startIndex - 1, {
