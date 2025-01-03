@@ -242,6 +242,14 @@ class Conditional extends Object {
       'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
     );
 
+    // The following two lines are parsed differently by jorje.
+    // They're both variable declaration, but the method call expressions are different.
+    // The first one is a method call with 3 names: anotherVariableName, VeryLongPropertyMember, and get.
+    // The second one is a method call with 1 name: get, and the other arguments are turned into variable expressions.
+    // Because of that, the first one is not broken after format, but the second one is.
+    // The second one gets formatted similarly to the issue #69, however, it
+    // is not a bug because the only way it gets formatted that way is if the
+    // user adds the newlines themselves.
     VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable.veryLongPropertyMember.get(accountId);
     VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable
       .veryLongPropertyMember

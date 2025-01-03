@@ -1227,7 +1227,7 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
   // Variable declarations
   const declarationDocs: Doc[] = path.map(print, "decls");
   if (declarationDocs.length > 1) {
-    parts.push(indentConcat([join([",", line], declarationDocs)]));
+    parts.push(indent(join([",", line], declarationDocs)));
     parts.push(";");
   } else if (declarationDocs.length === 1 && declarationDocs[0] !== undefined) {
     parts.push([declarationDocs[0], ";"]);

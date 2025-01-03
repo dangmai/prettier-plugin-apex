@@ -7,6 +7,10 @@ public class VariableDeclaration {
       anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'a';
     String veryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'veryLongValueThatShouldBreak',
       anotherVeryLongVariableNameThatByItselfIsAlreadyABitTooMuch = 'anotherVeryLongValueThatShouldBreak';
+    Contact b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'],
+      a = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'];
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size(),
+      a = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size();
     String c = 'c';
     String d = 'd';
     String e = c, d = a;
