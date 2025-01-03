@@ -55,7 +55,7 @@ export function isBinaryish(node: jorje.Expr): boolean {
   );
 }
 
-export function isSoqlOrSoslExpression(path: AstPath): boolean {
+export function isPathSoqlOrSoslExpression(path: AstPath): boolean {
   const node = path.getNode();
   if (!node) {
     return false;
@@ -81,7 +81,7 @@ export function isApexDocComment(comment: jorje.BlockComment): boolean {
   );
 }
 
-export function checkIfParentIsDottedExpression(path: AstPath): boolean {
+export function isParentPathDottedExpression(path: AstPath): boolean {
   const node = path.getNode();
   const parentNode = path.getParentNode();
 

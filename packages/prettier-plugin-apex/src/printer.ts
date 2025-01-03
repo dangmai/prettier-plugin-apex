@@ -25,11 +25,11 @@ import {
 import { EnrichedIfBlock } from "./parser.js";
 import {
   AnnotatedComment,
-  checkIfParentIsDottedExpression,
   getParentType,
   getPrecedence,
   isBinaryish,
-  isSoqlOrSoslExpression,
+  isParentPathDottedExpression,
+  isPathSoqlOrSoslExpression,
 } from "./util.js";
 
 const docBuilders = prettier.doc.builders;
@@ -142,7 +142,7 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
   const isRightExpressionSoqlOrSosl = path.call(
-    isSoqlOrSoslExpression,
+    isPathSoqlOrSoslExpression,
     "right",
   );
 
@@ -302,7 +302,7 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   if (node["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION) {
     return true;
   }
-  if (checkIfParentIsDottedExpression(path)) {
+  if (isParentPathDottedExpression(path)) {
     return true;
   }
   // When using SOQL/SOSL expressions inside method call/variable expressions,
@@ -317,7 +317,7 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   // The exception is if the dotted expression is a chain of method calls,
   // in which case we do want to break. This is already taken care of by the
   // `checkIfParentIsDottedExpression` conditional check earlier.
-  if (path.call(isSoqlOrSoslExpression, "dottedExpr", "value")) {
+  if (path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value")) {
     return false;
   }
   if (
@@ -329,7 +329,7 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   return node.dottedExpr.value;
 }
 
-function isArrayExpressionWithSoqlOrSosl(path: AstPath): boolean {
+function isPathArrayExpressionWithSoqlOrSosl(path: AstPath): boolean {
   const node = path.getNode();
   if (!node) {
     return false;
@@ -337,10 +337,10 @@ function isArrayExpressionWithSoqlOrSosl(path: AstPath): boolean {
   if (node["@class"] !== APEX_TYPES.ARRAY_EXPRESSION) {
     return false;
   }
-  if (path.call(isSoqlOrSoslExpression, "expr")) {
+  if (path.call(isPathSoqlOrSoslExpression, "expr")) {
     return true;
   }
-  return path.call(isArrayExpressionWithSoqlOrSosl, "expr");
+  return path.call(isPathArrayExpressionWithSoqlOrSosl, "expr");
 }
 
 function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
@@ -366,8 +366,8 @@ function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
   // in the first place is because of easier implementation - the logic in
   // method call/variable expression is already complex enough.
   if (
-    path.call(isSoqlOrSoslExpression, "dottedExpr", "value") ||
-    path.call(isArrayExpressionWithSoqlOrSosl, "dottedExpr", "value")
+    path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value") ||
+    path.call(isPathArrayExpressionWithSoqlOrSosl, "dottedExpr", "value")
   ) {
     dottedExpressionDoc = dedent(dottedExpressionDoc);
   }
@@ -410,7 +410,7 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   const { dottedExpr } = node;
   const parts: Doc[] = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
-  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const isParentDottedExpression = isParentPathDottedExpression(path);
   const isDottedExpressionSoqlExpression =
     dottedExpr &&
     dottedExpr.value &&
@@ -1264,7 +1264,7 @@ function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
   if (!node) {
     return false;
   }
-  if (path.call(isSoqlOrSoslExpression)) {
+  if (path.call(isPathSoqlOrSoslExpression)) {
     return true;
   }
   if (isBinaryish(node)) {
@@ -1420,7 +1420,7 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   const parentNode = path.getParentNode();
   const nodeName = path.key;
   const { dottedExpr } = node;
-  const isParentDottedExpression = checkIfParentIsDottedExpression(path);
+  const isParentDottedExpression = isParentPathDottedExpression(path);
   const isDottedExpressionThisVariableExpression =
     dottedExpr &&
     dottedExpr.value &&
