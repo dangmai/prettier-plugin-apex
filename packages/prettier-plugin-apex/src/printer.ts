@@ -346,31 +346,7 @@ function isPathArrayExpressionWithSoqlOrSosl(path: AstPath): boolean {
 function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
   const node = path.getNode();
   const dottedExpressionParts: Doc[] = [];
-  let dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
-
-  // If the dotted expression is SOQL/SOQL, the indent from the parent method call/
-  // variable expression is not needed, for example:
-  // ```
-  // Boolean a = [
-  //     SELECT Id FROM Contact // <-- notice the extra indentation here
-  // ].size()
-  // ```
-  // We want this instead:
-  // ```
-  // Boolean a = [
-  //   SELECT Id FROM Contact // <-- no extra indentation
-  // ].size()
-  // ```
-  // In this case, we will dedent that extra indent.
-  // The reason we dedent the extra indent, instead of not inserting that indent
-  // in the first place is because of easier implementation - the logic in
-  // method call/variable expression is already complex enough.
-  if (
-    path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value") ||
-    path.call(isPathArrayExpressionWithSoqlOrSosl, "dottedExpr", "value")
-  ) {
-    dottedExpressionDoc = dedent(dottedExpressionDoc);
-  }
+  const dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
 
   if (dottedExpressionDoc) {
     dottedExpressionParts.push(dottedExpressionDoc);
@@ -1421,6 +1397,9 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   const nodeName = path.key;
   const { dottedExpr } = node;
   const isParentDottedExpression = isParentPathDottedExpression(path);
+  const isDottedExpressionSoqlOrSosl =
+    path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value") ||
+    path.call(isPathArrayExpressionWithSoqlOrSosl, "dottedExpr", "value");
   const isDottedExpressionThisVariableExpression =
     dottedExpr &&
     dottedExpr.value &&
@@ -1481,6 +1460,20 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
     //   .c()  // <- this node here
     //   .d()
     isParentDottedExpression ||
+    // If dotted expression is SOQL/SOQL, we shouldn't group it, otherwise there
+    // will be extraneous indentations, for example:
+    // ```
+    // Boolean a = [
+    //     SELECT Id FROM Contact // <-- notice the extra indentation here
+    // ].size()
+    // ```
+    // We want this instead:
+    // ```
+    // Boolean a = [
+    //   SELECT Id FROM Contact // <-- no extra indentation
+    // ].size()
+    // ```
+    isDottedExpressionSoqlOrSosl ||
     // If dotted expression is a `super` or `this` variable expression, we
     // know that this is only one level deep and there's no need to group, e.g:
     // `this.simpleMethod();` or `super.simpleMethod();`
