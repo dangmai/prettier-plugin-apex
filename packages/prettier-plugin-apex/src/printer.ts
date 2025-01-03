@@ -141,7 +141,10 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const isNestedExpression = isBinaryish(parentNode);
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
-  const isRightExpressionSoqlOrSosl = isSoqlOrSoslExpression(node.right);
+  const isRightExpressionSoqlOrSosl = path.call(
+    isSoqlOrSoslExpression,
+    "right",
+  );
 
   const isNodeSamePrecedenceAsLeftChild =
     isLeftNodeBinaryish &&
@@ -314,7 +317,7 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   // The exception is if the dotted expression is a chain of method calls,
   // in which case we do want to break. This is already taken care of by the
   // `checkIfParentIsDottedExpression` conditional check earlier.
-  if (isSoqlOrSoslExpression(node.dottedExpr.value)) {
+  if (path.call(isSoqlOrSoslExpression, "dottedExpr", "value")) {
     return false;
   }
   if (
@@ -324,6 +327,20 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
     return true;
   }
   return node.dottedExpr.value;
+}
+
+function isArrayExpressionWithSoqlOrSosl(path: AstPath): boolean {
+  const node = path.getNode();
+  if (!node) {
+    return false;
+  }
+  if (node["@class"] !== APEX_TYPES.ARRAY_EXPRESSION) {
+    return false;
+  }
+  if (path.call(isSoqlOrSoslExpression, "expr")) {
+    return true;
+  }
+  return path.call(isArrayExpressionWithSoqlOrSosl, "expr");
 }
 
 function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
@@ -348,7 +365,10 @@ function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
   // The reason we dedent the extra indent, instead of not inserting that indent
   // in the first place is because of easier implementation - the logic in
   // method call/variable expression is already complex enough.
-  if (node.dottedExpr?.value && isSoqlOrSoslExpression(node.dottedExpr.value)) {
+  if (
+    path.call(isSoqlOrSoslExpression, "dottedExpr", "value") ||
+    path.call(isArrayExpressionWithSoqlOrSosl, "dottedExpr", "value")
+  ) {
     dottedExpressionDoc = dedent(dottedExpressionDoc);
   }
 
@@ -1244,7 +1264,7 @@ function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
   if (!node) {
     return false;
   }
-  if (isSoqlOrSoslExpression(node)) {
+  if (path.call(isSoqlOrSoslExpression)) {
     return true;
   }
   if (isBinaryish(node)) {

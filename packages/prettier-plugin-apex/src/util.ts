@@ -55,7 +55,11 @@ export function isBinaryish(node: jorje.Expr): boolean {
   );
 }
 
-export function isSoqlOrSoslExpression(node: jorje.Expr): boolean {
+export function isSoqlOrSoslExpression(path: AstPath): boolean {
+  const node = path.getNode();
+  if (!node) {
+    return false;
+  }
   return (
     node["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
     node["@class"] === APEX_TYPES.SOSL_EXPRESSION

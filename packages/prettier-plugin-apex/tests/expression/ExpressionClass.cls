@@ -271,26 +271,42 @@ class Conditional extends Object {
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size().size().size().size();
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
+    Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
 
     b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size();
+    b = [SELECT Id FROM Contact].size().size().size().size().size().size();
+    b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size().size().size().size();
     b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
     b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
+    b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
 
     [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size();
+    [SELECT Id FROM Contact].size().size().size().size().size().size();
+    [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size().size().size().size();
     [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
     [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
+    [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
 
     Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size();
+    Boolean b = [Find '' IN ALL FIELDS].size().size().size().size().size();
+    Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size().size().size().size();
     Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size() > 0;
     Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][0].size() > 0;
+    Boolean b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
 
     b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size();
+    b = [Find '' IN ALL FIELDS].size().size().size().size().size();
+    b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size().size().size().size();
     b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size() > 0;
     b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][0].size() > 0;
+    b = [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
 
     [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size();
+    [Find '' IN ALL FIELDS].size().size().size().size().size();
+    [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size().size().size().size();
     [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS].size() > 0;
     [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][0].size() > 0;
+    [FIND 'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent' IN ALL FIELDS][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
   }
 
   void javaMethodCallExpression_notNeeded() {}
