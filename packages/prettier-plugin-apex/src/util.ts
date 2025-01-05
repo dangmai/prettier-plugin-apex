@@ -66,6 +66,32 @@ export function isPathSoqlOrSoslExpression(path: AstPath): boolean {
   );
 }
 
+export function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
+  const node = path.getNode();
+  if (!node) {
+    return false;
+  }
+  if (path.call(isPathSoqlOrSoslExpression)) {
+    return true;
+  }
+  if (isBinaryish(node)) {
+    return path.call(shouldHaveNoBreakAfterOperator, "left");
+  }
+  if (
+    node["@class"] === APEX_TYPES.METHOD_CALL_EXPRESSION ||
+    node["@class"] === APEX_TYPES.VARIABLE_EXPRESSION
+  ) {
+    return path.call(shouldHaveNoBreakAfterOperator, "dottedExpr", "value");
+  }
+  if (
+    node["@class"] === APEX_TYPES.ARRAY_EXPRESSION ||
+    node["@class"] === APEX_TYPES.SWITCH_STATEMENT
+  ) {
+    return path.call(shouldHaveNoBreakAfterOperator, "expr");
+  }
+  return false;
+}
+
 /**
  * Check if this comment is an ApexDoc-style comment.
  * This code is straight from prettier JSDoc detection.
