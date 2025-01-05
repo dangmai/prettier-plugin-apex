@@ -349,7 +349,7 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
 // In this case, we will dedent that extra indent.
 // The reason we dedent the extra indent, instead of not inserting that indent
 // in the first place is because of easier implementation - a method call/
-// assignment expression is "inverted" compared to how we usually format code:
+// variable expression is "inverted" compared to how we usually format code:
 // In the example above, the SOQL dotted expression is a child of the method
 // call expression. In the "usual" way of formatting, the parent would give
 // the child the indent, but in order to prevent the extra indent, we would
@@ -364,7 +364,7 @@ function shouldDottedExpressionDedent(path: AstPath): boolean {
     return false;
   }
   const isNodeSoqlOrSoslExpression = path.call(isPathSoqlOrSoslExpression);
-  if (isNodeSoqlOrSoslExpression && node.insideAssignment) {
+  if (isNodeSoqlOrSoslExpression) {
     return true;
   }
   if (node["@class"] !== APEX_TYPES.ARRAY_EXPRESSION) {
