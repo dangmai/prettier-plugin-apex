@@ -363,8 +363,16 @@ function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
   // ```
   // In this case, we will dedent that extra indent.
   // The reason we dedent the extra indent, instead of not inserting that indent
-  // in the first place is because of easier implementation - the logic in
-  // method call/variable expression is already complex enough.
+  // in the first place is because of easier implementation - a method call/
+  // assignment expression is "inverted" compared to how we usually format code:
+  // In the example above, the SOQL dotted expression is a child of the method
+  // call expression. In the "usual" way of formatting, the parent would give
+  // the child the indent, but in order to prevent the extra indent, we would
+  // need the child to give the parent the indent.
+  // This is more difficult to do, although it is the way Prettier core does it:
+  // https://github.com/prettier/prettier/blob/eed53fc29a36a0d045a3768e1aba2f61cb5b593a/src/language-js/print/member-chain.js
+  // I have tried this method a few times and always ran into deadends,
+  // so for now I am sticking with the workaround method.
   if (
     path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value") ||
     path.call(isPathArrayExpressionWithSoqlOrSosl, "dottedExpr", "value")
