@@ -15,7 +15,10 @@ class Conditional extends Object {
     if (i >>>= j) {}
 
     [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Name = 'Hello';
+
     [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() - 1;
+
+    [SELECT Id, Name FROM Account WHERE Name = 'Super Long Id That Will Break On Its Own'].Name = [SELECT Id, Name FROM Account WHERE Name = 'Super Long Name That Will Break On Its Own'].Name;
   }
 
   void ternaryExpression() {
