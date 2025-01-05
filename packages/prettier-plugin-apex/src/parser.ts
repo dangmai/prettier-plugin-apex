@@ -456,6 +456,7 @@ export type EnrichedIfBlock = jorje.IfBlock & {
 type MetadataVisitorContext = {
   allowTrailingEmptyLine: boolean;
   arraySiblings?: any[];
+  insideAssignment: boolean;
 };
 const metadataVisitor: (
   emptyLineLocations: number[],
@@ -538,6 +539,15 @@ const metadataVisitor: (
         node.trailingEmptyLine = true;
       }
     }
+    if (
+      context?.insideAssignment &&
+      (apexClass === APEX_TYPES.SOQL_EXPRESSION ||
+        apexClass === APEX_TYPES.SOSL_EXPRESSION)
+    ) {
+      // handleDottedExpr uses this property to know whether to dedent a SOQL/SOSL
+      // expression
+      node.insideAssignment = true;
+    }
   },
   gatherChildrenContext: (node, currentContext) => {
     const apexClass = node["@class"];
@@ -560,9 +570,14 @@ const metadataVisitor: (
     if (Array.isArray(node) && node.length > 0) {
       arraySiblings = node;
     }
+    const insideAssignment =
+      currentContext?.insideAssignment ||
+      apexClass === APEX_TYPES.ASSIGNMENT_EXPRESSION ||
+      apexClass === APEX_TYPES.VARIABLE_DECLARATION;
     return {
       allowTrailingEmptyLine: allowTrailingEmptyLineWithin,
       arraySiblings,
+      insideAssignment,
     };
   },
 });

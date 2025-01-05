@@ -329,18 +329,44 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   return node.dottedExpr.value;
 }
 
-function isPathArrayExpressionWithSoqlOrSosl(path: AstPath): boolean {
+// If the dotted expression is SOQL/SOQL, the indent from the parent method call/
+// variable expression is not needed, for example:
+// ```
+// Boolean a = [
+//     SELECT Id FROM Contact // <-- notice the extra indentation here
+// ].size()
+// ```
+// We want this instead:
+// ```
+// Boolean a = [
+//   SELECT Id FROM Contact // <-- no extra indentation
+// ].size()
+// ```
+// In this case, we will dedent that extra indent.
+// The reason we dedent the extra indent, instead of not inserting that indent
+// in the first place is because of easier implementation - a method call/
+// assignment expression is "inverted" compared to how we usually format code:
+// In the example above, the SOQL dotted expression is a child of the method
+// call expression. In the "usual" way of formatting, the parent would give
+// the child the indent, but in order to prevent the extra indent, we would
+// need the child to give the parent the indent.
+// This is more difficult to do, although it is the way Prettier core does it:
+// https://github.com/prettier/prettier/blob/eed53fc29a36a0d045a3768e1aba2f61cb5b593a/src/language-js/print/member-chain.js
+// I have tried this method a few times and always ran into deadends,
+// so for now I am sticking with the workaround method.
+function shouldDottedExpressionDedent(path: AstPath): boolean {
   const node = path.getNode();
   if (!node) {
     return false;
   }
+  const isNodeSoqlOrSoslExpression = path.call(isPathSoqlOrSoslExpression);
+  if (isNodeSoqlOrSoslExpression && node.insideAssignment) {
+    return true;
+  }
   if (node["@class"] !== APEX_TYPES.ARRAY_EXPRESSION) {
     return false;
   }
-  if (path.call(isPathSoqlOrSoslExpression, "expr")) {
-    return true;
-  }
-  return path.call(isPathArrayExpressionWithSoqlOrSosl, "expr");
+  return path.call(shouldDottedExpressionDedent, "expr");
 }
 
 function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
@@ -348,35 +374,7 @@ function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
   const dottedExpressionParts: Doc[] = [];
   let dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
 
-  // If the dotted expression is SOQL/SOQL, the indent from the parent method call/
-  // variable expression is not needed, for example:
-  // ```
-  // Boolean a = [
-  //     SELECT Id FROM Contact // <-- notice the extra indentation here
-  // ].size()
-  // ```
-  // We want this instead:
-  // ```
-  // Boolean a = [
-  //   SELECT Id FROM Contact // <-- no extra indentation
-  // ].size()
-  // ```
-  // In this case, we will dedent that extra indent.
-  // The reason we dedent the extra indent, instead of not inserting that indent
-  // in the first place is because of easier implementation - a method call/
-  // assignment expression is "inverted" compared to how we usually format code:
-  // In the example above, the SOQL dotted expression is a child of the method
-  // call expression. In the "usual" way of formatting, the parent would give
-  // the child the indent, but in order to prevent the extra indent, we would
-  // need the child to give the parent the indent.
-  // This is more difficult to do, although it is the way Prettier core does it:
-  // https://github.com/prettier/prettier/blob/eed53fc29a36a0d045a3768e1aba2f61cb5b593a/src/language-js/print/member-chain.js
-  // I have tried this method a few times and always ran into deadends,
-  // so for now I am sticking with the workaround method.
-  if (
-    path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value") ||
-    path.call(isPathArrayExpressionWithSoqlOrSosl, "dottedExpr", "value")
-  ) {
+  if (path.call(shouldDottedExpressionDedent, "dottedExpr", "value")) {
     dottedExpressionDoc = dedent(dottedExpressionDoc);
   }
 
