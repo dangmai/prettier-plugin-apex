@@ -64,6 +64,15 @@ class LoopClass {
     for (Contact a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello']) {
       System.debug(a);
     }
+    for (String[] a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello'].SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong) {
+      System.debug(a);
+    }
+    for (String[] a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello'].SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.Method().Method()) {
+      System.debug(a);
+    }
+    for (String[] a: [SELECT Id, Name, Description, Birthdate FROM Contact WHERE Id != NULL AND Name != 'Hello'].SomethingSuperLong().SomethingSuperLong()) {
+      System.debug(a);
+    }
   }
 
   void forSosl() {
@@ -86,6 +95,24 @@ class LoopClass {
       FIND 'Just Barely Out Of Space For This Line'
       IN ALL FIELDS
     ]) {
+      System.debug(a);
+    }
+    for (SObject[] a: [
+      FIND 'Just Barely Out Of Space For This Line'
+      IN ALL FIELDS
+    ].SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong) {
+      System.debug(a);
+    }
+    for (SObject[] a: [
+      FIND 'Just Barely Out Of Space For This Line'
+      IN ALL FIELDS
+    ].SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.SomethingSuperLong.Method().Method()) {
+      System.debug(a);
+    }
+    for (SObject[] a: [
+      FIND 'Just Barely Out Of Space For This Line'
+      IN ALL FIELDS
+    ].SomethingSuperLong().SomethingSuperLong()) {
       System.debug(a);
     }
   }
