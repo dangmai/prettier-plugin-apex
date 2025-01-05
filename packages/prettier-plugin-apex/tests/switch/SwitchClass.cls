@@ -82,6 +82,15 @@ class SwitchClass {
         System.debug('Everything Else');
       }
     }
+
+    switch on [SELECT Id, Name FROM Contact WHERE Name = 'Super Long Name That Will Break The Line' LIMIT 1].size() {
+      when 0 {
+        System.debug('Test Name');
+      }
+      when else {
+        System.debug('Everything Else');
+      }
+    }
   }
 }
 
