@@ -299,7 +299,10 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   if (node.dottedExpr.value["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION) {
     return false;
   }
-  if (node["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION) {
+  if (
+    node["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION &&
+    node["@class"] !== APEX_TYPES.VARIABLE_EXPRESSION
+  ) {
     return true;
   }
   if (isParentPathDottedExpression(path)) {
@@ -410,20 +413,11 @@ function handleArrayExpressionIndex(
 }
 
 function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
   const parentNode = path.getParentNode();
   const nodeName = path.key;
-  const { dottedExpr } = node;
   const parts: Doc[] = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = isParentPathDottedExpression(path);
-  const isDottedExpressionSoqlExpression =
-    dottedExpr &&
-    dottedExpr.value &&
-    (dottedExpr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-      (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-        dottedExpr.value.expr &&
-        dottedExpr.value.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION));
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -458,7 +452,7 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
       parts.push(handleArrayExpressionIndex(innerPath, print, withGroup));
     });
   }
-  if (isParentDottedExpression || isDottedExpressionSoqlExpression) {
+  if (isParentDottedExpression) {
     return parts;
   }
   return groupIndentConcat(parts);

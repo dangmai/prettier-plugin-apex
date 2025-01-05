@@ -29,8 +29,7 @@ class SafeNavigationOperator {
       SELECT BillingCity
       FROM Account
       WHERE Id = '001xx000000001oAAA'
-    ]
-    ?.BillingCity;
+    ]?.BillingCity;
     System.debug(
       'Matches count: ' + city?.countMatches('San Francisco') ?? 100000000
     );

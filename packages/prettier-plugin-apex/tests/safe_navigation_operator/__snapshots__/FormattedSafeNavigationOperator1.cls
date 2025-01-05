@@ -16,7 +16,6 @@ class SafeNavigationOperator {
       SELECT Id, Name, One_Field__c, Another_Field__c
       FROM Account
       WHERE Id = :accId
-    ]
-    ?.Name;
+    ]?.Name;
   }
 }
