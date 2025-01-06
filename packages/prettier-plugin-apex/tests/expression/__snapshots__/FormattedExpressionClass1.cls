@@ -29,14 +29,23 @@ class Conditional extends Object {
       SELECT Id
       FROM Contact
       WHERE Name = 'Super Long Name That Will Break On Its Own'
-    ]
-    .Name = 'Hello';
+    ].Name = 'Hello';
+
     [
       SELECT Id
       FROM Contact
       WHERE Name = 'Super Long Name That Will Break On Its Own'
-    ]
-    .size() - 1;
+    ].size() - 1;
+
+    [
+      SELECT Id, Name
+      FROM Account
+      WHERE Name = 'Super Long Id That Will Break On Its Own'
+    ].Name = [
+      SELECT Id, Name
+      FROM Account
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].Name;
   }
 
   void ternaryExpression() {
@@ -113,21 +122,24 @@ class Conditional extends Object {
 
     Id b = (Id) a;
     Schema.SObjectType sobjectType = ((Id) a).getSObjectType();
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(
-      anotherVariableName.Very_Long_Property_Meber__c,
-      VeryLongOuterClassName.VeryLongInnerClassName.class
-    );
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(
-      anotherVariableName.Very_Long_Property_Meber__c,
-      VeryLongOuterClassName.VeryLongInnerClassName.class
-    );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(
+        anotherVariableName.Very_Long_Property_Meber__c,
+        VeryLongOuterClassName.VeryLongInnerClassName.class
+      );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      (VeryLongOuterClassName.VeryLongInnerClassName) JSON.deserialize(
+        anotherVariableName.Very_Long_Property_Meber__c,
+        VeryLongOuterClassName.VeryLongInnerClassName.class
+      );
   }
 
   void instanceOfExpression() {
     SObject o;
     Boolean b = o instanceof Account;
-    Boolean b = veryLongVariableNameThatWillForSureOneHundredPercentBreak.getMethod()
-      .getSObject() instanceof Account;
+    Boolean b =
+      veryLongVariableNameThatWillForSureOneHundredPercentBreak.getMethod()
+        .getSObject() instanceof Account;
   }
 
   void booleanExpression() {
@@ -233,20 +245,16 @@ class Conditional extends Object {
       (anExtremelyVeryLongVariable > anotherVeryLongVariable) ==
       (anExtremelyVeryLongVariable < anotherVeryLongVariable);
 
-    Boolean b =
-      [
-        SELECT Id
-        FROM Contact
-        WHERE Name = 'Super Long Name That Will Break On Its Own'
-      ]
-      .Id != null;
-    Boolean b =
-      [
-        SELECT Id
-        FROM Contact
-        WHERE Name = 'Super Long Name That Will Break On Its Own'
-      ][0]
-      .Id != null;
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].Id != null;
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][0].Id != null;
   }
 
   void triggerVariableExpr_inOtherSuite() {
@@ -279,7 +287,8 @@ class Conditional extends Object {
   void arrayExpression() {
     Integer[] a = new List<Integer>{ 1, 2, 3, 4 };
     Integer b;
-    Integer veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay = 1;
+    Integer veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay =
+      1;
 
     b = a[0];
     b = a[a[0]];
@@ -288,10 +297,12 @@ class Conditional extends Object {
         veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
       ]
     ];
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0];
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions[
-      veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
-    ];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      controller.systemStatusOptions[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      controller.propertyMember.systemStatusOptions[
+        veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
+      ];
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
       .propertyMember.systemStatusOptions[
         a[
@@ -304,10 +315,12 @@ class Conditional extends Object {
       veryLongNumberThatMayExceedsTheLongestLineOwnItsOwnWithoutAnythingElseInTheWay
     ];
 
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions()[0];
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.propertyMember.systemStatusOptions()[
-      veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
-    ];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      controller.systemStatusOptions()[0];
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      controller.propertyMember.systemStatusOptions()[
+        veryLongVariableThatWillBreakForSureWithoutAnyOtherElementAffectingIt
+      ];
     VeryLongOuterClassName.VeryLongInnerClassName variableName = controller
       .propertyMember.systemStatusOptions()[
         a[
@@ -321,7 +334,8 @@ class Conditional extends Object {
     ];
 
     b = 'String Literal'[0];
-    b = 'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[0];
+    b =
+      'Very Long String Literal That Will Break The Line For Sure Without Help From Any Other Element'[0];
 
     String longResult = o[0].callMethod('first param');
     String longResult = o[0]
@@ -340,11 +354,15 @@ class Conditional extends Object {
     Integer a = 1;
     Integer b = 2;
     Integer c = a + b;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.getSObjectFields()
-      .Another_Very_Long_SObject_Field_Name__c;
-    longVariableName.veryLongVariableNameThatShouldNotBeBroken = veryLongVariableName.handleSomeMethod();
-    longVariableName.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable = veryLongVariableName.handleSomeMethod();
+    longVariableName.Very_Long_SObject_Field_Name__c =
+      longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c =
+      longVariableName.getSObjectFields()
+        .Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.veryLongVariableNameThatShouldNotBeBroken =
+      veryLongVariableName.handleSomeMethod();
+    longVariableName.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable =
+      veryLongVariableName.handleSomeMethod();
   }
 
   void methodCallExpression() {
@@ -410,14 +428,21 @@ class Conditional extends Object {
       'A Super Long String That Will Break The Outer Parent And Lead To Complicated Result'
     );
 
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable.veryLongPropertyMember.get(
-      accountId
-    );
+    // The following two lines are parsed differently by jorje.
+    // They're both variable declaration, but the method call expressions are different.
+    // The first one is a method call with 3 names: anotherVariableName, VeryLongPropertyMember, and get.
+    // The second one is a method call with 1 name: get, and the other arguments are turned into variable expressions.
+    // Because of that, the first one is not broken after format, but the second one is.
+    // The second one gets formatted similarly to the issue #69, however, it
+    // is not a bug because the only way it gets formatted that way is if the
+    // user adds the newlines themselves.
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      anotherVariable.veryLongPropertyMember.get(accountId);
     VeryLongOuterClassName.VeryLongInnerClassName variableName = anotherVariable
       .veryLongPropertyMember
       .get(accountId);
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = controller.systemStatusOptions[0]
-      .getValue();
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      controller.systemStatusOptions[0].getValue();
     variableName.propertyName.add(
       new InnerClass(
         objectBuilder
@@ -427,8 +452,8 @@ class Conditional extends Object {
           .callYetAnotherYetAnotherMethod(Date.today())
       )
     );
-    variableName.propertyMember.get('Name')
-      .status = variableName.propertyOptions[0].getValue();
+    variableName.propertyMember.get('Name').status =
+      variableName.propertyOptions[0].getValue();
     a = b.c()
       .d(
         'first param',
@@ -438,29 +463,31 @@ class Conditional extends Object {
         'fifthParam',
         'sixthParam'
       );
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure.deserialize(
-      anotherVariableName.Very_Long_Property_Member__c,
-      VeryLongOuterClassName.VeryLongInnerClassName.class
-    );
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatWillBreakForSure
-      .deserialize(
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      superDuperLongVariableNameThatWillBreakForSure.deserialize(
         anotherVariableName.Very_Long_Property_Member__c,
         VeryLongOuterClassName.VeryLongInnerClassName.class
       );
-    VeryLongOuterClassName.VeryLongInnerClassName variableName = superDuperLongVariableNameThatIsAMethodThatWillBreakForSure(
-      anotherVariableName.Very_Long_Property_Member__c,
-      VeryLongOuterClassName.VeryLongInnerClassName.class
-    );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      superDuperLongVariableNameThatWillBreakForSure
+        .deserialize(
+          anotherVariableName.Very_Long_Property_Member__c,
+          VeryLongOuterClassName.VeryLongInnerClassName.class
+        );
+    VeryLongOuterClassName.VeryLongInnerClassName variableName =
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSure(
+        anotherVariableName.Very_Long_Property_Member__c,
+        VeryLongOuterClassName.VeryLongInnerClassName.class
+      );
 
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [
-        SELECT Id
-        FROM Account
-      ]
-      .callMethod();
+      SELECT Id
+      FROM Account
+    ].callMethod();
     VeryLongOuterClassName.VeryLongInnerClassName variableName = [
-        SELECT Id
-        FROM Account
-      ]
+      SELECT Id
+      FROM Account
+    ]
       .callMethod()
       .callAnotherMethod(
         'first param',
@@ -471,20 +498,209 @@ class Conditional extends Object {
         'sixthParam'
       );
 
-    Boolean b =
-      [
-        SELECT Id
-        FROM Contact
-        WHERE Name = 'Super Long Name That Will Break On Its Own'
-      ]
-      .size() > 0;
-    Boolean b =
-      [
-        SELECT Id
-        FROM Contact
-        WHERE Name = 'Super Long Name That Will Break On Its Own'
-      ][0]
-      .size() > 0;
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].size();
+    Boolean b = [SELECT Id FROM Contact]
+      .size()
+      .size()
+      .size()
+      .size()
+      .size()
+      .size();
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ]
+      .size()
+      .size()
+      .size()
+      .size();
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].size() > 0;
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][0].size() > 0;
+    Boolean b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger
+    ].size() > 0;
+
+    b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].size();
+    b = [SELECT Id FROM Contact].size().size().size().size().size().size();
+    b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ]
+      .size()
+      .size()
+      .size()
+      .size();
+    b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].size() > 0;
+    b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][0].size() > 0;
+    b = [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger
+    ].size() > 0;
+
+    [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].size();
+    [SELECT Id FROM Contact].size().size().size().size().size().size();
+    [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ]
+      .size()
+      .size()
+      .size()
+      .size();
+    [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ].size() > 0;
+    [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][0].size() > 0;
+    [
+      SELECT Id
+      FROM Contact
+      WHERE Name = 'Super Long Name That Will Break On Its Own'
+    ][
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger
+    ].size() > 0;
+
+    Boolean b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ].size();
+    Boolean b = [FIND '' IN ALL FIELDS].size().size().size().size().size();
+    Boolean b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ]
+      .size()
+      .size()
+      .size()
+      .size();
+    Boolean b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ].size() > 0;
+    Boolean b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ][0].size() > 0;
+    Boolean b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ][
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger
+    ].size() > 0;
+
+    b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ].size();
+    b = [FIND '' IN ALL FIELDS].size().size().size().size().size();
+    b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ]
+      .size()
+      .size()
+      .size()
+      .size();
+    b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ].size() > 0;
+    b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ][0].size() > 0;
+    b = [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ][
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger
+    ].size() > 0;
+
+    [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ].size();
+    [FIND '' IN ALL FIELDS].size().size().size().size().size();
+    [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ]
+      .size()
+      .size()
+      .size()
+      .size();
+    [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ].size() > 0;
+    [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ][0].size() > 0;
+    [
+      FIND
+        'Super Long Name That Will Break On Its Own For Sure One Hundred Thousand Percent'
+      IN ALL FIELDS
+    ][
+      superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger
+    ].size() > 0;
   }
 
   void javaMethodCallExpression_notNeeded() {
@@ -502,7 +718,8 @@ class Conditional extends Object {
     String longResult = super.callMethod('first param')
       .callAnotherMethod()
       .getStringResult();
-    String longResult = super.longPropertyName.anotherLongPropertyName.yetAnotherLongPropertyName;
+    String longResult =
+      super.longPropertyName.anotherLongPropertyName.yetAnotherLongPropertyName;
     String longResult = super.longPropertyName.callMethod('first param')
       .callAnotherMethod()
       .getStringResult();
@@ -510,17 +727,18 @@ class Conditional extends Object {
 
   void thisVariableExpression() {
     this.a = 'Hello World';
-    this.veryLongVariableNameThatShouldNotBeBroken = veryLongVariableName.handleSomeMethod();
-    this.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable = veryLongVariableName.handleSomeMethod();
+    this.veryLongVariableNameThatShouldNotBeBroken =
+      veryLongVariableName.handleSomeMethod();
+    this.veryLongVariableNameThatShouldNotBeBroken.anotherSubVariable =
+      veryLongVariableName.handleSomeMethod();
     System.debug(this.a + this.b);
   }
 
   void longStaticMethodCallChainExpression() {
-    Map<String, Schema.RecordTypeInfo> accRTs = Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
-    Blob yetAnotherVeryLongVariableThatWillSurelyBreakTheLineOnItsOwn = Blob.valueOf(
-        ''
-      )
-      .size();
+    Map<String, Schema.RecordTypeInfo> accRTs =
+      Schema.SObjectType.Account.getRecordTypeInfosByDeveloperName();
+    Blob yetAnotherVeryLongVariableThatWillSurelyBreakTheLineOnItsOwn =
+      Blob.valueOf('').size();
   }
 
   void classRefExpression() {
@@ -541,7 +759,8 @@ class Conditional extends Object {
   void dottedExprMethod() {
     a.Field__c = null;
     a.Field__c = null;
-    longVariableName.Very_Long_SObject_Field_Name__c = longVariableName.Another_Very_Long_SObject_Field_Name__c;
+    longVariableName.Very_Long_SObject_Field_Name__c =
+      longVariableName.Another_Very_Long_SObject_Field_Name__c;
     longVariableName.Very_Long_SObject_Field_Name__c = longVariableName
       .Another_Very_Long_SObject_Field_Name__c;
     CustomObject__c customObject = generator.objectBuilder.setExternalId(
