@@ -1798,32 +1798,39 @@ function handleElseBlock(path: AstPath, print: PrintFn): Doc {
 
 function handleTernaryExpression(path: AstPath, print: PrintFn): Doc {
   const parts: Doc[] = [];
-  parts.push(path.call(print, "condition"));
+  const conditionDoc = path.call(print, "condition");
+  if (path.call(shouldHaveNoBreakAfterOperator)) {
+    parts.push(conditionDoc);
+  } else {
+    parts.push(indent(conditionDoc));
+  }
 
-  parts.push(line);
-  parts.push("?");
-  parts.push(" ");
-  // Here we align the true and false expressions by 2 characters,
-  // because the ? and : characters already take up some space,
-  // and without adding the alignment, it is difficult to tell
-  // the correct nesting level, for example:
-  // a == 1
-  //   ? someVariable
-  //     .callMethod()
-  //   : anotherVariable
-  //     .anotherMethod()
-  // Instead, formatting this way makes it easier to read:
-  // a == 1
-  //   ? someVariable
-  //       .callMethod()
-  //   : anotherVariable
-  //       .anotherMethod()
-  parts.push(group(align(2, path.call(print, "trueExpr"))));
-  parts.push(line);
-  parts.push(":");
-  parts.push(" ");
-  parts.push(group(align(2, path.call(print, "falseExpr"))));
-  return groupIndentConcat(parts);
+  parts.push(
+    indent([
+      line,
+      "? ",
+      // Here we align the true and false expressions by 2 characters,
+      // because the ? and : characters already take up some space,
+      // and without adding the alignment, it is difficult to tell
+      // the correct nesting level, for example:
+      // a == 1
+      //   ? someVariable
+      //     .callMethod()
+      //   : anotherVariable
+      //     .anotherMethod()
+      // Instead, formatting this way makes it easier to read:
+      // a == 1
+      //   ? someVariable
+      //       .callMethod()
+      //   : anotherVariable
+      //       .anotherMethod()
+      group(align(2, path.call(print, "trueExpr"))),
+      line,
+      ": ",
+      group(align(2, path.call(print, "falseExpr"))),
+    ]),
+  );
+  return group(parts);
 }
 
 function handleInstanceOfExpression(path: AstPath, print: PrintFn): Doc {

@@ -103,6 +103,9 @@ export function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
   ) {
     return path.call(shouldHaveNoBreakAfterOperator, "expr");
   }
+  if (node["@class"] === APEX_TYPES.TERNARY_EXPRESSION) {
+    return path.call(shouldHaveNoBreakAfterOperator, "condition");
+  }
   return false;
 }
 

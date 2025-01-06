@@ -47,5 +47,8 @@ class Ternary {
             OR Name = 'another name'
             OR Name = 'one more name'
         ];
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaaa__c  WHERE Acc__c = :accntId
+      ].size() === 1 ? true : false;
   }
 }
