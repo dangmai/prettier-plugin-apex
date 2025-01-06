@@ -144,7 +144,7 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
   const isRightExpressionSoqlOrSosl = path.call(
-    isPathSoqlOrSoslExpression,
+    shouldHaveNoBreakBeforeSoqlOrSoslExpression,
     "right",
   );
 
@@ -224,7 +224,7 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
     docs.push(leftDoc);
     docs.push(" ");
     docs.push([nodeOp, line, rightDoc]);
-    return shouldIndentTopMostExpression ? indentConcat(docs) : docs;
+    return shouldIndentTopMostExpression ? indent(docs) : docs;
   }
   if (hasRightChildNodeWithoutGrouping) {
     docs.push(group(leftDoc));
@@ -251,15 +251,15 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
     ).length > 0;
 
   if (leftChildHasEndOfLineComment) {
-    docs.push(groupConcat([nodeOp, hardline, rightDoc]));
+    docs.push(group([nodeOp, hardline, rightDoc]));
   } else if (isRightExpressionSoqlOrSosl) {
     // If right expression is SOQL or SOSL, we want to keep the opening [ on the
     // same line as the binaryish operator, in order to save on characters used.
-    docs.push(groupConcat([nodeOp, " ", rightDoc]));
+    docs.push(group([nodeOp, " ", rightDoc]));
   } else {
-    docs.push(groupConcat([nodeOp, line, rightDoc]));
+    docs.push(group([nodeOp, line, rightDoc]));
   }
-  return groupConcat(docs);
+  return group(docs);
 }
 
 type AssignmentLayout =

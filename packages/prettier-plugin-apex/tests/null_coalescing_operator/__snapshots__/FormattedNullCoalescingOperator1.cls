@@ -25,6 +25,13 @@ class SafeNavigationOperator {
       WHERE Id = '001000001FAKEID' AND Very_Long_Field_Name__c = 'Hello'
     ];
 
+    // This is specific to 80 char limit
+    Boolean hasFoo = [SELECT Id FROM Saaa__c WHERE Acc__c = :accntId] ?? [
+      SELECT Id
+      FROM Sfdsfsdfsdf__c
+      WHERE Acc__c = :accntId
+    ].size()[0];
+
     string city = [
       SELECT BillingCity
       FROM Account
