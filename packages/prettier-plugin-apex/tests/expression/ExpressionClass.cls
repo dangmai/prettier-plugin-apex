@@ -73,7 +73,6 @@ class Conditional extends Object {
     user = UsernameWrapper.build(
       foo.Very_Long_Property_Name_That_Will_Break__c == true && foo.Status__c == 'Active'
     );
-
     return foo.Very_Long_Property_Name_That_Will_Break__c == true && foo.Status__c == 'Active';
   }
 
@@ -283,6 +282,15 @@ class Conditional extends Object {
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
+    // These next 2 are specific to break at 80 characters
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaa__c  WHERE Acc__c = :accntId
+      ].size() > 0;
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaa__c  WHERE Acc__c = :accntId
+      ].size() > [SELECT Id FROM Saaaa__c  WHERE Acc__c = :accntId].size();
+    System.debug([SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size());
+
 
     b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size();
     b = [SELECT Id FROM Contact].size().size().size().size().size().size();
