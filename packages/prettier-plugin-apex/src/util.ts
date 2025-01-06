@@ -80,7 +80,9 @@ export function isPathSoqlOrSoslInsideArrayExpression(path: AstPath): boolean {
   return path.call(isPathSoqlOrSoslInsideArrayExpression, "expr");
 }
 
-export function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
+export function shouldHaveNoBreakBeforeSoqlOrSoslExpression(
+  path: AstPath,
+): boolean {
   const node = path.getNode();
   if (!node) {
     return false;
@@ -89,22 +91,26 @@ export function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
     return true;
   }
   if (isBinaryish(node)) {
-    return path.call(shouldHaveNoBreakAfterOperator, "left");
+    return path.call(shouldHaveNoBreakBeforeSoqlOrSoslExpression, "left");
   }
   if (
     node["@class"] === APEX_TYPES.METHOD_CALL_EXPRESSION ||
     node["@class"] === APEX_TYPES.VARIABLE_EXPRESSION
   ) {
-    return path.call(shouldHaveNoBreakAfterOperator, "dottedExpr", "value");
+    return path.call(
+      shouldHaveNoBreakBeforeSoqlOrSoslExpression,
+      "dottedExpr",
+      "value",
+    );
   }
   if (
     node["@class"] === APEX_TYPES.ARRAY_EXPRESSION ||
     node["@class"] === APEX_TYPES.SWITCH_STATEMENT
   ) {
-    return path.call(shouldHaveNoBreakAfterOperator, "expr");
+    return path.call(shouldHaveNoBreakBeforeSoqlOrSoslExpression, "expr");
   }
   if (node["@class"] === APEX_TYPES.TERNARY_EXPRESSION) {
-    return path.call(shouldHaveNoBreakAfterOperator, "condition");
+    return path.call(shouldHaveNoBreakBeforeSoqlOrSoslExpression, "condition");
   }
   return false;
 }

@@ -31,7 +31,7 @@ import {
   isParentPathDottedExpression,
   isPathSoqlOrSoslExpression,
   isPathSoqlOrSoslInsideArrayExpression,
-  shouldHaveNoBreakAfterOperator,
+  shouldHaveNoBreakBeforeSoqlOrSoslExpression,
 } from "./util.js";
 
 const docBuilders = prettier.doc.builders;
@@ -283,7 +283,7 @@ function chooseAssignmentLayout(rightPath: AstPath): AssignmentLayout {
     // conditions that come afterwards.
     return "break-after-operator";
   }
-  if (rightPath.call(shouldHaveNoBreakAfterOperator)) {
+  if (rightPath.call(shouldHaveNoBreakBeforeSoqlOrSoslExpression)) {
     return "no-break-after-operator";
   }
   if (isBinaryish(node)) {
@@ -1109,7 +1109,7 @@ function handleSwitchStatement(path: AstPath, print: PrintFn): Doc {
   const parts: Doc[] = [];
   parts.push("switch on");
   const expressionDoc = path.call(print, "expr");
-  if (path.call(shouldHaveNoBreakAfterOperator)) {
+  if (path.call(shouldHaveNoBreakBeforeSoqlOrSoslExpression)) {
     parts.push(" ");
     parts.push(expressionDoc);
   } else {
@@ -1799,7 +1799,7 @@ function handleElseBlock(path: AstPath, print: PrintFn): Doc {
 function handleTernaryExpression(path: AstPath, print: PrintFn): Doc {
   const parts: Doc[] = [];
   const conditionDoc = path.call(print, "condition");
-  if (path.call(shouldHaveNoBreakAfterOperator)) {
+  if (path.call(shouldHaveNoBreakBeforeSoqlOrSoslExpression)) {
     parts.push(conditionDoc);
   } else {
     parts.push(indent(conditionDoc));
