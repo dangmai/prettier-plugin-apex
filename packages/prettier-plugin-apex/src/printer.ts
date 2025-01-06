@@ -30,6 +30,7 @@ import {
   isBinaryish,
   isParentPathDottedExpression,
   isPathSoqlOrSoslExpression,
+  isPathSoqlOrSoslInsideArrayExpression,
   shouldHaveNoBreakAfterOperator,
 } from "./util.js";
 
@@ -261,30 +262,76 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(docs);
 }
 
-function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const docs: Doc[] = [];
+type AssignmentLayout =
+  | "fluid"
+  | "break-after-operator"
+  | "no-break-after-operator"
+  | "left-doc-only";
 
-  const leftDoc: Doc = path.call(print, "left");
-  const operationDoc: Doc = path.call(print, "op");
-  const rightDoc: Doc = path.call(print, "right");
-  docs.push(leftDoc);
-  docs.push(" ");
-  docs.push(operationDoc);
-
-  const rightDocComments = node.right.comments;
-  const rightDocHasLeadingComments =
-    Array.isArray(rightDocComments) &&
-    rightDocComments.some((comment) => comment.leading);
-
-  if (isBinaryish(node.right) || rightDocHasLeadingComments) {
-    docs.push(line);
-    docs.push(rightDoc);
-    return groupIndentConcat(docs);
+function chooseAssignmentLayout(rightPath: AstPath): AssignmentLayout {
+  const node = rightPath.getNode();
+  if (node === undefined) {
+    return "left-doc-only";
   }
-  docs.push(" ");
-  docs.push(rightDoc);
-  return groupConcat(docs);
+  const assignmentComments = node.comments;
+  const assignmentHasLeadingComment =
+    Array.isArray(assignmentComments) &&
+    assignmentComments.some((comment) => comment.leading);
+
+  if (assignmentHasLeadingComment) {
+    // This is a special case that we need to break, regardless of other
+    // conditions that come afterwards.
+    return "break-after-operator";
+  }
+  if (rightPath.call(shouldHaveNoBreakAfterOperator)) {
+    return "no-break-after-operator";
+  }
+  if (isBinaryish(node)) {
+    return "break-after-operator";
+  }
+  return "fluid";
+}
+
+function handleAssignment(
+  path: AstPath,
+  print: PrintFn,
+  leftParam: string,
+  opDoc: Doc,
+  ...rightParams: [string] | [string, string]
+): Doc {
+  const layout =
+    rightParams.length === 1
+      ? path.call(chooseAssignmentLayout, rightParams[0])
+      : path.call(chooseAssignmentLayout, rightParams[0], rightParams[1]);
+  const leftDoc = path.call(print, leftParam);
+  const groupId = Symbol.for("assignment");
+  const rightDoc =
+    rightParams.length === 1
+      ? path.call(print, rightParams[0])
+      : path.call(print, rightParams[0], rightParams[1]);
+
+  switch (layout) {
+    case "left-doc-only":
+      return group(leftDoc);
+    case "no-break-after-operator":
+      return groupConcat([leftDoc, " ", opDoc, " ", rightDoc]);
+    case "break-after-operator":
+      return groupIndentConcat([leftDoc, " ", opDoc, line, rightDoc]);
+    case "fluid":
+      return groupConcat([
+        leftDoc,
+        " ",
+        opDoc,
+        group(indent(line), { id: groupId }),
+        indentIfBreak(rightDoc, {
+          groupId,
+        }),
+      ]);
+  }
+}
+
+function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
+  return handleAssignment(path, print, "left", path.call(print, "op"), "right");
 }
 
 function shouldDottedExpressionBreak(path: AstPath): boolean {
@@ -321,7 +368,10 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   // The exception is if the dotted expression is a chain of method calls,
   // in which case we do want to break. This is already taken care of by the
   // `checkIfParentIsDottedExpression` conditional check earlier.
-  if (path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value")) {
+  if (
+    path.call(isPathSoqlOrSoslExpression, "dottedExpr", "value") ||
+    path.call(isPathSoqlOrSoslInsideArrayExpression, "dottedExpr", "value")
+  ) {
     return false;
   }
   if (
@@ -1265,64 +1315,8 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-type AssignmentLayout =
-  | "fluid"
-  | "break-after-operator"
-  | "no-break-after-operator"
-  | "left-doc-only";
-
-function chooseAssignmentLayout(path: AstPath): AssignmentLayout {
-  const node = path.getNode();
-  if (node.assignment?.value === undefined) {
-    return "left-doc-only";
-  }
-  const assignmentComments = node.assignment?.value?.comments;
-  const assignmentHasLeadingComment =
-    Array.isArray(assignmentComments) &&
-    assignmentComments.some((comment) => comment.leading);
-
-  if (assignmentHasLeadingComment) {
-    // This is a special case that we need to break, regardless of other
-    // conditions that come afterwards.
-    return "break-after-operator";
-  }
-  if (path.call(shouldHaveNoBreakAfterOperator, "assignment", "value")) {
-    return "no-break-after-operator";
-  }
-  if (isBinaryish(node.assignment.value)) {
-    return "break-after-operator";
-  }
-  return "fluid";
-}
-
 function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
-  const layout = chooseAssignmentLayout(path);
-  const leftDoc = path.call(print, "name");
-  const groupId = Symbol.for("assignment");
-  switch (layout) {
-    case "left-doc-only":
-      return group(leftDoc);
-    case "no-break-after-operator":
-      return groupConcat([
-        leftDoc,
-        " = ",
-        path.call(print, "assignment", "value"),
-      ]);
-    case "break-after-operator":
-      return groupIndentConcat([
-        leftDoc,
-        " =",
-        line,
-        path.call(print, "assignment", "value"),
-      ]);
-    case "fluid":
-      return groupConcat([
-        leftDoc,
-        " =",
-        group(indent(line), { id: groupId }),
-        indentIfBreak(path.call(print, "assignment", "value"), { groupId }),
-      ]);
-  }
+  return handleAssignment(path, print, "name", "=", "assignment", "value");
 }
 
 function handleNewStandard(path: AstPath, print: PrintFn): Doc {

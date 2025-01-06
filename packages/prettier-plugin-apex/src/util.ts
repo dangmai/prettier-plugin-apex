@@ -66,6 +66,20 @@ export function isPathSoqlOrSoslExpression(path: AstPath): boolean {
   );
 }
 
+export function isPathSoqlOrSoslInsideArrayExpression(path: AstPath): boolean {
+  const node = path.getNode();
+  if (!node) {
+    return false;
+  }
+  if (path.call(isPathSoqlOrSoslExpression)) {
+    return true;
+  }
+  if (node["@class"] !== APEX_TYPES.ARRAY_EXPRESSION) {
+    return false;
+  }
+  return path.call(isPathSoqlOrSoslInsideArrayExpression, "expr");
+}
+
 export function shouldHaveNoBreakAfterOperator(path: AstPath): boolean {
   const node = path.getNode();
   if (!node) {
