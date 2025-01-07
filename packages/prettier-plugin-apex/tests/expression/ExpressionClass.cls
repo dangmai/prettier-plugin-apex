@@ -156,6 +156,24 @@ class Conditional extends Object {
 
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].Id != null;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].Id != null;
+
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaaa__c  WHERE Acc__c = :accntId
+      ].size() > 0;
+    Boolean hasFoo = aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaasssssssssssssssaasssaaaaaa > 0;
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaaaaaaaaaa__c  WHERE Acc__c = :accntId
+      ] > 0;
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaaa__c  WHERE Acc__c = :accntId
+      ].size() > sijdjosdijosadjsoajdsaoid.sdhuewidhjwieojfoewjfioejwfojsajdosjaikdisaojosajid();
+
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaaa__c  WHERE Acc__c = :accntId
+      ].size() > [SELECT Id FROM Sfdsfsdfsdf__c WHERE Acc__c = :accntId].size()[0];
+    Boolean hasFoo = [
+        SELECT Id FROM Saaaaa__c  WHERE Acc__c = :accntId
+      ].size() > [SELECT Id FROM Sfdsfsdfsdf__c WHERE Acc__c = :accntId];
   }
 
   void triggerVariableExpr_inOtherSuite() {}
@@ -282,13 +300,7 @@ class Conditional extends Object {
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size() > 0;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][0].size() > 0;
     Boolean b = [SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'][superDuperLongVariableNameThatIsAMethodThatWillBreakForSureWithoutAnyMoreHelpOrAssistanceToMakeItLookEvenLonger].size() > 0;
-    // These next 2 are specific to break at 80 characters
-    Boolean hasFoo = [
-        SELECT Id FROM Saaaa__c  WHERE Acc__c = :accntId
-      ].size() > 0;
-    Boolean hasFoo = [
-        SELECT Id FROM Saaaa__c  WHERE Acc__c = :accntId
-      ].size() > [SELECT Id FROM Saaaa__c  WHERE Acc__c = :accntId].size();
+
     System.debug([SELECT Id FROM Contact WHERE Name = 'Super Long Name That Will Break On Its Own'].size());
 
 

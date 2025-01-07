@@ -143,6 +143,10 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const isNestedExpression = isBinaryish(parentNode);
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
+  const isLeftExpressionSoqlOrSosl = path.call(
+    shouldHaveNoBreakBeforeSoqlOrSoslExpression,
+    "left",
+  );
   const isRightExpressionSoqlOrSosl = path.call(
     shouldHaveNoBreakBeforeSoqlOrSoslExpression,
     "right",
@@ -250,14 +254,36 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
         comment.trailing && comment.placement === "endOfLine",
     ).length > 0;
 
+  const rightSideGroup = (doc: Doc) => {
+    // If the left hand of the binaryish expression is SOQL or SOSL, it will
+    // not have the added indentation that other types of expressions have,
+    // because we want to keep the [ on the same line. Because of that, we
+    // need to add the indentation back in for the right hand side of the
+    // binaryish expression. For example, we don't want this:
+    // ```
+    // Boolean hasFoo = [SELECT Id FROM Saaaaa__c WHERE Acc__c = :accntId].size() >
+    // 0;
+    // ```
+    // We want this:
+    // ```
+    // Boolean hasFoo = [SELECT Id FROM Saaaaa__c WHERE Acc__c = :accntId].size() >
+    //   0;
+    // ```
+    // The only exception is if the right hand side is also SOQL or SOSL, in
+    // which case we want to keep the indentation the same as the left hand side.
+    if (isLeftExpressionSoqlOrSosl && !isRightExpressionSoqlOrSosl) {
+      return indent(group(doc));
+    }
+    return group(doc);
+  };
   if (leftChildHasEndOfLineComment) {
-    docs.push(group([nodeOp, hardline, rightDoc]));
+    docs.push(rightSideGroup([nodeOp, hardline, rightDoc]));
   } else if (isRightExpressionSoqlOrSosl) {
     // If right expression is SOQL or SOSL, we want to keep the opening [ on the
     // same line as the binaryish operator, in order to save on characters used.
-    docs.push(group([nodeOp, " ", rightDoc]));
+    docs.push(rightSideGroup([nodeOp, " ", rightDoc]));
   } else {
-    docs.push(group([nodeOp, line, rightDoc]));
+    docs.push(rightSideGroup([nodeOp, line, rightDoc]));
   }
   return group(docs);
 }
