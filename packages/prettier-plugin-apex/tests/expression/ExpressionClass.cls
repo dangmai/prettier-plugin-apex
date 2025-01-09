@@ -133,6 +133,12 @@ class Conditional extends Object {
       WHERE Acc__c = :accntId
     ].Boolean__c && ([SELECT Id, Name, Boolean__c FROM Saaaaasdasdasddsasdasdd__c WHERE Acc__c = :accntId].size() >
       [SELECT Id FROM Sfdsfsdfsdf__c WHERE Acc__c = :accntId].size());
+    Boolean hasFoo = ([
+      SELECT Boolean__c
+      FROM Saaaa__c
+      WHERE Acc__c = :accntId
+    ].Boolean__c && false) && ([SELECT Id, Name, Boolean__c FROM Saaaaasdasdasddsasdasdd__c WHERE Acc__c = :accntId].size() >
+      [SELECT Id FROM Sfdsfsdfsdf__c WHERE Acc__c = :accntId].size());
 
     Boolean myVeryLongBooleanVariable = anExtremelyVeryLongVariable >
       anotherVeryLongVariable >
