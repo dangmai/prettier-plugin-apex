@@ -127,6 +127,12 @@ class Conditional extends Object {
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > 1;
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure');
     Boolean result = oneRecord.get('Super Duper Long String That Will Break For Sure And Make This Line Go Very Long').get('Yet Another Very Long Variable To Help Breaking') > anotherRecord.get('Another Super Duper Long String That Will Break For Sure And Make This Line Go Very Long').get('Yet Another Variable To Help Breaking');
+    Boolean hasFoo = [
+      SELECT Boolean__c
+      FROM Saaaa__c
+      WHERE Acc__c = :accntId
+    ].Boolean__c && ([SELECT Id, Name, Boolean__c FROM Saaaaasdasdasddsasdasdd__c WHERE Acc__c = :accntId].size() >
+      [SELECT Id FROM Sfdsfsdfsdf__c WHERE Acc__c = :accntId].size());
 
     Boolean myVeryLongBooleanVariable = anExtremelyVeryLongVariable >
       anotherVeryLongVariable >
