@@ -8,4 +8,3 @@ System.debug('Hi');
 // Trailing Inline Comment in Anonymous Block
 
 /* Trailing Block Comment in Anonymous Block */
-
