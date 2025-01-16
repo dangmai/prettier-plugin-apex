@@ -1,5 +1,6 @@
 # Unreleased
 
+- Overhaul the variable declaration and assignment expression formatting to be more compact and readable ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/319), [issue](https://github.com/dangmai/prettier-plugin-apex/issues/1762), [issue](https://github.com/dangmai/prettier-plugin-apex/issues/573)).
 - Fix duplicate newlines after last trailing comment in document ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1777)).
 
 # 2.2.2
