@@ -123,8 +123,8 @@ importers:
         specifier: 6.0.7
         version: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.7.0)
       vite-plugin-radar:
-        specifier: 0.9.6
-        version: 0.9.6(vite@6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.7.0))
+        specifier: 0.10.0
+        version: 0.10.0(vite@6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.7.0))
 
   packages/prettier-plugin-apex:
     dependencies:
@@ -2586,8 +2586,8 @@ packages:
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
-  vite-plugin-radar@0.9.6:
-    resolution: {integrity: sha512-tLvUt7+iZznxYa8GmCrZBV3Q0fLQApsyg9EIJgaen8DjGky3vFIq9KoDWAoVMs9FZ5qbsSBb3YfSvoqwVV+5xw==}
+  vite-plugin-radar@0.10.0:
+    resolution: {integrity: sha512-PRApileUv7I+bInGbrQM9LvxvrFHELRvyO5yAodGwIgQBRID/hOPqx0pz7VBWFAcPNjJJVAp/LuT1417BuE/9g==}
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0
 
@@ -5282,7 +5282,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-radar@0.9.6(vite@6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.7.0)):
+  vite-plugin-radar@0.10.0(vite@6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.7.0)):
     dependencies:
       vite: 6.0.7(@types/node@22.10.5)(tsx@4.19.2)(yaml@2.7.0)
 
