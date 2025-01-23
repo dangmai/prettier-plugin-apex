@@ -57,8 +57,8 @@ importers:
         specifier: 3.4.2
         version: 3.4.2
       prettier-plugin-java:
-        specifier: 2.6.6
-        version: 2.6.6(prettier@3.4.2)
+        specifier: 2.6.7
+        version: 2.6.7(prettier@3.4.2)
       prettier-plugin-organize-imports:
         specifier: 4.1.0
         version: 4.1.0(prettier@3.4.2)(typescript@5.7.3)
@@ -2202,8 +2202,8 @@ packages:
     resolution: {integrity: sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==}
     engines: {node: '>=6.0.0'}
 
-  prettier-plugin-java@2.6.6:
-    resolution: {integrity: sha512-DGWZPJ5nZg/wcFgJJxxwkzL95G/SrLXJVAcNfZ6ERjw7ha04pk6m1OAWxqhaq29Zl3FYlEjYrW796fFOWUWpnw==}
+  prettier-plugin-java@2.6.7:
+    resolution: {integrity: sha512-AVm+X7fhAZpYKiUCdUIGZ8HJbkGkTUgYQIKVuCQEplcqpGw2ewVnNGcPb1Kc3+MYMfiEqzhd8ZYhMGVHw6tZdQ==}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -4843,7 +4843,7 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier-plugin-java@2.6.6(prettier@3.4.2):
+  prettier-plugin-java@2.6.7(prettier@3.4.2):
     dependencies:
       java-parser: 2.3.3
       lodash: 4.17.21
