@@ -4,7 +4,7 @@ buildscript {
     classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.2.1263'
 
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
-    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '4.0.24'
+    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '4.0.25'
   }
 }
 
