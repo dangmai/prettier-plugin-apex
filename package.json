@@ -32,7 +32,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-prettier": "5.2.3",
     "eslint-plugin-prettier-doc": "1.1.0",
-    "nx": "20.3.3",
+    "nx": "20.4.0",
     "prettier": "3.4.2",
     "prettier-plugin-java": "2.6.7",
     "prettier-plugin-organize-imports": "4.1.0",
