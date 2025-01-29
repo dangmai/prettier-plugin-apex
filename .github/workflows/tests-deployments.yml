@@ -44,7 +44,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: pnpm
 
-      - uses: actions/setup-java@v4.6.0
+      - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
@@ -125,7 +125,7 @@ jobs:
         with:
           node-version: "18"
           cache: pnpm
-      - uses: actions/setup-java@v4.6.0
+      - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
           java-version: "17"
@@ -252,7 +252,7 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      - uses: actions/setup-java@v4.6.0
+      - uses: actions/setup-java@v4.7.0
         with:
           distribution: temurin
           java-version: 11
