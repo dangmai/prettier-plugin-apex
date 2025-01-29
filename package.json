@@ -39,7 +39,7 @@
     "semver": "7.6.3",
     "tsx": "4.19.2",
     "typescript": "5.7.3",
-    "zx": "8.3.0"
+    "zx": "8.3.1"
   },
   "keywords": [],
   "author": "Dang Mai <contact@dangmai.net>",
