@@ -155,6 +155,9 @@ graalvmNative {
         environmentVariables.put("PATH", file('../musl-toolchain/bin').absolutePath + ":" + System.getenv("PATH"))
         buildArgs.add('--static');
         buildArgs.add('--libc=musl');
+        // #1822 - By default, the native executable can't be run in Docker x64
+        // images on macOS with M-chips. We set the compatibility flag to ensure
+        // it can be run in that context, although it may not be as optimized.
         buildArgs.add('-march=compatibility');
         // #1733, #1809 - We need to manually increase stack size for musl static binary,
         // otherwise we will run into stack overflow issues.
