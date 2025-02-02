@@ -1,6 +1,7 @@
 # Unreleased
 
 - Fix Linux native executables having low stack depth ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1809), [issue](https://github.com/dangmai/prettier-plugin-apex/issues/1733)).
+- Fix Linux native executables not being able to run in macOS Docker on Apple Silicon ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1822)).
 - Fix duplicate newlines after last trailing comment in document ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1777)).
 
 # 2.2.2
