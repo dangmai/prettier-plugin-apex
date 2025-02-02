@@ -155,6 +155,7 @@ graalvmNative {
         environmentVariables.put("PATH", file('../musl-toolchain/bin').absolutePath + ":" + System.getenv("PATH"))
         buildArgs.add('--static');
         buildArgs.add('--libc=musl');
+        buildArgs.add('-march=compatibility');
         // #1733, #1809 - We need to manually increase stack size for musl static binary,
         // otherwise we will run into stack overflow issues.
         // https://github.com/oracle/graal/issues/3398
