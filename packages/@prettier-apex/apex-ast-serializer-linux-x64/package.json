@@ -1,6 +1,6 @@
 {
   "name": "@prettier-apex/apex-ast-serializer-linux-x64",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "The Linux x64 binary of Apex AST Serializer",
   "repository": {
     "type": "git",
