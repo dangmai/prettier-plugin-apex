@@ -1,3 +1,7 @@
+# 2.2.4
+
+- Fix comment misidentified as the last trailing comment in source code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1836))
+
 # 2.2.3
 
 - Fix Linux native executables having low stack depth ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1809), [issue](https://github.com/dangmai/prettier-plugin-apex/issues/1733)).

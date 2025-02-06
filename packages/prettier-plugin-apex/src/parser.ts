@@ -20,6 +20,8 @@ import {
   getSerializerBinDirectory,
 } from "./util.js";
 
+const { getNextNonSpaceNonCommentCharacterIndex } = prettier.util;
+
 type MinimalLocation = {
   startIndex: number;
   endIndex: number;
@@ -720,9 +722,16 @@ export default async function parse(
       );
     const lastComment = ast.comments.at(-1);
     if (lastComment) {
-      // #1777 - We don't want a trailing empty line after the last comment in
-      // the document, because that will be a duplicate of the final empty line.
-      (lastComment as AnnotatedComment).trailingEmptyLine = false;
+      const nextCharAfterLastCommentIndex =
+        getNextNonSpaceNonCommentCharacterIndex(
+          sourceCode,
+          lastComment.location.endIndex,
+        );
+      if (nextCharAfterLastCommentIndex === sourceCode.length) {
+        // #1777 - We don't want a trailing empty line after the last comment in
+        // the document, because that will be a duplicate of the final empty line.
+        (lastComment as AnnotatedComment).trailingEmptyLine = false;
+      }
     }
     dfsPostOrderApply(ast, [
       nodeLocationVisitor(sourceCode, ast.comments),
