@@ -23,12 +23,12 @@ RUN echo "\n. $HOME/.asdf/asdf.sh\n" | tee -a ~/.bashrc ~/.profile
 COPY --chown=vscode:vscode .tool-versions /home/vscode/.tool-versions
 ENV PATH=$PATH:/home/vscode/.asdf/bin:/home/vscode/.asdf/shims
 WORKDIR /home/vscode
+RUN cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add {} && asdf install
 # TODO remove this when corepack is updated in the default NodeJS.
 # Currently it's broken without this, because it doesn't have the newly rotated
 # key from NPM.
 # https://github.com/pnpm/pnpm/issues/9014
 RUN npm install -g corepack@^0.31.0
-RUN cat .tool-versions | cut -d' ' -f1 | grep "^[^\#]" | xargs -i asdf plugin add {} && asdf install
 RUN corepack enable
 RUN asdf reshim nodejs
 RUN pnpm completion bash > ~/completion-for-pnpm.bash
