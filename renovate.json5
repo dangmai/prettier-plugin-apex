@@ -1,6 +1,9 @@
 {
   extends: ["config:recommended"],
   assignees: ["dangmai"],
+  platformAutomerge: true,
+  automergeType: "pr",
+  automergeStrategy: "squash",
   lockFileMaintenance: {
     enabled: true
   },
