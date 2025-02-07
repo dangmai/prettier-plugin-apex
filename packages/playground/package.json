@@ -26,7 +26,7 @@
     "@types/react": "19.0.8",
     "@types/react-dom": "19.0.3",
     "@vitejs/plugin-react": "4.3.4",
-    "vite": "6.0.11",
+    "vite": "6.1.0",
     "vite-plugin-radar": "0.10.0"
   },
   "author": "Dang Mai <contact@dangmai.net>",
