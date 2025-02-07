@@ -25,7 +25,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pre-build dev container image
-        uses: devcontainers/ci@v0.3.1900000413
+        uses: devcontainers/ci@v0.3.1900000417
         with:
           subFolder: .github
           imageName: ghcr.io/dangmai/prettier-plugin-apex-devcontainer
