@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/vscode/devcontainers/base:1.2.3-ubuntu24.04
 
 # needs to be declared *after* FROM to be available in shell scripts
 # renovate: datasource=github-releases depName=asdf packageName=asdf-vm/asdf
-ARG ASDF_VERSION=v0.16.1
+ARG ASDF_VERSION=v0.16.2
 
 LABEL org.opencontainers.image.authors="Dang Mai <contact@dangmai.net>" \
       org.opencontainers.image.source=https://github.com/dangmai/prettier-plugin-apex \
