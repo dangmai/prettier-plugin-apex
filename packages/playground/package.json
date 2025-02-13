@@ -13,7 +13,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@monaco-editor/react": "4.6.0",
+    "@monaco-editor/react": "4.7.0",
     "clipboard": "2.0.11",
     "endent": "2.1.0",
     "lz-string": "1.5.0",
