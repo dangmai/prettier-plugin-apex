@@ -38,7 +38,7 @@
     "eslint-plugin-import": "2.31.0",
     "eslint-plugin-prettier": "5.2.3",
     "eslint-plugin-prettier-doc": "1.1.0",
-    "nx": "20.4.3",
+    "nx": "20.4.4",
     "prettier": "3.5.1",
     "prettier-plugin-java": "2.6.7",
     "prettier-plugin-organize-imports": "4.1.0",
