@@ -43,7 +43,7 @@
     "prettier-plugin-java": "2.6.7",
     "prettier-plugin-organize-imports": "4.1.0",
     "semver": "7.7.1",
-    "tsx": "4.19.2",
+    "tsx": "4.19.3",
     "typescript": "5.7.3",
     "zx": "8.3.2"
   },
