@@ -368,5 +368,65 @@ class SOQLClass {
       FROM Contact
     ];
   }
+
+  void queryIgnore() {
+    // #1891 - pretty ignored code could lead to invalid formatted SOQL
+    Contact contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT 10
+    ];
+    Contact contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT /* test inline comment */ 10
+    ];
+    Contact contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT // test remaining comment
+        10
+    ];
+    contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT :abcd
+    ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      // prettier-ignore
+      WHERE
+        Quote__c != NULL
+        AND (
+          Bar__c IN ('Baz', 'Qux')
+          OR (
+            Bar__c = 'Faux'
+            AND Cat__c.Sat__c = TRUE
+          )
+      )
+    ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      WHERE Id IN (
+        SELECT Quote__c
+        FROM Foo__r
+        // prettier-ignore
+        WHERE
+          Quote__c != NULL
+          AND (Bar__c IN ('Baz', 'Qux')
+          OR (
+            Bar__c = 'Faux'
+            AND Cat__c.Sat__c = TRUE
+          )
+        )
+      )
+    ];
+  }
 }
 

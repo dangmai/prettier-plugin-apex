@@ -1,3 +1,7 @@
+# Unreleased
+
+- Fix ignored SOQL nodes formatted to invalid Apex code in certain situations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1891)).
+
 # 2.2.4
 
 - Fix comment misidentified as the last trailing comment in source code ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1836))
