@@ -138,7 +138,7 @@ function handleNodeSurroundedByCharacters(
       findNextUncommentedCharacter(
         sourceCode,
         endCharacter,
-        location.startIndex,
+        location.endIndex,
         commentNodes,
         /* backwards */ false,
       ) + 1,
@@ -231,6 +231,32 @@ function handleAnnotationLocation(
   );
 }
 
+function handleLimitValueLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+  node: any,
+): MinimalLocation {
+  // #1891 - the LIMIT node returned by jorje always gives us the location of
+  // the world LIMIT itself (i.e. 5 character long), but that leads to wrong
+  // format if the LIMIT (or the surrounding QUERY) is prettier ignored.
+  // Because of that, we will need to generate the location of the LIMIT value
+  // manually.
+  const valueString = node.i.toString();
+  return {
+    startIndex: location.startIndex,
+
+    endIndex:
+      findNextUncommentedCharacter(
+        sourceCode,
+        node.i.toString(),
+        location.endIndex,
+        commentNodes,
+        /* backwards */ false,
+      ) + valueString.length,
+  };
+}
+
 const identityFunction = (location: MinimalLocation): MinimalLocation =>
   location;
 // Sometimes we need to delete a location node. For example, a WhereCompoundOp
@@ -242,6 +268,140 @@ const identityFunction = (location: MinimalLocation): MinimalLocation =>
 // If we keep those locations, a comment might be duplicated since it is
 // attached to one WhereCompoundOp, and that operator is printed multiple times.
 const removeFunction = () => null;
+
+function handleWhereCompoundExpressionLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+): MinimalLocation {
+  // #1891 - the WHERE COMPOUND node returned by jorje doesn't give us the
+  // location of the full node, so we have to construct it manually based on
+  // the locations of its children. This works fine when the compound does not
+  // include opening and closing parenthesis, but when it does, we need to
+  // make sure that we take those into account. Otherwise, when the node is
+  // prettier ignored, we will end up not printing the correct parenthesis pair.
+  const previousParenthesisCharacterIndex = findNextUncommentedCharacter(
+    sourceCode,
+    "(",
+    location.startIndex,
+    commentNodes,
+    /* backwards */ true,
+  );
+  // There's no utility from Prettier that looks backwards to find the last
+  // non-commented, non-spaced character, so we have to use this workaround
+  // to check that the previous opening parenthesis applies to the current node.
+  const nextCharacterAfterParenthesisIndex =
+    getNextNonSpaceNonCommentCharacterIndex(
+      sourceCode,
+      previousParenthesisCharacterIndex + 1,
+    );
+  if (nextCharacterAfterParenthesisIndex === location.startIndex) {
+    return handleNodeSurroundedByCharacters("(", ")")(
+      location,
+      sourceCode,
+      commentNodes,
+    );
+  }
+  return identityFunction(location);
+}
+
+function handleWhereOperationExpressionLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+): MinimalLocation {
+  // #1891 - jorje does not give us the full location of this node, so we have
+  // to build it manually. There are 2 cases:
+  // 1. The node is not surrounded by parenthesis, in which case we can use the
+  //    identity function, e.g.:
+  //    Id = '123
+  // 2. The node is surrounded by parenthesis, in which case we need to use the
+  //    position of the parenthesis to build the location, e.g.:
+  //    (Id = '123')
+  // It is important to make this distinction, because the WHERE COMPOUND
+  // algorithm above this relies on correct location from this node to build up
+  // the correct location for the WHERE COMPOUND node.
+  // If not handled correctly, ignored code can lead to invalid Apex.
+  const previousParenthesisCharacterIndex = findNextUncommentedCharacter(
+    sourceCode,
+    "(",
+    location.startIndex,
+    commentNodes,
+    /* backwards */ true,
+  );
+  // There's no utility from Prettier that looks backwards to find the last
+  // non-commented, non-spaced character, so we have to use this workaround
+  // to check that the previous opening parenthesis applies to the current node.
+  const nextCharacterAfterParenthesisIndex =
+    getNextNonSpaceNonCommentCharacterIndex(
+      sourceCode,
+      previousParenthesisCharacterIndex + 1,
+    );
+  const nextCharacter = getNextNonSpaceNonCommentCharacterIndex(
+    sourceCode,
+    location.endIndex,
+  );
+
+  if (
+    nextCharacterAfterParenthesisIndex === location.startIndex &&
+    nextCharacter &&
+    sourceCode[nextCharacter] === ")"
+  ) {
+    return handleNodeSurroundedByCharacters("(", ")")(
+      location,
+      sourceCode,
+      commentNodes,
+    );
+  }
+  return identityFunction(location);
+}
+
+function handleWhereUnaryExpressionLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+): MinimalLocation {
+  // #1891 - jorje does not give us the full location of this node, so we have
+  // to build it manually. There are 2 cases:
+  // 1. The node is not surrounded by parenthesis, in which case we can use the
+  //    identity function, e.g.:
+  //    NOT Id = '123
+  // 2. The node is surrounded by parenthesis, in which case we need to use the
+  //    position of the parenthesis to build the location, e.g.:
+  //    (NOT Id = '123')
+  // It is important to make this distinction, because the WHERE COMPOUND
+  // algorithm above this relies on correct location from this node to build up
+  // the correct location for the WHERE COMPOUND node.
+  const previousParenthesisCharacterIndex = findNextUncommentedCharacter(
+    sourceCode,
+    "(",
+    location.startIndex,
+    commentNodes,
+    /* backwards */ true,
+  );
+  const nextCharacterAfterParenthesisIndex =
+    getNextNonSpaceNonCommentCharacterIndex(
+      sourceCode,
+      previousParenthesisCharacterIndex + 1,
+    );
+  const nextCharacter = getNextNonSpaceNonCommentCharacterIndex(
+    sourceCode,
+    location.endIndex,
+  );
+
+  if (
+    nextCharacterAfterParenthesisIndex === location.startIndex &&
+    nextCharacter &&
+    sourceCode[nextCharacter] === ")"
+  ) {
+    return handleNodeSurroundedByCharacters("(", ")")(
+      location,
+      sourceCode,
+      commentNodes,
+    );
+  }
+  return identityFunction(location);
+}
 
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
@@ -274,8 +434,10 @@ const locationGenerationHandler: {
   [APEX_TYPES.ELSE_WHEN]: identityFunction,
   [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: removeFunction,
   [APEX_TYPES.VARIABLE_DECLARATION_STATEMENT]: identityFunction,
-  [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: identityFunction,
-  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]: identityFunction,
+  [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: handleWhereCompoundExpressionLocation,
+  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]:
+    handleWhereOperationExpressionLocation,
+  [APEX_TYPES.WHERE_UNARY_EXPRESSION]: handleWhereUnaryExpressionLocation,
   [APEX_TYPES.SELECT_INNER_QUERY]: handleNodeSurroundedByCharacters("(", ")"),
   [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousUnitLocation,
   [APEX_TYPES.NESTED_EXPRESSION]: handleNodeSurroundedByCharacters("(", ")"),
@@ -290,6 +452,7 @@ const locationGenerationHandler: {
   [APEX_TYPES.METHOD_CALL_EXPRESSION]: handleNodeEndedWithCharacter(")"),
   [APEX_TYPES.ANNOTATION]: handleAnnotationLocation,
   [APEX_TYPES.METHOD_DECLARATION]: handleMethodDeclarationLocation,
+  [APEX_TYPES.LIMIT_VALUE]: handleLimitValueLocation,
 };
 
 type AnyNode = any;

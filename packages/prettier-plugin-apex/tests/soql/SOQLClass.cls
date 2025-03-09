@@ -368,5 +368,113 @@ class SOQLClass {
       FROM Contact
     ];
   }
+
+  void queryIgnore() {
+    // #1891 - pretty ignored code could lead to invalid formatted SOQL
+    Contact contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT 10
+    ];
+    Contact contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT /* test inline comment */ 10
+    ];
+    Contact contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT // test remaining comment
+        10
+    ];
+    contacts = [
+      // prettier-ignore
+      SELECT Id
+      FROM Contact
+      LIMIT :abcd
+    ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      // prettier-ignore
+      WHERE
+        Quote__c != NULL
+        AND (
+          Bar__c IN ('Baz', 'Qux')
+          OR (
+            Bar__c = 'Faux'
+            AND Cat__c.Sat__c = TRUE
+          )
+      )
+    ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      WHERE Id IN (
+        SELECT Quote__c
+        FROM Foo__r
+        // prettier-ignore
+        WHERE
+          Quote__c != NULL
+          AND (Bar__c IN ('Baz', 'Qux')
+          OR (
+            Bar__c = 'Faux'
+            AND Cat__c.Sat__c = TRUE
+          )
+        )
+      )
+    ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      WHERE Id IN (
+        SELECT Quote__c
+        FROM Foo__r
+        // prettier-ignore
+        WHERE Quote__c != NULL
+        AND (
+          Bar__c IN ('Baz', 'Qux')
+          OR (
+            Cat__c = 'Faux'
+            AND (
+              Status__c = 'Complete'
+            )
+          )
+        )
+      )
+    ];
+    contacts = [
+      SELECT Id, (SELECT Id FROM Foo__r)
+      FROM Contact
+      WHERE
+      CreatedDate < 2025-02-13T00:00:00Z
+      AND Id IN (
+          SELECT Quote__c
+          FROM Foo__r
+          // prettier-ignore
+          WHERE
+            Quote__c != NULL
+            AND (Bar__c IN ('Baz', 'Qux')
+            OR (
+              Cat__c = 'Faux'
+              AND Bat__c.Sat__c = TRUE
+              AND (
+                NOT (
+                  Status__c = 'Complete'
+                  AND (
+                    Someting__r.Active__c = FALSE
+                    OR Something__r.Status__c = 'Active'
+                  )
+                )
+              )
+            )
+          )
+        )
+      LIMIT 10
+    ];
+  }
 }
 
