@@ -305,6 +305,57 @@ function handleWhereCompoundExpressionLocation(
   return identityFunction(location);
 }
 
+function handleWhereOperationExpressionLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+  commentNodes: GenericComment[],
+): MinimalLocation {
+  // #1891 - jorje does not give us the full location of this node, so we have
+  // to build it manually. There are 2 cases:
+  // 1. The node is not surrounded by parenthesis, in which case we can use the
+  //    identity function, e.g.:
+  //    Id = '123
+  // 2. The node is surrounded by parenthesis, in which case we need to use the
+  //    position of the parenthesis to build the location, e.g.:
+  //    (Id = '123')
+  // It is important to make this distinction, because the WHERE COMPOUND
+  // algorithm above this relies on correct location from this node to build up
+  // the correct location for the WHERE COMPOUND node.
+  // If not handled correctly, ignored code can lead to invalid Apex.
+  const previousParenthesisCharacterIndex = findNextUncommentedCharacter(
+    sourceCode,
+    "(",
+    location.startIndex,
+    commentNodes,
+    /* backwards */ true,
+  );
+  // There's no utility from Prettier that looks backwards to find the last
+  // non-commented, non-spaced character, so we have to use this workaround
+  // to check that the previous opening parenthesis applies to the current node.
+  const nextCharacterAfterParenthesisIndex =
+    getNextNonSpaceNonCommentCharacterIndex(
+      sourceCode,
+      previousParenthesisCharacterIndex + 1,
+    );
+  const nextCharacter = getNextNonSpaceNonCommentCharacterIndex(
+    sourceCode,
+    location.endIndex,
+  );
+
+  if (
+    nextCharacterAfterParenthesisIndex === location.startIndex &&
+    nextCharacter &&
+    sourceCode[nextCharacter] === ")"
+  ) {
+    return handleNodeSurroundedByCharacters("(", ")")(
+      location,
+      sourceCode,
+      commentNodes,
+    );
+  }
+  return identityFunction(location);
+}
+
 // We need to generate the location for a node differently based on the node
 // type. This object holds a String => Function mapping in order to do that.
 const locationGenerationHandler: {
@@ -337,7 +388,8 @@ const locationGenerationHandler: {
   [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: removeFunction,
   [APEX_TYPES.VARIABLE_DECLARATION_STATEMENT]: identityFunction,
   [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: handleWhereCompoundExpressionLocation,
-  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]: identityFunction,
+  [APEX_TYPES.WHERE_OPERATION_EXPRESSION]:
+    handleWhereOperationExpressionLocation,
   [APEX_TYPES.SELECT_INNER_QUERY]: handleNodeSurroundedByCharacters("(", ")"),
   [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousUnitLocation,
   [APEX_TYPES.NESTED_EXPRESSION]: handleNodeSurroundedByCharacters("(", ")"),

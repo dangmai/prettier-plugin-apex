@@ -608,5 +608,25 @@ class SOQLClass {
         )
         )
     ];
+    contacts = [
+      SELECT Id
+      FROM Contact
+      WHERE
+        Id IN (
+          SELECT Quote__c
+          FROM Foo__r
+          // prettier-ignore
+          WHERE Quote__c != NULL
+        AND (
+          Bar__c IN ('Baz', 'Qux')
+          OR (
+            Cat__c = 'Faux'
+            AND (
+              Status__c = 'Complete'
+            )
+          )
+        )
+        )
+    ];
   }
 }
