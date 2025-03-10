@@ -4,6 +4,7 @@ import * as prettier from "prettier";
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   getTrailingComments,
+  hasPrettierIgnore,
   printComment,
   printDanglingComment,
 } from "./comments.js";
@@ -1072,7 +1073,32 @@ function handleBlockStatement(
     parts.push([hardline, ...danglingCommentDocs]);
   } else if (statementDocs.length > 0) {
     parts.push(hardline);
-    parts.push(join(hardline, statementDocs));
+    for (let i = 0; i < statementDocs.length; i++) {
+      const statementDoc = statementDocs[i];
+      if (!statementDoc) {
+        // eslint-disable-next-line no-continue -- for type safety only
+        continue;
+      }
+      if (i === 0) {
+        parts.push(statementDoc);
+      } else {
+        parts.push(hardline);
+        parts.push(statementDoc);
+      }
+
+      // #1892 - respect trailing empty line even for ignored nodes
+      if (
+        path.call(
+          (innerPath) =>
+            hasPrettierIgnore(innerPath) &&
+            innerPath.getNode().trailingEmptyLine,
+          "stmnts",
+          i,
+        )
+      ) {
+        parts.push(hardline);
+      }
+    }
   }
   parts.push(dedent(hardline));
   parts.push("}");

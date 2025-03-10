@@ -1,6 +1,7 @@
 # Unreleased
 
 - Fix ignored SOQL nodes formatted to invalid Apex code in certain situations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1891)).
+- Fix trailing empty line not printed after ignored nodes ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
 
 # 2.2.4
 
