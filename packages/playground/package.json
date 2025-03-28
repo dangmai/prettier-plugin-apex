@@ -18,8 +18,8 @@
     "endent": "2.1.0",
     "lz-string": "1.5.0",
     "prettier-plugin-apex": "workspace:*",
-    "react": "19.0.0",
-    "react-dom": "19.0.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "use-debounce": "10.0.4"
   },
   "devDependencies": {
