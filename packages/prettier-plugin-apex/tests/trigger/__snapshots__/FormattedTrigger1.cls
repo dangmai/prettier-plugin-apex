@@ -9,6 +9,9 @@ trigger myAccountTrigger on Account(
   before undelete
 ) {
   System.debug('Inside trigger');
+  // prettier-ignore
+  System.debug('There should be an empty line after this statement in the formatted code');
+
   if (Trigger.isBefore) {
     if (Trigger.isDelete) {
       for (Account a : Trigger.old) {

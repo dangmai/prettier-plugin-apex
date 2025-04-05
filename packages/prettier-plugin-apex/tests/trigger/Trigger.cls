@@ -1,6 +1,9 @@
 trigger myAccountTrigger on Account(before delete, before insert, before update,
   after delete, after insert, after update, after undelete, before undelete) {
   System.debug('Inside trigger');
+  // prettier-ignore
+  System.debug('There should be an empty line after this statement in the formatted code');
+
   if (Trigger.isBefore) {
     if (Trigger.isDelete) {
 

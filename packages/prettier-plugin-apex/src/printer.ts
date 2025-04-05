@@ -486,17 +486,31 @@ function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
   const memberParts = path
     .map(print, "members")
     .filter((member: Doc) => member);
+  for (let i = 0; i < memberParts.length; i++) {
+    const memberDoc = memberParts[i];
+    if (!memberDoc) {
+      // eslint-disable-next-line no-continue -- for type safety only
+      continue;
+    }
+    if (i === 0) {
+      parts.push(memberDoc);
+    } else {
+      parts.push(hardline);
+      parts.push(memberDoc);
+    }
 
-  const memberDocs: Doc[] = memberParts.map(
-    (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
-      if (index !== allMemberDocs.length - 1) {
-        return [memberDoc, hardline];
-      }
-      return memberDoc;
-    },
-  );
-  if (memberDocs.length > 0) {
-    parts.push(...memberDocs);
+    // #1892 - respect trailing empty line even for ignored nodes
+    if (
+      path.call(
+        (innerPath) =>
+          hasPrettierIgnore(innerPath) && innerPath.getNode().trailingEmptyLine,
+        "members",
+        i,
+        "stmnt",
+      )
+    ) {
+      parts.push(hardline);
+    }
   }
   return parts;
 }
@@ -539,10 +553,24 @@ function handleTriggerDeclarationUnit(
 
   const memberDocs: Doc[] = memberParts.map(
     (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
+      const innerDocs = [memberDoc];
       if (index !== allMemberDocs.length - 1) {
-        return [memberDoc, hardline];
+        innerDocs.push(hardline);
       }
-      return memberDoc;
+      // #1892 - respect trailing empty line even for ignored nodes
+      if (
+        path.call(
+          (innerPath) =>
+            hasPrettierIgnore(innerPath) &&
+            innerPath.getNode().trailingEmptyLine,
+          "members",
+          index,
+          "stmnt",
+        )
+      ) {
+        innerDocs.push(hardline);
+      }
+      return innerDocs;
     },
   );
   if (danglingCommentDocs.length > 0) {
