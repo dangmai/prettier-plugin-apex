@@ -1,4 +1,4 @@
-# Unreleased
+# 2.2.6
 
 - Fix dangling comments in `continue`/`break`/`return` statements not getting printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1946)).
 - Fix trailing empty line not printed after ignored nodes in triggers/anonymous blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
