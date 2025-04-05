@@ -318,6 +318,43 @@ function handleLongChainComment(comment: AnnotatedComment): boolean {
   return false;
 }
 
+// #1946 - when a comment is between the `continue`/`break`/`return` statement and
+// the `;` at the end of the line, it is technically a dangling comment to that
+// node. However, it makes more sense to simply classify it as a trailing
+// comment to the statement itself, i.e.:
+// ```
+// continue /* Comment */;
+// ```
+// should be formatted as:
+// ```
+// continue; /* Comment */
+// ```
+function handleContinueBreakDanglingComment(
+  comment: AnnotatedComment,
+): boolean {
+  const { enclosingNode } = comment;
+  if (!enclosingNode) {
+    return false;
+  }
+  if (
+    enclosingNode["@class"] === APEX_TYPES.CONTINUE_STATEMENT ||
+    enclosingNode["@class"] === APEX_TYPES.BREAK_STATEMENT
+  ) {
+    addTrailingComment(enclosingNode, comment);
+    return true;
+  }
+  if (
+    enclosingNode["@class"] === APEX_TYPES.RETURN_STATEMENT &&
+    // if there is some value that's returned, the comment is attached to that
+    // value, so we don't need to handle this case
+    !enclosingNode.expr.value
+  ) {
+    addTrailingComment(enclosingNode, comment);
+    return true;
+  }
+  return false;
+}
+
 /**
  * #383 (bug number 2) - If a prettier-ignore comment is attached to a modifier,
  * we need to bring it up a level, otherwise the only thing that's getting
@@ -384,7 +421,8 @@ export function handleEndOfLineComment(
     handleBlockStatementLeadingComment(comment) ||
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
-    handleLongChainComment(comment)
+    handleLongChainComment(comment) ||
+    handleContinueBreakDanglingComment(comment)
   );
 }
 
@@ -405,7 +443,8 @@ export function handleRemainingComment(
   return (
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
-    handleLongChainComment(comment)
+    handleLongChainComment(comment) ||
+    handleContinueBreakDanglingComment(comment)
   );
 }
 

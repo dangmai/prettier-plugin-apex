@@ -1,3 +1,7 @@
+# Unreleased
+
+- Fix dangling comments in `continue`/`break`/`return` statements not getting printed ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1946)).
+
 # 2.2.5
 
 - Fix ignored SOQL nodes formatted to invalid Apex code in certain situations ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1891)).
