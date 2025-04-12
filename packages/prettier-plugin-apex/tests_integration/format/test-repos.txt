@@ -7,7 +7,8 @@ https://github.com/ipavlic/apex-lambda.git
 https://github.com/rsoesemann/visualforce-table-grid.git
 https://github.com/twilio/twilio-salesforce.git
 https://github.com/dhoechst/Salesforce-Test-Factory.git
-https://github.com/dreamhouseapp/dreamhouse-sfdx.git
+https://github.com/trailheadapps/dreamhouse-sfdx.git
+https://github.com/dreamhouseapp/dreamhouse-lwc.git
 https://github.com/douglascayers-org/sfdx-mass-action-scheduler.git
 https://github.com/financialforcedev/fflib-apex-common.git
 https://github.com/financialforcedev/fflib-apex-mocks.git
