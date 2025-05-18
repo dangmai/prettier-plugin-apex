@@ -491,3 +491,5 @@ export const ALLOW_DANGLING_COMMENTS = [
   APEX_TYPES.INTERFACE_DECLARATION,
   APEX_TYPES.BLOCK_STATEMENT,
 ];
+
+export const AST_ROOT_NODE_CLASS = "jorje.AstRootNode" as const;

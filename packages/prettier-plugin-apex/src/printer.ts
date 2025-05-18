@@ -11,6 +11,7 @@ import {
 import {
   APEX_TYPES,
   ASSIGNMENT,
+  AST_ROOT_NODE_CLASS,
   BINARY,
   BOOLEAN,
   DATA_CATEGORY,
@@ -2911,6 +2912,7 @@ type ChildNodeHandler = (
 ) => Doc;
 
 const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
+  [AST_ROOT_NODE_CLASS]: handlePassthroughCall("unit"),
   [APEX_TYPES.IF_ELSE_BLOCK]: handleIfElseBlock,
   [APEX_TYPES.IF_BLOCK]: handleIfBlock,
   [APEX_TYPES.ELSE_BLOCK]: handleElseBlock,
@@ -3206,22 +3208,23 @@ function genericPrint(
     return "";
   }
   const apexClass = n["@class"];
-  if (path.stack.length === 1) {
-    // Hard code how to handle the root node here
-    const docs: Doc[] = [];
-    docs.push(path.call(print, APEX_TYPES.PARSER_OUTPUT, "unit"));
-    // Optionally, adding a hardline as the last thing in the document
-    if (options.apexInsertFinalNewline) {
-      docs.push(hardline);
-    }
-
-    return docs;
-  }
   if (!apexClass) {
     return "";
   }
   if (apexClass in nodeHandler) {
-    return (nodeHandler[apexClass] as SingleNodeHandler)(path, print, options);
+    const doc = (nodeHandler[apexClass] as SingleNodeHandler)(
+      path,
+      print,
+      options,
+    );
+
+    if (path.stack.length !== 1 || !options.apexInsertFinalNewline) {
+      return doc;
+    }
+
+    // Hard code how to handle the root node here
+    // Optionally, adding a hardline as the last thing in the document
+    return [doc, hardline];
   }
   const parentClass = getParentType(apexClass);
   if (parentClass && parentClass in nodeHandler) {

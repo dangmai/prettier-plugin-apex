@@ -8,12 +8,14 @@ import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   ALLOW_TRAILING_EMPTY_LINE,
   APEX_TYPES,
+  AST_ROOT_NODE_CLASS,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
 import {
   AnnotatedComment,
+  Ast,
   GenericComment,
-  SerializedAst,
+  JorjeResponse,
   findNextUncommentedCharacter,
   getNativeExecutableWithFallback,
   getParentType,
@@ -693,7 +695,7 @@ const metadataVisitor: (
     if (
       apexClass &&
       nodeLoc &&
-      context.allowTrailingEmptyLine &&
+      context?.allowTrailingEmptyLine &&
       trailingEmptyLineAllowed &&
       !isLastNodeInArray
     ) {
@@ -833,7 +835,7 @@ function getEmptyLineLocations(sourceCode: string): number[] {
 export default async function parse(
   sourceCode: string,
   options: prettier.RequiredOptions,
-): Promise<SerializedAst | Record<string, never>> {
+): Promise<Ast | Record<string, never>> {
   let serializedAst: string;
   let stderr: string = "";
   if (options.apexStandaloneParser === "built-in") {
@@ -866,23 +868,46 @@ export default async function parse(
     stderr = result.stderr;
   }
   if (serializedAst) {
-    const ast: SerializedAst = JSON.parse(serializedAst);
+    const response: JorjeResponse = JSON.parse(serializedAst);
     if (
-      ast[APEX_TYPES.PARSER_OUTPUT] &&
-      ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
+      response[APEX_TYPES.PARSER_OUTPUT] &&
+      response[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
     ) {
-      const errors = ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.map(
+      const errors = response[APEX_TYPES.PARSER_OUTPUT].parseErrors.map(
         (err: jorje.ParseException) => `${err.message}.`,
       );
       throw new Error(errors.join("\r\n"));
     }
-    ast.comments = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
-      .map((item) => item[1])
-      .filter(
-        (node) =>
-          node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
-          node["@class"] === APEX_TYPES.INLINE_COMMENT,
-      );
+    // #2004 - We need to make sure the AST follows the convention that upstream
+    // expects, i.e. an AST node should always be callable from `locStart` and
+    // `locEnd`. This is important for the `formatWithCursor` method. The jorje
+    // response does not follow this convention, it has non-AST related properties
+    // in it that breaks `formatWithCursor`, which is why we need this node.
+    //
+    // Additionally, the reason why we have a special type for the root node
+    // is because of the way comments are attached in Prettier - the root node
+    // can't have comments attached to it after the comment attaching phase,
+    // which leads to issues with trigger declaration comments. Because of that,
+    // we have this node that becomes the parent for the unit, which lets the
+    // trigger declaration unit have its own comments.
+    const ast: Ast = {
+      "@class": AST_ROOT_NODE_CLASS,
+      unit: response[APEX_TYPES.PARSER_OUTPUT].unit,
+      comments: response[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
+        .map((item) => item[1])
+        .filter(
+          (node) =>
+            node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
+            node["@class"] === APEX_TYPES.INLINE_COMMENT,
+        ),
+      loc: {
+        "@class": "apex.jorje.data.IndexLocation",
+        startIndex: 0,
+        endIndex: sourceCode.length,
+        column: 0,
+        line: 0,
+      },
+    };
     const lastComment = ast.comments.at(-1);
     if (lastComment) {
       const nextCharAfterLastCommentIndex =

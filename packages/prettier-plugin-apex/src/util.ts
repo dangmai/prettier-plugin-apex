@@ -8,6 +8,7 @@ import { AstPath } from "prettier";
 import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   APEX_TYPES,
+  AST_ROOT_NODE_CLASS,
   DATA_CATEGORY,
   MODIFIER,
   ORDER,
@@ -16,9 +17,15 @@ import {
   QUERY_WHERE,
 } from "./constants.js";
 
-export type SerializedAst = {
-  [APEX_TYPES.PARSER_OUTPUT]: jorje.ParserOutput;
+export type Ast = {
+  unit: jorje.CompilationUnit;
+  loc: Omit<jorje.Location, "loc">;
   comments: jorje.HiddenToken[];
+  "@class": typeof AST_ROOT_NODE_CLASS;
+};
+
+export type JorjeResponse = {
+  [APEX_TYPES.PARSER_OUTPUT]: jorje.ParserOutput;
 };
 
 export type GenericComment = jorje.HiddenToken;
