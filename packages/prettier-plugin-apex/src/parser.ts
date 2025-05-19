@@ -570,13 +570,41 @@ const nodeLocationVisitor: (
         if (parentClass) {
           handlerFn = locationGenerationHandler[parentClass];
         }
+        const excludes = [
+          APEX_TYPES.LOCATION_IDENTIFIER,
+          "apex.jorje.data.IndexLocation",
+          "string",
+          "int",
+          "double",
+        ];
+        if (!handlerFn && !excludes.includes(apexClass)) {
+          handlerFn = identityFunction;
+        }
       }
     }
 
-    if (handlerFn && currentLocation) {
-      node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
-    } else if (handlerFn && node.loc) {
-      node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
+    if (handlerFn) {
+      const locationToCheck = currentLocation || node.loc;
+      const newLocation = handlerFn(
+        locationToCheck,
+        sourceCode,
+        commentNodes,
+        node,
+      );
+      if (node.loc) {
+        node.loc = {
+          startIndex: Math.min(
+            node.loc.startIndex,
+            newLocation?.startIndex || Infinity,
+          ),
+          endIndex: Math.max(
+            node.loc.endIndex,
+            newLocation?.endIndex || -Infinity,
+          ),
+        };
+      } else {
+        node.loc = newLocation;
+      }
     }
 
     const nodeLoc = node.loc;

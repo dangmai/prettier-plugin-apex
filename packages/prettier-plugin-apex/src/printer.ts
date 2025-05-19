@@ -566,7 +566,6 @@ function handleTriggerDeclarationUnit(
             innerPath.getNode().trailingEmptyLine,
           "members",
           index,
-          "stmnt",
         )
       ) {
         innerDocs.push(hardline);
