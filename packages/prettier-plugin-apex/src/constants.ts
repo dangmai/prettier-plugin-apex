@@ -494,3 +494,5 @@ export const ALLOW_DANGLING_COMMENTS = [
 ];
 
 export const AST_ROOT_NODE_CLASS = "jorje.AstRootNode" as const;
+
+export const EXCLUDED_VISITOR_KEYS = new Set(["loc", "location"]);

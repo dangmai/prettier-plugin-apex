@@ -11,6 +11,7 @@ import {
   printComment,
   willPrintOwnComments,
 } from "./comments.js";
+import { EXCLUDED_VISITOR_KEYS } from "./constants.js";
 import parse from "./parser.js";
 import { hasPragma, insertPragma } from "./pragma.js";
 import printFn from "./printer.js";
@@ -48,6 +49,14 @@ function locEnd(node: Locatable): number {
   return location.endIndex;
 }
 
+function getVisitorKeys(node: any, nonTraversableKeys: Set<string>): string[] {
+  return Object.keys(node)
+    .filter(
+      (key) => !nonTraversableKeys.has(key) && !EXCLUDED_VISITOR_KEYS.has(key),
+    )
+    .filter((key) => node[key] != null && Object.keys(node[key]).length > 0);
+}
+
 export const parsers = {
   apex: {
     astFormat: "apex",
@@ -71,6 +80,7 @@ export const printers = {
   apex: {
     print: printFn,
     massageAstNode,
+    getVisitorKeys,
     hasPrettierIgnore,
     insertPragma,
     isBlockComment,
