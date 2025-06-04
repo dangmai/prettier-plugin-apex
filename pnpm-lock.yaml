@@ -57,8 +57,8 @@ importers:
         specifier: 3.5.3
         version: 3.5.3
       prettier-plugin-java:
-        specifier: 2.6.7
-        version: 2.6.7(prettier@3.5.3)
+        specifier: 2.6.8
+        version: 2.6.8(prettier@3.5.3)
       prettier-plugin-organize-imports:
         specifier: 4.1.0
         version: 4.1.0(prettier@3.5.3)(typescript@5.8.3)
@@ -1763,8 +1763,8 @@ packages:
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
 
-  java-parser@2.3.3:
-    resolution: {integrity: sha512-9YY8OGlNGfq5TDDq2SBjtIEHMVLeV8vSSZrXDaQBhQ84hi1zc3/+5l3DF3wW8JGqQT2kNVha05dziSamvN8M/g==}
+  java-parser@2.3.4:
+    resolution: {integrity: sha512-5fnUDL2AUYX7gs6YlfyVmvq+bFL+HlSBE+MdPdUsfaE898KObdu9aafJCKTJIzXi2IF+P/RiCA5kvGc0msxhYA==}
 
   jest-diff@29.7.0:
     resolution: {integrity: sha512-LMIgiIrhigmPrs03JHpxUh2yISK3vLFPkAodPeo0+BuF7wA2FoQbkEg1u8gBYBThncu7e1oEDUfIXVuTqLRUjw==}
@@ -2088,8 +2088,8 @@ packages:
     resolution: {integrity: sha512-GbK2cP9nraSSUF9N2XwUwqfzlAFlMNYYl+ShE/V+H8a9uNl/oUqB1w2EL54Jh0OlyRSd8RfWYJ3coVS4TROP2w==}
     engines: {node: '>=6.0.0'}
 
-  prettier-plugin-java@2.6.7:
-    resolution: {integrity: sha512-AVm+X7fhAZpYKiUCdUIGZ8HJbkGkTUgYQIKVuCQEplcqpGw2ewVnNGcPb1Kc3+MYMfiEqzhd8ZYhMGVHw6tZdQ==}
+  prettier-plugin-java@2.6.8:
+    resolution: {integrity: sha512-bHfkGld8uRlCiEy//nqJmD4RAzMEZNZW+hZ+8Lo89CaKtBa6ZL8OkkKZKlp1/OwcpcePsRYOUhh/YlQ8QeJHfw==}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -4316,7 +4316,7 @@ snapshots:
     optionalDependencies:
       '@pkgjs/parseargs': 0.11.0
 
-  java-parser@2.3.3:
+  java-parser@2.3.4:
     dependencies:
       chevrotain: 11.0.3
       chevrotain-allstar: 0.3.1(chevrotain@11.0.3)
@@ -4662,9 +4662,9 @@ snapshots:
     dependencies:
       fast-diff: 1.3.0
 
-  prettier-plugin-java@2.6.7(prettier@3.5.3):
+  prettier-plugin-java@2.6.8(prettier@3.5.3):
     dependencies:
-      java-parser: 2.3.3
+      java-parser: 2.3.4
       lodash: 4.17.21
       prettier: 3.5.3
 
