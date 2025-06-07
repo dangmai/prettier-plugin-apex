@@ -659,10 +659,23 @@ function handleClassDeclaration(
 
   const memberDocs: Doc[] = memberParts.map(
     (memberDoc: Doc, index: number, allMemberDocs: Doc[]) => {
+      const innerDocs = [memberDoc];
       if (index !== allMemberDocs.length - 1) {
-        return [memberDoc, hardline];
+        innerDocs.push(hardline);
       }
-      return memberDoc;
+      // #1892 - respect trailing empty line even for ignored nodes
+      if (
+        path.call(
+          (innerPath) =>
+            hasPrettierIgnore(innerPath) &&
+            innerPath.getNode().trailingEmptyLine,
+          "members",
+          index,
+        )
+      ) {
+        innerDocs.push(hardline);
+      }
+      return innerDocs;
     },
   );
 
