@@ -16,6 +16,7 @@ class CommentsWithModifiers {
   // prettier-ignore
   @TestVisible
   private enum AllOrAny { ALL, ANY }
+
   @TestVisible
   // prettier-ignore
   private enum AllOrAny { ALL, ANY }
@@ -23,6 +24,7 @@ class CommentsWithModifiers {
   /* prettier-ignore */
   @TestVisible
   private enum AllOrAny { ALL, ANY }
+
   @TestVisible
   /* prettier-ignore */
   private enum AllOrAny { ALL, ANY }
