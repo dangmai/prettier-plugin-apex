@@ -20,7 +20,7 @@
     "prettier-plugin-apex": "workspace:*",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "use-debounce": "10.0.4"
+    "use-debounce": "10.0.5"
   },
   "devDependencies": {
     "@types/react": "19.1.6",
