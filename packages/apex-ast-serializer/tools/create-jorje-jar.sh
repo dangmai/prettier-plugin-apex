@@ -2,7 +2,7 @@
 
 set -euxo pipefail
 
-URL=https://github.com/forcedotcom/salesforcedx-vscode/blob/develop/packages/salesforcedx-vscode-apex/out/apex-jorje-lsp.jar?raw=true
+URL=https://github.com/forcedotcom/salesforcedx-vscode/raw/refs/heads/develop/packages/salesforcedx-vscode-apex/jars/apex-jorje-lsp.jar
 FILENAME=apex-jorje-lsp-original.jar
 FILENAME_MINIMIZED=apex-jorje-lsp.jar
 CURRENT_MD5_FILENAME=current-jorje-md5.txt
