@@ -17,6 +17,7 @@
       // See this thread: https://github.com/microsoft/vscode-remote-release/issues/6364
       "extensions": [
         "hverlin.mise-vscode",
+        "nrwl.angular-console",
         "dangmai.workspace-default-settings",
         "esbenp.prettier-vscode",
         "salesforce.salesforcedx-vscode",
