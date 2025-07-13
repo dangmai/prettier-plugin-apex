@@ -9,6 +9,7 @@
       "url": "vscode://schemas/settings/folder"
     }
   ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "npm.packageManager": "pnpm",
   "editor.formatOnSave": true,
   "typescript.tsdk": "node_modules/typescript/lib",
