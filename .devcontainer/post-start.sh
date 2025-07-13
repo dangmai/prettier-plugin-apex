@@ -2,4 +2,5 @@
 
 set -euxo pipefail
 
+# This file gets run every time the container starts
 mise install
