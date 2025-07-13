@@ -5,6 +5,7 @@
     "ghcr.io/devcontainers-extra/features/mise:1": {}
   },
   "forwardPorts": [2117, 5173],
+  "postCreateCommand": "./.devcontainer/post-create.sh",
   "postStartCommand": "./.devcontainer/post-start.sh",
   "containerEnv": {
     "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
