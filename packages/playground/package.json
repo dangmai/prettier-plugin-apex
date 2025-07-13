@@ -2,6 +2,7 @@
   "name": "playground",
   "version": "1.0.0",
   "description": "Prettier Apex Playground Website",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "build": "del-cli dist && vite build",
