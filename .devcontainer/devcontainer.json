@@ -1,31 +1,24 @@
-// For format details, see https://aka.ms/devcontainer.json. For config options, see the
-// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
 {
   "name": "Prettier Plugin Apex",
-  // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "image": "ghcr.io/dangmai/prettier-plugin-apex-devcontainer:latest",
-
-  // Features to add to the dev container. More info: https://containers.dev/features.
-  "features": {},
-
-  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers-extra/features/mise:1": {}
+  },
   "forwardPorts": [2117, 5173],
-
-  // Use 'postCreateCommand' to run commands after the container is created.
-  // "postCreateCommand": "",
-  "postStartCommand": "./.devcontainer/set-java-home.sh",
-
+  "postCreateCommand": "./.devcontainer/post-create.sh",
+  "postStartCommand": "./.devcontainer/post-start.sh",
   "containerEnv": {
     "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
   },
-
-  // Configure tool-specific properties.
+  "waitFor": "postStartCommand",
   "customizations": {
     "vscode": {
       // For now it's a duplicated list of the recommended extensions.
       // In the future there may be a way to eliminate this duplication.
       // See this thread: https://github.com/microsoft/vscode-remote-release/issues/6364
       "extensions": [
+        "hverlin.mise-vscode",
+        "nrwl.angular-console",
         "dangmai.workspace-default-settings",
         "esbenp.prettier-vscode",
         "salesforce.salesforcedx-vscode",
@@ -43,8 +36,6 @@
       ]
     }
   },
-
-  // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
-  // "remoteUser": "root"
-  "remoteUser": "vscode"
+  "mounts": [],
+  "remoteEnv": {}
 }

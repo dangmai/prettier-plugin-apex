@@ -9,6 +9,7 @@
       "url": "vscode://schemas/settings/folder"
     }
   ],
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "npm.packageManager": "pnpm",
   "editor.formatOnSave": true,
   "typescript.tsdk": "node_modules/typescript/lib",
@@ -18,6 +19,7 @@
   ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.gradle.buildServer.enabled": "on",
+  "java.server.launchMode": "Standard",
   "gradle.nestedProjects": true,
   "vitest.rootConfig": "packages/prettier-plugin-apex/vite.config.ts",
   "vitest.nodeEnv": {
