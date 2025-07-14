@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-globals */
 // This file is adapted from https://github.com/prettier/prettier/blob/main/website/playground/urlHash.js
 import LZString from "lz-string";
 

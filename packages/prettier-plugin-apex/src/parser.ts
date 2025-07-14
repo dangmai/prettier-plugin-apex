@@ -1,19 +1,18 @@
-/* eslint no-param-reassign: 0 */
 import childProcess from "node:child_process";
 import path from "node:path";
 import process from "node:process";
 import prettier from "prettier";
 
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   ALLOW_TRAILING_EMPTY_LINE,
   APEX_TYPES,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
 import {
-  AnnotatedComment,
-  GenericComment,
-  SerializedAst,
+  type AnnotatedComment,
+  type GenericComment,
+  type SerializedAst,
   findNextUncommentedCharacter,
   getNativeExecutableWithFallback,
   getParentType,
@@ -559,8 +558,8 @@ const nodeLocationVisitor: (
     return accumulated;
   },
   apply: (node: AnyNode, currentLocation: MinimalLocation | null) => {
-    const apexClass = node["@class"];
-    let handlerFn;
+    const apexClass: string = node["@class"];
+    let handlerFn: (typeof locationGenerationHandler)[string] | undefined;
     if (apexClass) {
       handlerFn = locationGenerationHandler[apexClass];
       if (!handlerFn) {
@@ -721,7 +720,7 @@ const metadataVisitor: (
       allowTrailingEmptyLineWithin =
         currentContext?.allowTrailingEmptyLine ?? true;
     }
-    let arraySiblings;
+    let arraySiblings: any[] | undefined;
     if (Array.isArray(node) && node.length > 0) {
       arraySiblings = node;
     }

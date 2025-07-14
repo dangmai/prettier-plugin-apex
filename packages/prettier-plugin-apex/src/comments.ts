@@ -1,12 +1,11 @@
-/* eslint no-param-reassign: 0, no-plusplus: 0, no-else-return: 0, consistent-return: 0 */
 import type { AstPath, Doc, ParserOptions } from "prettier";
 import * as prettier from "prettier";
 
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import { ALLOW_DANGLING_COMMENTS, APEX_TYPES } from "./constants.js";
 import {
-  AnnotatedComment,
-  GenericComment,
+  type AnnotatedComment,
+  type GenericComment,
   isApexDocComment,
   isBinaryish,
 } from "./util.js";
@@ -41,7 +40,7 @@ function printApexDocComment(comment: jorje.BlockComment): Doc {
 }
 
 export function isPrettierIgnore(comment: AnnotatedComment): boolean {
-  let content;
+  let content: string;
   if (comment["@class"] === APEX_TYPES.BLOCK_COMMENT) {
     // For simplicity sake we only support this format
     // /* prettier-ignore */
@@ -59,7 +58,7 @@ export function printComment(path: AstPath): Doc {
   // This handles both Inline and Block Comments.
   // We don't just pass through the value because unlike other string literals,
   // this should not be escaped
-  let result;
+  let result: Doc;
   const node = path.getNode();
   if (isApexDocComment(node)) {
     result = printApexDocComment(node);
@@ -457,9 +456,7 @@ export function handleRemainingComment(
 export function hasPrettierIgnore(path: AstPath): boolean {
   const node = path.getNode();
   return (
-    node &&
-    node.comments &&
-    node.comments.length > 0 &&
+    node?.comments?.length > 0 &&
     node.comments.filter(isPrettierIgnore).length > 0
   );
 }

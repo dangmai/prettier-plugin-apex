@@ -1,6 +1,6 @@
-import { ChildProcess, spawn } from "child_process";
-import path from "path";
-import util from "util";
+import { type ChildProcess, spawn } from "node:child_process";
+import path from "node:path";
+import util from "node:util";
 import waitOn from "wait-on";
 
 import { getSerializerBinDirectory } from "./util.js";
@@ -31,7 +31,6 @@ export async function start(
   await waitOnPromise({
     resources: [`http://${host}:${port}/api/ast`],
   });
-  // eslint-disable-next-line no-console
   console.log(`Server listening on http://${host}:${port}`);
 
   return command;

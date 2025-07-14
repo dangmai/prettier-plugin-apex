@@ -1,9 +1,10 @@
 html {
   background-color: #fafafa;
   color: #6a6a6a;
-  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto,
-    Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue",
-    Arial, sans-serif;
+  font-family:
+    -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial,
+    sans-serif;
   font-size: 12px;
   line-height: 1.25;
 }
@@ -12,6 +13,16 @@ body {
   flex-direction: column;
   height: 100vh;
   margin: 0;
+}
+
+label {
+  font-family:
+    Consolas,
+    Courier New,
+    /* biome-ignore lint/suspicious/noDuplicateFontNames : They are not duplicate fonts */
+      Courier,
+    monospace;
+  margin: 10px 0;
 }
 
 #root,
@@ -195,15 +206,6 @@ header h1 {
 
 .option-entry input[type="number"] {
   max-width: 60px;
-}
-
-label {
-  font-family:
-    Consolas,
-    Courier New,
-    Courier,
-    monospace;
-  margin: 10px 0;
 }
 
 .tooltip {

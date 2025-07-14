@@ -1,11 +1,10 @@
-/* eslint no-param-reassign: 0 */
 import fs from "node:fs/promises";
 import module from "node:module";
 import nodePath from "node:path";
 import * as url from "node:url";
-import { AstPath } from "prettier";
+import type { AstPath } from "prettier";
 
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   APEX_TYPES,
   DATA_CATEGORY,
@@ -77,8 +76,8 @@ export function checkIfParentIsDottedExpression(path: AstPath): boolean {
   // We're making an assumption here that `callParent` is always synchronous.
   // We're doing it because FastPath does not expose other ways to find the
   // parent name.
-  let parentNodeName;
-  let grandParentNodeName;
+  let parentNodeName: PropertyKey | null = null;
+  let grandParentNodeName: PropertyKey | null = null;
   path.callParent((innerPath) => {
     parentNodeName = innerPath.getName();
   });
@@ -144,9 +143,7 @@ export function massageAstNode(ast: any, newObj: any): any {
     // the original and parsed strings.
     newObj.scope = ast.scope.toUpperCase();
   } else if (
-    ast.dottedExpr &&
-    ast.dottedExpr.value &&
-    ast.dottedExpr.value.names &&
+    ast?.dottedExpr?.value?.names &&
     ast.dottedExpr.value["@class"] === APEX_TYPES.VARIABLE_EXPRESSION &&
     ast.names
   ) {
@@ -190,9 +187,7 @@ export function findNextUncommentedCharacter(
   let index = -1;
 
   const findIndex = (comment: GenericComment) =>
-    comment.location &&
-    comment.location.startIndex &&
-    comment.location.endIndex &&
+    comment?.location?.endIndex &&
     comment.location.startIndex <= index &&
     comment.location.endIndex - 1 >= index;
   while (!indexFound) {

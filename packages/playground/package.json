@@ -8,7 +8,7 @@
     "build": "del-cli dist && vite build",
     "build:watch": "vite build --watch",
     "clean": "del-cli node_modules dist",
-    "lint": "eslint \"src/*.{ts,tsx}\" \"*.ts\"",
+    "lint": "biome lint ./src",
     "dev": "vite --open http://localhost:5173/",
     "prettier": "prettier --write \"src/**/*.{ts,tsx,css,html}\" \"./*.{md,ts}\"",
     "test": "echo \"Error: no test specified\" && exit 1"

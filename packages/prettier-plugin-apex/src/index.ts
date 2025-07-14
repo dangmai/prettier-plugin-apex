@@ -1,6 +1,6 @@
 import type { SupportOptions } from "prettier";
 
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   canAttachComment,
   handleEndOfLineComment,

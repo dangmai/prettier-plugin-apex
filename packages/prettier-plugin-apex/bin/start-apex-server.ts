@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { parseArgs } from "util";
+import { parseArgs } from "node:util";
 
 import { start } from "../src/http-server.js";
 

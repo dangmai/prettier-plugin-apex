@@ -23,7 +23,7 @@
         "esbenp.prettier-vscode",
         "salesforce.salesforcedx-vscode",
         "vitest.explorer",
-        "dbaeumer.vscode-eslint",
+        "biomejs.biome",
         "vscjava.vscode-java-pack",
         "vscjava.vscode-gradle",
         "tintinweb.vscode-decompiler"

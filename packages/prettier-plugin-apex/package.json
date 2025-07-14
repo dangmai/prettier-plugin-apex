@@ -31,7 +31,7 @@
     "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c '*'",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
     "stop-server": "tsx bin/stop-apex-server.ts",
-    "lint": "eslint \"{src,bin,tests_config}/**/*.{js,ts}\"",
+    "lint": "biome lint ./src ./bin ./tests_config",
     "prettier": "prettier --write \"{bin,src,playground,tests_config}/**/*.{js,mjs,ts,tsx,css,html}\" \"./*.{md,mjs,ts}\"",
     "prepack": "pnpm run build",
     "debug-check:native": "prettier --no-config --apex-standalone-parser native --debug-check --plugin=./dist/src/index.js",

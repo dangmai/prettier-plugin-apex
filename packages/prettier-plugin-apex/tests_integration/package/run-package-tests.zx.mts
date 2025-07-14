@@ -2,7 +2,6 @@
 
 import assert from "node:assert";
 
-// eslint-disable-next-line import/no-extraneous-dependencies -- we will use shared zx from the root
 import { $, argv, cd, fs, path, usePowerShell } from "zx";
 
 if (process.platform === "win32") {

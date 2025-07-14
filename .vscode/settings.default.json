@@ -13,10 +13,6 @@
   "npm.packageManager": "pnpm",
   "editor.formatOnSave": true,
   "typescript.tsdk": "node_modules/typescript/lib",
-  "eslint.workingDirectories": [
-    "./packages/playground",
-    "./packages/prettier-plugin-apex"
-  ],
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.gradle.buildServer.enabled": "on",
   "java.server.launchMode": "Standard",

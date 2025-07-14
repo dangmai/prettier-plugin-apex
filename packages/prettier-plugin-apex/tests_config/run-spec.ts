@@ -30,7 +30,6 @@ async function prettyPrint(
 }
 
 async function parse(string: string, opts: prettier.Options): Promise<any> {
-  // eslint-disable-next-line no-underscore-dangle
   const result = await prettier.__debug.parse(
     string,
     {

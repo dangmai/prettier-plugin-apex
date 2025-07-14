@@ -1,7 +1,7 @@
 import type { AstPath, Doc } from "prettier";
 import * as prettier from "prettier";
 
-import * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
   getTrailingComments,
   hasPrettierIgnore,
@@ -23,9 +23,9 @@ import {
   QUERY_WHERE,
   TRIGGER_USAGE,
 } from "./constants.js";
-import { EnrichedIfBlock } from "./parser.js";
+import type { EnrichedIfBlock } from "./parser.js";
 import {
-  AnnotatedComment,
+  type AnnotatedComment,
   checkIfParentIsDottedExpression,
   getParentType,
   getPrecedence,
@@ -78,14 +78,17 @@ function pushIfExist(
 
 function escapeString(text: string): string {
   // Code from https://stackoverflow.com/a/11716317/477761
-  return text
-    .replace(/\\/g, "\\\\")
-    .replace(/\u0008/g, "\\b") // eslint-disable-line no-control-regex
-    .replace(/\t/g, "\\t")
-    .replace(/\n/g, "\\n")
-    .replace(/\f/g, "\\f")
-    .replace(/\r/g, "\\r")
-    .replace(/'/g, "\\'");
+  return (
+    text
+      .replace(/\\/g, "\\\\")
+      // biome-ignore lint/suspicious/noControlCharactersInRegex: We do want to escape this control character
+      .replace(/\u0008/g, "\\b")
+      .replace(/\t/g, "\\t")
+      .replace(/\n/g, "\\n")
+      .replace(/\f/g, "\\f")
+      .replace(/\r/g, "\\r")
+      .replace(/'/g, "\\'")
+  );
 }
 
 function handleReturnStatement(path: AstPath, print: PrintFn): Doc {
@@ -318,7 +321,7 @@ function handleArrayExpressionIndex(
   withGroup = true,
 ): Doc {
   const node = path.getNode();
-  let parts;
+  let parts: Doc;
   if (node.index["@class"] === APEX_TYPES.LITERAL_EXPRESSION) {
     // For literal index, we will make sure it's always attached to the [],
     // because it's usually short and will look bad being broken up.
@@ -338,12 +341,9 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
-    dottedExpr &&
-    dottedExpr.value &&
-    (dottedExpr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-      (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-        dottedExpr.value.expr &&
-        dottedExpr.value.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION));
+    dottedExpr?.value?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (dottedExpr?.value?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+      dottedExpr.value.expr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION);
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -402,7 +402,7 @@ function handleLiteralExpression(
     return "null";
   }
   const literalDoc: Doc = path.call(print, "literal", "$");
-  let doc;
+  let doc: Doc | undefined;
   if (literalType === "STRING") {
     // #165 - We have to use the original string because it might contain Unicode code points,
     // which gets converted to displayed characters automatically by Java after being parsed by jorje.
@@ -489,7 +489,6 @@ function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
   for (let i = 0; i < memberParts.length; i++) {
     const memberDoc = memberParts[i];
     if (!memberDoc) {
-      // eslint-disable-next-line no-continue -- for type safety only
       continue;
     }
     if (i === 0) {
@@ -944,7 +943,7 @@ function handleStatement(
   path: AstPath,
   print: PrintFn,
 ): Doc {
-  let doc;
+  let doc: Doc | undefined;
   switch (childClass as jorje.Stmnt["@class"]) {
     case APEX_TYPES.DML_INSERT_STATEMENT:
       doc = "insert";
@@ -1117,7 +1116,6 @@ function handleBlockStatement(
     for (let i = 0; i < statementDocs.length; i++) {
       const statementDoc = statementDocs[i];
       if (!statementDoc) {
-        // eslint-disable-next-line no-continue -- for type safety only
         continue;
       }
       if (i === 0) {
@@ -1254,7 +1252,7 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
 function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
   const node = path.getNode();
   const parts: Doc[] = [];
-  let resultDoc;
+  let resultDoc: Doc;
 
   parts.push(path.call(print, "name"));
   const assignmentDocs: Doc = path.call(print, "assignment", "value");
@@ -1364,20 +1362,13 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   const { dottedExpr } = node;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
-    dottedExpr &&
-    dottedExpr.value &&
-    (dottedExpr.value["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-      (dottedExpr.value["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-        dottedExpr.value.expr &&
-        dottedExpr.value.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION));
+    dottedExpr?.value?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (dottedExpr?.value?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+      dottedExpr.value.expr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION);
   const isDottedExpressionThisVariableExpression =
-    dottedExpr &&
-    dottedExpr.value &&
-    dottedExpr.value["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
+    dottedExpr?.value?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
   const isDottedExpressionSuperVariableExpression =
-    dottedExpr &&
-    dottedExpr.value &&
-    dottedExpr.value["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
+    dottedExpr?.value?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs: Doc[] = path.map(print, "names");
@@ -1420,7 +1411,7 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
       arrayIndexDoc = handleArrayExpressionIndex(innerPath, print, withGroup);
     });
   }
-  let resultDoc;
+  let resultDoc: Doc;
   const noGroup =
     // If this is a nested dotted expression, we do not want to group it,
     // since we want it to be part of the method call chain group, e.g:
@@ -2502,7 +2493,7 @@ function handleOrderByExpression(
   print: PrintFn,
 ): Doc {
   const parts: Doc[] = [];
-  let expressionField;
+  let expressionField: string;
   switch (childClass as jorje.OrderByExpr["@class"]) {
     case APEX_TYPES.ORDER_BY_EXPRESSION_DISTANCE:
       expressionField = "distance";
@@ -2582,7 +2573,7 @@ function handleGroupByClause(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleGroupByType(childClass: string): Doc {
-  let doc;
+  let doc: Doc | undefined;
   switch (childClass as jorje.GroupByType["@class"]) {
     case APEX_TYPES.GROUP_BY_TYPE_ROLL_UP:
       doc = "ROLLUP";
@@ -2617,7 +2608,7 @@ function handleUsingExpression(
   path: AstPath,
   print: PrintFn,
 ): Doc {
-  let doc;
+  let doc: Doc | undefined;
   switch (childClass as jorje.UsingExpr["@class"]) {
     case APEX_TYPES.USING_EXPRESSION_USING:
       doc = [
@@ -2648,7 +2639,7 @@ function handleUsingExpression(
 }
 
 function handleTrackingType(childClass: string): Doc {
-  let doc;
+  let doc: Doc | undefined;
   switch (childClass as jorje.TrackingType["@class"]) {
     case APEX_TYPES.TRACKING_TYPE_FOR_VIEW:
       doc = "FOR VIEW";
@@ -2661,7 +2652,7 @@ function handleTrackingType(childClass: string): Doc {
 }
 
 function handleQueryOption(childClass: string): Doc {
-  let doc;
+  let doc: Doc | undefined;
   switch (childClass as jorje.QueryOption["@class"]) {
     case APEX_TYPES.QUERY_OPTION_LOCK_ROWS:
       doc = "FOR UPDATE";
@@ -2684,7 +2675,7 @@ function handleUpdateStatsClause(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleUpdateStatsOption(childClass: string): Doc {
-  let doc;
+  let doc: Doc | undefined;
   switch (childClass as jorje.UpdateStatsOption["@class"]) {
     case APEX_TYPES.UPDATE_STATS_OPTION_TRACKING:
       doc = "TRACKING";
@@ -3170,7 +3161,7 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
 
 function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
   let insertNewLine = false;
-  if (node && node.trailingEmptyLine) {
+  if (node?.trailingEmptyLine) {
     // If the node has trailing comments, we have to defer the printing of the
     // trailing new line to the last trailing comment, because otherwise
     // there will be a new line before the trailing comments.
