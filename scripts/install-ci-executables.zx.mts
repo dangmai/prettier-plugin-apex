@@ -6,7 +6,7 @@ import { $, argv, fs } from "zx";
 import {
   getNativeExecutableNameForPlatform,
   NATIVE_PACKAGES,
-} from "../packages/prettier-plugin-apex/src/util.js"; // eslint-disable-line import/no-unresolved
+} from "../packages/prettier-plugin-apex/src/util.js";
 
 $.verbose = true;
 const artifactDir = argv._[0];

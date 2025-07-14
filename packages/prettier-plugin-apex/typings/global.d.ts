@@ -9,7 +9,6 @@ declare module "prettier" {
     apexInsertFinalNewline: boolean;
   }
   namespace __debug {
-    // eslint-disable-next-line import/prefer-default-export
     export function parse(
       originalText: string,
       originalOptions: Partial<RequiredOptions>,
