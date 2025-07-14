@@ -21,3 +21,9 @@ jq --arg java_home "$JAVA_HOME" \
 jq '."terminal.integrated.automationProfile.linux" = { "path": "/bin/bash", "args": ["-l"] }' \
     "${SETTINGS_LOCATION}" > settings.tmp.json \
     && mv settings.tmp.json "${SETTINGS_LOCATION}"
+
+# Without setting vitest shellType to terminal, it uses child_process which
+# does not have the correct environment variables set up.
+jq '."vitest.shellType" = "terminal"' \
+    "${SETTINGS_LOCATION}" > settings.tmp.json \
+    && mv settings.tmp.json "${SETTINGS_LOCATION}"
