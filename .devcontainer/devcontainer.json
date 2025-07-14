@@ -10,6 +10,7 @@
   "containerEnv": {
     "COREPACK_ENABLE_DOWNLOAD_PROMPT": "0"
   },
+  "waitFor": "postStartCommand",
   "customizations": {
     "vscode": {
       // For now it's a duplicated list of the recommended extensions.

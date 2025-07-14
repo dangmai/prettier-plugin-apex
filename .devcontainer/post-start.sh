@@ -5,6 +5,7 @@ set -euxo pipefail
 # This file gets run every time the container starts
 mise install
 mise exec -- corepack enable
+mise exec -- pnpm install
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 SETTINGS_LOCATION="${SCRIPT_DIR}/../.vscode/settings.json"
