@@ -6,7 +6,8 @@ buildscript {
   dependencies {
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
     classpath group: 'org.apache.groovy', name: 'groovy-json', version: '4.0.27'
-    // GraalVM native plugin classpath dependency
+    // GraalVM native plugin classpath dependency.
+    // This is specified here because the plugin is applied conditionally
     classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.11.0'
   }
 }
@@ -17,8 +18,12 @@ plugins {
   id 'jacoco'
 }
 
-// Only apply GraalVM native plugin if Java version > 11
-if (JavaVersion.current() > JavaVersion.VERSION_11) {
+// Define whether GraalVM native features should be enabled
+// GraalVM plugin v0.11.0+ requires Java > 11
+def graalvmNativeEnabled = JavaVersion.current() > JavaVersion.VERSION_11
+
+// Only apply GraalVM native plugin if supported by current Java version
+if (graalvmNativeEnabled) {
   apply plugin: 'org.graalvm.buildtools.native'
 }
 
@@ -32,8 +37,8 @@ sourceSets {
     compileClasspath += sourceSets.main.compileClasspath
     runtimeClasspath += sourceSets.main.runtimeClasspath
   }
-  // Only define graalvm sourceSet if Java version > 11
-  if (JavaVersion.current() > JavaVersion.VERSION_11) {
+  // Only define graalvm sourceSet if GraalVM native features are enabled
+  if (graalvmNativeEnabled) {
     graalvm {}
   }
 }
@@ -100,16 +105,16 @@ dependencies {
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20250517'
 
-  // Only add GraalVM-specific dependencies if Java version > 11
-  if (JavaVersion.current() > JavaVersion.VERSION_11) {
+  // Only add GraalVM-specific dependencies if GraalVM native features are enabled
+  if (graalvmNativeEnabled) {
     // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
     graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.181'
     nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
   }
 }
 
-// Only configure GraalVM-specific configurations if Java version > 11
-if (JavaVersion.current() > JavaVersion.VERSION_11) {
+// Only configure GraalVM-specific configurations if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
   configurations {
     nativeImageClasspath.extendsFrom(graalvmImplementation)
   }
@@ -134,14 +139,14 @@ jacocoTestReport {
 }
 
 // This task can be used to run tests under native instrumentation
-// Only create this task if Java version > 11
-if (JavaVersion.current() > JavaVersion.VERSION_11) {
+// Only create this task if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
   task nativeInstrumentedTest(type: Test) {
   }
 }
 
-// Only configure GraalVM native settings if Java version > 11
-if (JavaVersion.current() > JavaVersion.VERSION_11) {
+// Only configure GraalVM native settings if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
   graalvmNative {
     metadataRepository {
       // Since version 0.10.0, the metadata repository is enabled by default,
