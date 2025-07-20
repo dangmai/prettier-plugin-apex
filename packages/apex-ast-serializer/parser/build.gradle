@@ -6,9 +6,6 @@ buildscript {
   dependencies {
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
     classpath group: 'org.apache.groovy', name: 'groovy-json', version: '4.0.27'
-    // GraalVM native plugin classpath dependency.
-    // This is specified here because the plugin is applied conditionally
-    classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.11.0'
   }
 }
 plugins {
@@ -22,8 +19,9 @@ plugins {
 // GraalVM plugin v0.11.0+ requires Java > 11
 def graalvmNativeEnabled = JavaVersion.current() > JavaVersion.VERSION_11
 
-// Only apply GraalVM native plugin if supported by current Java version
+// Only add GraalVM plugin to classpath and apply it if GraalVM native features are enabled
 if (graalvmNativeEnabled) {
+  buildscript.dependencies.add('classpath', 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.11.0')
   apply plugin: 'org.graalvm.buildtools.native'
 }
 
