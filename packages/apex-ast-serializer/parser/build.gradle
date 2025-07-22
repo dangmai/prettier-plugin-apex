@@ -1,10 +1,19 @@
 buildscript {
   repositories {
     mavenCentral()
+    gradlePluginPortal()
   }
   dependencies {
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
     classpath group: 'org.apache.groovy', name: 'groovy-json', version: '4.0.27'
+    // GraalVM native plugin classpath dependency.
+    // Only add this dependency if we're running on Java > 11, since the plugin requires Java 17+
+    // Note: This condition is duplicated below as graalvmNativeEnabled variable for consistency,
+    // but we can't move the variable declaration to the top level because
+    // Gradle doesn't accept that syntax
+    if (JavaVersion.current() > JavaVersion.VERSION_11) {
+      classpath 'org.graalvm.buildtools.native:org.graalvm.buildtools.native.gradle.plugin:0.11.0'
+    }
   }
 }
 plugins {
@@ -12,7 +21,15 @@ plugins {
   id "java-test-fixtures"
   id 'application'
   id 'jacoco'
-  id 'org.graalvm.buildtools.native' version '0.10.6'
+}
+
+// Define whether GraalVM native features should be enabled
+// GraalVM plugin v0.11.0+ requires Java > 11
+def graalvmNativeEnabled = JavaVersion.current() > JavaVersion.VERSION_11
+
+// Only apply GraalVM native plugin if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
+  apply plugin: 'org.graalvm.buildtools.native'
 }
 
 sourceSets {
@@ -25,7 +42,10 @@ sourceSets {
     compileClasspath += sourceSets.main.compileClasspath
     runtimeClasspath += sourceSets.main.runtimeClasspath
   }
-  graalvm {}
+  // Only define graalvm sourceSet if GraalVM native features are enabled
+  if (graalvmNativeEnabled) {
+    graalvm {}
+  }
 }
 
 application {
@@ -90,13 +110,19 @@ dependencies {
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20250517'
 
-  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.181'
-  nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
+  // Only add GraalVM-specific dependencies if GraalVM native features are enabled
+  if (graalvmNativeEnabled) {
+    // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
+    graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.181'
+    nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
+  }
 }
 
-configurations {
-  nativeImageClasspath.extendsFrom(graalvmImplementation)
+// Only configure GraalVM-specific configurations if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
+  configurations {
+    nativeImageClasspath.extendsFrom(graalvmImplementation)
+  }
 }
 
 // Common configs for all Test tasks. Currently this includes the standard
@@ -118,57 +144,63 @@ jacocoTestReport {
 }
 
 // This task can be used to run tests under native instrumentation
-task nativeInstrumentedTest(type: Test) {
+// Only create this task if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
+  task nativeInstrumentedTest(type: Test) {
+  }
 }
 
-graalvmNative {
-  metadataRepository {
-    // Since version 0.10.0, the metadata repository is enabled by default,
-    // The metadata repository contains community-driven collection of
-    // reachability metadata for open-source libraries. However, they are
-    // leading to issues with apex-jorje-lsp library, and I haven't found
-    // a way to exclude it yet, so for now I'll disable it.
-    enabled = false
-  }
-  agent {
-    enabled = true
-    defaultMode = "standard"
+// Only configure GraalVM native settings if GraalVM native features are enabled
+if (graalvmNativeEnabled) {
+  graalvmNative {
+    metadataRepository {
+      // Since version 0.10.0, the metadata repository is enabled by default,
+      // The metadata repository contains community-driven collection of
+      // reachability metadata for open-source libraries. However, they are
+      // leading to issues with apex-jorje-lsp library, and I haven't found
+      // a way to exclude it yet, so for now I'll disable it.
+      enabled = false
+    }
+    agent {
+      enabled = true
+      defaultMode = "standard"
 
-    // Weird syntax: https://github.com/graalvm/native-build-tools/issues/303
-    // This is here because we don't want to set up the full native-image
-    // system while running tests in CI/CD.
-    java.util.function.Predicate predicate = { t -> t.name != 'test' && t.name != 'run' }
-    tasksToInstrumentPredicate = predicate
-  }
-  binaries {
-    main {
-      configurationFileDirectories.from(
-        file('build/native/agent-output/nativeInstrumentedTest')
-      )
-      imageName = 'apex-ast-serializer'
-      sharedLibrary = false
-      buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
-      buildArgs.addAll(application.applicationDefaultJvmArgs)
-      // Certain Linux distribution doesn't allow dynamic-linked binaries to be
-      // run, for example, NixOS, so we need to build a static binary.
-      if (System.getProperty('os.name').toLowerCase().contains('linux') && System.getProperty('os.arch').contains('amd64')) {
-        environmentVariables.put("PATH", file('../musl-toolchain/bin').absolutePath + ":" + System.getenv("PATH"))
-        buildArgs.add('--static');
-        buildArgs.add('--libc=musl');
-        // #1822 - By default, the native executable can't be run in Docker x64
-        // images on macOS with M-chips. We set the compatibility flag to ensure
-        // it can be run in that context, although it may not be as optimized.
-        buildArgs.add('-march=compatibility');
-        // #1733, #1809 - We need to manually increase stack size for musl static binary,
-        // otherwise we will run into stack overflow issues.
-        // https://github.com/oracle/graal/issues/3398
-        buildArgs.add('-H:+UnlockExperimentalVMOptions');
-        buildArgs.add('-H:CCompilerOption=-Wl,-z,stack-size=10485760');
+      // Weird syntax: https://github.com/graalvm/native-build-tools/issues/303
+      // This is here because we don't want to set up the full native-image
+      // system while running tests in CI/CD.
+      java.util.function.Predicate predicate = { t -> t.name != 'test' && t.name != 'run' }
+      tasksToInstrumentPredicate = predicate
+    }
+    binaries {
+      main {
+        configurationFileDirectories.from(
+          file('build/native/agent-output/nativeInstrumentedTest')
+        )
+        imageName = 'apex-ast-serializer'
+        sharedLibrary = false
+        buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
+        buildArgs.addAll(application.applicationDefaultJvmArgs)
+        // Certain Linux distribution doesn't allow dynamic-linked binaries to be
+        // run, for example, NixOS, so we need to build a static binary.
+        if (System.getProperty('os.name').toLowerCase().contains('linux') && System.getProperty('os.arch').contains('amd64')) {
+          environmentVariables.put("PATH", file('../musl-toolchain/bin').absolutePath + ":" + System.getenv("PATH"))
+          buildArgs.add('--static');
+          buildArgs.add('--libc=musl');
+          // #1822 - By default, the native executable can't be run in Docker x64
+          // images on macOS with M-chips. We set the compatibility flag to ensure
+          // it can be run in that context, although it may not be as optimized.
+          buildArgs.add('-march=compatibility');
+          // #1733, #1809 - We need to manually increase stack size for musl static binary,
+          // otherwise we will run into stack overflow issues.
+          // https://github.com/oracle/graal/issues/3398
+          buildArgs.add('-H:+UnlockExperimentalVMOptions');
+          buildArgs.add('-H:CCompilerOption=-Wl,-z,stack-size=10485760');
+        }
       }
     }
   }
-}
 
-nativeCompile {
-  mustRunAfter nativeInstrumentedTest
+  nativeCompile {
+    mustRunAfter nativeInstrumentedTest
+  }
 }
