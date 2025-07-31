@@ -36,8 +36,8 @@ importers:
         specifier: 3.6.2
         version: 3.6.2
       prettier-plugin-java:
-        specifier: 2.7.3
-        version: 2.7.3(prettier@3.6.2)
+        specifier: 2.7.4
+        version: 2.7.4(prettier@3.6.2)
       prettier-plugin-organize-imports:
         specifier: 4.2.0
         version: 4.2.0(prettier@3.6.2)(typescript@5.8.3)
@@ -1599,8 +1599,8 @@ packages:
     resolution: {integrity: sha512-3Ybi1tAuwAP9s0r1UQ2J4n5Y0G05bJkpUIO0/bI9MhwmD70S5aTWbXGBwxHrelT+XM1k6dM0pk+SwNkpTRN7Pg==}
     engines: {node: ^10 || ^12 || >=14}
 
-  prettier-plugin-java@2.7.3:
-    resolution: {integrity: sha512-fZfZRNDSvgLXQSHjQkXaSCLgbA9aHs71EH7RZP8IhJXUezwvWHwqRtd4131+r/zQq0QrjmMJ0ANJvLmhCY31lw==}
+  prettier-plugin-java@2.7.4:
+    resolution: {integrity: sha512-RiRNkumIW9vaDpxirgIPI+oLSRmuCmoVZuTax9i3cWzWnxd+uKyAfDe4efS+ce00owAeh0a1DI5eFaH1xYWNPg==}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -3392,7 +3392,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  prettier-plugin-java@2.7.3(prettier@3.6.2):
+  prettier-plugin-java@2.7.4(prettier@3.6.2):
     dependencies:
       java-parser: 3.0.1
       prettier: 3.6.2
