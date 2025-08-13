@@ -29,7 +29,7 @@
     "@tsconfig/node18": "18.2.4",
     "@types/node": "18.19.31",
     "@types/semver": "7.7.0",
-    "cross-env": "7.0.3",
+    "cross-env": "10.0.0",
     "del-cli": "6.0.0",
     "nx": "21.3.11",
     "prettier": "3.6.2",
