@@ -25,8 +25,6 @@
     "clean": "del-cli node_modules dist",
     "pretest": "pnpm run lint",
     "test": "vitest run",
-    "test:parser:built-in": "cross-env APEX_PARSER=built-in pnpm test",
-    "test:parser:native": "cross-env APEX_PARSER=native pnpm test",
     "test:package": "tsx tests_integration/package/run-package-tests.zx.mts",
     "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c '*'",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
@@ -83,7 +81,15 @@
         "outputs": [
           "{projectRoot}/coverage"
         ],
-        "cache": false
+        "cache": false,
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "{projectRoot}",
+          "command": "pnpm test",
+          "env": {
+            "APEX_PARSER": "built-in"
+          }
+        }
       },
       "test:parser:native": {
         "dependsOn": [
@@ -92,7 +98,15 @@
         "outputs": [
           "{projectRoot}/coverage"
         ],
-        "cache": false
+        "cache": false,
+        "executor": "nx:run-commands",
+        "options": {
+          "cwd": "{projectRoot}",
+          "command": "pnpm test",
+          "env": {
+            "APEX_PARSER": "native"
+          }
+        }
       },
       "build:dev": {
         "dependsOn": [
