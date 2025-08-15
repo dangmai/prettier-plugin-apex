@@ -169,7 +169,9 @@ export function massageAstNode(ast: any, newObj: any): any {
       }
     }
   }
-  METADATA_TO_IGNORE.forEach((name) => delete newObj[name]);
+  METADATA_TO_IGNORE.forEach((name) => {
+    delete newObj[name];
+  });
 }
 
 /**
