@@ -66,11 +66,15 @@ function pushIfExist(
 ): Doc[] {
   if (doc) {
     if (preDocs) {
-      preDocs.forEach((preDoc: Doc) => parts.push(preDoc));
+      preDocs.forEach((preDoc: Doc) => {
+        parts.push(preDoc);
+      });
     }
     parts.push(doc);
     if (postDocs) {
-      postDocs.forEach((postDoc: Doc) => parts.push(postDoc));
+      postDocs.forEach((postDoc: Doc) => {
+        parts.push(postDoc);
+      });
     }
   }
   return parts;
