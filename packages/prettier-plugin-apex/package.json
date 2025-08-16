@@ -74,7 +74,7 @@
         ],
         "cache": false
       },
-      "test:parser:built-in": {
+      "test:parser": {
         "dependsOn": [
           "build:dev"
         ],
@@ -89,22 +89,17 @@
           "env": {
             "APEX_PARSER": "built-in"
           }
-        }
-      },
-      "test:parser:native": {
-        "dependsOn": [
-          "build:dev"
-        ],
-        "outputs": [
-          "{projectRoot}/coverage"
-        ],
-        "cache": false,
-        "executor": "nx:run-commands",
-        "options": {
-          "cwd": "{projectRoot}",
-          "command": "pnpm test",
-          "env": {
-            "APEX_PARSER": "native"
+        },
+        "configurations": {
+          "built-in": {
+            "env": {
+              "APEX_PARSER": "built-in"
+            }
+          },
+          "native": {
+            "env": {
+              "APEX_PARSER": "native"
+            }
           }
         }
       },

@@ -14,7 +14,7 @@ pnpm install
 pnpm nx run prettier-plugin-apex:lint
 pnpm nx run prettier-plugin-apex:start-server # This spins up the built in HTTP parsing server
 # In another terminal
-pnpm nx run prettier-plugin-apex:test:parser:built-in
+pnpm nx run prettier-plugin-apex:test:parser --configuration built-in
 # When you are done
 pnpm nx run prettier-plugin-apex:stop-server
 ```
@@ -35,8 +35,8 @@ with the [Development Containers](https://containers.dev/) standard.
 Here's what you need to know about the Prettier Apex tests:
 
 - The tests use [Vitest snapshots](https://vitest.dev/guide/snapshot).
-- You can make changes and run `pnpm nx run prettier-plugin-apex:test:parser:built-in -u` to update the snapshots. Then run `git diff` to take a look at what changed. Always update the snapshots when opening a PR.
-- You can run `AST_COMPARE=1 pnpm nx run prettier-plugin-apex:test:parser:built-in` for a more robust test run. That formats each file, re-parses it, and compares the new AST with the original one and makes sure they are semantically equivalent.
+- You can make changes and run `pnpm nx run prettier-plugin-apex:test:parser --configuration built-in -u` to update the snapshots. Then run `git diff` to take a look at what changed. Always update the snapshots when opening a PR.
+- You can run `AST_COMPARE=1 pnpm nx run prettier-plugin-apex:test:parser --configuration built-in` for a more robust test run. That formats each file, re-parses it, and compares the new AST with the original one and makes sure they are semantically equivalent.
 - Each test folder has a `jsfmt.spec.ts` that runs the tests. Generally you can just put `runSpec(fileURLToPath(new URL(".", import.meta.url)), ["apex"]);` there. This will verify that the output using the Apex parser stays consistent. You can also pass options as the third argument, like this: `runSpec(fileURLToPath(new URL(".", import.meta.url)), ["apex"], { apexInsertFinalNewLine: false });`
 - If you would like to debug prettier locally, you can either debug it in node or the browser. The easiest way to debug it in the browser is to run the interactive `docs` REPL locally. The easiest way to debug it in node, is to create a local test file and run it in an editor like VS Code.
 

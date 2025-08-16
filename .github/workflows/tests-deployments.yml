@@ -79,7 +79,7 @@ jobs:
         run: pnpm nx run prettier-plugin-apex:wait-server
 
       - name: Run functional tests
-        run: AST_COMPARE=true pnpm nx run prettier-plugin-apex:test:parser:built-in
+        run: AST_COMPARE=true pnpm nx run prettier-plugin-apex:test:parser --configuration built-in
 
       - name: Upload Prettier Plugin Apex code coverage
         if: matrix.ENABLE_CODE_COVERAGE
