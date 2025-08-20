@@ -48,8 +48,8 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
       zx:
-        specifier: 8.8.0
-        version: 8.8.0
+        specifier: 8.8.1
+        version: 8.8.1
 
   packages/@prettier-apex/apex-ast-serializer-darwin-arm64: {}
 
@@ -1970,8 +1970,8 @@ packages:
     resolution: {integrity: sha512-7dSzzRQ++CKnNI/krKnYRV7JKKPUXMEh61soaHKg9mrWEhzFWhFnxPxGl+69cD1Ou63C13NUPCnmIcrvqCuM6w==}
     engines: {node: '>=12'}
 
-  zx@8.8.0:
-    resolution: {integrity: sha512-v0VZXgSHusDvTtZROno3Ws8xkE1uNSSwH/yF8Fm+ZwBrYhr+bRNNpsnTJ32eR/t6umc7lAz5WqdP800ugW9zFA==}
+  zx@8.8.1:
+    resolution: {integrity: sha512-qvsKBnvWHstHKCluKPlEgI/D3+mdiQyMoSSeFR8IX/aXzWIas5A297KxKgPJhuPXdrR6ma0Jzx43+GQ/8sqbrw==}
     engines: {node: '>= 12.17.0'}
     hasBin: true
 
@@ -3729,4 +3729,4 @@ snapshots:
       y18n: 5.0.8
       yargs-parser: 21.1.1
 
-  zx@8.8.0: {}
+  zx@8.8.1: {}
