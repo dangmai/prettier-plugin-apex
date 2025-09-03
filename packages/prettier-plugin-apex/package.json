@@ -2,6 +2,7 @@
   "name": "prettier-plugin-apex",
   "version": "2.2.6",
   "description": "Salesforce Apex plugin for Prettier",
+  "repository": "dangmai/prettier-plugin-apex",
   "type": "module",
   "exports": "./dist/src/index.js",
   "browser": "dist/src/standalone.umd.cjs",
