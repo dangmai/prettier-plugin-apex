@@ -28,7 +28,7 @@
     "@nx/shared-fs-cache": "3.1.0",
     "@tsconfig/node18": "18.2.4",
     "@types/node": "18.19.31",
-    "@types/semver": "7.7.0",
+    "@types/semver": "7.7.1",
     "del-cli": "6.0.0",
     "nx": "21.4.1",
     "prettier": "3.6.2",
