@@ -13,7 +13,7 @@ importers:
         version: 2.2.4
       '@nx/shared-fs-cache':
         specifier: 3.1.1
-        version: 3.1.1(nx@21.5.3)
+        version: 3.1.1(nx@21.6.1)
       '@tsconfig/node18':
         specifier: 18.2.4
         version: 18.2.4
@@ -27,8 +27,8 @@ importers:
         specifier: 6.0.0
         version: 6.0.0
       nx:
-        specifier: 21.5.3
-        version: 21.5.3
+        specifier: 21.6.1
+        version: 21.6.1
       prettier:
         specifier: 3.6.2
         version: 3.6.2
@@ -1539,8 +1539,8 @@ packages:
     resolution: {integrity: sha512-S48WzZW777zhNIrn7gxOlISNAqi9ZC/uQFnRdbeIHhZhCA6UqpkOT8T1G7BvfdgP4Er8gF4sUbaS0i7QvIfCWw==}
     engines: {node: '>=8'}
 
-  nx@21.5.3:
-    resolution: {integrity: sha512-+XwzK3OWZw/7zLdhNHBms9VdAA8F6w6QsX8qFQ3+3CnbqEy0IDmVxTXb8c711LDMbEtNn94EiWvSV6C00FKw9Q==}
+  nx@21.6.1:
+    resolution: {integrity: sha512-sVz4kXPxhHm+jyLpRlQblHP3ltlkivUc2psl6WpEbS3Z1pV5cMg6H/GDLohLt5VyQ8tgqKNA+mXQqljVUh8hWg==}
     hasBin: true
     peerDependencies:
       '@swc-node/register': ^1.8.0
@@ -2361,13 +2361,13 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.19.1
 
-  '@nx/devkit@21.5.1(nx@21.5.3)':
+  '@nx/devkit@21.5.1(nx@21.6.1)':
     dependencies:
       ejs: 3.1.10
       enquirer: 2.3.6
       ignore: 5.3.2
       minimatch: 9.0.3
-      nx: 21.5.3
+      nx: 21.6.1
       semver: 7.7.2
       tmp: 0.2.5
       tslib: 2.8.1
@@ -2451,11 +2451,11 @@ snapshots:
   '@nx/nx-win32-x64-msvc@21.5.3':
     optional: true
 
-  '@nx/shared-fs-cache@3.1.1(nx@21.5.3)':
+  '@nx/shared-fs-cache@3.1.1(nx@21.6.1)':
     dependencies:
-      '@nx/devkit': 21.5.1(nx@21.5.3)
+      '@nx/devkit': 21.5.1(nx@21.6.1)
       '@nx/key': 3.1.1
-      nx: 21.5.3
+      nx: 21.6.1
       semver: 7.5.4
     transitivePeerDependencies:
       - debug
@@ -3301,7 +3301,7 @@ snapshots:
     dependencies:
       path-key: 3.1.1
 
-  nx@21.5.3:
+  nx@21.6.1:
     dependencies:
       '@napi-rs/wasm-runtime': 0.2.4
       '@yarnpkg/lockfile': 1.1.0
@@ -3373,7 +3373,7 @@ snapshots:
       bl: 4.1.0
       chalk: 4.1.2
       cli-cursor: 3.1.0
-      cli-spinners: 2.6.1
+      cli-spinners: 2.9.2
       is-interactive: 1.0.0
       log-symbols: 4.1.0
       strip-ansi: 6.0.1
