@@ -24,8 +24,8 @@
     "use-debounce": "10.0.6"
   },
   "devDependencies": {
-    "@types/react": "19.2.1",
-    "@types/react-dom": "19.2.0",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.1",
     "@vitejs/plugin-react": "5.0.4",
     "vite": "7.1.9",
     "vite-plugin-radar": "0.10.1"
