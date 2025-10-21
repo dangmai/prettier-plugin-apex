@@ -111,8 +111,8 @@ importers:
         specifier: ^3.0.0
         version: 3.6.2
       wait-on:
-        specifier: ^8.0.0
-        version: 8.0.5
+        specifier: ^9.0.0
+        version: 9.0.1
     devDependencies:
       '@types/wait-on':
         specifier: 5.3.4
@@ -1956,9 +1956,9 @@ packages:
       jsdom:
         optional: true
 
-  wait-on@8.0.5:
-    resolution: {integrity: sha512-J3WlS0txVHkhLRb2FsmRg3dkMTCV1+M6Xra3Ho7HzZDHpE7DCOnoSoCJsZotrmW3uRMhvIJGSKUKrh/MeF4iag==}
-    engines: {node: '>=12.0.0'}
+  wait-on@9.0.1:
+    resolution: {integrity: sha512-noeCAI+XbqWMXY23sKril0BSURhuLYarkVXwJv1uUWwoojZJE7pmX3vJ7kh7SZaNgPGzfsCSQIZM/AGvu0Q9pA==}
+    engines: {node: '>=20.0.0'}
     hasBin: true
 
   wcwidth@1.0.1:
@@ -3742,7 +3742,7 @@ snapshots:
       - tsx
       - yaml
 
-  wait-on@8.0.5:
+  wait-on@9.0.1:
     dependencies:
       axios: 1.12.2
       joi: 18.0.1
