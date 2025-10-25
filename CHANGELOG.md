@@ -2,6 +2,10 @@
 
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
 
+## Dependency Changes
+
+- Drop support for NodeJS < 20.
+
 ## Internal Changes
 
 - Replace `eslint` with `biome` for linting purpose.
