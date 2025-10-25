@@ -14,7 +14,7 @@
     "version": "tsx scripts/release.zx.mts"
   },
   "engines": {
-    "node": ">= 18.11.0",
+    "node": ">= 20",
     "pnpm": "^10.0.0"
   },
   "pnpm": {
@@ -26,8 +26,8 @@
   "devDependencies": {
     "@biomejs/biome": "2.3.0",
     "@nx/shared-fs-cache": "4.0.0",
-    "@tsconfig/node18": "18.2.4",
-    "@types/node": "18.19.31",
+    "@tsconfig/node20": "20.1.6",
+    "@types/node": "20.14.8",
     "@types/semver": "7.7.1",
     "del-cli": "6.0.0",
     "nx": "22.0.1",

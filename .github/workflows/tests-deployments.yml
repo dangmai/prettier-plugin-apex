@@ -14,15 +14,16 @@ jobs:
       fail-fast: false
       matrix:
         node:
+          - "25"
+          - "24"
           - "22"
           - "20"
-          - "18"
         java:
           - "21"
           - "17"
           - "11"
         include:
-          - node: "18"
+          - node: "20"
             java: "11"
             ENABLE_CODE_COVERAGE: true
             ENABLE_INTEGRATION_TESTS: true
@@ -123,7 +124,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.0.0
         with:
-          node-version: "18"
+          node-version: "20"
           cache: pnpm
       - uses: actions/setup-java@v5.0.0
         with:
@@ -182,7 +183,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.0.0
         with:
-          node-version: 18
+          node-version: 20
           cache: pnpm
       - name: Set up JDK
         uses: graalvm/setup-graalvm@v1.2.4.1
