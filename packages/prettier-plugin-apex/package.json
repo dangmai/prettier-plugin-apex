@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "jest-docblock": "^30.0.0",
-    "wait-on": "^8.0.0"
+    "wait-on": "^9.0.0"
   },
   "optionalDependencies": {
     "@prettier-apex/apex-ast-serializer-darwin-arm64": "workspace:*",
