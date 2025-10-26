@@ -243,7 +243,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.0.0
         with:
-          node-version: 22
+          # Need at least Node 24 for OIDC Trusted Publishing support
+          node-version: 24
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
