@@ -7,6 +7,11 @@ on:
     - cron: "0 8 * * *"
   workflow_dispatch:
 
+permissions:
+  # Required for NPM Trusted Publishing OIDC
+  # https://docs.npmjs.com/trusted-publishers#step-2-configure-your-cicd-workflow
+  id-token: write
+
 jobs:
   functional-tests:
     runs-on: ubuntu-latest
@@ -240,6 +245,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+          registry-url: https://registry.npmjs.org
 
       - uses: actions/setup-java@v5.0.0
         with:
@@ -262,11 +268,6 @@ jobs:
 
       - name: Copy artifacts to correct packages
         run: pnpm run install:native:ci /tmp/artifacts
-
-      - name: Set publishing config
-        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
       - name: Check if prerelease
         id: check_prerelease
