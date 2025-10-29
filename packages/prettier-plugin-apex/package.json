@@ -44,9 +44,9 @@
   "license": "MIT",
   "devDependencies": {
     "@types/wait-on": "5.3.4",
-    "@vitest/coverage-v8": "4.0.4",
+    "@vitest/coverage-v8": "4.0.5",
     "vite": "7.1.12",
-    "vitest": "4.0.4"
+    "vitest": "4.0.5"
   },
   "peerDependencies": {
     "prettier": "^3.0.0"
