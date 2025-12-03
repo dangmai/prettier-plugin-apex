@@ -4,7 +4,7 @@ buildscript {
   }
   dependencies {
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
-    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '5.0.2'
+    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '5.0.3'
   }
 }
 plugins {
