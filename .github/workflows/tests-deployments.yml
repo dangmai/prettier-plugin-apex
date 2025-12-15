@@ -221,7 +221,7 @@ jobs:
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ env.OUTPUT_NAME }}
           path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
@@ -261,7 +261,7 @@ jobs:
         run: pnpm run build
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: /tmp/artifacts
           pattern: apex-ast-serializer-*
