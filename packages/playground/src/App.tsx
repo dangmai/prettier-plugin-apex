@@ -18,6 +18,8 @@ let didInit = false;
 interface EncodedState {
   options: {
     apexInsertFinalNewline: boolean;
+    apexListMultiline: boolean;
+    apexMapMultiline: boolean;
     host: string;
     parser: string;
     port: number;
@@ -47,6 +49,8 @@ function App() {
   const [tabWidth, setTabWidth] = useState(2);
   const [useTabs, setUseTabs] = useState(false);
   const [apexInsertFinalNewline, setApexInsertFinalNewline] = useState(true);
+  const [apexListMultiline, setApexListMultiline] = useState(false);
+  const [apexMapMultiline, setApexMapMultiline] = useState(false);
   const [originalCode, setOriginalCode] = useState(endent`
     class HelloWorld {
       void hello() {
@@ -76,6 +80,8 @@ function App() {
       setTabWidth(state.options.tabWidth);
       setUseTabs(state.options.useTabs);
       setApexInsertFinalNewline(state.options.apexInsertFinalNewline);
+      setApexListMultiline(state.options.apexListMultiline ?? false);
+      setApexMapMultiline(state.options.apexMapMultiline ?? false);
       setOriginalCode(state.code);
     }
   }, []);
@@ -90,6 +96,8 @@ function App() {
         apexStandaloneHost: debouncedHost,
         apexStandaloneProtocol: protocol,
         apexInsertFinalNewline,
+        apexListMultiline,
+        apexMapMultiline,
         plugins: [prettierApex],
         parser,
         printWidth,
@@ -130,6 +138,8 @@ function App() {
     tabWidth,
     useTabs,
     apexInsertFinalNewline,
+    apexListMultiline,
+    apexMapMultiline,
     debouncedCode,
   ]);
 
@@ -234,6 +244,32 @@ function App() {
                     }
                   />
                 </OptionEntry>
+                <OptionEntry
+                  label="--apex-list-multiline"
+                  labelHtmlFor="apex-list-multiline"
+                >
+                  <input
+                    type="checkbox"
+                    id="apex-list-multiline"
+                    checked={apexListMultiline}
+                    onChange={(event) =>
+                      setApexListMultiline(event.target.checked)
+                    }
+                  />
+                </OptionEntry>
+                <OptionEntry
+                  label="--apex-map-multiline"
+                  labelHtmlFor="apex-map-multiline"
+                >
+                  <input
+                    type="checkbox"
+                    id="apex-map-multiline"
+                    checked={apexMapMultiline}
+                    onChange={(event) =>
+                      setApexMapMultiline(event.target.checked)
+                    }
+                  />
+                </OptionEntry>
               </details>
               <details open={false} className="sub-options">
                 <summary>Advanced</summary>
@@ -333,6 +369,8 @@ function App() {
                     tabWidth,
                     useTabs,
                     apexInsertFinalNewline,
+                    apexListMultiline,
+                    apexMapMultiline,
                   },
                   code: debouncedCode,
                 } as EncodedState);
