@@ -80,8 +80,8 @@ function App() {
       setTabWidth(state.options.tabWidth);
       setUseTabs(state.options.useTabs);
       setApexInsertFinalNewline(state.options.apexInsertFinalNewline);
-      setApexListMultiline(state.options.apexListMultiline ?? false);
-      setApexMapMultiline(state.options.apexMapMultiline ?? false);
+      setApexListMultiline(state.options.apexListMultiline);
+      setApexMapMultiline(state.options.apexMapMultiline);
       setOriginalCode(state.code);
     }
   }, []);
