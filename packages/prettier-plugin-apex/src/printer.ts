@@ -1592,7 +1592,11 @@ function handleNewMapInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewMapLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewMapLiteral(
+  path: AstPath,
+  print: PrintFn,
+  options: prettier.ParserOptions,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "pairs");
 
   const parts: Doc[] = [];
@@ -1604,9 +1608,19 @@ function handleNewMapLiteral(path: AstPath, print: PrintFn): Doc {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(line);
-    parts.push(join([",", line], valueDocs));
-    parts.push(dedent(line));
+    const shouldForceMultiline =
+      options.apexMapMultiline && valueDocs.length > 1;
+    if (shouldForceMultiline) {
+      // Force multiline when option is enabled and there are 2+ entries
+      parts.push(hardline);
+      parts.push(join([",", hardline], valueDocs));
+      parts.push(dedent(hardline));
+    } else {
+      // Use original behavior: allow width-based breaking
+      parts.push(line);
+      parts.push(join([",", line], valueDocs));
+      parts.push(dedent(line));
+    }
   }
   parts.push("}");
   return groupIndentConcat(parts);
@@ -1622,7 +1636,11 @@ function handleMapLiteralKeyValue(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNewListLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewListLiteral(
+  path: AstPath,
+  print: PrintFn,
+  options: prettier.ParserOptions,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "values");
 
   const parts: Doc[] = [];
@@ -1633,9 +1651,19 @@ function handleNewListLiteral(path: AstPath, print: PrintFn): Doc {
   // Values
   parts.push("{");
   if (valueDocs.length > 0) {
-    parts.push(line);
-    parts.push(join([",", line], valueDocs));
-    parts.push(dedent(line));
+    const shouldForceMultiline =
+      options.apexListMultiline && valueDocs.length > 1;
+    if (shouldForceMultiline) {
+      // Force multiline when option is enabled and there are 2+ entries
+      parts.push(hardline);
+      parts.push(join([",", hardline], valueDocs));
+      parts.push(dedent(hardline));
+    } else {
+      // Use original behavior: allow width-based breaking
+      parts.push(line);
+      parts.push(join([",", line], valueDocs));
+      parts.push(dedent(line));
+    }
   }
   parts.push("}");
   return groupIndentConcat(parts);

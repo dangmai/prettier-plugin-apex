@@ -137,6 +137,20 @@ export const options: SupportOptions = {
     description:
       "Whether to insert one newline as the last thing in the output. Default to true.",
   },
+  apexListMultiline: {
+    type: "boolean",
+    category: CATEGORY_APEX,
+    default: false,
+    description:
+      "Whether to format list literals with multiple entries across multiple lines. Default to false.",
+  },
+  apexMapMultiline: {
+    type: "boolean",
+    category: CATEGORY_APEX,
+    default: false,
+    description:
+      "Whether to format map literals with multiple entries across multiple lines. Default to false.",
+  },
 };
 
 export const defaultOptions = {};

@@ -7,6 +7,8 @@ declare module "prettier" {
     apexStandaloneHost: string;
     apexStandaloneProtocol: string;
     apexInsertFinalNewline: boolean;
+    apexListMultiline: boolean;
+    apexMapMultiline: boolean;
   }
   namespace __debug {
     export function parse(

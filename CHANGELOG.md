@@ -1,5 +1,7 @@
 # Unreleased
 
+- Add `apexListMultiline` configuration option to control multiline formatting of list literals with multiple entries.
+- Add `apexMapMultiline` configuration option to control multiline formatting of map literals with multiple entries.
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
 
 ## Dependency Changes
