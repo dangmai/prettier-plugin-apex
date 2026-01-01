@@ -5,18 +5,20 @@
   automergeType: "pr",
   automergeStrategy: "squash",
   lockFileMaintenance: {
-    enabled: true
+    enabled: true,
   },
   customManagers: [
-    // From https://docs.renovatebot.com/modules/manager/regex/#advanced-capture
     {
       customType: "regex",
       description: "Update _VERSION variables in Dockerfiles",
-      fileMatch: ["(^|/|\\.)Dockerfile$", "(^|/)Dockerfile\\.[^/]*$"],
+      managerFilePatterns: [
+        "/(^|/|\\.)Dockerfile$/",
+        "/(^|/)Dockerfile\\.[^/]*$/",
+      ],
       matchStrings: [
-        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
-      ]
-    }
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s",
+      ],
+    },
   ],
   packageRules: [
     {
@@ -25,28 +27,28 @@
         "patch",
         "pin",
         "digest",
-        "lockFileMaintenance"
+        "lockFileMaintenance",
       ],
-      automerge: true
+      automerge: true,
     },
     {
       matchPackageNames: ["@types/node"],
-      enabled: false
+      enabled: false,
     },
     {
       matchPackageNames: ["node"],
       matchUpdateTypes: ["major"],
-      enabled: false
+      enabled: false,
     },
     {
       matchPackageNames: ["eclipse-temurin"],
       matchUpdateTypes: ["major"],
-      enabled: false
+      enabled: false,
     },
     {
       groupName: "typescript-generator",
       additionalBranchPrefix: "",
-      matchPackageNames: ["/typescript-generator/"]
-    }
-  ]
+      matchPackageNames: ["/typescript-generator/"],
+    },
+  ],
 }
