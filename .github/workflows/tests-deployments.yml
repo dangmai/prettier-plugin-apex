@@ -71,7 +71,7 @@ jobs:
 
       - name: Upload Apex AST Serializer code coverage
         if: matrix.ENABLE_CODE_COVERAGE
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5.5.2
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -89,7 +89,7 @@ jobs:
 
       - name: Upload Prettier Plugin Apex code coverage
         if: matrix.ENABLE_CODE_COVERAGE
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v5.5.2
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -221,7 +221,7 @@ jobs:
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v6.0.0
         with:
           name: ${{ env.OUTPUT_NAME }}
           path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
@@ -261,7 +261,7 @@ jobs:
         run: pnpm run build
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v7.0.0
         with:
           path: /tmp/artifacts
           pattern: apex-ast-serializer-*
@@ -285,4 +285,4 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.check_prerelease.outcome == 'success'
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v2.5.0
