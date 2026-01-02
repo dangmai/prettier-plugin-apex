@@ -51,7 +51,7 @@ jobs:
 
       - uses: actions/setup-java@v5.1.0
         with:
-          distribution: temurin
+          distribution: graalvm
           java-version: ${{ matrix.java }}
           cache: gradle
 
@@ -132,7 +132,7 @@ jobs:
           cache: pnpm
       - uses: actions/setup-java@v5.1.0
         with:
-          distribution: temurin
+          distribution: graalvm
           java-version: "17"
           cache: gradle
       - name: Install dependencies
