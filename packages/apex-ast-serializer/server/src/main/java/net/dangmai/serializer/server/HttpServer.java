@@ -1,25 +1,23 @@
 package net.dangmai.serializer.server;
 
-import static org.eclipse.jetty.servlet.ServletContextHandler.NO_SESSIONS;
+import static org.eclipse.jetty.ee10.servlet.ServletContextHandler.NO_SESSIONS;
 
-import jakarta.servlet.DispatcherType;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.EnumSet;
 import java.util.Properties;
+import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.server.Handler.Sequence;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.CrossOriginHandler;
 import org.eclipse.jetty.server.handler.ShutdownHandler;
-import org.eclipse.jetty.servlet.FilterHolder;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.servlets.CrossOriginFilter;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,24 +106,22 @@ public class HttpServer {
         "jersey.config.server.provider.packages",
         "net.dangmai.serializer.server.resources"
       );
+      Sequence handlerSequence = new Sequence();
       if (cmd.hasOption("c")) {
-        FilterHolder filterHolder = servletContextHandler.addFilter(
-          CrossOriginFilter.class,
-          "/*",
-          EnumSet.of(DispatcherType.REQUEST)
+        CrossOriginHandler crossOriginHandler = new CrossOriginHandler();
+        crossOriginHandler.setAllowedOriginPatterns(
+          Set.of(cmd.getOptionValue("c"))
         );
-        filterHolder.setInitParameter(
-          "allowedOrigins",
-          cmd.getOptionValue("c")
-        );
+        handlerSequence.addHandler(crossOriginHandler);
       }
 
-      HandlerList handlerList = new HandlerList();
-      handlerList.addHandler(servletContextHandler);
+      handlerSequence.addHandler(servletContextHandler);
       if (cmd.hasOption("s")) {
-        handlerList.addHandler(new ShutdownHandler(cmd.getOptionValue("a")));
+        handlerSequence.addHandler(
+          new ShutdownHandler(cmd.getOptionValue("a"))
+        );
       }
-      server.setHandler(handlerList);
+      server.setHandler(handlerSequence);
 
       try {
         server.start();
