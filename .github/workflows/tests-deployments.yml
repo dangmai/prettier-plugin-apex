@@ -24,12 +24,12 @@ jobs:
           - "22"
           - "20"
         java:
+          - "25"
           - "21"
           - "17"
-          - "11"
         include:
           - node: "20"
-            java: "11"
+            java: "17"
             ENABLE_CODE_COVERAGE: true
             ENABLE_INTEGRATION_TESTS: true
     env:
@@ -250,8 +250,8 @@ jobs:
 
       - uses: actions/setup-java@v5.1.0
         with:
-          distribution: temurin
-          java-version: 11
+          distribution: graalvm
+          java-version: 17
           cache: gradle
 
       - name: Install dependencies

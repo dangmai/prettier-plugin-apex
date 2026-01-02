@@ -17,8 +17,8 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v5.1.0
         with:
-          distribution: temurin
-          java-version: 11
+          distribution: graalvm
+          java-version: 17
           cache: gradle
       - name: Run create-jorje-jar.sh
         run: ./packages/apex-ast-serializer/tools/create-jorje-jar.sh

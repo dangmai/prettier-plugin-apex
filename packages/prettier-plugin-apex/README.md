@@ -34,7 +34,7 @@ including a mix of open source/proprietary/Salesforce internal code bases.
 ### Requirements
 
 - Node >= 20 (that have not been End-of-Life'd)
-- Java Runtime Engine >= 11 _only_ for platforms without prebuilt native executables
+- Java Runtime Engine >= 17 _only_ for platforms without prebuilt native executables
 - The following platforms are provided with prebuilt native executables for improved parsing performance:
   - Windows x64
   - Linux x64

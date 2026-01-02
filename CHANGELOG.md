@@ -5,6 +5,7 @@
 ## Dependency Changes
 
 - Drop support for NodeJS < 20.
+- Drop support for Java < 17.
 
 ## Internal Changes
 
