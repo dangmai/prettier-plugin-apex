@@ -49,7 +49,21 @@ application {
   ]
   applicationDistribution.into("bin") {
     from(parserStartScripts)
-    fileMode = 0755
+    filePermissions {
+      user {
+        read = true
+        write = true
+        execute = true
+      }
+      group {
+        read = true
+        write = true
+      }
+      other {
+        read = true
+        write = true
+      }
+    }
   }
 
   applicationDistribution.from("build/typings") {
