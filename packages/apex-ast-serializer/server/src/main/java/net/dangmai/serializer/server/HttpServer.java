@@ -109,9 +109,8 @@ public class HttpServer {
       Sequence handlerSequence = new Sequence();
       if (cmd.hasOption("c")) {
         CrossOriginHandler crossOriginHandler = new CrossOriginHandler();
-        crossOriginHandler.setAllowedOriginPatterns(
-          Set.of(cmd.getOptionValue("c"))
-        );
+        String[] origins = cmd.getOptionValue("c").split(",");
+        crossOriginHandler.setAllowedOriginPatterns(Set.of(origins));
         handlerSequence.addHandler(crossOriginHandler);
       }
 
