@@ -212,6 +212,11 @@ jobs:
         run: pnpm nx run apex-ast-serializer:build:musl
       - name: Build native executable
         run: pnpm nx run apex-ast-serializer:build:native
+        env:
+          # Needed for Windows; to resolve issue with temp folder during native image build, due to relativization
+          # problem when different drives are used, such as in GHA runners.
+          # https://github.com/graalvm/native-build-tools/issues/754
+          GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
       - name: Save NX Cache
         uses: actions/cache/save@v5.0.1
         with:
