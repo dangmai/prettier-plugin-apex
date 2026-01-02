@@ -44,7 +44,6 @@ java {
 
   toolchain {
     languageVersion = JavaLanguageVersion.of(23)
-    nativeImageCapable = true
   }
 }
 
