@@ -13,7 +13,9 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+      - renovate/* # We use Renovate automergeType branch, which means we need to run on these branches too, otherwise the branch protection check will fail
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [master]
