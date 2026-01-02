@@ -9,7 +9,7 @@ The result is printed out to `stdout` as either a JSON or XML object.
 
 ## Building
 
-This project requires Java >= 11 to compile, and specifically [GraalVM](https://www.graalvm.org/) to build native images.
+This project requires Java >= 17 to compile, and specifically [GraalVM](https://www.graalvm.org/) to build native images.
 
 To get the distributable package (without the native image), run:
 

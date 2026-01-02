@@ -60,9 +60,10 @@ application {
 java {
   group 'net.dangmai'
   version = new groovy.json.JsonSlurper().parse(file('../../../package.json')).version
+}
 
-  sourceCompatibility = JavaVersion.VERSION_11
-  targetCompatibility = JavaVersion.VERSION_11
+tasks.withType(JavaCompile).configureEach {
+    options.release = 17
 }
 
 processResources {
