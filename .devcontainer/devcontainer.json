@@ -2,7 +2,7 @@
   "name": "Prettier Plugin Apex",
   "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers-extra/features/mise:1": {}
+    "ghcr.io/devcontainers-extra/features/mise:1.0.0": {}
   },
   "forwardPorts": [2117, 5173],
   "postCreateCommand": "./.devcontainer/post-create.sh",
