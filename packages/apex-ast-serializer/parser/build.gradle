@@ -87,7 +87,7 @@ dependencies {
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '6.0.1'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${junitVersion}"
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20250517'
@@ -121,6 +121,10 @@ jacocoTestReport {
 
 // This task can be used to run tests under native instrumentation
 task nativeInstrumentedTest(type: Test) {
+  // Since Gradle 9, we need to explicitly specify the test classes and classpath
+  // https://docs.gradle.org/current/userguide/upgrading_major_version_9.html#test_tasks_may_no_longer_execute_expected_tests
+  testClassesDirs = testing.suites.test.sources.output.classesDirs
+  classpath = testing.suites.test.sources.runtimeClasspath
 }
 
 graalvmNative {
