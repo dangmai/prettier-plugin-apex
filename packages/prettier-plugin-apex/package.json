@@ -27,7 +27,7 @@
     "pretest": "pnpm run lint",
     "test": "vitest run",
     "test:package": "tsx tests_integration/package/run-package-tests.zx.mts",
-    "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c '*'",
+    "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c http://localhost:5173",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
     "stop-server": "tsx bin/stop-apex-server.ts",
     "lint": "biome lint ./src ./bin ./tests_config",

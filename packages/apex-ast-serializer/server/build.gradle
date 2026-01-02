@@ -141,7 +141,7 @@ jar {
 
 ext {
   slf4jVersion = '2.0.17'
-  jettyVersion = '11.0.26'
+  jettyVersion = '12.1.5'
   jerseyVersion = '3.1.11'
   junitVersion = '6.0.1'
 }
@@ -154,16 +154,11 @@ dependencies {
   implementation "org.slf4j:slf4j-api:${slf4jVersion}"
   implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
   implementation "org.eclipse.jetty:jetty-server:${jettyVersion}"
-  implementation "org.eclipse.jetty:jetty-servlet:${jettyVersion}"
-  implementation "org.eclipse.jetty:jetty-servlets:${jettyVersion}"
+  implementation "org.eclipse.jetty.ee10:jetty-ee10-servlet:${jettyVersion}"
+  implementation "org.eclipse.jetty.ee10:jetty-ee10-servlets:${jettyVersion}"
   implementation "org.glassfish.jersey.core:jersey-server:${jerseyVersion}"
   implementation "org.glassfish.jersey.containers:jersey-container-servlet-core:${jerseyVersion}"
-  // The next time we bump jersey major version, we will need to change the package
-  // here back to org.glassfish.jersey.containers:jersey-container-jetty-http.
-  // The current package is a workaround for 3.1.5 to work specifically with
-  // Jetty 11. See this issue for more detail:
-  // https://github.com/eclipse-ee4j/jersey/issues/5483
-  implementation "org.glassfish.jersey.containers:jersey-container-jetty11-http:${jerseyVersion}"
+  implementation "org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}"
   implementation("org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}") {
     exclude(module: 'byte-buddy') // Workaround https://github.com/FasterXML/jackson-databind/issues/4428 until Jackson 2.17.1
   }
