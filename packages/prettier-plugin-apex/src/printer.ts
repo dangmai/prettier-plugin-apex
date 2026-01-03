@@ -50,14 +50,6 @@ function groupIndentConcat(docs: Doc[]): Doc {
   return group(indent(docs));
 }
 
-function handlePassthroughCall(
-  prop1: string,
-  prop2?: string,
-): (path: AstPath, print: PrintFn) => Doc {
-  return (path: AstPath, print: PrintFn) =>
-    prop2 ? path.call(print, prop1, prop2) : path.call(print, prop1);
-}
-
 function pushIfExist(
   parts: Doc[],
   doc: Doc,
@@ -949,6 +941,8 @@ function handleStatement(
 ): Doc {
   let doc: Doc | undefined;
   switch (childClass as jorje.Stmnt["@class"]) {
+    case APEX_TYPES.VARIABLE_DECLARATION_STATEMENT:
+      return handleVariableDeclarationStatement(path, print);
     case APEX_TYPES.DML_INSERT_STATEMENT:
       doc = "insert";
       break;
@@ -1251,6 +1245,93 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
     parts.push([declarationDocs[0], ";"]);
   }
   return groupConcat(parts);
+}
+
+function handleVariableDeclarationStatement(
+  path: AstPath,
+  print: PrintFn,
+): Doc {
+  return path.call(print, "variableDecls");
+}
+
+function handleLocationIdentifier(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "value");
+}
+
+function handleLiteralCase(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "expr");
+}
+
+function handleClassDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "body");
+}
+
+function handleEnumDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "body");
+}
+
+function handleInterfaceDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "body");
+}
+
+function handlePropertyMember(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "propertyDecl");
+}
+
+function handleFieldMember(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "variableDecls");
+}
+
+function handleMethodMember(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "methodDecl");
+}
+
+function handleInnerClassMember(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "body");
+}
+
+function handleInnerEnumMember(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "body");
+}
+
+function handleInnerInterfaceMember(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "body");
+}
+
+function handleSelectCaseExpression(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "expr");
+}
+
+function handleWhenOperator(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "identifier");
+}
+
+function handleCaseOperator(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "identifier");
+}
+
+function handleGroupByExpression(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "field");
+}
+
+function handleGeolocationExpression(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "expr");
+}
+
+function handleNumberLiteral(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "number", "$");
+}
+
+function handleNumberExpression(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "expr");
+}
+
+function handleQueryLiteralExpression(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "literal");
+}
+
+function handleApexExpression(path: AstPath, print: PrintFn): Doc {
+  return path.call(print, "expr");
 }
 
 function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
@@ -2928,12 +3009,10 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.JAVA_TYPE_REF]: handleJavaTypeRef,
   [APEX_TYPES.CLASS_TYPE_REF]: handleClassTypeRef,
   [APEX_TYPES.ARRAY_TYPE_REF]: handleArrayTypeRef,
-  [APEX_TYPES.LOCATION_IDENTIFIER]: handlePassthroughCall("value"),
+  [APEX_TYPES.LOCATION_IDENTIFIER]: handleLocationIdentifier,
   [APEX_TYPES.MODIFIER_PARAMETER_REF]: handleModifierParameterRef,
   [APEX_TYPES.EMPTY_MODIFIER_PARAMETER_REF]: handleEmptyModifierParameterRef,
   [APEX_TYPES.BLOCK_STATEMENT]: handleBlockStatement,
-  [APEX_TYPES.VARIABLE_DECLARATION_STATEMENT]:
-    handlePassthroughCall("variableDecls"),
   [APEX_TYPES.VARIABLE_DECLARATIONS]: handleVariableDeclarations,
   [APEX_TYPES.NAME_VALUE_PARAMETER]: handleNameValueParameter,
   [APEX_TYPES.ANNOTATION]: handleAnnotation,
@@ -2967,7 +3046,7 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.ELSE_WHEN]: handleElseWhen,
   [APEX_TYPES.TYPE_WHEN]: handleTypeWhen,
   [APEX_TYPES.ENUM_CASE]: handleEnumCase,
-  [APEX_TYPES.LITERAL_CASE]: handlePassthroughCall("expr"),
+  [APEX_TYPES.LITERAL_CASE]: handleLiteralCase,
   [APEX_TYPES.PROPERTY_DECLATION]: handlePropertyDeclaration,
   [APEX_TYPES.PROPERTY_GETTER]: handlePropertyGetterSetter("get"),
   [APEX_TYPES.PROPERTY_SETTER]: handlePropertyGetterSetter("set"),
@@ -2992,21 +3071,21 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
 
   // Compilation Unit: we're not handling InvalidDeclUnit
   [APEX_TYPES.TRIGGER_DECLARATION_UNIT]: handleTriggerDeclarationUnit,
-  [APEX_TYPES.CLASS_DECLARATION_UNIT]: handlePassthroughCall("body"),
-  [APEX_TYPES.ENUM_DECLARATION_UNIT]: handlePassthroughCall("body"),
-  [APEX_TYPES.INTERFACE_DECLARATION_UNIT]: handlePassthroughCall("body"),
+  [APEX_TYPES.CLASS_DECLARATION_UNIT]: handleClassDeclarationUnit,
+  [APEX_TYPES.ENUM_DECLARATION_UNIT]: handleEnumDeclarationUnit,
+  [APEX_TYPES.INTERFACE_DECLARATION_UNIT]: handleInterfaceDeclarationUnit,
   [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousBlockUnit,
 
   // Block Member
-  [APEX_TYPES.PROPERTY_MEMBER]: handlePassthroughCall("propertyDecl"),
-  [APEX_TYPES.FIELD_MEMBER]: handlePassthroughCall("variableDecls"),
+  [APEX_TYPES.PROPERTY_MEMBER]: handlePropertyMember,
+  [APEX_TYPES.FIELD_MEMBER]: handleFieldMember,
   [APEX_TYPES.STATEMENT_BLOCK_MEMBER]: handleStatementBlockMember(),
   [APEX_TYPES.STATIC_STATEMENT_BLOCK_MEMBER]:
     handleStatementBlockMember("static"),
-  [APEX_TYPES.METHOD_MEMBER]: handlePassthroughCall("methodDecl"),
-  [APEX_TYPES.INNER_CLASS_MEMBER]: handlePassthroughCall("body"),
-  [APEX_TYPES.INNER_ENUM_MEMBER]: handlePassthroughCall("body"),
-  [APEX_TYPES.INNER_INTERFACE_MEMBER]: handlePassthroughCall("body"),
+  [APEX_TYPES.METHOD_MEMBER]: handleMethodMember,
+  [APEX_TYPES.INNER_CLASS_MEMBER]: handleInnerClassMember,
+  [APEX_TYPES.INNER_ENUM_MEMBER]: handleInnerEnumMember,
+  [APEX_TYPES.INNER_INTERFACE_MEMBER]: handleInnerInterfaceMember,
 
   // Expression
   [APEX_TYPES.TERNARY_EXPRESSION]: handleTernaryExpression,
@@ -3075,18 +3154,18 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.SELECT_COUNT_CLAUSE]: () => ["SELECT", " ", "COUNT()"],
   [APEX_TYPES.SELECT_COLUMN_EXPRESSION]: handleColumnExpression,
   [APEX_TYPES.SELECT_INNER_QUERY]: handleSelectInnerQuery,
-  [APEX_TYPES.SELECT_CASE_EXPRESSION]: handlePassthroughCall("expr"),
+  [APEX_TYPES.SELECT_CASE_EXPRESSION]: handleSelectCaseExpression,
   [APEX_TYPES.CASE_EXPRESSION]: handleCaseExpression,
-  [APEX_TYPES.WHEN_OPERATOR]: handlePassthroughCall("identifier"),
+  [APEX_TYPES.WHEN_OPERATOR]: handleWhenOperator,
   [APEX_TYPES.WHEN_EXPRESSION]: handleWhenExpression,
-  [APEX_TYPES.CASE_OPERATOR]: handlePassthroughCall("identifier"),
+  [APEX_TYPES.CASE_OPERATOR]: handleCaseOperator,
   [APEX_TYPES.ELSE_EXPRESSION]: handleElseExpression,
   [APEX_TYPES.FIELD]: handleField,
   [APEX_TYPES.FIELD_IDENTIFIER]: handleFieldIdentifier,
   [APEX_TYPES.FROM_CLAUSE]: handleFromClause,
   [APEX_TYPES.FROM_EXPRESSION]: handleFromExpression,
   [APEX_TYPES.GROUP_BY_CLAUSE]: handleGroupByClause,
-  [APEX_TYPES.GROUP_BY_EXPRESSION]: handlePassthroughCall("field"),
+  [APEX_TYPES.GROUP_BY_EXPRESSION]: handleGroupByExpression,
   [APEX_TYPES.GROUP_BY_TYPE]: handleGroupByType,
   [APEX_TYPES.HAVING_CLAUSE]: handleHavingClause,
   [APEX_TYPES.WHERE_CLAUSE]: handleWhereClause,
@@ -3100,12 +3179,12 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.WHERE_DISTANCE_EXPRESSION]: handleWhereDistanceExpression,
   [APEX_TYPES.DISTANCE_FUNCTION_EXPRESSION]: handleDistanceFunctionExpression,
   [APEX_TYPES.GEOLOCATION_LITERAL]: handleGeolocationLiteral,
-  [APEX_TYPES.GEOLOCATION_EXPRESSION]: handlePassthroughCall("expr"),
-  [APEX_TYPES.NUMBER_LITERAL]: handlePassthroughCall("number", "$"),
-  [APEX_TYPES.NUMBER_EXPRESSION]: handlePassthroughCall("expr"),
-  [APEX_TYPES.QUERY_LITERAL_EXPRESSION]: handlePassthroughCall("literal"),
+  [APEX_TYPES.GEOLOCATION_EXPRESSION]: handleGeolocationExpression,
+  [APEX_TYPES.NUMBER_LITERAL]: handleNumberLiteral,
+  [APEX_TYPES.NUMBER_EXPRESSION]: handleNumberExpression,
+  [APEX_TYPES.QUERY_LITERAL_EXPRESSION]: handleQueryLiteralExpression,
   [APEX_TYPES.QUERY_LITERAL]: handleWhereQueryLiteral,
-  [APEX_TYPES.APEX_EXPRESSION]: handlePassthroughCall("expr"),
+  [APEX_TYPES.APEX_EXPRESSION]: handleApexExpression,
   [APEX_TYPES.COLON_EXPRESSION]: handleColonExpression,
   [APEX_TYPES.ORDER_BY_CLAUSE]: handleOrderByClause,
   [APEX_TYPES.ORDER_BY_EXPRESSION]: handleOrderByExpression,
