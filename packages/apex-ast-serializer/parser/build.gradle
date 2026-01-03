@@ -12,7 +12,7 @@ plugins {
   id "java-test-fixtures"
   id 'application'
   id 'jacoco'
-  id 'org.graalvm.buildtools.native' version '0.10.6'
+  id 'org.graalvm.buildtools.native' version '0.11.3'
 }
 
 sourceSets {
@@ -41,10 +41,11 @@ application {
 java {
   group 'net.dangmai'
   version = new groovy.json.JsonSlurper().parse(file('../../../package.json')).version
-}
 
-tasks.withType(JavaCompile).configureEach {
-    options.release = 17
+  // We can't use Gradle's "release" feature because of this bug with GraalVM native build tools:
+  // https://github.com/oracle/graal/issues/7414
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 }
 
 processResources {
@@ -86,7 +87,7 @@ dependencies {
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
   testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '6.0.1'
+  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${junitVersion}"
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation group: 'org.json', name: 'json', version: '20250517'
@@ -120,6 +121,10 @@ jacocoTestReport {
 
 // This task can be used to run tests under native instrumentation
 task nativeInstrumentedTest(type: Test) {
+  // Since Gradle 9, we need to explicitly specify the test classes and classpath
+  // https://docs.gradle.org/current/userguide/upgrading_major_version_9.html#test_tasks_may_no_longer_execute_expected_tests
+  testClassesDirs = testing.suites.test.sources.output.classesDirs
+  classpath = testing.suites.test.sources.runtimeClasspath
 }
 
 graalvmNative {

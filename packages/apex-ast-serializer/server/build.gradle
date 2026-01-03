@@ -74,10 +74,11 @@ application {
 java {
   group 'net.dangmai'
   version = new groovy.json.JsonSlurper().parse(file('../../../package.json')).version
-}
 
-tasks.withType(JavaCompile).configureEach {
-    options.release = 17
+  // We can't use Gradle's "release" feature because of this bug with GraalVM native build tools:
+  // https://github.com/oracle/graal/issues/7414
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 }
 
 processResources {
