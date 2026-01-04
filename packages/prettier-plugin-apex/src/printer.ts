@@ -61,7 +61,9 @@ function pushIfExist(
         parts.push(...preDocs);
     }
     parts.push(doc);
-    postDocs && parts.push(...postDocs);
+    if (postDocs) {
+        parts.push(...postDocs);
+    }
   }
   return parts;
 }
