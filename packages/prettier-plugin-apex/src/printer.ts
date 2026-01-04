@@ -57,16 +57,23 @@ function pushIfExist(
   preDocs?: Doc[] | null,
 ): Doc[] {
   if (doc) {
-    if (preDocs) {
-      preDocs.forEach((preDoc: Doc) => {
+    // Optimized: cache length and go straight to loop (loop condition handles length > 0 check)
+    const preDocsLength = preDocs ? preDocs.length : 0;
+    // If preDocsLength > 0, preDocs must be non-null, so safe to use non-null assertion
+    for (let i = 0; i < preDocsLength; i++) {
+      const preDoc = preDocs![i];
+      if (preDoc) {
         parts.push(preDoc);
-      });
+      }
     }
     parts.push(doc);
-    if (postDocs) {
-      postDocs.forEach((postDoc: Doc) => {
+    const postDocsLength = postDocs ? postDocs.length : 0;
+    // If postDocsLength > 0, postDocs must be non-null, so safe to use non-null assertion
+    for (let i = 0; i < postDocsLength; i++) {
+      const postDoc = postDocs![i];
+      if (postDoc) {
         parts.push(postDoc);
-      });
+      }
     }
   }
   return parts;
