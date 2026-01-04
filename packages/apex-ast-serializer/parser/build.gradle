@@ -4,7 +4,7 @@ buildscript {
   }
   dependencies {
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
-    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '5.0.3'
+    classpath("org.apache.groovy:groovy-json:5.0.3")
   }
 }
 plugins {
@@ -39,7 +39,7 @@ application {
 }
 
 java {
-  group 'net.dangmai'
+  group = 'net.dangmai'
   version = new groovy.json.JsonSlurper().parse(file('../../../package.json')).version
 
   // We can't use Gradle's "release" feature because of this bug with GraalVM native build tools:
@@ -61,7 +61,9 @@ repositories {
     dirs '../libs'
   }
   mavenCentral()
-  maven { url "https://jitpack.io" }
+  maven {
+    url = "https://jitpack.io"
+  }
   gradlePluginPortal()
 }
 
@@ -74,26 +76,27 @@ ext {
 }
 
 dependencies {
-  api name: 'apex-jorje-lsp'
+  api(":apex-jorje-lsp")
+
   // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  api group: 'com.thoughtworks.xstream', name: 'xstream', version: '1.4.21'
+  api("com.thoughtworks.xstream:xstream:1.4.21")
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
-  api group: 'commons-cli', name: 'commons-cli', version: '1.11.0'
+  api("commons-cli:commons-cli:1.11.0")
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  api group: 'commons-io', name: 'commons-io', version: '2.21.0'
+  api("commons-io:commons-io:2.21.0")
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: "${junitVersion}"
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:${junitVersion}")
 
   // https://mvnrepository.com/artifact/org.json/json
-  testFixturesImplementation group: 'org.json', name: 'json', version: '20250517'
+  testFixturesImplementation("org.json:json:20250517")
 
   // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  graalvmImplementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.184'
+  graalvmImplementation("io.github.classgraph:classgraph:4.8.184")
   nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
 }
 

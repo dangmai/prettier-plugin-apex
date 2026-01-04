@@ -1,10 +1,10 @@
 buildscript {
   dependencies {
     // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
-    classpath group: 'cz.habarta.typescript-generator', name: 'typescript-generator-gradle-plugin', version: '3.2.1263'
+    classpath("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:3.2.1263")
 
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
-    classpath group: 'org.apache.groovy', name: 'groovy-json', version: '5.0.3'
+    classpath("org.apache.groovy:groovy-json:5.0.3")
   }
 }
 
@@ -72,7 +72,7 @@ application {
 }
 
 java {
-  group 'net.dangmai'
+  group = 'net.dangmai'
   version = new groovy.json.JsonSlurper().parse(file('../../../package.json')).version
 
   // We can't use Gradle's "release" feature because of this bug with GraalVM native build tools:
@@ -151,33 +151,33 @@ dependencies {
   implementation project(':parser')
   testImplementation(testFixtures(project(":parser")))
 
-  implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
-  implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-  implementation "org.slf4j:slf4j-simple:${slf4jVersion}"
-  implementation "org.eclipse.jetty:jetty-server:${jettyVersion}"
-  implementation "org.eclipse.jetty.ee10:jetty-ee10-servlet:${jettyVersion}"
-  implementation "org.eclipse.jetty.ee10:jetty-ee10-servlets:${jettyVersion}"
-  implementation "org.glassfish.jersey.core:jersey-server:${jerseyVersion}"
-  implementation "org.glassfish.jersey.containers:jersey-container-servlet:${jerseyVersion}"
-  implementation "org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}"
+  implementation("javax.xml.bind:jaxb-api:2.3.1")
+  implementation("org.slf4j:slf4j-api:${slf4jVersion}")
+  implementation("org.slf4j:slf4j-simple:${slf4jVersion}")
+  implementation("org.eclipse.jetty:jetty-server:${jettyVersion}")
+  implementation("org.eclipse.jetty.ee10:jetty-ee10-servlet:${jettyVersion}")
+  implementation("org.eclipse.jetty.ee10:jetty-ee10-servlets:${jettyVersion}")
+  implementation("org.glassfish.jersey.core:jersey-server:${jerseyVersion}")
+  implementation("org.glassfish.jersey.containers:jersey-container-servlet:${jerseyVersion}")
+  implementation("org.glassfish.jersey.containers:jersey-container-jetty-http:${jerseyVersion}")
   implementation("org.glassfish.jersey.media:jersey-media-json-jackson:${jerseyVersion}") {
     exclude(module: 'byte-buddy') // Workaround https://github.com/FasterXML/jackson-databind/issues/4428 until Jackson 2.17.1
   }
-  implementation "org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}"
+  implementation("org.glassfish.jersey.inject:jersey-hk2:${jerseyVersion}")
 
   // https://mvnrepository.com/artifact/jakarta.activation/jakarta.activation-api
-  implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.4'
+  implementation("jakarta.activation:jakarta.activation-api:2.1.4")
 
   // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-  implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.6'
+  implementation("org.glassfish.jaxb:jaxb-runtime:4.0.6")
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
-  testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: "${junitVersion}"
-  testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: '6.0.1'
+  testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+  testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.1")
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
-  compileOnly group: 'cz.habarta.typescript-generator', name: 'typescript-generator-core', version: '3.2.1263'
+  compileOnly("cz.habarta.typescript-generator:typescript-generator-core:3.2.1263")
 }
 
 test {
