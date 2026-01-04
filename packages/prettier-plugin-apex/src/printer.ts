@@ -3250,33 +3250,35 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
 };
 
 function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
+  // Early return optimization: if node has no trailingEmptyLine, return immediately
+  if (!node?.trailingEmptyLine) {
+    return doc;
+  }
   let insertNewLine = false;
-  if (node?.trailingEmptyLine) {
-    // If the node has trailing comments, we have to defer the printing of the
-    // trailing new line to the last trailing comment, because otherwise
-    // there will be a new line before the trailing comments.
-    // If the node doesn't have trailing comments, we can safefly print the
-    // empty line directly after the node.
-    if (node.comments) {
-      const trailingComments = getTrailingComments(node);
-      if (trailingComments.length === 0) {
-        insertNewLine = true;
-      } else {
-        const lastTrailingCommentForThisNode =
-          trailingComments[trailingComments.length - 1];
-        if (
-          lastTrailingCommentForThisNode &&
-          // This trailingEmptyLine could have been explicitly set to false
-          // in the parsing phase if this comment is the last one in the document,
-          // in which case we'll respect it and not add a trailing empty line.
-          lastTrailingCommentForThisNode.trailingEmptyLine !== false
-        ) {
-          lastTrailingCommentForThisNode.trailingEmptyLine = true;
-        }
-      }
-    } else {
+  // If the node has trailing comments, we have to defer the printing of the
+  // trailing new line to the last trailing comment, because otherwise
+  // there will be a new line before the trailing comments.
+  // If the node doesn't have trailing comments, we can safefly print the
+  // empty line directly after the node.
+  if (node.comments) {
+    const trailingComments = getTrailingComments(node);
+    if (trailingComments.length === 0) {
       insertNewLine = true;
+    } else {
+      const lastTrailingCommentForThisNode =
+        trailingComments[trailingComments.length - 1];
+      if (
+        lastTrailingCommentForThisNode &&
+        // This trailingEmptyLine could have been explicitly set to false
+        // in the parsing phase if this comment is the last one in the document,
+        // in which case we'll respect it and not add a trailing empty line.
+        lastTrailingCommentForThisNode.trailingEmptyLine !== false
+      ) {
+        lastTrailingCommentForThisNode.trailingEmptyLine = true;
+      }
     }
+  } else {
+    insertNewLine = true;
   }
   if (insertNewLine) {
     return [doc, hardline];
