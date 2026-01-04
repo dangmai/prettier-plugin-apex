@@ -57,7 +57,9 @@ function pushIfExist(
   preDocs?: Doc[] | null,
 ): Doc[] {
   if (doc) {
-    preDocs && parts.push(...preDocs);
+    if (preDocs) {
+        parts.push(...preDocs);
+    }
     parts.push(doc);
     postDocs && parts.push(...postDocs);
   }
