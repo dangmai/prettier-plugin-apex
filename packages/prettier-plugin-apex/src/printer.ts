@@ -61,7 +61,7 @@ function pushIfExist(
     const preDocsLength = preDocs ? preDocs.length : 0;
     // If preDocsLength > 0, preDocs must be non-null, so safe to use non-null assertion
     for (let i = 0; i < preDocsLength; i++) {
-      const preDoc = preDocs![i];
+      const preDoc = preDocs?.[i];
       if (preDoc) {
         parts.push(preDoc);
       }
@@ -70,7 +70,7 @@ function pushIfExist(
     const postDocsLength = postDocs ? postDocs.length : 0;
     // If postDocsLength > 0, postDocs must be non-null, so safe to use non-null assertion
     for (let i = 0; i < postDocsLength; i++) {
-      const postDoc = postDocs![i];
+      const postDoc = postDocs?.[i];
       if (postDoc) {
         parts.push(postDoc);
       }
