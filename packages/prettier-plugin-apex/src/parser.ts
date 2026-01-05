@@ -493,15 +493,14 @@ function dfsPostOrderApply(
       currentContexts ? currentContexts[i] : undefined,
     );
   }
+  // Optimized: cache keys length and check for null before typeof check
   const keys = Object.keys(node);
-  for (let i = 0; i < keys.length; i++) {
+  const keysLength = keys.length;
+  for (let i = 0; i < keysLength; i++) {
     const key = keys[i] as string;
-    if (typeof node[key] === "object") {
-      const childrenResults = dfsPostOrderApply(
-        node[key],
-        fns,
-        childrenContexts,
-      );
+    const value = node[key];
+    if (typeof value === "object") {
+      const childrenResults = dfsPostOrderApply(value, fns, childrenContexts);
       for (let j = 0; j < fns.length; j++) {
         finalChildrenResults[j] = fns[j]?.accumulator?.(
           childrenResults[j],
@@ -895,10 +894,12 @@ export default async function parse(
         (lastComment as AnnotatedComment).trailingEmptyLine = false;
       }
     }
+    const lineIndexes = getLineIndexes(sourceCode);
+    const emptyLineLocations = getEmptyLineLocations(sourceCode);
     dfsPostOrderApply(ast, [
       nodeLocationVisitor(sourceCode, ast.comments),
-      lineIndexVisitor(getLineIndexes(sourceCode)),
-      metadataVisitor(getEmptyLineLocations(sourceCode)),
+      lineIndexVisitor(lineIndexes),
+      metadataVisitor(emptyLineLocations),
     ]);
 
     return ast;
