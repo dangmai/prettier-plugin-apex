@@ -94,13 +94,13 @@ importers:
         version: 19.2.3(@types/react@19.2.7)
       '@vitejs/plugin-react':
         specifier: 5.1.2
-        version: 5.1.2(vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
+        version: 5.1.2(vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
       vite:
-        specifier: 7.3.0
-        version: 7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: 7.3.1
+        version: 7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-radar:
         specifier: 0.10.1
-        version: 0.10.1(vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
+        version: 0.10.1(vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/prettier-plugin-apex:
     dependencies:
@@ -121,8 +121,8 @@ importers:
         specifier: 4.0.16
         version: 4.0.16(vitest@4.0.16(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
       vite:
-        specifier: 7.3.0
-        version: 7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: 7.3.1
+        version: 7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
       vitest:
         specifier: 4.0.16
         version: 4.0.16(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
@@ -1769,8 +1769,8 @@ packages:
     peerDependencies:
       vite: ^2.0.0 || ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0
 
-  vite@7.3.0:
-    resolution: {integrity: sha512-dZwN5L1VlUBewiP6H9s2+B3e3Jg96D0vzN+Ry73sOefebhYr9f94wwkMNN/9ouoU8pV1BqA1d1zGk8928cx0rg==}
+  vite@7.3.1:
+    resolution: {integrity: sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -2461,7 +2461,7 @@ snapshots:
     dependencies:
       '@types/node': 20.14.8
 
-  '@vitejs/plugin-react@5.1.2(vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitejs/plugin-react@5.1.2(vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -2469,7 +2469,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.53
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -2499,13 +2499,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.16(vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/mocker@4.0.16(vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@vitest/spy': 4.0.16
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/pretty-format@4.0.16':
     dependencies:
@@ -3425,11 +3425,11 @@ snapshots:
 
   util-deprecate@1.0.2: {}
 
-  vite-plugin-radar@0.10.1(vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)):
+  vite-plugin-radar@0.10.1(vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
-      vite: 7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
 
-  vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2):
+  vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       esbuild: 0.27.2
       fdir: 6.5.0(picomatch@4.0.3)
@@ -3446,7 +3446,7 @@ snapshots:
   vitest@4.0.16(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.16
-      '@vitest/mocker': 4.0.16(vite@7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
+      '@vitest/mocker': 4.0.16(vite@7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/pretty-format': 4.0.16
       '@vitest/runner': 4.0.16
       '@vitest/snapshot': 4.0.16
@@ -3463,7 +3463,7 @@ snapshots:
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 7.3.0(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@20.14.8)(tsx@4.21.0)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 20.14.8
