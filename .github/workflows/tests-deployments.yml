@@ -202,7 +202,7 @@ jobs:
         run: chmod +x gradlew
       - name: Restore NX cache
         id: nx-cache-restore
-        uses: actions/cache/restore@v5.0.1
+        uses: actions/cache/restore@v5.0.2
         with:
           path: |
             .nx
@@ -218,7 +218,7 @@ jobs:
           # https://github.com/graalvm/native-build-tools/issues/754
           GRADLE_OPTS: -Djava.io.tmpdir=${{ runner.temp }}
       - name: Save NX Cache
-        uses: actions/cache/save@v5.0.1
+        uses: actions/cache/save@v5.0.2
         with:
           path: |
             .nx
