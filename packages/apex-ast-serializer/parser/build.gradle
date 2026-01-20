@@ -12,7 +12,7 @@ plugins {
   id "java-test-fixtures"
   id 'application'
   id 'jacoco'
-  id 'org.graalvm.buildtools.native' version '0.11.3'
+  id 'org.graalvm.buildtools.native' version '0.11.4'
 }
 
 sourceSets {
