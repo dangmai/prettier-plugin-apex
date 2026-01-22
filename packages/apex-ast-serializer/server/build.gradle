@@ -4,7 +4,7 @@ buildscript {
     classpath("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:3.2.1263")
 
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
-    classpath("org.apache.groovy:groovy-json:5.0.3")
+    classpath("org.apache.groovy:groovy-json:5.0.4")
   }
 }
 
