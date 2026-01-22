@@ -39,7 +39,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
@@ -123,7 +123,7 @@ jobs:
           - macos-15-intel
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@v6.0.2
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
       - name: Setup Node.js
@@ -182,7 +182,7 @@ jobs:
       run:
         working-directory: ./packages/apex-ast-serializer
     steps:
-      - uses: actions/checkout@v6.0.1
+      - uses: actions/checkout@v6.0.2
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
       - name: Setup Node.js
@@ -240,7 +240,7 @@ jobs:
       - build-native-executables
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v6.0.2
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
