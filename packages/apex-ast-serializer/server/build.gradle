@@ -144,7 +144,7 @@ ext {
   slf4jVersion = '2.0.17'
   jettyVersion = '12.1.6'
   jerseyVersion = '4.0.2'
-  junitVersion = '6.0.2'
+  junitVersion = '6.0.3'
 }
 
 dependencies {
@@ -172,7 +172,7 @@ dependencies {
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.2")
+  testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
   compileOnly("cz.habarta.typescript-generator:typescript-generator-core:3.2.1263")
