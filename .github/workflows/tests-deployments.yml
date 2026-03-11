@@ -266,7 +266,7 @@ jobs:
         run: pnpm run build
 
       - name: Download Artifacts
-        uses: actions/download-artifact@v8.0.0
+        uses: actions/download-artifact@v8.0.1
         with:
           path: /tmp/artifacts
           pattern: apex-ast-serializer-*
