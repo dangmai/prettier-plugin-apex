@@ -16,7 +16,7 @@
   "dependencies": {
     "@monaco-editor/react": "4.7.0",
     "clipboard": "2.0.11",
-    "endent": "2.1.0",
+    "dedent": "1.7.2",
     "lz-string": "1.5.0",
     "prettier-plugin-apex": "workspace:*",
     "react": "19.2.4",

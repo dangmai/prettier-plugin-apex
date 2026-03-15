@@ -1,5 +1,5 @@
 import Editor from "@monaco-editor/react";
-import endent from "endent";
+import dedent from "dedent";
 import * as prettier from "prettier";
 import * as prettierApex from "prettier-plugin-apex";
 import { useEffect, useState } from "react";
@@ -47,7 +47,7 @@ function App() {
   const [tabWidth, setTabWidth] = useState(2);
   const [useTabs, setUseTabs] = useState(false);
   const [apexInsertFinalNewline, setApexInsertFinalNewline] = useState(true);
-  const [originalCode, setOriginalCode] = useState(endent`
+  const [originalCode, setOriginalCode] = useState(dedent`
     class HelloWorld {
       void hello() {
         Account[] accounts = [select id from account];
