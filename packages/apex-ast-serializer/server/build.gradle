@@ -167,7 +167,7 @@ dependencies {
   implementation("jakarta.activation:jakarta.activation-api:2.1.4")
 
   // https://mvnrepository.com/artifact/org.glassfish.jaxb/jaxb-runtime
-  implementation("org.glassfish.jaxb:jaxb-runtime:4.0.6")
+  implementation("org.glassfish.jaxb:jaxb-runtime:4.0.7")
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
