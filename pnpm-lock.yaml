@@ -83,8 +83,8 @@ importers:
         specifier: 19.2.4
         version: 19.2.4(react@19.2.4)
       use-debounce:
-        specifier: 10.1.0
-        version: 10.1.0(react@19.2.4)
+        specifier: 10.1.1
+        version: 10.1.1(react@19.2.4)
     devDependencies:
       '@types/react':
         specifier: 19.2.14
@@ -1710,8 +1710,8 @@ packages:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
     engines: {node: '>=18'}
 
-  use-debounce@10.1.0:
-    resolution: {integrity: sha512-lu87Za35V3n/MyMoEpD5zJv0k7hCn0p+V/fK2kWD+3k2u3kOCwO593UArbczg1fhfs2rqPEnHpULJ3KmGdDzvg==}
+  use-debounce@10.1.1:
+    resolution: {integrity: sha512-kvds8BHR2k28cFsxW8k3nc/tRga2rs1RHYCqmmGqb90MEeE++oALwzh2COiuBLO1/QXiOuShXoSN2ZpWnMmvuQ==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       react: '*'
@@ -3226,7 +3226,7 @@ snapshots:
 
   unicorn-magic@0.3.0: {}
 
-  use-debounce@10.1.0(react@19.2.4):
+  use-debounce@10.1.1(react@19.2.4):
     dependencies:
       react: 19.2.4
 
