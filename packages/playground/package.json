@@ -19,8 +19,8 @@
     "dedent": "1.7.2",
     "lz-string": "1.5.0",
     "prettier-plugin-apex": "workspace:*",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
     "use-debounce": "10.1.1"
   },
   "devDependencies": {
