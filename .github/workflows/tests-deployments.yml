@@ -226,7 +226,7 @@ jobs:
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
       - name: Upload artifact
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ env.OUTPUT_NAME }}
           path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
