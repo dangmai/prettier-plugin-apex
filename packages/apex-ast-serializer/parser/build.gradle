@@ -85,7 +85,7 @@ dependencies {
   api("commons-cli:commons-cli:1.11.0")
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
-  api("commons-io:commons-io:2.21.0")
+  api("commons-io:commons-io:2.22.0")
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
