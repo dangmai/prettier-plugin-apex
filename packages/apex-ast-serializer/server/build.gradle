@@ -129,11 +129,11 @@ distZip {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   archiveFileName = "apex-ast-serializer.zip"
 }
-distZip.dependsOn generateTypeScript
+distZip.dependsOn tasks.named("generateTypeScript")
 installDist {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-installDist.dependsOn generateTypeScript
+installDist.dependsOn tasks.named("generateTypeScript")
 installDist.destinationDir = file("../../prettier-plugin-apex/vendor/apex-ast-serializer")
 
 jar {
