@@ -33,6 +33,10 @@
       automerge: true
     },
     {
+      matchPackageNames: ["@nx/shared-fs-cache"],
+      ignoreVersions: ["5.0.3"]
+    },
+    {
       matchPackageNames: ["@types/node"],
       enabled: false
     },
