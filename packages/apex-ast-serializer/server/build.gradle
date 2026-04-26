@@ -1,7 +1,7 @@
 buildscript {
   dependencies {
     // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-gradle-plugin
-    classpath("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:3.2.1263")
+    classpath("cz.habarta.typescript-generator:typescript-generator-gradle-plugin:4.0.0")
 
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
     classpath("org.apache.groovy:groovy-json:5.0.5")
@@ -129,11 +129,12 @@ distZip {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   archiveFileName = "apex-ast-serializer.zip"
 }
-distZip.dependsOn generateTypeScript
+distTar.dependsOn tasks.named("generateTypeScript")
+distZip.dependsOn tasks.named("generateTypeScript")
 installDist {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
-installDist.dependsOn generateTypeScript
+installDist.dependsOn tasks.named("generateTypeScript")
 installDist.destinationDir = file("../../prettier-plugin-apex/vendor/apex-ast-serializer")
 
 jar {
@@ -175,7 +176,7 @@ dependencies {
   testRuntimeOnly("org.junit.platform:junit-platform-launcher:6.0.3")
 
   // https://mvnrepository.com/artifact/cz.habarta.typescript-generator/typescript-generator-core
-  compileOnly("cz.habarta.typescript-generator:typescript-generator-core:3.2.1263")
+  compileOnly("cz.habarta.typescript-generator:typescript-generator-core:4.0.0")
 }
 
 test {
