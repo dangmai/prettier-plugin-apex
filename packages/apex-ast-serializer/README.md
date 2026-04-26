@@ -7,6 +7,16 @@ using the jorje Apex parser distributed by Salesforce.
 
 The result is printed out to `stdout` as either a JSON or XML object.
 
+## The jorje Dependency
+
+This project depends on `apex-jorje-lsp.jar`, Salesforce's proprietary internal Apex parser (distributed as part of the [Salesforce VSCode extension](https://github.com/forcedotcom/salesforcedx-vscode)). It was reverse-engineered to expose a full AST suitable for formatting.
+
+The JAR is stored (minimized) at `libs/apex-jorje-lsp.jar`. A daily CI workflow (`update-jorje.yml`) checks for new versions and opens a PR automatically. To manually update it, run `tools/create-jorje-jar.sh`.
+
+The TypeScript type definitions for the Apex AST (`packages/prettier-plugin-apex/vendor/typings/jorje.d.ts`) are **fully generated** by the Gradle `typescript-generator` plugin — they are produced automatically as part of the `installDist` build step and should not be edited by hand.
+
+Do not replace or upgrade `apex-jorje-lsp.jar` casually — changes may affect the AST structure and require updates to `printer.ts` and the generated typings.
+
 ## Building
 
 This project requires Java >= 17 to compile, and specifically [GraalVM](https://www.graalvm.org/) to build native images.
