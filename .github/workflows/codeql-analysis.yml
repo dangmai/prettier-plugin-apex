@@ -14,11 +14,11 @@ name: "CodeQL"
 on:
   push:
     branches:
-      - master
+      - main
       - renovate/* # We use Renovate automergeType branch, which means we need to run on these branches too, otherwise the branch protection check will fail
   pull_request:
     # The branches below must be a subset of the branches above
-    branches: [master]
+    branches: [ main ]
   schedule:
     - cron: "21 9 * * 2"
 
@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "java"]
+        language: [ "javascript", "java" ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python' ]
         # Learn more:
         # https://docs.github.com/en/free-pro-team@latest/github/finding-security-vulnerabilities-and-errors-in-your-code/configuring-code-scanning#changing-the-languages-that-are-analyzed
@@ -53,9 +53,9 @@ jobs:
           # Prefix the list here with "+" to use these queries and those in the config file.
           # queries: ./path/to/local/query, your-org/your-repo/queries@main
 
-      # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
-      # If this step fails, then you should remove it and run the build manually (see below)
       - name: Autobuild
+        # Autobuild attempts to build any compiled languages  (C/C++, C#, or Java).
+        # If this step fails, then you should remove it and run the build manually (see below)
         uses: github/codeql-action/autobuild@v4.35.2
         if: ${{ matrix.language == 'javascript' }}
 

@@ -21,7 +21,7 @@
     }
   },
   "affected": {
-    "defaultBase": "master"
+    "defaultBase": "main"
   },
   "analytics": false
 }

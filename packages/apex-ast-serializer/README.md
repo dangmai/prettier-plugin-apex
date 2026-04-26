@@ -1,6 +1,6 @@
 # Apex AST Serializer
 
-[![codecov](https://codecov.io/gh/dangmai/prettier-plugin-apex/branch/master/graph/badge.svg?flag=apex-ast-serializer)](https://codecov.io/gh/dangmai/prettier-plugin-apex)
+[![codecov](https://codecov.io/gh/dangmai/prettier-plugin-apex/branch/main/graph/badge.svg?flag=apex-ast-serializer)](https://codecov.io/gh/dangmai/prettier-plugin-apex)
 
 This program serializes the Abstract Syntax Tree of an Apex Class/Trigger,
 using the jorje Apex parser distributed by Salesforce.

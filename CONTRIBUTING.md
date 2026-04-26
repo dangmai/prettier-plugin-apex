@@ -42,7 +42,7 @@ Here's what you need to know about the Prettier Apex tests:
 
 Run `pnpm run -r prettier` to automatically format files.
 
-If you can, take look at [commands.md](https://github.com/prettier/prettier/blob/master/commands.md) and check out [Wadler's paper](http://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf) to understand how Prettier works.
+If you can, take look at [commands.md](https://github.com/prettier/prettier/blob/main/commands.md) and check out [Wadler's paper](http://homepages.inf.ed.ac.uk/wadler/papers/prettier/prettier.pdf) to understand how Prettier works.
 
 ## Performance
 
