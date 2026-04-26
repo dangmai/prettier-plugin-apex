@@ -220,7 +220,7 @@ jobs:
       - name: Sanity check native executable
         shell: bash
         run: |
-          ./parser/build/native/nativeCompile/${{ env.ASSET_NAME }} -l ../../prettier-plugin-apex/tests/loop/LoopClass.cls > "$RUNNER_TEMP/sanity-check.json"
+          ./parser/build/native/nativeCompile/${{ env.ASSET_NAME }} -l ../prettier-plugin-apex/tests/loop/LoopClass.cls > "$RUNNER_TEMP/sanity-check.json"
           node -e "const fs=require('fs'); JSON.parse(fs.readFileSync(process.argv[1],'utf8')); console.log('Sanity check passed');" "$RUNNER_TEMP/sanity-check.json"
       - name: Save NX Cache
         uses: actions/cache/save@v5.0.5
