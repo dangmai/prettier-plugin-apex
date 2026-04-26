@@ -129,6 +129,7 @@ distZip {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
   archiveFileName = "apex-ast-serializer.zip"
 }
+distTar.dependsOn tasks.named("generateTypeScript")
 distZip.dependsOn tasks.named("generateTypeScript")
 installDist {
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
