@@ -106,7 +106,7 @@ importers:
     dependencies:
       jest-docblock:
         specifier: ^30.0.0
-        version: 30.2.0
+        version: 30.4.0
       prettier:
         specifier: ^3.0.0
         version: 3.8.3
@@ -1219,8 +1219,8 @@ packages:
   java-parser@3.0.1:
     resolution: {integrity: sha512-sDIR7u9b7O2JViNUxiZRhnRz7URII/eE7g2B+BmGxDeS6Ex3OYAcCyz5oh0H4LQ+hL/BS8OJTz8apMy9xtGmrQ==}
 
-  jest-docblock@30.2.0:
-    resolution: {integrity: sha512-tR/FFgZKS1CXluOQzZvNH3+0z9jXr3ldGSD8bhyuxvlVUwbeLOGynkunvlTMxchC5urrKndYiwCFC0DLVjpOCA==}
+  jest-docblock@30.4.0:
+    resolution: {integrity: sha512-ZPMabUZCx5MpbZ2eBYSvZ0J8fvo3dR9oM+eeUpb3aKNQFuS2tu3Duw1TNlMoP8k3WQgKGJuhcMFvwcVuq6T7oA==}
     engines: {node: ^18.14.0 || ^20.0.0 || ^22.0.0 || >=24.0.0}
 
   joi@18.1.2:
@@ -2711,7 +2711,7 @@ snapshots:
       chevrotain-allstar: 0.3.1(chevrotain@11.0.3)
       lodash: 4.17.21
 
-  jest-docblock@30.2.0:
+  jest-docblock@30.4.0:
     dependencies:
       detect-newline: 3.1.0
 
