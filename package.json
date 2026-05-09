@@ -24,7 +24,7 @@
     ]
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.14",
+    "@biomejs/biome": "2.4.15",
     "@nx/shared-fs-cache": "5.0.5",
     "@tsconfig/node20": "20.1.9",
     "@types/node": "20.14.8",
