@@ -17,12 +17,6 @@
     "node": ">= 20",
     "pnpm": "^11.0.0"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild",
-      "nx"
-    ]
-  },
   "devDependencies": {
     "@biomejs/biome": "2.4.14",
     "@nx/shared-fs-cache": "5.0.5",
