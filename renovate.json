@@ -80,6 +80,15 @@
       "platformAutomerge": false,
       "automergeType": "pr",
       "automerge": true
+    },
+    {
+      // The git-tags datasource against the musl cgit-served repo doesn't
+      // expose tag timestamps, so the global minimumReleaseAge gate would
+      // suppress all musl bumps under Renovate 42+. Fall back to the pre-42
+      // behaviour (treat missing timestamp as "old enough").
+      "description": "Allow musl bumps even when release timestamps are unavailable",
+      "matchPackageNames": ["https://git.musl-libc.org/git/musl"],
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
     }
   ]
 }
