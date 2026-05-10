@@ -1,82 +1,82 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  extends: ["config:recommended"],
-  assignees: ["dangmai"],
-  platformAutomerge: true,
-  automergeType: "branch",
-  automergeStrategy: "squash",
-  lockFileMaintenance: {
-    enabled: true
+  "extends": ["config:recommended"],
+  "assignees": ["dangmai"],
+  "platformAutomerge": true,
+  "automergeType": "branch",
+  "automergeStrategy": "squash",
+  "lockFileMaintenance": {
+    "enabled": true
   },
-  customManagers: [
+  "customManagers": [
     // From https://docs.renovatebot.com/modules/manager/regex/#advanced-capture
     {
-      customType: "regex",
-      description: "Update _VERSION variables in Dockerfiles",
-      managerFilePatterns: [
+      "customType": "regex",
+      "description": "Update _VERSION variables in Dockerfiles",
+      "managerFilePatterns": [
         "/(^|/|\\.)Dockerfile$/",
         "/(^|/)Dockerfile\\.[^/]*$/"
       ],
-      matchStrings: [
+      "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
       ]
     },
     {
-      customType: "regex",
-      description: "Update _VERSION variables in shell scripts",
-      managerFilePatterns: ["/\\.sh$/"],
-      matchStrings: [
+      "customType": "regex",
+      "description": "Update _VERSION variables in shell scripts",
+      "managerFilePatterns": ["/\\.sh$/"],
+      "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?(?: extractVersion=(?<extractVersion>\\S+))?\\s+[A-Z_]+_VERSION=\"(?<currentValue>[^\"]+)\""
       ]
     }
   ],
-  packageRules: [
+  "packageRules": [
     {
-      matchUpdateTypes: [
+      "matchUpdateTypes": [
         "minor",
         "patch",
         "pin",
         "digest",
         "lockFileMaintenance"
       ],
-      automerge: true
+      "automerge": true
     },
     {
-      matchPackageNames: ["@nx/shared-fs-cache"],
-      allowedVersions: "!/^5\\.0\\.3$/"
+      "matchPackageNames": ["@nx/shared-fs-cache"],
+      "allowedVersions": "!/^5\\.0\\.3$/"
     },
     {
-      matchPackageNames: ["@types/node"],
-      enabled: false
+      "matchPackageNames": ["@types/node"],
+      "enabled": false
     },
     {
-      matchPackageNames: ["node"],
-      matchUpdateTypes: ["major"],
-      enabled: false
+      "matchPackageNames": ["node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     },
     {
-      matchPackageNames: ["eclipse-temurin"],
-      matchUpdateTypes: ["major"],
-      enabled: false
+      "matchPackageNames": ["eclipse-temurin"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     },
     {
-      groupName: "typescript-generator",
-      additionalBranchPrefix: "",
-      matchPackageNames: ["/typescript-generator/"]
+      "groupName": "typescript-generator",
+      "additionalBranchPrefix": "",
+      "matchPackageNames": ["/typescript-generator/"]
     },
     {
       // Bumps to musl or zlib must be validated by the static Linux build
       // before merging. Use Renovate-managed automerge in PR mode (instead
       // of platform automerge with branch automerge) so Renovate explicitly
       // waits for the build-native-executables check to report green.
-      description: "Wait for the static Linux build before automerging musl/zlib",
-      matchPackageNames: [
+      "description": "Wait for the static Linux build before automerging musl/zlib",
+      "matchPackageNames": [
         "https://git.musl-libc.org/git/musl",
         "madler/zlib"
       ],
-      platformAutomerge: false,
-      automergeType: "pr",
-      automerge: true
+      "platformAutomerge": false,
+      "automergeType": "pr",
+      "automerge": true
     }
   ]
 }

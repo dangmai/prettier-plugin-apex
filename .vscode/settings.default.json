@@ -1,14 +1,5 @@
 {
-  "json.schemas": [
-    {
-      "fileMatch": ["/renovate.json5"],
-      "url": "https://docs.renovatebot.com/renovate-schema.json"
-    },
-    {
-      "fileMatch": ["/.vscode/settings.default.json"],
-      "url": "vscode://schemas/settings/folder"
-    }
-  ],
+  "$schema": "vscode://schemas/settings/folder",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "npm.packageManager": "pnpm",
   "editor.formatOnSave": true,
@@ -21,5 +12,11 @@
   "vitest.nodeEnv": {
     "AST_COMPARE": "1",
     "APEX_PARSER": "built-in"
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "renovate.json": "jsonc"
   }
 }

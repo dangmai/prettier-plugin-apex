@@ -2,15 +2,5 @@
   "plugins": ["prettier-plugin-organize-imports", "prettier-plugin-java"],
   "trailingComma": "all",
   "endOfLine": "lf",
-  "organizeImportsSkipDestructiveCodeActions": true,
-  "overrides": [
-    {
-      "files": "*.json5",
-      "options": {
-        "parser": "json5",
-        "quoteProps": "preserve",
-        "trailingComma": "none"
-      }
-    }
-  ]
+  "organizeImportsSkipDestructiveCodeActions": true
 }
