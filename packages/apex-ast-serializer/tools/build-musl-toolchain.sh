@@ -7,7 +7,7 @@ set -euxo pipefail
 # renovate: datasource=git-tags depName=musl packageName=https://git.musl-libc.org/git/musl extractVersion=^v(?<version>.+)$
 MUSL_VERSION="1.2.6"
 # renovate: datasource=github-tags depName=zlib packageName=madler/zlib extractVersion=^v(?<version>.+)$
-ZLIB_VERSION="1.2.13"
+ZLIB_VERSION="1.3.2"
 
 # Specify an installation directory for musl:
 export MUSL_HOME=$PWD/musl-toolchain
