@@ -2,3 +2,7 @@ packages:
   - "packages/playground"
   - "packages/prettier-plugin-apex/"
   - "packages/@prettier-apex/*"
+
+allowBuilds:
+  esbuild: true
+  nx: true
