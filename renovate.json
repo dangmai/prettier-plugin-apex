@@ -8,6 +8,9 @@
   "lockFileMaintenance": {
     "enabled": true
   },
+  "minimumReleaseAge": "3 days",
+  // Disable PR Hourly Limit
+  "prHourlyLimit": 0,
   "customManagers": [
     // From https://docs.renovatebot.com/modules/manager/regex/#advanced-capture
     {
