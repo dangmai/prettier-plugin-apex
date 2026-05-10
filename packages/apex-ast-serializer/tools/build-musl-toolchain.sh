@@ -4,7 +4,7 @@ set -euxo pipefail
 
 # Adapted from https://www.graalvm.org/latest/reference-manual/native-image/guides/build-static-executables/
 
-# renovate: datasource=git-tags depName=musl packageName=https://git.musl-libc.org/cgit/musl extractVersion=^v(?<version>.+)$
+# renovate: datasource=git-tags depName=musl packageName=https://git.musl-libc.org/git/musl extractVersion=^v(?<version>.+)$
 MUSL_VERSION="1.2.4"
 # renovate: datasource=github-tags depName=zlib packageName=madler/zlib extractVersion=^v(?<version>.+)$
 ZLIB_VERSION="1.2.13"

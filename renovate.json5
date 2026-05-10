@@ -71,7 +71,7 @@
       // waits for the build-native-executables check to report green.
       description: "Wait for the static Linux build before automerging musl/zlib",
       matchPackageNames: [
-        "https://git.musl-libc.org/cgit/musl",
+        "https://git.musl-libc.org/git/musl",
         "madler/zlib"
       ],
       platformAutomerge: false,
