@@ -20,6 +20,14 @@
       matchStrings: [
         "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s(?:ENV|ARG) .+?_VERSION=(?<currentValue>.+?)\\s"
       ]
+    },
+    {
+      customType: "regex",
+      description: "Update _VERSION variables in shell scripts",
+      managerFilePatterns: ["/\\.sh$/"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>[a-z-]+?)(?: depName=(?<depName>.+?))? packageName=(?<packageName>.+?)(?: versioning=(?<versioning>[a-z-]+?))?(?: extractVersion=(?<extractVersion>\\S+))?\\s+[A-Z_]+_VERSION=\"(?<currentValue>[^\"]+)\""
+      ]
     }
   ],
   packageRules: [
@@ -55,6 +63,20 @@
       groupName: "typescript-generator",
       additionalBranchPrefix: "",
       matchPackageNames: ["/typescript-generator/"]
+    },
+    {
+      // Bumps to musl or zlib must be validated by the static Linux build
+      // before merging. Use Renovate-managed automerge in PR mode (instead
+      // of platform automerge with branch automerge) so Renovate explicitly
+      // waits for the build-native-executables check to report green.
+      description: "Wait for the static Linux build before automerging musl/zlib",
+      matchPackageNames: [
+        "https://git.musl-libc.org/cgit/musl",
+        "madler/zlib"
+      ],
+      platformAutomerge: false,
+      automergeType: "pr",
+      automerge: true
     }
   ]
 }
