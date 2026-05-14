@@ -162,8 +162,8 @@ class SOSLClass {
       RETURNING
         My_Custom_Object__c(
           Id
-          WHERE
-            DISTANCE(My_Location_Field__c, GEOLOCATION(37, 122), 'mi') < 100)
+          WHERE DISTANCE(My_Location_Field__c, GEOLOCATION(37, 122), 'mi') < 100
+        )
     ];
   }
   void bindKeyword() {
@@ -184,7 +184,8 @@ class SOSLClass {
           WHERE
             PublishStatus = 'Online'
             AND language = 'en_US'
-            AND KnowledgeArticleVersion = 'ka230000000PCiy')
+            AND KnowledgeArticleVersion = 'ka230000000PCiy'
+        )
       UPDATE VIEWSTAT
     ];
     searchResult = [
@@ -192,7 +193,8 @@ class SOSLClass {
       RETURNING
         KnowledgeArticleVersion(
           Title
-          WHERE PublishStatus = 'Online' AND language = 'en_US')
+          WHERE PublishStatus = 'Online' AND language = 'en_US'
+        )
       UPDATE TRACKING
     ];
     searchResult = [
@@ -200,7 +202,8 @@ class SOSLClass {
       RETURNING
         KnowledgeArticleVersion(
           Title
-          WHERE PublishStatus = 'Online' AND language = 'en_US')
+          WHERE PublishStatus = 'Online' AND language = 'en_US'
+        )
       UPDATE TRACKING, VIEWSTAT
     ];
   }
