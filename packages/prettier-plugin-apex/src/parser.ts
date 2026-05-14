@@ -230,6 +230,29 @@ function handleAnnotationLocation(
   );
 }
 
+function handleWithIdentifierLocation(
+  location: MinimalLocation,
+  sourceCode: string,
+): MinimalLocation {
+  // jorje gives us the location of the inner identifier only (e.g.
+  // `SECURITY_ENFORCED`), not the `WITH` keyword in front of it. Without
+  // extending the start back to cover `WITH`, comments that sit between the
+  // previous clause and the `WITH` keyword have nowhere to land:
+  // Prettier sees them as preceding the inner identifier, attaches them as
+  // a leading comment, and the printer emits them between `WITH` and the
+  // identifier on subsequent format passes. We perform a case-insensitive
+  // backwards scan for `WITH` to anchor the start of the node. A
+  // `WithIdentifier` AST node is only ever produced when the source contains
+  // a `WITH` keyword before the identifier, so `lastIndexOf` will always
+  // find a match here.
+  const upToStart = sourceCode.slice(0, location.startIndex).toLowerCase();
+  const withIndex = upToStart.lastIndexOf("with");
+  return {
+    startIndex: withIndex,
+    endIndex: location.endIndex,
+  };
+}
+
 function handleLimitValueLocation(
   location: MinimalLocation,
   sourceCode: string,
@@ -452,6 +475,7 @@ const locationGenerationHandler: {
   [APEX_TYPES.ANNOTATION]: handleAnnotationLocation,
   [APEX_TYPES.METHOD_DECLARATION]: handleMethodDeclarationLocation,
   [APEX_TYPES.LIMIT_VALUE]: handleLimitValueLocation,
+  [APEX_TYPES.WITH_IDENTIFIER]: handleWithIdentifierLocation,
 };
 
 type AnyNode = any;
