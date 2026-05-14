@@ -1,6 +1,7 @@
 # Unreleased
 
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
+- Fix standalone comments before SOQL `WITH SECURITY_ENFORCED` / `WITH USER_MODE` / `WITH SYSTEM_MODE` clauses migrating between `WITH` and the identifier across format passes.
 - Fix trailing comments on the last field of a SOSL `RETURNING X(...)` clause migrating outside the closing paren across format passes.
 
 ## Dependency Changes
