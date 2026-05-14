@@ -2087,6 +2087,7 @@ function handleReturningExpression(path: AstPath, print: PrintFn): Doc {
   if (selectDoc) {
     parts.push("(");
     parts.push(path.call(print, "select", "value"));
+    parts.push(softline);
     parts.push(")");
   }
   return groupConcat(parts);
