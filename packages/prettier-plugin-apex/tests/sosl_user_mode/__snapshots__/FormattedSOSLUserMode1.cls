@@ -79,7 +79,8 @@ class SOSLUserMode {
           BillingCountry
           WHERE Name LIKE 'Acme%'
           ORDER BY Name ASC
-          LIMIT 100),
+          LIMIT 100
+        ),
         Contact(Id, FirstName, LastName, Email LIMIT 50),
         Opportunity(Id, Name, Amount WHERE Amount > 1000 LIMIT 25)
       WITH USER_MODE
