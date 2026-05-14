@@ -241,12 +241,12 @@ function handleWithIdentifierLocation(
   // Prettier sees them as preceding the inner identifier, attaches them as
   // a leading comment, and the printer emits them between `WITH` and the
   // identifier on subsequent format passes. We perform a case-insensitive
-  // backwards scan for `WITH` to anchor the start of the node.
+  // backwards scan for `WITH` to anchor the start of the node. A
+  // `WithIdentifier` AST node is only ever produced when the source contains
+  // a `WITH` keyword before the identifier, so `lastIndexOf` will always
+  // find a match here.
   const upToStart = sourceCode.slice(0, location.startIndex).toLowerCase();
   const withIndex = upToStart.lastIndexOf("with");
-  if (withIndex === -1) {
-    return location;
-  }
   return {
     startIndex: withIndex,
     endIndex: location.endIndex,
