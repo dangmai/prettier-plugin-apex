@@ -459,6 +459,7 @@ const locationGenerationHandler: {
   [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: handleWhereCompoundExpressionLocation,
   [APEX_TYPES.WHERE_OPERATION_EXPRESSION]:
     handleWhereOperationExpressionLocation,
+  [APEX_TYPES.WHERE_FORMULA_EXPRESSION]: handleWhereOperationExpressionLocation,
   [APEX_TYPES.WHERE_UNARY_EXPRESSION]: handleWhereUnaryExpressionLocation,
   [APEX_TYPES.SELECT_INNER_QUERY]: handleNodeSurroundedByCharacters("(", ")"),
   [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousUnitLocation,
