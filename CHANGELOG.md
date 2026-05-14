@@ -1,6 +1,7 @@
 # Unreleased
 
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
+- Fix trailing comments on the last field of a SOSL `RETURNING X(...)` clause migrating outside the closing paren across format passes.
 
 ## Dependency Changes
 
