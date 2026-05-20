@@ -14,14 +14,14 @@
     "version": "tsx scripts/release.zx.mts"
   },
   "engines": {
-    "node": ">= 20",
+    "node": ">= 22",
     "pnpm": "^11.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.15",
     "@nx/shared-fs-cache": "5.0.5",
-    "@tsconfig/node20": "20.1.9",
-    "@types/node": "20.14.8",
+    "@tsconfig/node22": "22.0.5",
+    "@types/node": "22.19.19",
     "@types/semver": "7.7.1",
     "del-cli": "7.0.0",
     "nx": "22.7.2",
