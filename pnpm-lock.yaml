@@ -33,8 +33,8 @@ importers:
         specifier: 3.8.3
         version: 3.8.3
       prettier-plugin-java:
-        specifier: 2.9.4
-        version: 2.9.4(prettier@3.8.3)
+        specifier: 2.9.5
+        version: 2.9.5(prettier@3.8.3)
       prettier-plugin-organize-imports:
         specifier: 4.3.0
         version: 4.3.0(prettier@3.8.3)(typescript@6.0.3)
@@ -1453,8 +1453,8 @@ packages:
     resolution: {integrity: sha512-E6rsNU1QNJgB3sjj7OANinGncFKuK+164sLXw1/CqBjj/EkXSoSdHCtWQGBNlREIGLnL7IEUEGa08YFVUbrhVg==}
     engines: {node: '>=16'}
 
-  prettier-plugin-java@2.9.4:
-    resolution: {integrity: sha512-Tykgo7c669X0R7M+CprLi5GvqFA20CrGB3LVJYWei6EQqflX44qXZCNQ6ZL1qTmm2HCGkagAuEq86Sbq+ZOidA==}
+  prettier-plugin-java@2.9.5:
+    resolution: {integrity: sha512-K7fg7rNgetxb11FkxJ741M2jelUd9jVovWWeE4+Gl1iCiExhSwJzhD+hFCPDWAHdjcpv7E6xFcGC8zu7Xu44oQ==}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -1754,8 +1754,8 @@ packages:
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
-  web-tree-sitter@0.26.8:
-    resolution: {integrity: sha512-4sUwi7ZyOrIk5KLgYLkc2A/F0LFMQnBhfb+2Cdl7ik4ePJ6JD+fk4ofI2sA5eGawBKBaK4Vntt7Ww5KcEsay4A==}
+  web-tree-sitter@0.26.9:
+    resolution: {integrity: sha512-YJwSHANl6XFgeEjB8nitgj0qZYt5gkIesJ4w2srS2wcLB4GUa4xcOkM0YaMsU6WNR53YVIkDSY7Ej4pf3IXtCA==}
 
   why-is-node-running@2.3.0:
     resolution: {integrity: sha512-hUrmaWBdVDcxvYqnyh09zunKzROWjbZTiNy8dBEjkS7ehEDQibXJ7XvlmtbwuTclUiIyN+CyXQD4Vmko8fNm8w==}
@@ -3008,10 +3008,10 @@ snapshots:
 
   presentable-error@0.0.1: {}
 
-  prettier-plugin-java@2.9.4(prettier@3.8.3):
+  prettier-plugin-java@2.9.5(prettier@3.8.3):
     dependencies:
       prettier: 3.8.3
-      web-tree-sitter: 0.26.8
+      web-tree-sitter: 0.26.9
 
   prettier-plugin-organize-imports@4.3.0(prettier@3.8.3)(typescript@6.0.3):
     dependencies:
@@ -3243,7 +3243,7 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  web-tree-sitter@0.26.8: {}
+  web-tree-sitter@0.26.9: {}
 
   why-is-node-running@2.3.0:
     dependencies:
