@@ -33,8 +33,8 @@ importers:
         specifier: 3.8.3
         version: 3.8.3
       prettier-plugin-java:
-        specifier: 2.9.6
-        version: 2.9.6(prettier@3.8.3)
+        specifier: 2.9.7
+        version: 2.9.7(prettier@3.8.3)
       prettier-plugin-organize-imports:
         specifier: 4.3.0
         version: 4.3.0(prettier@3.8.3)(typescript@6.0.3)
@@ -1449,8 +1449,8 @@ packages:
     resolution: {integrity: sha512-E6rsNU1QNJgB3sjj7OANinGncFKuK+164sLXw1/CqBjj/EkXSoSdHCtWQGBNlREIGLnL7IEUEGa08YFVUbrhVg==}
     engines: {node: '>=16'}
 
-  prettier-plugin-java@2.9.6:
-    resolution: {integrity: sha512-nGw+O5Sjm8MEMLprH1dTONp7Rge26DVqChzpT4k2RVaVhs08dga2O1oiIUc0eFsk6TuA9aMOi+MmmXIb+spgBQ==}
+  prettier-plugin-java@2.9.7:
+    resolution: {integrity: sha512-5ifIseGcpuBizlGw9bUZPoyRPj8c9TV2g2jfO+70Dt92ZH5XG39iXZ4qyGTXN7OTdEprqJjHYQ8UWZcfDc4P9Q==}
     peerDependencies:
       prettier: ^3.0.0
 
@@ -3000,7 +3000,7 @@ snapshots:
 
   presentable-error@0.0.1: {}
 
-  prettier-plugin-java@2.9.6(prettier@3.8.3):
+  prettier-plugin-java@2.9.7(prettier@3.8.3):
     dependencies:
       prettier: 3.8.3
       web-tree-sitter: 0.26.9
