@@ -84,7 +84,7 @@ jobs:
 
       - name: Upload Apex AST Serializer code coverage
         if: matrix.ENABLE_CODE_COVERAGE
-        uses: codecov/codecov-action@v6.0.1
+        uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
@@ -102,7 +102,7 @@ jobs:
 
       - name: Upload Prettier Plugin Apex code coverage
         if: matrix.ENABLE_CODE_COVERAGE
-        uses: codecov/codecov-action@v6.0.1
+        uses: codecov/codecov-action@v7
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         with:
