@@ -30,14 +30,14 @@ importers:
         specifier: 22.7.5
         version: 22.7.5
       prettier:
-        specifier: 3.8.3
-        version: 3.8.3
+        specifier: 3.8.4
+        version: 3.8.4
       prettier-plugin-java:
         specifier: 2.9.7
-        version: 2.9.7(prettier@3.8.3)
+        version: 2.9.7(prettier@3.8.4)
       prettier-plugin-organize-imports:
         specifier: 4.3.0
-        version: 4.3.0(prettier@3.8.3)(typescript@6.0.3)
+        version: 4.3.0(prettier@3.8.4)(typescript@6.0.3)
       semver:
         specifier: 7.8.3
         version: 7.8.3
@@ -1466,6 +1466,11 @@ packages:
 
   prettier@3.8.3:
     resolution: {integrity: sha512-7igPTM53cGHMW8xWuVTydi2KO233VFiTNyF5hLJqpilHfmn8C8gPf+PS7dUT64YcXFbiMGZxS9pCSxL/Dxm/Jw==}
+    engines: {node: '>=14'}
+    hasBin: true
+
+  prettier@3.8.4:
+    resolution: {integrity: sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -3005,17 +3010,19 @@ snapshots:
 
   presentable-error@0.0.1: {}
 
-  prettier-plugin-java@2.9.7(prettier@3.8.3):
+  prettier-plugin-java@2.9.7(prettier@3.8.4):
     dependencies:
-      prettier: 3.8.3
+      prettier: 3.8.4
       web-tree-sitter: 0.26.9
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.8.3)(typescript@6.0.3):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.8.4)(typescript@6.0.3):
     dependencies:
-      prettier: 3.8.3
+      prettier: 3.8.4
       typescript: 6.0.3
 
   prettier@3.8.3: {}
+
+  prettier@3.8.4: {}
 
   proxy-from-env@2.1.0: {}
 
