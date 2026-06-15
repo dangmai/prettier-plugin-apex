@@ -157,6 +157,32 @@ graalvmNative {
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
+      // Run static initializers for the parser's pure-data classes (ANTLR3
+      // DFA tables) at image build time so their cost is not re-paid by
+      // every process at first parse.
+      buildArgs.add('--initialize-at-build-time=org.antlr.runtime')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.parser.impl')
+      // Anonymous classes in parser.impl extend AST data classes, and a class
+      // is only build-time initializable when its supertypes are too.
+      buildArgs.add('--initialize-at-build-time=apex.jorje.data')
+      buildArgs.add('--initialize-at-build-time=apex.common')
+      // ParserEngine holds its NAMED/ANONYMOUS instances in static finals,
+      // so build-time initialization bakes fully-constructed parser engines
+      // into the image heap - a fresh process can parse immediately.
+      buildArgs.add('--initialize-at-build-time=apex.jorje.semantic')
+      // Bake the configured XStream serializers into the image heap.
+      buildArgs.add('--initialize-at-build-time=net.dangmai.serializer')
+      buildArgs.add('--initialize-at-build-time=com.thoughtworks.xstream')
+      // XStream class initializers reflect into JDK internals; the image
+      // builder JVM needs the same opens the application gets at run time
+      // (-J passes the flag to the builder JVM), plus java.io for
+      // ObjectStreamClass access.
+      buildArgs.add('-J--add-opens=java.base/java.io=ALL-UNNAMED')
+      application.applicationDefaultJvmArgs.each { buildArgs.add('-J' + it) }
+      // The jorje class initializers above build Guava objects (immutable
+      // collections, CharMatchers); objects in the image heap require their
+      // classes to also be build-time initialized.
+      buildArgs.add('--initialize-at-build-time=com.google.common')
       buildArgs.addAll(application.applicationDefaultJvmArgs)
       // Certain Linux distribution doesn't allow dynamic-linked binaries to be
       // run, for example, NixOS, so we need to build a static binary.

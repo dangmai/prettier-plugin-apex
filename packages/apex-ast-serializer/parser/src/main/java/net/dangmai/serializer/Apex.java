@@ -17,16 +17,27 @@ import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.json.JsonWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.logging.LogManager;
@@ -39,6 +50,15 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.io.IOUtils;
 
 public class Apex {
+
+  static {
+    // Install the index-based location factory once, at class initialization,
+    // rather than on every parse. Without it comments are not retained
+    // correctly. The Apex class is loaded before any getAST call, and on the
+    // native image this runs at build time (the package is initialized at
+    // build time) so the factory is baked into the image.
+    Locations.useIndexFactory();
+  }
 
   private static void setUpXStream(XStream xstream, int mode) {
     xstream.setMode(mode);
@@ -78,18 +98,24 @@ public class Apex {
     } else {
       engine = ParserEngine.get(ParserEngine.Type.NAMED);
     }
-    Locations.useIndexFactory(); // without this, comments won't be retained correctly
     ParserOutput output = engine.parse(
       sourceFile,
       ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS,
       ParserEngine.SoqlParserType.NEW
     );
 
-    // Serializing the output
-    int mode = XStream.NO_REFERENCES;
+    // Serializing the output. The XStream instances are cached in XStreams:
+    // construction is expensive (reflection-heavy converter registration)
+    // and would otherwise be paid on every parse.
+    XStream xstream = prettyPrint ? XStreams.PRETTY : XStreams.COMPACT;
+    synchronized (xstream) {
+      xstream.toXML(output, writer);
+    }
+  }
+
+  static XStream buildXStream(boolean prettyPrint) {
     Mapper defaultMapper = (new XStream()).getMapper();
-    XStream xstream;
-    xstream = new XStream(
+    XStream xstream = new XStream(
       null,
       new JsonHierarchicalStreamDriver() {
         @Override
@@ -110,9 +136,8 @@ public class Apex {
       new ClassLoaderReference(new CompositeClassLoader()),
       new WithClassMapper(defaultMapper)
     );
-    setUpXStream(xstream, mode);
-
-    xstream.toXML(output, writer);
+    setUpXStream(xstream, XStream.NO_REFERENCES);
+    return xstream;
   }
 
   public static void main(String[] args) throws ParseException, IOException {
@@ -134,6 +159,15 @@ public class Apex {
       "Location of Apex class file. If not specified, the Apex content will be read from stdin."
     );
     cliOptions.addOption("p", "pretty", false, "Pretty print output.");
+    cliOptions.addOption(
+      "s",
+      "stream",
+      false,
+      "Stream mode: serve multiple parse requests over stdin/stdout. " +
+      "Each request is a header line `<anonymous flag> <payload byte count>` " +
+      "followed by that many bytes of Apex source. Each response is a " +
+      "header line `<OK|ERR> <payload byte count>` followed by the payload."
+    );
     cliOptions.addOption("h", "help", false, "Print help information.");
     cliOptions.addOption("v", "version", false, "Print version information.");
 
@@ -159,6 +193,8 @@ public class Apex {
         System.err.println("Failed to read version information.");
         e.printStackTrace();
       }
+    } else if (cmd.hasOption("s")) {
+      runStream(System.in, System.out);
     } else {
       if (cmd.hasOption("l")) {
         apexReader = new FileReader(
@@ -181,15 +217,152 @@ public class Apex {
     }
   }
 
+  // Serves parse requests over stdin/stdout until EOF so that callers pay
+  // process startup cost once instead of per parsed file. The framing is
+  // byte-count based on both sides, so it makes no assumption about the
+  // payload contents.
+  static void runStream(InputStream rawIn, OutputStream rawOut)
+    throws IOException {
+    InputStream in = new BufferedInputStream(rawIn);
+    // Buffer stdout so the header and body of a response coalesce into one
+    // write, and reuse a single byte buffer across requests. The serialized
+    // AST is encoded straight into that buffer and streamed out with writeTo,
+    // avoiding the per-request String -> getBytes copies of the whole payload.
+    OutputStream out = new BufferedOutputStream(rawOut);
+    ByteArrayOutputStream responseBuffer = new ByteArrayOutputStream(65536);
+    while (true) {
+      String header = readHeaderLine(in);
+      if (header == null) {
+        return; // EOF - the calling process has closed our stdin
+      }
+      String[] parts = header.trim().split(" ");
+      boolean anonymous = parts[0].equals("1");
+      int byteCount = Integer.parseInt(parts[1]);
+      byte[] payload = in.readNBytes(byteCount);
+      String sourceCode = new String(payload, StandardCharsets.UTF_8);
+
+      try {
+        responseBuffer.reset();
+        Writer writer = new OutputStreamWriter(
+          responseBuffer,
+          StandardCharsets.UTF_8
+        );
+        getAST(anonymous, false, new StringReader(sourceCode), writer);
+        writer.flush();
+        out.write(
+          ("OK " + responseBuffer.size() + "\n").getBytes(
+            StandardCharsets.UTF_8
+          )
+        );
+        responseBuffer.writeTo(out);
+      } catch (Exception error) {
+        String message =
+          error.getMessage() == null ? error.toString() : error.getMessage();
+        byte[] response = message.getBytes(StandardCharsets.UTF_8);
+        out.write(
+          ("ERR " + response.length + "\n").getBytes(StandardCharsets.UTF_8)
+        );
+        out.write(response);
+      }
+      out.flush();
+    }
+  }
+
+  // Package-private so CliTest can read stream-mode response frames with the
+  // same reader the production loop uses.
+  static String readHeaderLine(InputStream in) throws IOException {
+    ByteArrayOutputStream line = new ByteArrayOutputStream();
+    int b;
+    while ((b = in.read()) != -1) {
+      if (b == '\n') {
+        return line.toString(StandardCharsets.UTF_8);
+      }
+      line.write(b);
+    }
+    return line.size() == 0 ? null : line.toString(StandardCharsets.UTF_8);
+  }
+
   // We use this mapper to make sure all classes in the jorje package gets printed out as class attribute
   private static class WithClassMapper extends MapperWrapper {
+
+    // IndexLocation is package-private in jorje, so it has to be looked up
+    // reflectively.
+    private static final Class<?> INDEX_LOCATION_CLASS;
+
+    // Fully-qualified `@class` names made up ~35% of the serialized AST. We
+    // emit a short token ("t" + base36 index into the sorted name list) for
+    // every known node class instead, and the JavaScript consumer translates
+    // it back during its post-parse walk (see src/apex-class-tokens.ts). The
+    // name list is the resource apex-class-tokens.txt, kept in sync with the
+    // TypeScript copy by a unit test. Classes absent from the list (e.g. the
+    // root ParserOutput, which is emitted as an object key rather than an
+    // attribute) keep their full name.
+    private static final Map<String, String> CLASS_TO_TOKEN = loadClassTokens();
+
+    static {
+      Class<?> indexLocation = null;
+      try {
+        indexLocation = Class.forName("apex.jorje.data.IndexLocation");
+      } catch (ClassNotFoundException e) {
+        // Fall through: locations keep their @class attribute.
+      }
+      INDEX_LOCATION_CLASS = indexLocation;
+    }
+
+    private static Map<String, String> loadClassTokens() {
+      List<String> names = new ArrayList<>();
+      try (
+        BufferedReader reader = new BufferedReader(
+          new InputStreamReader(
+            WithClassMapper.class.getResourceAsStream("apex-class-tokens.txt"),
+            StandardCharsets.UTF_8
+          )
+        )
+      ) {
+        String line;
+        while ((line = reader.readLine()) != null) {
+          line = line.trim();
+          if (!line.isEmpty()) {
+            names.add(line);
+          }
+        }
+      } catch (IOException | NullPointerException e) {
+        // Without the resource we fall back to emitting full class names.
+        return Collections.emptyMap();
+      }
+      // Lexicographic sort matches the JavaScript side's default Array sort for
+      // these ASCII strings, so both assign the same token to each class.
+      Collections.sort(names);
+      Map<String, String> tokens = new HashMap<>(names.size() * 2);
+      for (int i = 0; i < names.size(); i++) {
+        tokens.put(names.get(i), "t" + Integer.toString(i, 36));
+      }
+      return tokens;
+    }
 
     WithClassMapper(Mapper wrapped) {
       super(wrapped);
     }
 
     @Override
+    public String serializedClass(Class type) {
+      String name = super.serializedClass(type);
+      String token = CLASS_TO_TOKEN.get(name);
+      return token != null ? token : name;
+    }
+
+    @Override
     public Class defaultImplementationOf(Class type) {
+      // Location fields are always IndexLocation at runtime (we use
+      // Locations.useIndexFactory()), and the JavaScript consumer never
+      // reads their @class attribute - declaring the default implementation
+      // lets XStream omit the attribute on every location node, which
+      // meaningfully shrinks the serialized AST.
+      if (
+        type == apex.jorje.data.Location.class && INDEX_LOCATION_CLASS != null
+      ) {
+        return INDEX_LOCATION_CLASS;
+      }
       if (
         type.getPackage() != null &&
         type.getPackage().getName().startsWith("apex.jorje")

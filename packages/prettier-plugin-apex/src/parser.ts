@@ -4,6 +4,7 @@ import process from "node:process";
 import prettier from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import { TOKEN_TO_CLASS } from "./apex-class-tokens.js";
 import {
   ALLOW_TRAILING_EMPTY_LINE,
   APEX_TYPES,
@@ -30,6 +31,25 @@ interface SpawnOutput {
   stdout: string;
   stderr: string;
 }
+// The return type is intentionally inferred: an explicit SpawnOptions
+// annotation would widen the stdio typing and make spawn() return nullable
+// stdio streams.
+function getSerializerSpawnOptions() {
+  return {
+    // A shell is only needed on Windows, where the fallback serializer is a
+    // .bat wrapper that cannot be spawned directly. Skipping the shell
+    // elsewhere avoids an extra process fork per parse.
+    shell: process.platform === "win32",
+    env: {
+      ...process.env,
+      // #1513 - Gradle's generated Windows application wrapper checks for
+      // the DEBUG environment variable and will output verbose logs if it is
+      // set, which will break the parser output.
+      DEBUG: "",
+    },
+  };
+}
+
 async function parseTextWithSpawn(
   executable: string,
   text: string,
@@ -40,29 +60,26 @@ async function parseTextWithSpawn(
     args.push("-a");
   }
   return new Promise((resolve, reject) => {
-    const spawnedProcess = childProcess.spawn(executable, args, {
-      shell: true,
-      env: {
-        ...process.env,
-        // #1513 - Gradle's generated Windows application wrapper checks for
-        // the DEBUG environment variable and will output verbose logs if it is set,
-        // which will break the parser output.
-        DEBUG: "",
-      },
-    });
+    const spawnedProcess = childProcess.spawn(
+      executable,
+      args,
+      getSerializerSpawnOptions(),
+    );
     spawnedProcess.stdin.write(text);
     spawnedProcess.stdin.end();
 
-    let stdout = "";
-    let stderr = "";
+    const stdoutChunks: Buffer[] = [];
+    const stderrChunks: Buffer[] = [];
     spawnedProcess.stdout.on("data", (chunk) => {
-      stdout += chunk;
+      stdoutChunks.push(chunk);
     });
     spawnedProcess.stderr.on("data", (chunk) => {
-      stderr += chunk;
+      stderrChunks.push(chunk);
     });
 
     spawnedProcess.on("close", (code) => {
+      const stdout = Buffer.concat(stdoutChunks).toString();
+      const stderr = Buffer.concat(stderrChunks).toString();
       if (code === 0) {
         resolve({ stdout, stderr });
       } else {
@@ -70,9 +87,199 @@ async function parseTextWithSpawn(
       }
     });
     spawnedProcess.on("error", () => {
-      reject(new Error(stdout + stderr));
+      reject(
+        new Error(
+          Buffer.concat(stdoutChunks).toString() +
+            Buffer.concat(stderrChunks).toString(),
+        ),
+      );
     });
   });
+}
+
+// Persistent "stream mode" parser processes, keyed by executable path. The
+// serializer is spawned once with -s and then serves every subsequent parse
+// request over stdin/stdout, avoiding the per-file process startup cost.
+// The framing contract (header line + byte-counted payload, OK/ERR statuses)
+// is implemented by Apex.runStream in apex-ast-serializer and documented in
+// that package's README under "Stream mode" - both sides must stay in sync.
+type PipeRequest = {
+  resolve: (response: string) => void;
+  reject: (error: Error) => void;
+};
+type PipeState = {
+  process: childProcess.ChildProcess;
+  pending: PipeRequest[];
+  // Incremental frame parser state. The header line is accumulated as it
+  // arrives; payload bytes are collected as zero-copy views and joined with
+  // a single Buffer.concat per frame, so each received byte is copied at
+  // most once regardless of how many chunks the response is split into.
+  headerText: string;
+  payloadLength: number;
+  payloadOk: boolean;
+  payloadChunks: Buffer[];
+  payloadByteLength: number;
+};
+const pipeProcesses = new Map<string, PipeState>();
+// Executables that don't understand -s (binaries released before stream mode
+// existed); these fall back to one process per parse request.
+const pipeIncapableExecutables = new Set<string>();
+
+class PipeUnsupportedError extends Error {}
+
+// Headers look like `OK 12345` - anything longer is not our protocol.
+const PIPE_MAX_HEADER_LENGTH = 64;
+
+function handlePipeChunk(state: PipeState, chunk: Buffer): void {
+  let offset = 0;
+  while (offset < chunk.length) {
+    if (state.payloadLength === -1) {
+      // Still reading the header line.
+      const newlineIndex = chunk.indexOf(0x0a, offset);
+      if (newlineIndex === -1) {
+        state.headerText += chunk.toString("latin1", offset);
+        if (state.headerText.length > PIPE_MAX_HEADER_LENGTH) {
+          // The process is not speaking our protocol (e.g. an old binary
+          // printing a CLI error); tear it down so the caller falls back.
+          state.process.kill();
+        }
+        return;
+      }
+      const header =
+        state.headerText + chunk.toString("latin1", offset, newlineIndex);
+      offset = newlineIndex + 1;
+      const [status, lengthText] = header.split(" ");
+      const payloadLength = Number(lengthText);
+      if (
+        (status !== "OK" && status !== "ERR") ||
+        !Number.isInteger(payloadLength)
+      ) {
+        state.process.kill();
+        return;
+      }
+      state.headerText = "";
+      state.payloadLength = payloadLength;
+      state.payloadOk = status === "OK";
+    }
+    const bytesNeeded = state.payloadLength - state.payloadByteLength;
+    const bytesToTake = Math.min(bytesNeeded, chunk.length - offset);
+    if (bytesToTake > 0) {
+      state.payloadChunks.push(chunk.subarray(offset, offset + bytesToTake));
+      state.payloadByteLength += bytesToTake;
+      offset += bytesToTake;
+    }
+    if (state.payloadByteLength < state.payloadLength) {
+      return;
+    }
+    // Frame complete.
+    const payload =
+      state.payloadChunks.length === 1
+        ? (state.payloadChunks[0] as Buffer).toString()
+        : Buffer.concat(state.payloadChunks).toString();
+    const payloadOk = state.payloadOk;
+    state.payloadLength = -1;
+    state.payloadChunks = [];
+    state.payloadByteLength = 0;
+    const request = state.pending.shift();
+    if (state.pending.length === 0) {
+      setPipeKeepAlive(state, false);
+    }
+    if (request) {
+      if (payloadOk) {
+        request.resolve(payload);
+      } else {
+        request.reject(new Error(payload));
+      }
+    }
+  }
+}
+
+function getPipeProcess(executable: string): PipeState {
+  const existing = pipeProcesses.get(executable);
+  if (existing && existing.process.exitCode === null) {
+    return existing;
+  }
+  const spawnedProcess = childProcess.spawn(
+    executable,
+    ["-s"],
+    getSerializerSpawnOptions(),
+  );
+  const state: PipeState = {
+    process: spawnedProcess,
+    pending: [],
+    headerText: "",
+    payloadLength: -1,
+    payloadOk: false,
+    payloadChunks: [],
+    payloadByteLength: 0,
+  };
+  spawnedProcess.stdout?.on("data", (chunk: Buffer) => {
+    handlePipeChunk(state, chunk);
+  });
+  const failPending = () => {
+    const pending = state.pending.splice(0);
+    pipeProcesses.delete(executable);
+    for (const request of pending) {
+      request.reject(
+        new PipeUnsupportedError(
+          "Parser process exited before responding; it may not support stream mode",
+        ),
+      );
+    }
+  };
+  spawnedProcess.on("close", failPending);
+  spawnedProcess.on("error", failPending);
+  // Writes can race with the process exiting (e.g. an old binary that does
+  // not understand -s); the resulting EPIPE must not surface as an uncaught
+  // exception - pending requests are already rejected by the close handler.
+  spawnedProcess.stdin?.on("error", () => {});
+  setPipeKeepAlive(state, false);
+  pipeProcesses.set(executable, state);
+  return state;
+}
+
+// While a request is in flight the process must keep the Node event loop
+// alive (otherwise Node would exit mid-parse), but an idle parser process
+// must not prevent Node from exiting. The stdio pipes are net.Sockets at
+// runtime, which support ref/unref despite being typed as plain streams.
+type RefCountable = { ref?: () => void; unref?: () => void } | null;
+
+function setPipeKeepAlive(state: PipeState, keepAlive: boolean): void {
+  const method = keepAlive ? "ref" : "unref";
+  state.process[method]();
+  (state.process.stdin as RefCountable)?.[method]?.();
+  (state.process.stdout as RefCountable)?.[method]?.();
+  (state.process.stderr as RefCountable)?.[method]?.();
+}
+
+async function parseTextWithPipe(
+  executable: string,
+  text: string,
+  anonymous: boolean,
+): Promise<string> {
+  if (pipeIncapableExecutables.has(executable)) {
+    return (await parseTextWithSpawn(executable, text, anonymous)).stdout;
+  }
+  try {
+    return await new Promise<string>((resolve, reject) => {
+      const state = getPipeProcess(executable);
+      state.pending.push({ resolve, reject });
+      setPipeKeepAlive(state, true);
+      // Two writes instead of building a concatenated buffer: both happen
+      // synchronously (no interleaving with concurrent requests is possible)
+      // and this avoids copying the payload an extra time.
+      state.process.stdin?.write(
+        `${anonymous ? 1 : 0} ${Buffer.byteLength(text)}\n`,
+      );
+      state.process.stdin?.write(text);
+    });
+  } catch (error) {
+    if (error instanceof PipeUnsupportedError) {
+      pipeIncapableExecutables.add(executable);
+      return (await parseTextWithSpawn(executable, text, anonymous)).stdout;
+    }
+    throw error;
+  }
 }
 
 async function parseTextWithHttp(
@@ -852,12 +1059,37 @@ function getEmptyLineLocations(sourceCode: string): number[] {
     );
 }
 
+// The serializer interns jorje `@class` names to short tokens (t0, t1, ...) to
+// shrink the payload; expand them back to the fully-qualified names the printer
+// dispatches on. Values that aren't known tokens (the full class names emitted
+// by serializer binaries released before interning) pass through untouched, so
+// the plugin stays compatible with both.
+function expandClassTokens(value: unknown): void {
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      expandClassTokens(item);
+    }
+  } else if (value !== null && typeof value === "object") {
+    const node = value as Record<string, unknown>;
+    const token = node["@class"];
+    if (typeof token === "string") {
+      const fullClass = TOKEN_TO_CLASS[token];
+      if (fullClass !== undefined) {
+        node["@class"] = fullClass;
+      }
+    }
+    for (const key in node) {
+      expandClassTokens(node[key]);
+    }
+  }
+}
+
 export default async function parse(
   sourceCode: string,
   options: prettier.RequiredOptions,
 ): Promise<SerializedAst | Record<string, never>> {
   let serializedAst: string;
-  let stderr: string = "";
+  const stderr = "";
   if (options.apexStandaloneParser === "built-in") {
     serializedAst = await parseTextWithHttp(
       sourceCode,
@@ -868,15 +1100,13 @@ export default async function parse(
     );
   } else if (options.apexStandaloneParser === "native") {
     const serializerBin = await getNativeExecutableWithFallback();
-    const result = await parseTextWithSpawn(
+    serializedAst = await parseTextWithPipe(
       serializerBin,
       sourceCode,
       options.parser === "apex-anonymous",
     );
-    serializedAst = result.stdout;
-    stderr = result.stderr;
   } else {
-    const result = await parseTextWithSpawn(
+    serializedAst = await parseTextWithPipe(
       path.join(
         await getSerializerBinDirectory(),
         `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`,
@@ -884,11 +1114,10 @@ export default async function parse(
       sourceCode,
       options.parser === "apex-anonymous",
     );
-    serializedAst = result.stdout;
-    stderr = result.stderr;
   }
   if (serializedAst) {
     const ast: SerializedAst = JSON.parse(serializedAst);
+    expandClassTokens(ast);
     if (
       ast[APEX_TYPES.PARSER_OUTPUT] &&
       ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0

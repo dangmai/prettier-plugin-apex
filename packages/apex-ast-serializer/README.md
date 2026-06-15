@@ -43,6 +43,20 @@ To get a list of supported options:
 ./apex-ast-serializer --help
 ```
 
+### Stream mode
+
+By default the serializer parses one file from stdin and exits. With `-s`
+(`--stream`) it stays alive and serves any number of parse requests over
+stdin/stdout, so callers pay process startup cost only once:
+
+- Request: a header line `<anonymous flag> <payload byte count>` (e.g.
+  `0 1234`), followed by exactly that many bytes of Apex source (UTF-8).
+- Response: a header line `<OK|ERR> <payload byte count>`, followed by the
+  payload — the serialized AST JSON on `OK`, an error message on `ERR`.
+
+The process exits when its stdin is closed. This is what prettier-plugin-apex
+uses for the `native` and `none` parser modes.
+
 ## License
 
 MIT
