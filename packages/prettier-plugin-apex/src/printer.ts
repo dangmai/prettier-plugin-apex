@@ -58,28 +58,30 @@ function pushIfExist(
 ): Doc[] {
   if (doc) {
     if (preDocs) {
-        parts.push(...preDocs);
+      parts.push(...preDocs);
     }
     parts.push(doc);
     if (postDocs) {
-        parts.push(...postDocs);
+      parts.push(...postDocs);
     }
   }
   return parts;
 }
 
+const ESCAPE_REPLACEMENTS: Record<string, string> = {
+  "\\": "\\\\",
+  "\u0008": "\\b",
+  "\t": "\\t",
+  "\n": "\\n",
+  "\f": "\\f",
+  "\r": "\\r",
+  "'": "\\'",
+};
 function escapeString(text: string): string {
-  // Code from https://stackoverflow.com/a/11716317/477761
-  return (
-    text
-      .replace(/\\/g, "\\\\")
-      // biome-ignore lint/suspicious/noControlCharactersInRegex: We do want to escape this control character
-      .replace(/\u0008/g, "\\b")
-      .replace(/\t/g, "\\t")
-      .replace(/\n/g, "\\n")
-      .replace(/\f/g, "\\f")
-      .replace(/\r/g, "\\r")
-      .replace(/'/g, "\\'")
+  return text.replace(
+    // biome-ignore lint/suspicious/noControlCharactersInRegex: We do want to escape this control character
+    /[\\\u0008\t\n\f\r']/g,
+    (character) => ESCAPE_REPLACEMENTS[character] as string,
   );
 }
 
@@ -221,10 +223,10 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   // certain situation, because the EOL comment might become attached to the
   // entire binaryish expression after the first format.
   const leftChildHasEndOfLineComment =
-    node.left.comments?.filter(
+    node.left.comments?.some(
       (comment: AnnotatedComment) =>
         comment.trailing && comment.placement === "endOfLine",
-    ).length > 0;
+    ) ?? false;
 
   if (leftChildHasEndOfLineComment) {
     docs.push(groupConcat([operationDoc, hardline, rightDoc]));
@@ -467,7 +469,9 @@ function getDanglingCommentDocs(path: AstPath, _print: PrintFn, options: any) {
   path.each((commentPath: AstPath) => {
     danglingCommentParts.push(printDanglingComment(commentPath, options));
   }, "danglingComments");
-  delete node.danglingComments;
+  // Assignment instead of `delete`, which would force a hidden-class
+  // transition on the node.
+  node.danglingComments = undefined;
   return danglingCommentParts;
 }
 

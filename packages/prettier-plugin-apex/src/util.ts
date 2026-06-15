@@ -54,18 +54,39 @@ export function isBinaryish(node: jorje.Expr): boolean {
 }
 
 /**
- * Check if this comment is an ApexDoc-style comment.
- * This code is straight from prettier JSDoc detection.
+ * Check if this comment is an ApexDoc-style comment, i.e. a block comment
+ * in which every line between the first and the last starts with `*` (after
+ * leading whitespace). This mirrors prettier's JSDoc detection, but walks
+ * the newlines directly instead of materializing a line array.
  * @param comment the comment to check.
  */
 export function isApexDocComment(comment: jorje.BlockComment): boolean {
-  const lines = comment.value.split("\n");
-  return (
-    lines.length > 1 &&
-    lines
-      .slice(1, lines.length - 1)
-      .every((commentLine) => commentLine.trim()[0] === "*")
-  );
+  const value = comment.value;
+  let lineStart = value.indexOf("\n");
+  if (lineStart === -1) {
+    return false;
+  }
+  // Local so the global-flag regex's lastIndex state cannot leak between
+  // calls.
+  const nonWhitespace = /\S/g;
+  lineStart += 1;
+  let lineEnd = value.indexOf("\n", lineStart);
+  while (lineEnd !== -1) {
+    // The first non-whitespace character of the line must be an asterisk;
+    // a whitespace-only line disqualifies the comment.
+    nonWhitespace.lastIndex = lineStart;
+    const firstContent = nonWhitespace.exec(value);
+    if (
+      !firstContent ||
+      firstContent.index >= lineEnd ||
+      value[firstContent.index] !== "*"
+    ) {
+      return false;
+    }
+    lineStart = lineEnd + 1;
+    lineEnd = value.indexOf("\n", lineStart);
+  }
+  return true;
 }
 
 export function checkIfParentIsDottedExpression(path: AstPath): boolean {
@@ -101,26 +122,6 @@ export function checkIfParentIsDottedExpression(path: AstPath): boolean {
   }
   return result;
 }
-
-// The metadata corresponding to these keys cannot be compared for some reason
-// or another, so we will delete them before the AST comparison
-const METADATA_TO_IGNORE = [
-  "loc",
-  "location",
-  "lastNodeLoc",
-  "text",
-  "rawQuery",
-  "@id",
-  // It is impossible to preserve the comment AST. Neither recast nor
-  // prettier tries to do it so we are not going to bother either.
-  "comments",
-  "$",
-  "leading",
-  "trailing",
-  "hiddenTokenMap",
-  "trailingEmptyLine",
-  "forcedHardline",
-];
 
 /**
  * Massaging the AST node so that it can be compared. This gets called by
@@ -169,15 +170,61 @@ export function massageAstNode(ast: any, newObj: any): any {
       }
     }
   }
-  METADATA_TO_IGNORE.forEach((name) => {
-    delete newObj[name];
-  });
 }
+
+// The metadata corresponding to these keys cannot be compared for some reason
+// or another. Prettier's massage machinery skips them before cloning, so
+// they never appear in the compared AST (and their subtrees are not visited).
+massageAstNode.ignoredProperties = new Set([
+  "loc",
+  "location",
+  "lastNodeLoc",
+  "text",
+  "rawQuery",
+  "@id",
+  // It is impossible to preserve the comment AST. Neither recast nor
+  // prettier tries to do it so we are not going to bother either.
+  "comments",
+  "$",
+  "leading",
+  "trailing",
+  "hiddenTokenMap",
+  "trailingEmptyLine",
+  "forcedHardline",
+]);
 
 /**
  * Helper function to find a character in a string, starting at an index.
  * It will ignore characters that are part of comments.
  */
+// Comments arrive sorted by start index (jorje's hidden token map is keyed
+// by index) and never overlap, so a binary search finds the only comment
+// that could contain the given index. Returns that comment's location, or
+// null when the index is not inside any comment.
+function findContainingCommentLocation(
+  commentNodes: GenericComment[],
+  index: number,
+): { startIndex: number; endIndex: number } | null {
+  let low = 0;
+  let high = commentNodes.length - 1;
+  let candidate = -1;
+  while (low <= high) {
+    const mid = (low + high) >> 1;
+    const location = commentNodes[mid]?.location;
+    if (location && location.startIndex <= index) {
+      candidate = mid;
+      low = mid + 1;
+    } else {
+      high = mid - 1;
+    }
+  }
+  if (candidate === -1) {
+    return null;
+  }
+  const location = commentNodes[candidate]?.location;
+  return location?.endIndex && location.endIndex - 1 >= index ? location : null;
+}
+
 export function findNextUncommentedCharacter(
   sourceCode: string,
   character: string,
@@ -185,27 +232,24 @@ export function findNextUncommentedCharacter(
   commentNodes: GenericComment[],
   backwards = false,
 ): number {
-  let indexFound = false;
-  let index = -1;
-
-  const findIndex = (comment: GenericComment) =>
-    comment?.location?.endIndex &&
-    comment.location.startIndex <= index &&
-    comment.location.endIndex - 1 >= index;
-  while (!indexFound) {
-    if (backwards) {
-      index = sourceCode.lastIndexOf(character, fromIndex);
-    } else {
-      index = sourceCode.indexOf(character, fromIndex);
+  while (true) {
+    const index = backwards
+      ? sourceCode.lastIndexOf(character, fromIndex)
+      : sourceCode.indexOf(character, fromIndex);
+    const containingComment = findContainingCommentLocation(
+      commentNodes,
+      index,
+    );
+    if (!containingComment) {
+      return index;
     }
-    indexFound = commentNodes.filter(findIndex).length === 0;
-    if (backwards) {
-      fromIndex = index - 1;
-    } else {
-      fromIndex = index + 1;
-    }
+    // The match is inside a comment: resume the scan past the entire comment
+    // instead of at the next character, so a comment containing many
+    // occurrences of the target character is skipped in one step.
+    fromIndex = backwards
+      ? containingComment.startIndex - 1
+      : containingComment.endIndex;
   }
-  return index;
 }
 
 // Optimization to look up parent types faster
