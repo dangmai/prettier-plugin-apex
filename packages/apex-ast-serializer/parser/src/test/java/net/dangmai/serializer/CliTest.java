@@ -105,6 +105,28 @@ public class CliTest {
     });
   }
 
+  @Test
+  void shouldGetPrettyJsonFromNamedApexFile() {
+    assertDoesNotThrow(() -> {
+      TestUtilities.getApexTestFiles()
+        .forEach(file -> {
+          try {
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            runCli(null, new String[] { "-p", "-l", file.getAbsolutePath() });
+
+            String content = byteArrayOutputStream.toString();
+            assertNotNull(content, "There should be content");
+            assertTrue(
+              TestUtilities.isJSONValid(content),
+              "Content should be valid JSON"
+            );
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+    });
+  }
+
   private void runCli(final InputStream inputStream, final String[] params)
     throws Exception {
     final InputStream old = System.in;
