@@ -40,6 +40,12 @@ import org.apache.commons.io.IOUtils;
 
 public class Apex {
 
+  static {
+    // Required for correct comment retention; once at class init (baked into
+    // the native image) instead of per parse.
+    Locations.useIndexFactory();
+  }
+
   private static void setUpXStream(XStream xstream, int mode) {
     xstream.setMode(mode);
     xstream.registerConverter(
@@ -78,18 +84,23 @@ public class Apex {
     } else {
       engine = ParserEngine.get(ParserEngine.Type.NAMED);
     }
-    Locations.useIndexFactory(); // without this, comments won't be retained correctly
     ParserOutput output = engine.parse(
       sourceFile,
       ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS,
       ParserEngine.SoqlParserType.NEW
     );
 
-    // Serializing the output
-    int mode = XStream.NO_REFERENCES;
+    // Reuse the cached XStream; construction is expensive and would otherwise
+    // repeat on every parse.
+    XStream xstream = prettyPrint ? XStreams.PRETTY : XStreams.COMPACT;
+    synchronized (xstream) {
+      xstream.toXML(output, writer);
+    }
+  }
+
+  static XStream buildXStream(boolean prettyPrint) {
     Mapper defaultMapper = (new XStream()).getMapper();
-    XStream xstream;
-    xstream = new XStream(
+    XStream xstream = new XStream(
       null,
       new JsonHierarchicalStreamDriver() {
         @Override
@@ -102,7 +113,7 @@ public class Apex {
             new char[0],
             "".toCharArray(),
             JsonWriter.Format.SPACE_AFTER_LABEL |
-            JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+              JsonWriter.Format.COMPACT_EMPTY_ELEMENT
           );
           return new CustomJsonWriter(writer, format);
         }
@@ -110,9 +121,8 @@ public class Apex {
       new ClassLoaderReference(new CompositeClassLoader()),
       new WithClassMapper(defaultMapper)
     );
-    setUpXStream(xstream, mode);
-
-    xstream.toXML(output, writer);
+    setUpXStream(xstream, XStream.NO_REFERENCES);
+    return xstream;
   }
 
   public static void main(String[] args) throws ParseException, IOException {

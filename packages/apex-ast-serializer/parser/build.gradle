@@ -157,6 +157,21 @@ graalvmNative {
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
       buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
+      // Initialize the parser + serializer stack at image build time so a
+      // fresh process pays no jorje/XStream setup at first parse. This is a
+      // closure: a class is build-time-initializable only if everything it
+      // touches at init is too.
+      buildArgs.add('--initialize-at-build-time=org.antlr.runtime')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.parser.impl')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.data')
+      buildArgs.add('--initialize-at-build-time=apex.common')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.semantic')
+      buildArgs.add('--initialize-at-build-time=net.dangmai.serializer')
+      buildArgs.add('--initialize-at-build-time=com.thoughtworks.xstream')
+      buildArgs.add('--initialize-at-build-time=com.google.common')
+      // -J targets the builder JVM; XStream reflects into java.io during init.
+      buildArgs.add('-J--add-opens=java.base/java.io=ALL-UNNAMED')
+      application.applicationDefaultJvmArgs.each { buildArgs.add('-J' + it) }
       buildArgs.addAll(application.applicationDefaultJvmArgs)
       // Certain Linux distribution doesn't allow dynamic-linked binaries to be
       // run, for example, NixOS, so we need to build a static binary.
