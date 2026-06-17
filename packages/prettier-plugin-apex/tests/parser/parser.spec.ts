@@ -95,6 +95,15 @@ describe("Parser Tests", () => {
       ).rejects.toThrow("Unexpected token");
     },
   );
+  it.concurrent("formats whitespace-only source to empty output", async () => {
+    await expect(
+      prettier.format("   \n  ", {
+        plugins: [prettierApex],
+        parser: "apex",
+        apexStandaloneParser: "none",
+      }),
+    ).resolves.toBe("");
+  });
   it.concurrent(
     "throws error when asynchronous parser runs into invalid input file",
     async () => {
