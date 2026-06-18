@@ -27,7 +27,8 @@
     "pretest": "pnpm run lint",
     "test": "vitest run",
     "test:package": "tsx tests_integration/package/run-package-tests.zx.mts",
-    "benchmark": "tsx tests_perf/run.ts",
+    "benchmark": "tsx tests_perf/setup.ts",
+    "benchmark:core": "tsx tests_perf/run.ts",
     "start-server": "tsx bin/start-apex-server.ts -h 0.0.0.0 -c http://localhost:5173",
     "wait-server": "wait-on --timeout 300000 http://localhost:2117/api/ast/",
     "stop-server": "tsx bin/stop-apex-server.ts",
@@ -44,6 +45,7 @@
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
   "devDependencies": {
+    "@inquirer/prompts": "^8.5.2",
     "@types/wait-on": "5.3.4",
     "@vitest/coverage-v8": "4.1.8",
     "vite": "8.0.16",
