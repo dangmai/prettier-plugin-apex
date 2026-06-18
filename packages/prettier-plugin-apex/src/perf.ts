@@ -15,7 +15,7 @@ export type PerfMarks = Record<string, number>;
 let marks: PerfMarks = {};
 
 export function perfMark(name: string): void {
-  if (process.env.APEX_PERF) {
+  if (process.env["APEX_PERF"]) {
     marks[name] = performance.now();
   }
 }

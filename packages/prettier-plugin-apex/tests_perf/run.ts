@@ -20,7 +20,7 @@
 //   pnpm tsx tests_perf/run.ts [--warmup N] [--iterations N] [--out file.json] [--raw]
 //   pnpm tsx tests_perf/run.ts compare base.json head.json
 //
-process.env.APEX_PERF = "1"; // enable parser.ts marks before importing the plugin
+process.env["APEX_PERF"] = "1"; // enable parser.ts marks before importing the plugin
 
 import { execSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
