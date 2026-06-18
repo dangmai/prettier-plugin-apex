@@ -1,5 +1,7 @@
 # Unreleased
 
+## Formatting Changes
+
 - Support Apex multiline string literals (`'''...'''`), preserving their content verbatim ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_multiline_string.htm&release=262&type=5)).
 - Support the SOQL `FORMULA('...')` function in `WHERE` clauses ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_soql_formula_function.htm&release=262&type=5)). The formula expression is printed verbatim from the source.
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
