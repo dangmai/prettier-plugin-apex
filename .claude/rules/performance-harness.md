@@ -7,11 +7,8 @@ description: >-
   split of transport into jorje-parse vs XStream-serialize vs spawn/IPC. Read
   this before changing benchmarking/profiling code or the instrumentation it
   depends on.
-files:
-  - packages/prettier-plugin-apex/tests_perf/run.ts
-  - packages/prettier-plugin-apex/tests_perf/setup.ts
-  - packages/prettier-plugin-apex/tests_perf/generate-corpus.ts
-  - packages/prettier-plugin-apex/tests_perf/corpus/PerfBenchmarkLarge.cls
+paths:
+  - packages/prettier-plugin-apex/tests_perf/**/*
   - packages/prettier-plugin-apex/src/perf.ts
   - packages/prettier-plugin-apex/src/parser.ts
   - packages/apex-ast-serializer/parser/src/main/java/net/dangmai/serializer/Apex.java
