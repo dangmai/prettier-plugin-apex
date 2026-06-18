@@ -26,6 +26,8 @@ import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
@@ -72,6 +74,7 @@ public class Apex {
     String sourceCode = IOUtils.toString(reader);
     reader.close();
     SourceFile sourceFile = SourceFile.builder().setBody(sourceCode).build();
+    long parseStartNs = System.nanoTime();
     ParserEngine engine;
     if (anonymous) {
       engine = ParserEngine.get(ParserEngine.Type.ANONYMOUS);
@@ -84,6 +87,7 @@ public class Apex {
       ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS,
       ParserEngine.SoqlParserType.NEW
     );
+    long parseEndNs = System.nanoTime();
 
     // Serializing the output
     int mode = XStream.NO_REFERENCES;
@@ -102,7 +106,7 @@ public class Apex {
             new char[0],
             "".toCharArray(),
             JsonWriter.Format.SPACE_AFTER_LABEL |
-            JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+              JsonWriter.Format.COMPACT_EMPTY_ELEMENT
           );
           return new CustomJsonWriter(writer, format);
         }
@@ -113,6 +117,27 @@ public class Apex {
     setUpXStream(xstream, mode);
 
     xstream.toXML(output, writer);
+    long serializeEndNs = System.nanoTime();
+
+    // Performance harness: when a perf file is configured, write jorje parse
+    // vs XStream serialize timings to it. This keeps the stdout payload
+    // untouched and is inert outside benchmarking. The path comes from the
+    // `apexPerfFile` system property (used by tests) or the APEX_PERF_FILE
+    // environment variable (used by the Node perf harness).
+    String perfFile = System.getProperty(
+      "apexPerfFile",
+      System.getenv("APEX_PERF_FILE")
+    );
+    if (perfFile != null && !perfFile.isEmpty()) {
+      Files.writeString(
+        Path.of(perfFile),
+        "{\"parseNs\":" +
+          (parseEndNs - parseStartNs) +
+          ",\"serializeNs\":" +
+          (serializeEndNs - parseEndNs) +
+          "}"
+      );
+    }
   }
 
   public static void main(String[] args) throws ParseException, IOException {
