@@ -247,7 +247,7 @@ jobs:
 
       - name: Post sticky PR comment
         if: steps.setup.outputs.comment == 'true'
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3.0.4
         with:
           header: benchmark
           path: ${{ runner.temp }}/report.md
