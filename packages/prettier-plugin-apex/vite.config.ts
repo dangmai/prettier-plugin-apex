@@ -34,6 +34,9 @@ export default defineConfig({
     coverage: {
       enabled: ENABLE_COVERAGE,
       include: ["src/**/*.ts"],
+      // perf.ts is benchmark instrumentation, only exercised by the perf
+      // harness (tests_perf) under APEX_PERF rather than by the unit suite.
+      exclude: ["src/perf.ts"],
     },
     setupFiles: ["tests_config/run-spec.ts"],
   },
