@@ -41,13 +41,18 @@ const PKG_ROOT = path.resolve(
   "..",
 );
 
-const BUCKETS = [
+const MAIN_BUCKETS = [
   "transport",
   "deserialize",
   "prepping",
   "printing",
   "total",
 ] as const;
+// Sub-breakdown of `transport`, only populated for spawn-based modes whose
+// serializer emits Java-side timings (native / JVM, not built-in HTTP):
+// jorje parse, XStream serialize, and the spawn/IPC residual.
+const SUB_BUCKETS = ["java-parse", "java-serialize", "spawn-ipc"] as const;
+const BUCKETS = [...MAIN_BUCKETS, ...SUB_BUCKETS] as const;
 type Bucket = (typeof BUCKETS)[number];
 
 const CORPUS: { name: string; file: string }[] = [
@@ -193,11 +198,19 @@ async function benchFile(
     if (i < warmup) continue;
 
     const m = perfGetMarks();
-    samples.transport.push((m.transportEnd ?? 0) - (m.transportStart ?? 0));
+    const transport = (m.transportEnd ?? 0) - (m.transportStart ?? 0);
+    samples.transport.push(transport);
     samples.deserialize.push((m.deserializeEnd ?? 0) - (m.transportEnd ?? 0));
     samples.prepping.push((m.prepEnd ?? 0) - (m.deserializeEnd ?? 0));
     samples.printing.push(t1 - (m.prepEnd ?? 0));
     samples.total.push(t1 - t0);
+    // Java-side timings (ms), recorded via the serializer's temp file. Absent
+    // (0) for the built-in HTTP path, which emits no per-call timing.
+    const javaParse = m.javaParseMs ?? 0;
+    const javaSerialize = m.javaSerializeMs ?? 0;
+    samples["java-parse"].push(javaParse);
+    samples["java-serialize"].push(javaSerialize);
+    samples["spawn-ipc"].push(transport - javaParse - javaSerialize);
   }
 
   const result = Object.fromEntries(
@@ -210,18 +223,28 @@ function fmt(n: number, width = 9): string {
   return n.toFixed(3).padStart(width);
 }
 
+function printRow(label: string, s: Stats): void {
+  console.log(
+    `  ${label}${fmt(s.median)}${fmt(s.mean, 10)}${fmt(s.stddev, 10)}${s.cv.toFixed(1).padStart(8)}`,
+  );
+}
+
 function printFileTable(name: string, r: FileResult): void {
   console.log(`\n\x1b[1m${name}\x1b[0m`);
   console.log(
     `  ${"bucket".padEnd(12)}${"median".padStart(9)}${"mean".padStart(10)}${"stddev".padStart(10)}${"cv%".padStart(8)}`,
   );
-  for (const b of BUCKETS) {
-    const s = r[b];
+  for (const b of MAIN_BUCKETS) {
     const label =
       b === "total" ? `\x1b[1m${b}\x1b[0m`.padEnd(12 + 8) : b.padEnd(12);
-    console.log(
-      `  ${label}${fmt(s.median)}${fmt(s.mean, 10)}${fmt(s.stddev, 10)}${s.cv.toFixed(1).padStart(8)}`,
-    );
+    printRow(label, r[b]);
+  }
+  // Only show the transport breakdown when the serializer emitted Java timings.
+  if (r["java-parse"].median > 0 || r["java-serialize"].median > 0) {
+    console.log("  \x1b[2m└ transport breakdown:\x1b[0m");
+    for (const b of SUB_BUCKETS) {
+      printRow(`  ${b}`.padEnd(12), r[b]);
+    }
   }
 }
 
@@ -330,6 +353,8 @@ function runCompare(baseFile: string, headFile: string): void {
       `  ${"bucket".padEnd(12)}${"base".padStart(10)}${"head".padStart(10)}${"delta".padStart(10)}${"delta%".padStart(9)}`,
     );
     for (const bucket of BUCKETS) {
+      // Tolerate result files from an older harness without the sub-buckets.
+      if (!b[bucket] || !h[bucket]) continue;
       const bm = b[bucket].median;
       const hm = h[bucket].median;
       const delta = hm - bm;
