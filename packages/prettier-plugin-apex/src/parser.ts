@@ -9,6 +9,7 @@ import {
   APEX_TYPES,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
+import { perfMark } from "./perf.js";
 import {
   type AnnotatedComment,
   type GenericComment,
@@ -859,6 +860,9 @@ export default async function parse(
 ): Promise<SerializedAst | Record<string, never>> {
   let serializedAst: string;
   let stderr: string = "";
+  // Perf harness boundary: start of "transport" (process spawn / HTTP +
+  // jorje parse + Java-side serialization + receiving the payload).
+  perfMark("transportStart");
   if (options.apexStandaloneParser === "built-in") {
     serializedAst = await parseTextWithHttp(
       sourceCode,
@@ -888,8 +892,13 @@ export default async function parse(
     serializedAst = result.stdout;
     stderr = result.stderr;
   }
+  // Perf harness boundary: end of "transport", start of "deserialize".
+  perfMark("transportEnd");
   if (serializedAst) {
     const ast: SerializedAst = JSON.parse(serializedAst);
+    // Perf harness boundary: end of "deserialize" (JSON.parse), start of
+    // "prepping" (comment extraction, line indexes, and the DFS enrichment).
+    perfMark("deserializeEnd");
     if (
       ast[APEX_TYPES.PARSER_OUTPUT] &&
       ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
@@ -927,6 +936,10 @@ export default async function parse(
       metadataVisitor(emptyLineLocations),
     ]);
 
+    // Perf harness boundary: end of "prepping". Everything after parse()
+    // returns (comment attachment + the print walk) is attributed to
+    // "printing" by the harness.
+    perfMark("prepEnd");
     return ast;
   }
   throw new Error(`Failed to parse Apex code: ${stderr}`);
