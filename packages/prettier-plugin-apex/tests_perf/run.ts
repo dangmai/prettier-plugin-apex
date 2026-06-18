@@ -112,24 +112,46 @@ function nativeBinaryPresent(): boolean {
   }
 }
 
-function precheck(mode: string): { usingFallback: boolean } {
+function optionDefault(name: string): string {
+  const opt = (apex.options as Record<string, { default?: unknown }>)[name];
+  return String(opt?.default ?? "");
+}
+
+async function serverReachable(): Promise<boolean> {
+  const host = optionDefault("apexStandaloneHost") || "localhost";
+  const port = optionDefault("apexStandalonePort") || "2117";
+  const protocol = optionDefault("apexStandaloneProtocol") || "http";
+  try {
+    const res = await fetch(`${protocol}://${host}:${port}/api/ast/`);
+    return res.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function precheck(mode: string): Promise<{ usingFallback: boolean }> {
   let usingFallback = false;
-  if (mode === "native") {
-    if (!nativeBinaryPresent()) {
-      usingFallback = true;
-      console.warn(
-        "\n\x1b[33m⚠  Native binary not found for this platform.\x1b[0m",
-      );
-      console.warn(
-        "   The default mode is 'native', but it will fall back to the JVM serializer.",
-      );
-      console.warn(
-        "   The 'transport' bucket will reflect JVM startup, NOT the real native default.",
-      );
-      console.warn(
-        "   Build it first for representative numbers: pnpm run build:native && pnpm run install:native:dev\n",
-      );
-    }
+  if (mode === "native" && !nativeBinaryPresent()) {
+    usingFallback = true;
+    console.warn(
+      "\n\x1b[33m⚠  Native binary not found for this platform.\x1b[0m",
+    );
+    console.warn(
+      "   'native' mode will silently fall back to the JVM serializer.",
+    );
+    console.warn(
+      "   The 'transport' bucket will reflect JVM startup, NOT real native.",
+    );
+    console.warn(
+      "   Use the interactive harness (pnpm run benchmark) to download or build a binary.\n",
+    );
+  } else if (mode === "built-in" && !(await serverReachable())) {
+    console.warn(
+      "\n\x1b[33m⚠  Built-in parser server is not reachable.\x1b[0m",
+    );
+    console.warn(
+      "   Start it first: pnpm run start-server (or use pnpm run benchmark).\n",
+    );
   }
   return { usingFallback };
 }
@@ -149,20 +171,24 @@ async function benchFile(
   warmup: number,
   iterations: number,
   collectRaw: boolean,
+  parserOverride?: string,
 ): Promise<{ result: FileResult; raw?: Record<Bucket, number[]> }> {
   const samples = Object.fromEntries(
     BUCKETS.map((b) => [b, [] as number[]]),
   ) as Record<Bucket, number[]>;
 
+  // Only pass apexStandaloneParser when explicitly overridden; otherwise the
+  // plugin's own default is exercised (the zero-config adopter experience).
+  const formatOptions: prettier.Options = {
+    parser: "apex",
+    plugins: [apex as unknown as prettier.Plugin],
+    ...(parserOverride ? { apexStandaloneParser: parserOverride } : {}),
+  };
+
   for (let i = 0; i < warmup + iterations; i++) {
     perfReset();
     const t0 = performance.now();
-    // Intentionally do NOT pass apexStandaloneParser, so the plugin's own
-    // default is exercised.
-    await prettier.format(src, {
-      parser: "apex",
-      plugins: [apex as unknown as prettier.Plugin],
-    });
+    await prettier.format(src, formatOptions);
     const t1 = performance.now();
     if (i < warmup) continue;
 
@@ -204,28 +230,35 @@ function parseFlags(argv: string[]): {
   iterations: number;
   out?: string;
   raw: boolean;
+  parser?: string;
 } {
   let warmup = 5;
   let iterations = 30;
   let out: string | undefined;
   let raw = false;
+  let parser: string | undefined;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--warmup") warmup = Number(argv[++i]);
     else if (a === "--iterations") iterations = Number(argv[++i]);
     else if (a === "--out") out = argv[++i];
     else if (a === "--raw") raw = true;
+    // --parser overrides the mode benchmarked. Omit it to exercise the
+    // plugin's own default (what a zero-config adopter gets), which is the
+    // CI default. The interactive wizard passes this explicitly.
+    else if (a === "--parser") parser = argv[++i];
   }
-  return { warmup, iterations, out, raw };
+  return { warmup, iterations, out, raw, parser };
 }
 
 async function runBenchmark(argv: string[]): Promise<void> {
-  const { warmup, iterations, out, raw } = parseFlags(argv);
-  const mode = resolvedDefaultMode();
-  const { usingFallback } = precheck(mode);
+  const { warmup, iterations, out, raw, parser } = parseFlags(argv);
+  const mode = parser ?? resolvedDefaultMode();
+  const { usingFallback } = await precheck(mode);
 
+  const modeLabel = parser ? `${mode} (explicit)` : `${mode} (plugin default)`;
   console.log(
-    `\nBenchmarking default mode: \x1b[1m${mode}\x1b[0m${usingFallback ? " \x1b[33m(JVM fallback)\x1b[0m" : ""}`,
+    `\nBenchmarking mode: \x1b[1m${modeLabel}\x1b[0m${usingFallback ? " \x1b[33m(JVM fallback)\x1b[0m" : ""}`,
   );
   console.log(
     `Node ${process.version}, ${process.platform}-${process.arch}, ${warmup} warmup + ${iterations} measured iterations/file (times in ms)`,
@@ -246,6 +279,7 @@ async function runBenchmark(argv: string[]): Promise<void> {
       warmup,
       iterations,
       raw,
+      parser,
     );
     results[entry.name] = result;
     if (rawSamples) rawResults[entry.name] = rawSamples;
@@ -256,6 +290,7 @@ async function runBenchmark(argv: string[]): Promise<void> {
     const payload = {
       meta: {
         mode,
+        explicitParser: parser ?? null,
         usingFallback,
         node: process.version,
         platform: process.platform,
