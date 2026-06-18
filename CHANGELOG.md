@@ -16,6 +16,7 @@
 ## Internal Changes
 
 - Replace `eslint` with `biome` for linting purpose.
+- Add a performance benchmark harness for profiling where time goes during formatting.
 
 # 2.2.6
 
