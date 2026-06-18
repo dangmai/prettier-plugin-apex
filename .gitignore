@@ -15,6 +15,7 @@ packages/prettier-plugin-apex/vendor
 packages/apex-ast-serializer/parser/src/pgo-profiles
 packages/apex-ast-serializer/musl-toolchain
 packages/@prettier-apex/apex-ast-serializer*/apex-ast-serializer*
+packages/prettier-plugin-apex/tests_perf/results
 
 .nx
 .pnpm-store

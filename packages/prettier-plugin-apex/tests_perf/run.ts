@@ -1,0 +1,319 @@
+#!/usr/bin/env -S tsx
+//
+// Performance harness for prettier-plugin-apex.
+//
+// Benchmarks the DEFAULT parser mode (whatever `apexStandaloneParser.default`
+// resolves to in src/index.ts — currently "native") so that the numbers reflect
+// the experience of someone adopting the project without any extra setup. It
+// breaks a format down into four buckets using the env-gated marks in
+// src/parser.ts:
+//
+//   transport   - process spawn / HTTP + jorje parse + Java-side serialization
+//                 + receiving the payload (opaque; can't be split from JS)
+//   deserialize - JSON.parse of the serialized AST
+//   prepping    - post-deserialize enrichment (comment extraction, line
+//                 indexes, and the DFS location/metadata walk)
+//   printing    - everything after parse() returns: Prettier's comment
+//                 attachment + the doc-IR print walk
+//
+// Usage:
+//   pnpm tsx tests_perf/run.ts [--warmup N] [--iterations N] [--out file.json] [--raw]
+//   pnpm tsx tests_perf/run.ts compare base.json head.json
+//
+process.env.APEX_PERF = "1"; // enable parser.ts marks before importing the plugin
+
+import { execSync } from "node:child_process";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import module from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import prettier from "prettier";
+
+import * as apex from "../src/index.js";
+import { perfGetMarks, perfReset } from "../src/perf.js";
+import {
+  NATIVE_PACKAGES,
+  getNativeExecutableNameForPlatform,
+} from "../src/util.js";
+
+const PKG_ROOT = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+);
+
+const BUCKETS = [
+  "transport",
+  "deserialize",
+  "prepping",
+  "printing",
+  "total",
+] as const;
+type Bucket = (typeof BUCKETS)[number];
+
+const CORPUS: { name: string; file: string }[] = [
+  { name: "Comments.cls (real)", file: "tests/comments/Comments.cls" },
+  { name: "SOQLClass.cls (real)", file: "tests/soql/SOQLClass.cls" },
+  {
+    name: "ExpressionClass.cls (real)",
+    file: "tests/expression/ExpressionClass.cls",
+  },
+  {
+    name: "PerfBenchmarkLarge.cls (generated)",
+    file: "tests_perf/corpus/PerfBenchmarkLarge.cls",
+  },
+];
+
+interface Stats {
+  median: number;
+  mean: number;
+  stddev: number;
+  cv: number;
+  n: number;
+}
+type FileResult = Record<Bucket, Stats>;
+
+function stats(xs: number[]): Stats {
+  const sorted = [...xs].sort((a, b) => a - b);
+  const n = sorted.length;
+  const median =
+    n === 0
+      ? 0
+      : n % 2
+        ? (sorted[(n - 1) / 2] as number)
+        : ((sorted[n / 2 - 1] as number) + (sorted[n / 2] as number)) / 2;
+  const mean = n ? xs.reduce((a, b) => a + b, 0) / n : 0;
+  const variance =
+    n > 1 ? xs.reduce((a, b) => a + (b - mean) ** 2, 0) / (n - 1) : 0;
+  const stddev = Math.sqrt(variance);
+  const cv = mean ? (stddev / mean) * 100 : 0;
+  return { median, mean, stddev, cv, n };
+}
+
+function resolvedDefaultMode(): string {
+  // The plugin's declared default for apexStandaloneParser.
+  const opt = (apex.options as Record<string, { default?: unknown }>)
+    .apexStandaloneParser;
+  return String(opt?.default ?? "unknown");
+}
+
+// Detects whether the real native binary is present. When it isn't, the plugin
+// silently falls back to the JVM serializer, which has very different (slower)
+// startup — so the numbers would NOT reflect the true default experience.
+function nativeBinaryPresent(): boolean {
+  const key = `${process.platform}-${process.arch}`;
+  const pkg = NATIVE_PACKAGES[key];
+  if (!pkg) return false;
+  try {
+    const require = module.createRequire(import.meta.url);
+    require.resolve(path.join(pkg, getNativeExecutableNameForPlatform(key)));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function precheck(mode: string): { usingFallback: boolean } {
+  let usingFallback = false;
+  if (mode === "native") {
+    if (!nativeBinaryPresent()) {
+      usingFallback = true;
+      console.warn(
+        "\n\x1b[33m⚠  Native binary not found for this platform.\x1b[0m",
+      );
+      console.warn(
+        "   The default mode is 'native', but it will fall back to the JVM serializer.",
+      );
+      console.warn(
+        "   The 'transport' bucket will reflect JVM startup, NOT the real native default.",
+      );
+      console.warn(
+        "   Build it first for representative numbers: pnpm run build:native && pnpm run install:native:dev\n",
+      );
+    }
+  }
+  return { usingFallback };
+}
+
+function gitSha(): string {
+  try {
+    return execSync("git rev-parse --short HEAD", { cwd: PKG_ROOT })
+      .toString()
+      .trim();
+  } catch {
+    return "unknown";
+  }
+}
+
+async function benchFile(
+  src: string,
+  warmup: number,
+  iterations: number,
+  collectRaw: boolean,
+): Promise<{ result: FileResult; raw?: Record<Bucket, number[]> }> {
+  const samples = Object.fromEntries(
+    BUCKETS.map((b) => [b, [] as number[]]),
+  ) as Record<Bucket, number[]>;
+
+  for (let i = 0; i < warmup + iterations; i++) {
+    perfReset();
+    const t0 = performance.now();
+    // Intentionally do NOT pass apexStandaloneParser, so the plugin's own
+    // default is exercised.
+    await prettier.format(src, {
+      parser: "apex",
+      plugins: [apex as unknown as prettier.Plugin],
+    });
+    const t1 = performance.now();
+    if (i < warmup) continue;
+
+    const m = perfGetMarks();
+    samples.transport.push((m.transportEnd ?? 0) - (m.transportStart ?? 0));
+    samples.deserialize.push((m.deserializeEnd ?? 0) - (m.transportEnd ?? 0));
+    samples.prepping.push((m.prepEnd ?? 0) - (m.deserializeEnd ?? 0));
+    samples.printing.push(t1 - (m.prepEnd ?? 0));
+    samples.total.push(t1 - t0);
+  }
+
+  const result = Object.fromEntries(
+    BUCKETS.map((b) => [b, stats(samples[b])]),
+  ) as FileResult;
+  return collectRaw ? { result, raw: samples } : { result };
+}
+
+function fmt(n: number, width = 9): string {
+  return n.toFixed(3).padStart(width);
+}
+
+function printFileTable(name: string, r: FileResult): void {
+  console.log(`\n\x1b[1m${name}\x1b[0m`);
+  console.log(
+    `  ${"bucket".padEnd(12)}${"median".padStart(9)}${"mean".padStart(10)}${"stddev".padStart(10)}${"cv%".padStart(8)}`,
+  );
+  for (const b of BUCKETS) {
+    const s = r[b];
+    const label =
+      b === "total" ? `\x1b[1m${b}\x1b[0m`.padEnd(12 + 8) : b.padEnd(12);
+    console.log(
+      `  ${label}${fmt(s.median)}${fmt(s.mean, 10)}${fmt(s.stddev, 10)}${s.cv.toFixed(1).padStart(8)}`,
+    );
+  }
+}
+
+function parseFlags(argv: string[]): {
+  warmup: number;
+  iterations: number;
+  out?: string;
+  raw: boolean;
+} {
+  let warmup = 5;
+  let iterations = 30;
+  let out: string | undefined;
+  let raw = false;
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a === "--warmup") warmup = Number(argv[++i]);
+    else if (a === "--iterations") iterations = Number(argv[++i]);
+    else if (a === "--out") out = argv[++i];
+    else if (a === "--raw") raw = true;
+  }
+  return { warmup, iterations, out, raw };
+}
+
+async function runBenchmark(argv: string[]): Promise<void> {
+  const { warmup, iterations, out, raw } = parseFlags(argv);
+  const mode = resolvedDefaultMode();
+  const { usingFallback } = precheck(mode);
+
+  console.log(
+    `\nBenchmarking default mode: \x1b[1m${mode}\x1b[0m${usingFallback ? " \x1b[33m(JVM fallback)\x1b[0m" : ""}`,
+  );
+  console.log(
+    `Node ${process.version}, ${process.platform}-${process.arch}, ${warmup} warmup + ${iterations} measured iterations/file (times in ms)`,
+  );
+
+  const results: Record<string, FileResult> = {};
+  const rawResults: Record<string, Record<Bucket, number[]>> = {};
+
+  for (const entry of CORPUS) {
+    const abs = path.join(PKG_ROOT, entry.file);
+    if (!existsSync(abs)) {
+      console.warn(`  skipping ${entry.name}: file not found (${entry.file})`);
+      continue;
+    }
+    const src = readFileSync(abs, "utf8");
+    const { result, raw: rawSamples } = await benchFile(
+      src,
+      warmup,
+      iterations,
+      raw,
+    );
+    results[entry.name] = result;
+    if (rawSamples) rawResults[entry.name] = rawSamples;
+    printFileTable(entry.name, result);
+  }
+
+  if (out) {
+    const payload = {
+      meta: {
+        mode,
+        usingFallback,
+        node: process.version,
+        platform: process.platform,
+        arch: process.arch,
+        warmup,
+        iterations,
+        gitSha: gitSha(),
+        timestamp: new Date().toISOString(),
+      },
+      results,
+      ...(raw ? { raw: rawResults } : {}),
+    };
+    const outAbs = path.isAbsolute(out) ? out : path.join(PKG_ROOT, out);
+    mkdirSync(path.dirname(outAbs), { recursive: true });
+    writeFileSync(outAbs, JSON.stringify(payload, null, 2));
+    console.log(`\nWrote results to ${outAbs}`);
+  }
+}
+
+function runCompare(baseFile: string, headFile: string): void {
+  const base = JSON.parse(readFileSync(baseFile, "utf8"));
+  const head = JSON.parse(readFileSync(headFile, "utf8"));
+  console.log(
+    `\nComparing median times (ms)  base=${base.meta?.gitSha ?? "?"}  head=${head.meta?.gitSha ?? "?"}`,
+  );
+  if (base.meta?.mode !== head.meta?.mode) {
+    console.warn(
+      `  \x1b[33m⚠ mode mismatch: base=${base.meta?.mode} head=${head.meta?.mode}\x1b[0m`,
+    );
+  }
+  for (const name of Object.keys(head.results)) {
+    const b: FileResult | undefined = base.results[name];
+    const h: FileResult = head.results[name];
+    if (!b) continue;
+    console.log(`\n\x1b[1m${name}\x1b[0m`);
+    console.log(
+      `  ${"bucket".padEnd(12)}${"base".padStart(10)}${"head".padStart(10)}${"delta".padStart(10)}${"delta%".padStart(9)}`,
+    );
+    for (const bucket of BUCKETS) {
+      const bm = b[bucket].median;
+      const hm = h[bucket].median;
+      const delta = hm - bm;
+      const pct = bm ? (delta / bm) * 100 : 0;
+      const sign = delta > 0 ? "\x1b[31m" : delta < 0 ? "\x1b[32m" : "";
+      console.log(
+        `  ${bucket.padEnd(12)}${fmt(bm, 10)}${fmt(hm, 10)}${sign}${fmt(delta, 10)}${`${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`.padStart(9)}\x1b[0m`,
+      );
+    }
+  }
+}
+
+const [, , maybeSub, ...rest] = process.argv;
+if (maybeSub === "compare") {
+  if (rest.length < 2) {
+    console.error("Usage: run.ts compare base.json head.json");
+    process.exit(1);
+  }
+  runCompare(rest[0] as string, rest[1] as string);
+} else {
+  await runBenchmark(process.argv.slice(2));
+}
