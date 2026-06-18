@@ -210,7 +210,11 @@ async function benchFile(
     const javaSerialize = m.javaSerializeMs ?? 0;
     samples["java-parse"].push(javaParse);
     samples["java-serialize"].push(javaSerialize);
-    samples["spawn-ipc"].push(transport - javaParse - javaSerialize);
+    // Clamp: the JS-clock transport vs Java nanoTime brackets can differ by
+    // measurement noise, which would otherwise show a tiny negative residual.
+    samples["spawn-ipc"].push(
+      Math.max(0, transport - javaParse - javaSerialize),
+    );
   }
 
   const result = Object.fromEntries(

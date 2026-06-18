@@ -89,7 +89,8 @@ public class Apex {
     );
     long parseEndNs = System.nanoTime();
 
-    // Serializing the output
+    // Serializing the output. Note: the serialize timing recorded below spans
+    // XStream construction and setup in addition to toXML, not just marshalling.
     int mode = XStream.NO_REFERENCES;
     Mapper defaultMapper = (new XStream()).getMapper();
     XStream xstream;
@@ -124,6 +125,9 @@ public class Apex {
     // untouched and is inert outside benchmarking. The path comes from the
     // `apexPerfFile` system property (used by tests) or the APEX_PERF_FILE
     // environment variable (used by the Node perf harness).
+    // Only configure this from a short-lived per-invocation CLI process; never
+    // set it in the long-running server, where concurrent requests would race
+    // on a single file.
     String perfFile = System.getProperty(
       "apexPerfFile",
       System.getenv("APEX_PERF_FILE")

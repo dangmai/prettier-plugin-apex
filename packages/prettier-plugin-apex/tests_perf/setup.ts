@@ -186,7 +186,10 @@ async function provisionNative(scripted?: Obtain): Promise<void> {
       ],
     }));
 
-  if (obtain === "download" && javaChanged) {
+  // Only prompt interactively. When --obtain was passed explicitly (scripted /
+  // non-TTY), the caller already opted in, so don't block on a confirm() that
+  // has no stdin to read.
+  if (obtain === "download" && javaChanged && !scripted) {
     const proceed = await confirm({
       message:
         "Your Java changes won't be in the downloaded binary — numbers will be stale. Continue?",
@@ -211,7 +214,8 @@ async function main(): Promise<void> {
   const passthrough: string[] = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === "--") continue; // pnpm forwards its arg separator; ignore it
+    if (a === "--")
+      continue; // pnpm forwards its arg separator; ignore it
     else if (a === "--mode") scriptedMode = argv[++i] as Mode;
     else if (a === "--obtain") scriptedObtain = argv[++i] as Obtain;
     else passthrough.push(a as string);

@@ -50,8 +50,15 @@ export function perfReadSpawnFile(file: string): void {
   if (!file) return;
   try {
     const timings = JSON.parse(fs.readFileSync(file, "utf8"));
-    marks["javaParseMs"] = timings.parseNs / 1e6;
-    marks["javaSerializeMs"] = timings.serializeNs / 1e6;
+    // Guard against a partial/garbled file: a missing field divides to NaN
+    // (which JSON.parse wouldn't throw on) and would poison the stats.
+    if (
+      typeof timings.parseNs === "number" &&
+      typeof timings.serializeNs === "number"
+    ) {
+      marks["javaParseMs"] = timings.parseNs / 1e6;
+      marks["javaSerializeMs"] = timings.serializeNs / 1e6;
+    }
     fs.unlinkSync(file);
   } catch {
     // Older serializer without timing support, or the write failed.
