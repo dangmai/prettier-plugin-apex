@@ -34,6 +34,6 @@ Topic-specific guidance lives in `.claude/rules/` and auto-loads when you open m
 - `comments.md` — comment attachment
 - `testing.md` — the TDD fixture workflow and test commands
 - `parser-modes.md` — native / built-in HTTP / CLI parser modes and the server
-- `java-serializer.md` — the Java / jorje / XStream / native-image component
+- `java-serializer.md` — the Java / jorje / code-generated serializer / native-image component
 - `playground.md` — the web playground
 - `performance-harness.md` — performance benchmarking

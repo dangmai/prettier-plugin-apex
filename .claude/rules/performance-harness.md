@@ -4,7 +4,7 @@ description: >-
   end-to-end formatting time goes, split into buckets — transport (process
   spawn + jorje parse + serialize + receive), deserialize (JSON.parse),
   prepping (the DFS enrichment in parser.ts), and printing — plus a Java-side
-  split of transport into jorje-parse vs XStream-serialize vs spawn/IPC. Read
+  split of transport into jorje-parse vs serialize vs spawn/IPC. Read
   this before changing benchmarking/profiling code or the instrumentation it
   depends on.
 paths:
@@ -74,7 +74,7 @@ adopter's experience.
   sites. It is excluded from coverage in `vite.config.ts`.
 - `src/parser.ts` places marks at the parse seams (around the serializer call,
   after `JSON.parse`, after the DFS enrichment) and wires the spawn temp file.
-- `Apex.java` (`getAST`) brackets jorje parse and XStream serialize with
+- `Apex.java` (`getAST`) brackets jorje parse and serialize with
   `nanoTime` and, when `apexPerfFile`/`APEX_PERF_FILE` is set, writes
   `{parseNs,serializeNs}` to that file. Stdout (the JSON payload) is never
   touched. **Never set `APEX_PERF_FILE` in the long-running server** — only the
