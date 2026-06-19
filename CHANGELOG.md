@@ -17,7 +17,7 @@
 
 - Replace `eslint` with `biome` for linting purpose.
 - Add a performance benchmark harness for profiling where time goes during formatting.
-- Add a label-gated CI workflow that benchmarks a PR against its base branch and reports the deltas.
+- Add a CI workflow that benchmarks a labeled PR against its base branch, and can also be run manually on any branch or against a contributor's PR.
 
 # 2.2.6
 
