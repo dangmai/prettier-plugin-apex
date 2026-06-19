@@ -115,6 +115,10 @@ final class JavaEmitter {
             // toString(), so emitting toString() here is output-safe.
             sink.valueString(o.toString());
           } else {
+            // No Java-array branch on purpose: no jorje field is array-typed, so
+            // this is unreachable today. A future array field would fall through
+            // to writeNode and fail loudly (unknown @class) rather than emit a
+            // wrong shape -- the closed-world contract surfacing a jorje change.
             writeNode(o, sink);
           }
         }
