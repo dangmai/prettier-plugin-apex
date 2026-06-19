@@ -12,6 +12,7 @@ paths:
   - packages/prettier-plugin-apex/src/perf.ts
   - packages/prettier-plugin-apex/src/parser.ts
   - packages/apex-ast-serializer/parser/src/main/java/net/dangmai/serializer/Apex.java
+  - .github/workflows/benchmark.yml
 ---
 
 # Performance harness
@@ -31,7 +32,22 @@ driven by numbers rather than guesses.
 - `pnpm run benchmark:core` — the non-interactive core (`tests_perf/run.ts`).
   CI uses this directly after building the native binary. Flags: `--parser`,
   `--warmup`, `--iterations`, `--out <json>`, `--raw`, and a `compare
-  base.json head.json` subcommand.
+  base.json head.json [--markdown]` subcommand. `--markdown` emits a
+  GitHub-flavored table (used by the CI job summary + PR comment); plain compare
+  prints an ANSI console table. Invoke `compare` via `tsx` directly, not
+  `pnpm run benchmark:core --`, since pnpm forwards a literal `--` that shadows
+  the subcommand.
+
+## CI workflow
+
+`.github/workflows/benchmark.yml` runs the harness on a PR when it carries the
+`benchmark` label (report-only — it never fails the PR; GitHub runners are too
+noisy for a hard gate). In one job on one runner it builds the head native
+binary from source (sharing the scheduled build's NX cache, so a PR that doesn't
+touch the Java serializer skips the slow native-image build), downloads the
+latest scheduled `main` native artifact for the base side, benchmarks both
+back-to-back to cancel hardware variance, then renders `compare --markdown` into
+the job summary, a `benchmark-results` artifact, and a sticky PR comment.
 
 The harness benchmarks whatever the plugin's **default** mode is (currently
 `native`) unless `--parser` overrides it, so the numbers reflect a zero-config
