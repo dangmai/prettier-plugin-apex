@@ -2,7 +2,15 @@
   "name": "prettier-plugin-apex",
   "version": "2.3.0-beta.2",
   "description": "Salesforce Apex plugin for Prettier",
-  "repository": "dangmai/prettier-plugin-apex",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dangmai/prettier-plugin-apex.git",
+    "directory": "packages/prettier-plugin-apex"
+  },
+  "homepage": "https://github.com/dangmai/prettier-plugin-apex#readme",
+  "bugs": {
+    "url": "https://github.com/dangmai/prettier-plugin-apex/issues"
+  },
   "type": "module",
   "exports": "./dist/src/index.js",
   "browser": "dist/src/standalone.umd.cjs",
