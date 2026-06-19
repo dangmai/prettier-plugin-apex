@@ -30,6 +30,10 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
 - ☑ M5 done (commit 956a52c5) — `SerializerParityTest` structurally clean over the full
   corpus (307 types). Dual path added (`APEX_SERIALIZER=generated`, default still XStream).
   Benchmark: **~7x faster serialize** (174ms→24ms warm, ~2400-line class).
+- ☑ M5 review fixes (commit 6edc4428) — getter return-type validation (ParseException
+  `error`→getUserError, was wrongly getError); oracle date-time tolerance scoped to
+  `.literal`. **CI fix**: `generateAstSerializer` was being instrumented by the GraalVM
+  agent (broke CI test+CodeQL jobs since M4); excluded it from the agent predicate.
 - ☐ **M6 next** — flip default to generated; full JS suite (built-in+native+AST_COMPARE);
   native build still has the Feature. Re-measure `--mode native`; record delta.
 
