@@ -25,17 +25,13 @@ sourceSets {
     compileClasspath += sourceSets.main.compileClasspath
     runtimeClasspath += sourceSets.main.runtimeClasspath
   }
-  graalvm {}
 }
 
 application {
   mainClass.set("net.dangmai.serializer.Apex")
-  applicationDefaultJvmArgs = [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED",
-    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-    "--add-opens=java.base/java.util=ALL-UNNAMED",
-    "--add-opens=java.base/java.text=ALL-UNNAMED"
-  ]
+  // The reflection-free generated serializer needs no module opens; the old
+  // --add-opens existed solely for XStream's Optional ReflectionConverter.
+  applicationDefaultJvmArgs = []
 }
 
 java {
@@ -78,14 +74,20 @@ ext {
 dependencies {
   api(":apex-jorje-lsp")
 
-  // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  api("com.thoughtworks.xstream:xstream:1.4.21")
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+  // Streaming JSON writer backing the generated, reflection-free serializer.
+  // Core only (not databind), so there is no runtime reflection.
+  api("com.fasterxml.jackson.core:jackson-core:2.18.2")
 
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
   api("commons-cli:commons-cli:1.11.0")
 
   // https://mvnrepository.com/artifact/commons-io/commons-io
   api("commons-io:commons-io:2.22.0")
+
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+  // Test-only: parse both serializers' JSON into trees for structural comparison.
+  testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
 
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
@@ -94,14 +96,6 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation("org.json:json:20250517")
-
-  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  graalvmImplementation("io.github.classgraph:classgraph:4.8.184")
-  nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
-}
-
-configurations {
-  nativeImageClasspath.extendsFrom(graalvmImplementation)
 }
 
 // Common configs for all Test tasks. Currently this includes the standard
@@ -120,6 +114,27 @@ jacocoTestReport {
     xml.required = true
   }
   dependsOn test
+}
+
+// Generate the reflection-free AST serializer from jorje at build time, and
+// compile the result into this module alongside the hand-written sources.
+evaluationDependsOn(':serializer-generator')
+def astSerializerOutputDir = layout.buildDirectory.dir("generated/sources/ast-serializer")
+def generateAstSerializer = tasks.register('generateAstSerializer', JavaExec) {
+  def generatorProject = project(':serializer-generator')
+  dependsOn generatorProject.tasks.named('classes')
+  dependsOn generatorProject.tasks.named('processResources')
+  classpath = generatorProject.sourceSets.main.runtimeClasspath
+  mainClass = 'net.dangmai.serializer.codegen.SerializerGenerator'
+  def outDir = astSerializerOutputDir.get().asFile
+  args = [outDir.absolutePath]
+  inputs.files(generatorProject.sourceSets.main.runtimeClasspath)
+  outputs.dir(astSerializerOutputDir)
+  doFirst { delete(outDir) }
+}
+sourceSets.main.java.srcDir(astSerializerOutputDir)
+tasks.named('compileJava') {
+  dependsOn generateAstSerializer
 }
 
 // This task can be used to run tests under native instrumentation
@@ -145,8 +160,13 @@ graalvmNative {
 
     // Weird syntax: https://github.com/graalvm/native-build-tools/issues/303
     // This is here because we don't want to set up the full native-image
-    // system while running tests in CI/CD.
-    java.util.function.Predicate predicate = { t -> t.name != 'test' && t.name != 'run' }
+    // system while running tests in CI/CD. generateAstSerializer is also
+    // excluded: it's a plain build-time JavaExec (the serializer codegen) that
+    // would otherwise be launched with -agentlib:native-image-agent and fail
+    // wherever the native-image agent isn't installed (e.g. CI test jobs).
+    java.util.function.Predicate predicate = { t ->
+      t.name != 'test' && t.name != 'run' && t.name != 'generateAstSerializer'
+    }
     tasksToInstrumentPredicate = predicate
   }
   binaries {
@@ -156,7 +176,21 @@ graalvmNative {
       )
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
-      buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
+      // Initialize the parser + serializer stack at image build time so a fresh
+      // process pays no jorje setup cost at first parse (the dominant cost in
+      // spawn-per-file native mode). This is a closure: a class is
+      // build-time-initializable only if everything it touches at init is too.
+      buildArgs.add('--initialize-at-build-time=org.antlr.runtime')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.parser.impl')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.data')
+      buildArgs.add('--initialize-at-build-time=apex.common')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.semantic')
+      buildArgs.add('--initialize-at-build-time=com.google.common')
+      // Note: net.dangmai.serializer is intentionally NOT build-time
+      // initialized -- its only static state is JsonAstSink's Jackson
+      // JsonFactory, which the image builder can't snapshot (unresolved
+      // ErrorReportConfiguration/OutputDecorator fields). The serializer is
+      // stateless static methods anyway, so there is nothing to bake in.
       buildArgs.addAll(application.applicationDefaultJvmArgs)
       // Certain Linux distribution doesn't allow dynamic-linked binaries to be
       // run, for example, NixOS, so we need to build a static binary.

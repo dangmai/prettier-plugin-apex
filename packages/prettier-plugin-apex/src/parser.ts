@@ -9,6 +9,7 @@ import {
   APEX_TYPES,
   TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
 } from "./constants.js";
+import { perfMark, perfReadSpawnFile, perfSpawnFile } from "./perf.js";
 import {
   type AnnotatedComment,
   type GenericComment,
@@ -48,6 +49,10 @@ async function parseTextWithSpawn(
   if (anonymous) {
     args.push("-a");
   }
+  // Perf harness: a private temp file the serializer writes its jorje-parse vs
+  // serialize timings to ("" disables it). Read back after exit. Keeps the
+  // stdout payload untouched.
+  const perfFile = perfSpawnFile();
   return new Promise((resolve, reject) => {
     const spawnedProcess = childProcess.spawn(executable, args, {
       shell: true,
@@ -57,6 +62,7 @@ async function parseTextWithSpawn(
         // the DEBUG environment variable and will output verbose logs if it is set,
         // which will break the parser output.
         DEBUG: "",
+        APEX_PERF_FILE: perfFile,
       },
     });
     spawnedProcess.stdin.write(text);
@@ -72,6 +78,7 @@ async function parseTextWithSpawn(
     });
 
     spawnedProcess.on("close", (code) => {
+      perfReadSpawnFile(perfFile);
       if (code === 0) {
         resolve({ stdout, stderr });
       } else {
@@ -468,6 +475,7 @@ const locationGenerationHandler: {
   [APEX_TYPES.WHERE_COMPOUND_EXPRESSION]: handleWhereCompoundExpressionLocation,
   [APEX_TYPES.WHERE_OPERATION_EXPRESSION]:
     handleWhereOperationExpressionLocation,
+  [APEX_TYPES.WHERE_FORMULA_EXPRESSION]: handleWhereOperationExpressionLocation,
   [APEX_TYPES.WHERE_UNARY_EXPRESSION]: handleWhereUnaryExpressionLocation,
   [APEX_TYPES.SELECT_INNER_QUERY]: handleNodeSurroundedByCharacters("(", ")"),
   [APEX_TYPES.ANONYMOUS_BLOCK_UNIT]: handleAnonymousUnitLocation,
@@ -897,6 +905,9 @@ export default async function parse(
   options: prettier.RequiredOptions,
 ): Promise<SerializedAst | Record<string, never>> {
   let serializedAst: string;
+  // Perf harness boundary: start of "transport" (process spawn / HTTP +
+  // jorje parse + Java-side serialization + receiving the payload).
+  perfMark("transportStart");
   if (options.apexStandaloneParser === "built-in") {
     serializedAst = await parseTextWithHttp(
       sourceCode,
@@ -926,8 +937,13 @@ export default async function parse(
       )
     ).stdout;
   }
+  // Perf harness boundary: end of "transport", start of "deserialize".
+  perfMark("transportEnd");
   if (serializedAst) {
     const ast: SerializedAst = JSON.parse(serializedAst);
+    // Perf harness boundary: end of "deserialize" (JSON.parse), start of
+    // "prepping" (comment extraction, line indexes, and the DFS enrichment).
+    perfMark("deserializeEnd");
 
     const parserOutput = ast[APEX_TYPES.PARSER_OUTPUT];
     if (parserOutput && parserOutput.parseErrors.length > 0) {
@@ -970,6 +986,10 @@ export default async function parse(
       metadataVisitor(emptyLineLocations),
     );
 
+    // Perf harness boundary: end of "prepping". Everything after parse()
+    // returns (comment attachment + the print walk) is attributed to
+    // "printing" by the harness.
+    perfMark("prepEnd");
     return ast;
   }
   throw new Error("Failed to parse Apex code: the parser returned no output");

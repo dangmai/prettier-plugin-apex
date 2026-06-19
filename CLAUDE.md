@@ -18,31 +18,22 @@ packages/
   @prettier-apex/            # Platform-specific native binary packages
 ```
 
-## Key commands
+## Universal workflow rules
 
-```bash
-# Start HTTP parsing server (needed for built-in mode; VSCode task does this automatically)
-pnpm nx run prettier-plugin-apex:start-server
+- **Before pushing**: run `pnpm nx run prettier-plugin-apex:lint` and the unit tests (`pnpm nx run prettier-plugin-apex:test:parser --configuration built-in`). Both must pass.
+- **Changelog entry required for any change that affects formatted output.** Add a bullet under `# Unreleased` in `CHANGELOG.md`. Bug fixes, layout changes, comment-handling changes, and new grammar support all qualify. Pure test additions, build/CI tweaks, internal refactors, and dependency bumps don't.
+- **For changes that could affect performance** (printer, parser/prep walk, comment attachment, or the Java serializer), add the `benchmark` label to the PR and read the bot's comparison comment to confirm the real measured impact — don't reason about perf only in the abstract. See `performance-harness.md`.
+- **After completing a major feature**: verify CLAUDE.md and the relevant README files still accurately describe the project.
+- **Big feature work needs an ADR** in `adr/` at the repo root, recording the decision and its rationale.
 
-# Run unit tests (built-in HTTP server mode — preferred for local dev)
-pnpm nx run prettier-plugin-apex:test:parser --configuration built-in
+## Scoped rules
 
-# Run unit tests (native binary mode)
-pnpm nx run prettier-plugin-apex:test:parser --configuration native
+Topic-specific guidance lives in `.claude/rules/` and auto-loads when you open matching files:
 
-# Update snapshots
-pnpm nx run prettier-plugin-apex:test:parser --configuration built-in -u
-
-# Run with AST comparison (validates semantic equivalence after formatting)
-AST_COMPARE=true pnpm nx run prettier-plugin-apex:test:parser --configuration built-in
-
-# Lint
-pnpm nx run prettier-plugin-apex:lint
-```
-
-## Agent workflow rules
-
-- **Follow TDD.** For any change that touches the printer, parser, or comment-attachment logic, write a failing test fixture first (a `.cls` file under `packages/prettier-plugin-apex/tests/<feature>/` with a `jsfmt.spec.ts`), confirm it fails for the expected reason, then make the change. Snapshot-only PRs (test additions for already-working grammar) skip the red phase, but anything fixing or extending behavior must have a fixture that fails without the change.
-- **Changelog entry required for any change that affects formatted output.** Add a bullet under `# Unreleased` in `CHANGELOG.md` describing the user-visible behavior change. Bug fixes, layout changes, comment-handling changes, and new grammar support all qualify. Pure test additions, build/CI tweaks, internal refactors, and dependency bumps don't.
-- **Before pushing**: run `pnpm nx run prettier-plugin-apex:lint` and fix any issues, then run the unit tests (`test:parser --configuration built-in`). Both must pass. For changes touching the printer or comment logic, also run `AST_COMPARE=true …` to catch idempotency regressions.
-- **After completing a major feature**: verify that CLAUDE.md and the relevant README files still accurately describe the project.
+- `printer.md` — the doc-IR printer and node handlers
+- `comments.md` — comment attachment
+- `testing.md` — the TDD fixture workflow and test commands
+- `parser-modes.md` — native / built-in HTTP / CLI parser modes and the server
+- `java-serializer.md` — the Java / jorje / code-generated serializer / native-image component
+- `playground.md` — the web playground
+- `performance-harness.md` — performance benchmarking

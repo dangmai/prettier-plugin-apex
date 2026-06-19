@@ -14,9 +14,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * This class modifies how Enum typings are generated to align with how XStream
- * serializes Enums. Basically it wraps Enum types in an interface that looks
- * like `{"$": EnumType, "@class": ClassName}`
+ * This class modifies how Enum typings are generated to align with how the AST
+ * serializer encodes Enums. Basically it wraps Enum types in an interface that
+ * looks like `{"$": EnumType, "@class": ClassName}`
  */
 public class CustomEnumExtension extends Extension {
 

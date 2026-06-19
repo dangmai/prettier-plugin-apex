@@ -260,6 +260,10 @@ export const APEX_TYPES = {
     "apex.jorje.data.soql.WhereExpr$WhereDistanceExpr" as const,
   DISTANCE_FUNCTION_EXPRESSION:
     "apex.jorje.data.soql.DistanceFunctionExpr" as const,
+  WHERE_FORMULA_EXPRESSION:
+    "apex.jorje.data.soql.WhereExpr$WhereFormulaExpr" as const,
+  FORMULA_FUNCTION_EXPRESSION:
+    "apex.jorje.data.soql.FormulaFunctionExpr" as const,
   GEOLOCATION_LITERAL:
     "apex.jorje.data.soql.Geolocation$GeolocationLiteral" as const,
   GEOLOCATION_EXPRESSION:

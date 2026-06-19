@@ -2370,6 +2370,33 @@ function handleDistanceFunctionExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
+function handleWhereFormulaExpression(path: AstPath, print: PrintFn): Doc {
+  const parts: Doc[] = [];
+  parts.push(path.call(print, "formula"));
+  parts.push(" ");
+  parts.push(path.call(print, "op"));
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return groupConcat(parts);
+}
+
+function handleFormulaFunctionExpression(
+  path: AstPath,
+  _print: PrintFn,
+  options: prettier.ParserOptions,
+): Doc {
+  // The formula is an opaque string expression that jorje does not parse, so
+  // we print its body verbatim from the source. The node location spans the
+  // whole `FORMULA('...')` call. We uppercase the `FORMULA` keyword to stay
+  // consistent with the other SOQL functions (e.g. DISTANCE, GEOLOCATION).
+  const node = path.getNode();
+  const source = options.originalText.slice(
+    node.loc.startIndex,
+    node.loc.endIndex,
+  );
+  return source.replace(/^formula/i, "FORMULA");
+}
+
 function handleGeolocationLiteral(path: AstPath, print: PrintFn): Doc {
   const parts: Doc[] = [];
   const childParts: Doc[] = [];
@@ -3179,6 +3206,8 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.SELECT_DISTANCE_EXPRESSION]: handleSelectDistanceExpression,
   [APEX_TYPES.WHERE_DISTANCE_EXPRESSION]: handleWhereDistanceExpression,
   [APEX_TYPES.DISTANCE_FUNCTION_EXPRESSION]: handleDistanceFunctionExpression,
+  [APEX_TYPES.WHERE_FORMULA_EXPRESSION]: handleWhereFormulaExpression,
+  [APEX_TYPES.FORMULA_FUNCTION_EXPRESSION]: handleFormulaFunctionExpression,
   [APEX_TYPES.GEOLOCATION_LITERAL]: handleGeolocationLiteral,
   [APEX_TYPES.GEOLOCATION_EXPRESSION]: handleGeolocationExpression,
   [APEX_TYPES.NUMBER_LITERAL]: handleNumberLiteral,
