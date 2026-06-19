@@ -14,6 +14,7 @@ plugins {
   id 'jacoco'
 }
 apply plugin: 'cz.habarta.typescript-generator'
+apply from: '../jorje-discovery.gradle'
 
 sourceSets {
   test{
@@ -28,12 +29,9 @@ sourceSets {
 task parserStartScripts(type: CreateStartScripts) {
   mainClass.set('net.dangmai.serializer.Apex')
   applicationName = 'apex-ast-serializer'
-  defaultJvmOpts = [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED",
-    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-    "--add-opens=java.base/java.util=ALL-UNNAMED",
-    "--add-opens=java.base/java.text=ALL-UNNAMED"
-  ]
+  // The reflection-free generated serializer needs no module opens; the old
+  // --add-opens existed solely for XStream.
+  defaultJvmOpts = []
   classpath = startScripts.classpath
   outputDir = startScripts.outputDir
 }
@@ -41,12 +39,7 @@ task parserStartScripts(type: CreateStartScripts) {
 application {
   mainClass.set("net.dangmai.serializer.server.HttpServer")
   applicationName = "apex-ast-serializer-http"
-  applicationDefaultJvmArgs = [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED",
-    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-    "--add-opens=java.base/java.util=ALL-UNNAMED",
-    "--add-opens=java.base/java.text=ALL-UNNAMED"
-  ]
+  applicationDefaultJvmArgs = []
   applicationDistribution.into("bin") {
     from(parserStartScripts)
     filePermissions {
@@ -192,22 +185,11 @@ jacocoTestReport {
 
 generateTypeScript {
   jsonLibrary = 'jackson2'
-  classes = [
-    'apex.jorje.semantic.compiler.parser.ParserOutput',
-  ]
-  classPatterns = [
-    'apex.jorje.data.**',
-    'apex.jorje.parser.impl.HiddenToken**',
-  ]
-  excludeClassPatterns = [
-    'apex.jorje.**$MatchBlock',
-    'apex.jorje.**$MatchBlockWithDefault',
-    'apex.jorje.**$SwitchBlock',
-    'apex.jorje.**$SwitchBlockWithDefault',
-    'apex.jorje.**$Visitor',
-    'apex.jorje.**Factory',
-    'apex.jorje.**Decorator',
-  ]
+  // Discovery patterns come from the shared ../jorje-discovery.gradle so they
+  // can't drift from the serializer-generator.
+  classes = jorjeDiscovery.classes
+  classPatterns = jorjeDiscovery.classPatterns
+  excludeClassPatterns = jorjeDiscovery.excludeClassPatterns
   customTypeNaming = [
     'apex.jorje.data.ast.Expr$LiteralExpr:ExprLiteralExpr',
     'apex.jorje.data.soql.QueryExpr$LiteralExpr:QueryExprLiteralExpr',

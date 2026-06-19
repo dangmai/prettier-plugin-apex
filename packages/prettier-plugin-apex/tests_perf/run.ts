@@ -50,7 +50,7 @@ const MAIN_BUCKETS = [
 ] as const;
 // Sub-breakdown of `transport`, only populated for spawn-based modes whose
 // serializer emits Java-side timings (native / JVM, not built-in HTTP):
-// jorje parse, XStream serialize, and the spawn/IPC residual.
+// jorje parse, serialize, and the spawn/IPC residual.
 const SUB_BUCKETS = ["java-parse", "java-serialize", "spawn-ipc"] as const;
 const BUCKETS = [...MAIN_BUCKETS, ...SUB_BUCKETS] as const;
 type Bucket = (typeof BUCKETS)[number];

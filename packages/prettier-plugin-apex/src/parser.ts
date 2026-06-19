@@ -41,8 +41,8 @@ async function parseTextWithSpawn(
     args.push("-a");
   }
   // Perf harness: a private temp file the serializer writes its jorje-parse vs
-  // XStream-serialize timings to ("" disables it). Read back after exit. Keeps
-  // the stdout payload untouched.
+  // serialize timings to ("" disables it). Read back after exit. Keeps the
+  // stdout payload untouched.
   const perfFile = perfSpawnFile();
   return new Promise((resolve, reject) => {
     const spawnedProcess = childProcess.spawn(executable, args, {

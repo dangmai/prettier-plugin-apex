@@ -1,0 +1,58 @@
+plugins {
+  id 'java'
+  id 'application'
+}
+
+// Shared jorje discovery patterns (same source the typescript-generator uses).
+apply from: '../jorje-discovery.gradle'
+
+// Emit the shared patterns into a properties resource that JorjeDiscovery reads
+// at runtime, so the generator and the typescript-generator can't drift.
+def discoveryConfigDir = layout.buildDirectory.dir("generated/discovery")
+def generateDiscoveryConfig = tasks.register('generateDiscoveryConfig') {
+  outputs.dir(discoveryConfigDir)
+  def config = jorjeDiscovery
+  doLast {
+    def file = discoveryConfigDir.get().file('jorje-discovery.properties').asFile
+    file.parentFile.mkdirs()
+    file.text = [
+      'classes=' + config.classes.join(','),
+      'classPatterns=' + config.classPatterns.join(','),
+      'excludeClassPatterns=' + config.excludeClassPatterns.join(','),
+    ].join('\n') + '\n'
+  }
+}
+
+sourceSets.main.resources.srcDir(discoveryConfigDir)
+tasks.named('processResources') {
+  dependsOn generateDiscoveryConfig
+}
+
+repositories {
+  flatDir {
+    dirs '../libs'
+  }
+  mavenCentral()
+  maven {
+    url = "https://jitpack.io"
+  }
+}
+
+java {
+  // Match the rest of the project: the GraalVM native build can't use Gradle's
+  // "release" feature (https://github.com/oracle/graal/issues/7414).
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
+
+application {
+  mainClass.set("net.dangmai.serializer.codegen.SerializerGenerator")
+}
+
+dependencies {
+  // jorje, so the generator can introspect the AST classes at build time.
+  implementation(":apex-jorje-lsp")
+
+  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
+  implementation("io.github.classgraph:classgraph:4.8.184")
+}

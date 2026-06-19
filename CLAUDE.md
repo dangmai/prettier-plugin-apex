@@ -24,6 +24,7 @@ packages/
 - **Changelog entry required for any change that affects formatted output.** Add a bullet under `# Unreleased` in `CHANGELOG.md`. Bug fixes, layout changes, comment-handling changes, and new grammar support all qualify. Pure test additions, build/CI tweaks, internal refactors, and dependency bumps don't.
 - **For changes that could affect performance** (printer, parser/prep walk, comment attachment, or the Java serializer), add the `benchmark` label to the PR and read the bot's comparison comment to confirm the real measured impact — don't reason about perf only in the abstract. See `performance-harness.md`.
 - **After completing a major feature**: verify CLAUDE.md and the relevant README files still accurately describe the project.
+- **Big feature work needs an ADR** in `adr/` at the repo root, recording the decision and its rationale.
 
 ## Scoped rules
 
@@ -33,6 +34,6 @@ Topic-specific guidance lives in `.claude/rules/` and auto-loads when you open m
 - `comments.md` — comment attachment
 - `testing.md` — the TDD fixture workflow and test commands
 - `parser-modes.md` — native / built-in HTTP / CLI parser modes and the server
-- `java-serializer.md` — the Java / jorje / XStream / native-image component
+- `java-serializer.md` — the Java / jorje / code-generated serializer / native-image component
 - `playground.md` — the web playground
 - `performance-harness.md` — performance benchmarking
