@@ -18,6 +18,7 @@
 - Replace `eslint` with `biome` for linting purpose.
 - Add a performance benchmark harness for profiling where time goes during formatting.
 - Add a CI workflow that benchmarks a labeled PR against its base branch, and can also be run manually on any branch or against a contributor's PR.
+- Replace runtime XStream reflection with a build-time code-generated serializer, substantially improving serialization performance.
 
 # 2.2.6
 
