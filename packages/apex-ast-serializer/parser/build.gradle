@@ -127,6 +127,27 @@ jacocoTestReport {
   dependsOn test
 }
 
+// Generate the reflection-free AST serializer from jorje at build time, and
+// compile the result into this module alongside the hand-written sources.
+evaluationDependsOn(':serializer-generator')
+def astSerializerOutputDir = layout.buildDirectory.dir("generated/sources/ast-serializer")
+def generateAstSerializer = tasks.register('generateAstSerializer', JavaExec) {
+  def generatorProject = project(':serializer-generator')
+  dependsOn generatorProject.tasks.named('classes')
+  dependsOn generatorProject.tasks.named('processResources')
+  classpath = generatorProject.sourceSets.main.runtimeClasspath
+  mainClass = 'net.dangmai.serializer.codegen.SerializerGenerator'
+  def outDir = astSerializerOutputDir.get().asFile
+  args = [outDir.absolutePath]
+  inputs.files(generatorProject.sourceSets.main.runtimeClasspath)
+  outputs.dir(astSerializerOutputDir)
+  doFirst { delete(outDir) }
+}
+sourceSets.main.java.srcDir(astSerializerOutputDir)
+tasks.named('compileJava') {
+  dependsOn generateAstSerializer
+}
+
 // This task can be used to run tests under native instrumentation
 task nativeInstrumentedTest(type: Test) {
   // Since Gradle 9, we need to explicitly specify the test classes and classpath

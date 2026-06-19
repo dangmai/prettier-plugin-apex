@@ -74,6 +74,10 @@ public final class JorjeDiscovery {
     try (
       ScanResult scanResult = new ClassGraph()
         .enableClassInfo()
+        // jorje serializes package-private types too (e.g. apex.jorje.data.IndexLocation),
+        // and typescript-generator includes them — match that, or the dispatcher would
+        // throw on them at runtime.
+        .ignoreClassVisibility()
         .acceptPackages(SCAN_PACKAGE)
         .scan()
     ) {
