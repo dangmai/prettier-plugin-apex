@@ -337,6 +337,66 @@ async function runBenchmark(argv: string[]): Promise<void> {
   }
 }
 
+// Renders the base-vs-head comparison as GitHub-flavored markdown, for the CI
+// job summary and the sticky PR comment. Kept here (rather than in the workflow)
+// so the bucket list and delta math stay shared with the console renderer.
+function compareMarkdown(baseFile: string, headFile: string): string {
+  const base = JSON.parse(readFileSync(baseFile, "utf8"));
+  const head = JSON.parse(readFileSync(headFile, "utf8"));
+  const m = head.meta ?? {};
+  const out: string[] = [];
+  out.push(
+    `## Performance benchmark — base \`${base.meta?.gitSha ?? "?"}\` vs head \`${head.meta?.gitSha ?? "?"}\``,
+  );
+  out.push("");
+  out.push(
+    `Mode: \`${m.mode ?? "?"}\` · ${m.node ?? "?"} · ${m.platform ?? "?"}-${m.arch ?? "?"} · ${m.warmup ?? "?"} warmup + ${m.iterations ?? "?"} measured iterations`,
+  );
+  if (base.meta?.mode !== head.meta?.mode) {
+    out.push("");
+    out.push(
+      `> ⚠️ Mode mismatch: base=\`${base.meta?.mode}\` head=\`${head.meta?.mode}\``,
+    );
+  }
+  out.push("");
+  out.push(
+    "> ⚠️ Run on a shared GitHub-hosted runner, report-only. Both sides ran back-to-back on the same machine to cancel hardware variance, but small deltas (a few %) are still noise — look for consistent, sizeable shifts.",
+  );
+
+  for (const name of Object.keys(head.results)) {
+    const b: FileResult | undefined = base.results[name];
+    const h: FileResult = head.results[name];
+    if (!b) continue;
+    const hasSub = h["java-parse"].median > 0 || h["java-serialize"].median > 0;
+    out.push("");
+    out.push(`### ${name}`);
+    out.push("");
+    out.push("| bucket | base (ms) | head (ms) | Δ (ms) | Δ% |");
+    out.push("| --- | ---: | ---: | ---: | ---: |");
+    for (const bucket of BUCKETS) {
+      if (!b[bucket] || !h[bucket]) continue;
+      const isSub = (SUB_BUCKETS as readonly string[]).includes(bucket);
+      if (isSub && !hasSub) continue;
+      const bm = b[bucket].median;
+      const hm = h[bucket].median;
+      const delta = hm - bm;
+      const pct = bm ? (delta / bm) * 100 : 0;
+      const label =
+        bucket === "total"
+          ? "**total**"
+          : isSub
+            ? `└ ${bucket}`
+            : bucket;
+      const pctStr = `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
+      out.push(
+        `| ${label} | ${bm.toFixed(3)} | ${hm.toFixed(3)} | ${delta >= 0 ? "+" : ""}${delta.toFixed(3)} | ${pctStr} |`,
+      );
+    }
+  }
+  out.push("");
+  return out.join("\n");
+}
+
 function runCompare(baseFile: string, headFile: string): void {
   const base = JSON.parse(readFileSync(baseFile, "utf8"));
   const head = JSON.parse(readFileSync(headFile, "utf8"));
@@ -373,11 +433,19 @@ function runCompare(baseFile: string, headFile: string): void {
 
 const [, , maybeSub, ...rest] = process.argv;
 if (maybeSub === "compare") {
-  if (rest.length < 2) {
-    console.error("Usage: run.ts compare base.json head.json");
+  const positional = rest.filter((a) => !a.startsWith("--"));
+  if (positional.length < 2) {
+    console.error("Usage: run.ts compare base.json head.json [--markdown]");
     process.exit(1);
   }
-  runCompare(rest[0] as string, rest[1] as string);
+  const [baseFile, headFile] = positional as [string, string];
+  if (rest.includes("--markdown")) {
+    // Emit only the markdown report to stdout, so CI can pipe it straight into
+    // $GITHUB_STEP_SUMMARY / a PR comment without ANSI noise.
+    process.stdout.write(compareMarkdown(baseFile, headFile));
+  } else {
+    runCompare(baseFile, headFile);
+  }
 } else {
   await runBenchmark(process.argv.slice(2));
 }
