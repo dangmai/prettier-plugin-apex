@@ -25,7 +25,6 @@ sourceSets {
     compileClasspath += sourceSets.main.compileClasspath
     runtimeClasspath += sourceSets.main.runtimeClasspath
   }
-  graalvm {}
 }
 
 application {
@@ -78,9 +77,6 @@ ext {
 dependencies {
   api(":apex-jorje-lsp")
 
-  // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
-  api("com.thoughtworks.xstream:xstream:1.4.21")
-
   // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
   // Streaming JSON writer backing the generated, reflection-free serializer.
   // Core only (not databind), so there is no runtime reflection.
@@ -103,14 +99,6 @@ dependencies {
 
   // https://mvnrepository.com/artifact/org.json/json
   testFixturesImplementation("org.json:json:20250517")
-
-  // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  graalvmImplementation("io.github.classgraph:classgraph:4.8.184")
-  nativeImageCompileOnly sourceSets.graalvm.output.classesDirs
-}
-
-configurations {
-  nativeImageClasspath.extendsFrom(graalvmImplementation)
 }
 
 // Common configs for all Test tasks. Currently this includes the standard
@@ -191,7 +179,6 @@ graalvmNative {
       )
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
-      buildArgs.add('--features=net.dangmai.serializer.RuntimeReflectionRegistrationFeature')
       buildArgs.addAll(application.applicationDefaultJvmArgs)
       // Certain Linux distribution doesn't allow dynamic-linked binaries to be
       // run, for example, NixOS, so we need to build a static binary.
