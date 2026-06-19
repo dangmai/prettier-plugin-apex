@@ -48,8 +48,9 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
   server — none needed them). Native image builds & passes **without** the reflection
   Feature and **without** any `--add-opens`. All modes green: built-in 95, AST_COMPARE 273,
   native 95. Stale docs updated (`.claude/rules/java-serializer.md`, perf comments).
-- ☐ **M8 next** — write the repo's first ADR in `adr/` documenting the decision + rationale
-  (perf lever, codegen approach, JSON parity, dual-path migration, reflection/opens removal).
+- ☑ M8 done — wrote the repo's first ADR: `adr/0001-replace-xstream-with-codegen-serializer.md`
+  (Nygard/MADR format: context, decision, alternatives, consequences with the M6 perf table,
+  deferred follow-ups). **All milestones complete.**
 
 ## Decisions (settled, do not re-litigate)
 
@@ -87,7 +88,7 @@ reflection-free generator regardless of format.
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☑ |
 | M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☑ |
 | M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☑ |
-| M8 | Write the ADR in `adr/` documenting the decision + rationale (this is the repo's first ADR) | ☐ |
+| M8 | Write the ADR in `adr/` documenting the decision + rationale (this is the repo's first ADR) | ☑ |
 
 > The ADR is deliberately deferred until the work is essentially done (too many
 > unknowns now). It's required by the project CLAUDE.md for big feature work and
