@@ -1,41 +1,101 @@
 name: Benchmark
 
-# Label-gated performance comparison. Add the `benchmark` label to a PR to run
-# the perf harness on both the PR (head) and its base branch on the SAME runner,
-# then post the delta. It's report-only — it never fails the PR on a regression,
-# because GitHub-hosted runners are too noisy for a hard gate. The native build
-# is expensive, which is why this is opt-in via the label rather than always-on.
+# Performance harness runner. Three ways in:
+#   1. A PR carrying the `benchmark` label — benchmarks the PR (head) against its
+#      base branch and posts a sticky comment + job summary.
+#   2. workflow_dispatch on a branch — benchmarks that branch against `main`
+#      (summary + artifacts only, no comment). On `main` itself it just reports
+#      the absolute numbers, since there's nothing to compare against.
+#   3. workflow_dispatch with a `pr` number — benchmarks a contributor's PR (incl.
+#      forks) against `main`. Only repo collaborators can trigger workflow_dispatch,
+#      so this stays a maintainer-gated, review-then-run action (see the note on
+#      the `pr` input below).
+#
+# It's always report-only — it never fails on a regression, because GitHub-hosted
+# runners are too noisy for a hard gate. The native build is expensive, which is
+# why it's opt-in rather than always-on.
 
 on:
   pull_request:
     types: [opened, reopened, synchronize, labeled]
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: >-
+          PR number to benchmark against main (e.g. a fork PR). Leave empty to
+          benchmark the dispatched branch. SECURITY: this checks out and RUNS the
+          PR's code with this repo's token, so only dispatch it after reviewing
+          the PR's diff.
+        required: false
+        type: string
 
-# Read prior workflow artifacts (the daily main native build) and write a sticky
-# comment on the PR.
+# Read prior workflow artifacts (main's native build) and write a sticky comment.
 permissions:
   contents: read
   actions: read
   pull-requests: write
 
-# A new push supersedes an in-flight benchmark for the same PR.
+# A new push / dispatch supersedes an in-flight run for the same PR or branch.
 concurrency:
-  group: benchmark-${{ github.event.pull_request.number }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   benchmark:
-    name: Benchmark PR vs base
-    # Only run when the PR carries the `benchmark` label. On `labeled` the array
-    # already includes the just-added label, so this covers both "add the label
-    # to kick it off" and "re-run on push while the label is present".
-    if: contains(github.event.pull_request.labels.*.name, 'benchmark')
+    name: Benchmark
+    # PR path is label-gated; workflow_dispatch (collaborator-only) always runs.
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.pull_request.labels.*.name, 'benchmark')
     runs-on: ubuntu-latest
     env:
       OUTPUT_NAME: apex-ast-serializer-linux-x64
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - name: Checkout PR (head)
+      # Resolve what to benchmark and how to report, from the trigger context.
+      # Runs before checkout — it only reads the event payload, not the code.
+      - name: Resolve run parameters
+        id: setup
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          PR_INPUT: ${{ github.event.inputs.pr }}
+          GH_REF: ${{ github.ref }}
+          GH_REF_NAME: ${{ github.ref_name }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+          head_ref="$GH_REF"
+          base_ref=""
+          compare=false
+          comment=false
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            base_ref="$PR_BASE_REF"
+            compare=true
+            comment=true
+          elif [ -n "${PR_INPUT:-}" ]; then
+            if ! printf '%s' "$PR_INPUT" | grep -Eq '^[0-9]+$'; then
+              echo "::error::The 'pr' input must be a PR number."
+              exit 1
+            fi
+            head_ref="refs/pull/$PR_INPUT/merge"
+            base_ref="main"
+            compare=true
+          elif [ "$GH_REF_NAME" = "main" ]; then
+            compare=false
+          else
+            base_ref="main"
+            compare=true
+          fi
+          {
+            echo "head_ref=$head_ref"
+            echo "base_ref=$base_ref"
+            echo "compare=$compare"
+            echo "comment=$comment"
+          } >> "$GITHUB_OUTPUT"
+          echo "Resolved: head_ref=$head_ref base_ref=$base_ref compare=$compare comment=$comment"
+
+      - name: Checkout head
         uses: actions/checkout@v6.0.3
+        with:
+          ref: ${{ steps.setup.outputs.head_ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -55,7 +115,7 @@ jobs:
           distribution: graalvm
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      # ---- head: build the native binary from the PR source ----
+      # ---- head: build the native binary from source ----
       - name: Install head dependencies
         run: pnpm install --frozen-lockfile
 
@@ -63,8 +123,8 @@ jobs:
         run: chmod +x packages/apex-ast-serializer/gradlew
 
       # Share the native-build NX cache with the scheduled build job (same key):
-      # a PR that doesn't touch the Java serializer reuses main's compiled binary
-      # and skips the slow native-image build entirely.
+      # a build that doesn't touch the Java serializer reuses main's compiled
+      # binary and skips the slow native-image build entirely.
       - name: Restore native build NX cache
         id: nx-cache-restore
         uses: actions/cache/restore@v5.0.5
@@ -79,10 +139,14 @@ jobs:
       - name: Build head native executable
         run: pnpm nx run apex-ast-serializer:build:native
         env:
-          NX_KEY: ${{ secrets.NX_KEY }}
+          # Withhold the Nx Cloud token from untrusted fork-PR code (pr input);
+          # trusted contexts (own branches, same-repo PRs) still get the cache.
+          NX_KEY: ${{ github.event.inputs.pr == '' && secrets.NX_KEY || '' }}
 
+      # Only cache a SUCCESSFUL build — saving after a failure would poison the
+      # write-once cache key with an empty/partial .nx for the whole branch.
       - name: Save native build NX cache
-        if: always() && steps.nx-cache-restore.outputs.cache-hit != 'true'
+        if: success() && steps.nx-cache-restore.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5.0.5
         with:
           path: |
@@ -92,55 +156,56 @@ jobs:
       - name: Install head native binary
         run: pnpm run install:native:dev
 
-      # ---- base: download the latest main daily native build ----
+      # ---- base: download main's most recent native build ----
       # The build-native-executables job in tests-deployments.yml uploads this
-      # artifact on every scheduled (daily) and workflow_dispatch run.
+      # artifact on every scheduled and workflow_dispatch run; pick the newest.
       - name: Download base native binary
+        if: steps.setup.outputs.compare == 'true'
         run: |
           set -euo pipefail
-          find_run() {
-            gh run list --repo "$GITHUB_REPOSITORY" \
-              --workflow=tests-deployments.yml --branch=main \
-              --status=success --event="$1" --limit=1 \
-              --json databaseId --jq '.[0].databaseId // empty'
-          }
-          run_id=$(find_run schedule)
-          if [ -z "$run_id" ]; then run_id=$(find_run workflow_dispatch); fi
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" \
+            --workflow=tests-deployments.yml --branch=main --status=success \
+            --limit=30 --json databaseId,event,createdAt \
+            --jq '[.[] | select(.event=="schedule" or .event=="workflow_dispatch")] | sort_by(.createdAt) | last | .databaseId // empty')
           if [ -z "$run_id" ]; then
-            echo "::error::No successful main native build found to use as the base binary. Trigger tests-deployments.yml on main (workflow_dispatch) and retry."
+            echo "::error::No successful scheduled/manual main native build found to use as the base binary. Trigger tests-deployments.yml on main (workflow_dispatch) and retry."
             exit 1
           fi
           echo "Using main native build from run $run_id"
           gh run download "$run_id" --repo "$GITHUB_REPOSITORY" \
             --name "$OUTPUT_NAME" --dir "$RUNNER_TEMP/base-bin"
 
-      # Check the base branch out only now that all head Nx work is done. Nx
-      # scans the whole tree for project.json files, so a base/ checkout present
-      # during the head native build would collide with the head's projects
-      # ("defined in multiple locations"). The base side runs only tsx, never Nx.
+      # Check the base branch out only now that all head Nx work is done. Nx scans
+      # the whole tree for project.json files, so a base/ checkout present during
+      # the head native build would collide ("defined in multiple locations").
+      # The base side runs only tsx, never Nx.
       - name: Checkout base branch
+        if: steps.setup.outputs.compare == 'true'
         uses: actions/checkout@v6.0.3
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
+          ref: ${{ steps.setup.outputs.base_ref }}
           path: base
 
       - name: Install base dependencies
+        if: steps.setup.outputs.compare == 'true'
         working-directory: base
         run: pnpm install --frozen-lockfile
 
       # install:native:ci expects every platform's binary at once, so copy the
       # single linux artifact straight into the base checkout's native package.
       - name: Install base native binary
+        if: steps.setup.outputs.compare == 'true'
         run: |
           set -euo pipefail
           dest="base/packages/@prettier-apex/$OUTPUT_NAME"
           cp "$RUNNER_TEMP/base-bin/$OUTPUT_NAME" "$dest/$OUTPUT_NAME"
           chmod +x "$dest/$OUTPUT_NAME"
 
-      # ---- run both benchmarks back-to-back on this one runner ----
+      # ---- run the benchmarks back-to-back on this one runner ----
       # tsx is invoked directly (not `pnpm run benchmark:core --`) because pnpm
-      # forwards a literal `--` that would shadow the `compare` subcommand.
+      # forwards a literal `--` that would shadow the compare/report subcommand.
       - name: Benchmark base
+        if: steps.setup.outputs.compare == 'true'
         working-directory: base/packages/prettier-plugin-apex
         run: |
           set -euo pipefail
@@ -155,10 +220,19 @@ jobs:
           node -e "if (require('$RUNNER_TEMP/head.json').meta.usingFallback) { console.error('Head fell back to the JVM serializer — native binary missing.'); process.exit(1); }"
 
       - name: Render comparison
+        if: steps.setup.outputs.compare == 'true'
         run: |
           set -euo pipefail
           pnpm exec tsx packages/prettier-plugin-apex/tests_perf/run.ts \
             compare "$RUNNER_TEMP/base.json" "$RUNNER_TEMP/head.json" --markdown \
+            | tee "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Render report
+        if: steps.setup.outputs.compare != 'true'
+        run: |
+          set -euo pipefail
+          pnpm exec tsx packages/prettier-plugin-apex/tests_perf/run.ts \
+            report "$RUNNER_TEMP/head.json" \
             | tee "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload result JSON
@@ -168,9 +242,11 @@ jobs:
           path: |
             ${{ runner.temp }}/base.json
             ${{ runner.temp }}/head.json
+          if-no-files-found: ignore
           retention-days: 30
 
       - name: Post sticky PR comment
+        if: steps.setup.outputs.comment == 'true'
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           header: benchmark

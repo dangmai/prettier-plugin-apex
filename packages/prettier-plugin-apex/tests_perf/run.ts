@@ -337,6 +337,44 @@ async function runBenchmark(argv: string[]): Promise<void> {
   }
 }
 
+function bucketLabel(bucket: Bucket, isSub: boolean): string {
+  return bucket === "total" ? "**total**" : isSub ? `└ ${bucket}` : bucket;
+}
+
+// Renders a single benchmark run as a markdown table (no comparison). Used when
+// there is nothing to compare against — e.g. a workflow_dispatch run on `main`.
+function reportMarkdown(file: string): string {
+  const data = JSON.parse(readFileSync(file, "utf8"));
+  const m = data.meta ?? {};
+  const out: string[] = [];
+  out.push(`## Performance benchmark — \`${m.gitSha ?? "?"}\``);
+  out.push("");
+  out.push(
+    `Mode: \`${m.mode ?? "?"}\` · ${m.node ?? "?"} · ${m.platform ?? "?"}-${m.arch ?? "?"} · ${m.warmup ?? "?"} warmup + ${m.iterations ?? "?"} measured iterations`,
+  );
+  out.push("");
+  out.push(
+    "> ⚠️ Run on a shared GitHub-hosted runner — treat small numbers as noise.",
+  );
+  for (const name of Object.keys(data.results)) {
+    const r: FileResult = data.results[name];
+    const hasSub = r["java-parse"].median > 0 || r["java-serialize"].median > 0;
+    out.push("");
+    out.push(`### ${name}`);
+    out.push("");
+    out.push("| bucket | median (ms) |");
+    out.push("| --- | ---: |");
+    for (const bucket of BUCKETS) {
+      if (!r[bucket]) continue;
+      const isSub = (SUB_BUCKETS as readonly string[]).includes(bucket);
+      if (isSub && !hasSub) continue;
+      out.push(`| ${bucketLabel(bucket, isSub)} | ${r[bucket].median.toFixed(3)} |`);
+    }
+  }
+  out.push("");
+  return out.join("\n");
+}
+
 // Renders the base-vs-head comparison as GitHub-flavored markdown, for the CI
 // job summary and the sticky PR comment. Kept here (rather than in the workflow)
 // so the bucket list and delta math stay shared with the console renderer.
@@ -361,6 +399,10 @@ function compareMarkdown(baseFile: string, headFile: string): string {
   out.push("");
   out.push(
     "> ⚠️ Run on a shared GitHub-hosted runner, report-only. Both sides ran back-to-back on the same machine to cancel hardware variance, but small deltas (a few %) are still noise — look for consistent, sizeable shifts.",
+  );
+  out.push("");
+  out.push(
+    "> ℹ️ Base is the most recent `main` native build (gitSha above); it can lag `main`'s current tip if no newer scheduled/manual build has run since.",
   );
 
   const emittedSub = (r: FileResult): boolean =>
@@ -400,12 +442,7 @@ function compareMarkdown(baseFile: string, headFile: string): string {
       const hm = h[bucket].median;
       const delta = hm - bm;
       const pct = bm ? (delta / bm) * 100 : 0;
-      const label =
-        bucket === "total"
-          ? "**total**"
-          : isSub
-            ? `└ ${bucket}`
-            : bucket;
+      const label = bucketLabel(bucket, isSub);
       // When the base lacks the Java split, comparing head's sub-buckets to an
       // all-zero base is meaningless — show the head value but suppress the delta.
       if (isSub && !baseHasSub) {
@@ -471,6 +508,15 @@ if (maybeSub === "compare") {
   } else {
     runCompare(baseFile, headFile);
   }
+} else if (maybeSub === "report") {
+  // Single-run markdown table, for when there's no base to compare against
+  // (e.g. a workflow_dispatch run on main).
+  const positional = rest.filter((a) => !a.startsWith("--"));
+  if (positional.length < 1) {
+    console.error("Usage: run.ts report results.json");
+    process.exit(1);
+  }
+  process.stdout.write(reportMarkdown(positional[0] as string));
 } else {
   await runBenchmark(process.argv.slice(2));
 }
