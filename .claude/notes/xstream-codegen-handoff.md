@@ -21,7 +21,8 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
 - ☑ Baseline measured (see numbers).
 - ☑ Plan written (`~/.claude/plans/iridescent-crafting-quokka.md`).
 - ☑ Worktree + this hand-off file created.
-- ☐ **M1 not started** — next action.
+- ☑ M1 done (commit 75221992) — `serializer-generator` subproject scaffolded.
+- ☐ **M2 next** — extract shared discovery config.
 
 ## Decisions (settled, do not re-litigate)
 
@@ -52,7 +53,7 @@ reflection-free generator regardless of format.
 
 | # | Milestone | Status |
 |---|---|---|
-| M1 | Scaffold `serializer-generator` subproject; scan jorje, print type count | ☐ |
+| M1 | Scaffold `serializer-generator` subproject; scan jorje, print type count | ☑ |
 | M2 | Extract shared `jorje-discovery.gradle`; `jorje.d.ts` regenerates identical | ☐ |
 | M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☐ |
 | M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☐ |
@@ -89,6 +90,10 @@ instrumented source is still TODO — capture it before/at M6 for the real adopt
 
 ## Gotchas / risks
 
+- M1 pattern-based discovery finds **338** types (283 concrete classes, 7 enums, 42
+  abstract, 6 interfaces) — not the ~347 estimated. The gap is transitive types
+  typescript-generator pulls in beyond the patterns (referenced exception/collection
+  types). The generator dispatcher must cover those too; the M5 oracle surfaces which.
 - `ParserOutput` fields are private → use getters; generator must prefer public field,
   fall back to public getter, fail-fast otherwise.
 - Format quirks to replicate structurally: `@class` everywhere, enum
