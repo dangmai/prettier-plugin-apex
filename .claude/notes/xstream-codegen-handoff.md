@@ -127,9 +127,16 @@ space after `:` where XStream had one — structurally identical, fine.
   `GETTER_OVERRIDES` map (currently `*ParameterRef#typeRef` → `getType`).
 - **M5 must verify** (likely parity gaps): XStream primitive `@class` aliases
   (`"string"`, `"big-decimal"`, `"int"`, …) — guessed from XStream defaults, confirm via
-  oracle; how `Object`-typed fields holding String/primitives wrap; null field rendering
-  (none seen so far — jorje prefers `Optional`); whether anonymous `*Blocks$N` Location
-  impls ever appear at runtime (dispatcher would throw); the `typeRef` override coverage.
+  oracle; how `Object`-typed fields holding String/primitives wrap; whether anonymous
+  `*Blocks$N` Location impls ever appear at runtime (dispatcher would throw); the
+  `typeRef` override coverage.
+- **Null fields are omitted** (decided M4, post-review): the generator reads each
+  reference field once and skips it when null, matching XStream's omit-null behavior (and
+  fixing an unboxing NPE on null boxed-wrapper fields). Primitives are always emitted.
+  Confirm via the oracle that XStream truly omits (vs. `null`) — if not, revisit.
+- **Generated source is deterministic** (fields sorted by name per hierarchy level);
+  generated method names are asserted unique. Reviewer (M1–M4) found no other material
+  issues — design cleared pending the M5 oracle.
 - `ParserOutput` fields are private → use getters; generator must prefer public field,
   fall back to public getter, fail-fast otherwise.
 - Format quirks to replicate structurally: `@class` everywhere, enum
