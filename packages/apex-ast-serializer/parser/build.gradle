@@ -81,6 +81,11 @@ dependencies {
   // https://mvnrepository.com/artifact/com.thoughtworks.xstream/xstream
   api("com.thoughtworks.xstream:xstream:1.4.21")
 
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core
+  // Streaming JSON writer backing the generated, reflection-free serializer.
+  // Core only (not databind), so there is no runtime reflection.
+  api("com.fasterxml.jackson.core:jackson-core:2.18.2")
+
   // https://mvnrepository.com/artifact/commons-cli/commons-cli
   api("commons-cli:commons-cli:1.11.0")
 
