@@ -22,7 +22,8 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
 - ☑ Plan written (`~/.claude/plans/iridescent-crafting-quokka.md`).
 - ☑ Worktree + this hand-off file created.
 - ☑ M1 done (commit 75221992) — `serializer-generator` subproject scaffolded.
-- ☐ **M2 next** — extract shared discovery config.
+- ☑ M2 done (commit 9ae8cf88) — shared `jorje-discovery.gradle`; `jorje.d.ts` byte-identical.
+- ☐ **M3 next** — `AstSink` + `JsonAstSink`, unit-tested in isolation.
 
 ## Decisions (settled, do not re-litigate)
 
@@ -54,7 +55,7 @@ reflection-free generator regardless of format.
 | # | Milestone | Status |
 |---|---|---|
 | M1 | Scaffold `serializer-generator` subproject; scan jorje, print type count | ☑ |
-| M2 | Extract shared `jorje-discovery.gradle`; `jorje.d.ts` regenerates identical | ☐ |
+| M2 | Extract shared `jorje-discovery.gradle`; `jorje.d.ts` regenerates identical | ☑ |
 | M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☐ |
 | M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☐ |
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☐ |
