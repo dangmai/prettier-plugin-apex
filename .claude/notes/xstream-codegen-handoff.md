@@ -126,3 +126,19 @@ space after `:` where XStream had one — structurally identical, fine.
 - No cycle guard (NO_REFERENCES gone) — jorje ASTs are trees; add identity guard only
   if the oracle reveals a back-edge.
 - Remove `--add-opens` one at a time (jetty/jersey/jaxb/jorje may need some).
+
+## Future ideas (deferred, post-cutover, numbers-gated)
+
+- **Wire-level `@class` interning.** A dictionary that emits each FQCN once in a
+  header table and references it by a short index per node (`"@class":3`) would cut
+  payload size meaningfully (FQCNs are 40–60 chars and the most-repeated token; ~30–50%
+  smaller plausibly). BUT: (a) bytes aren't on our critical path — they attack the
+  already-tiny `deser` (1.8–19ms) and the spawn-dominated `spawn-ipc` buckets, not the
+  ~600ms java-serialize cost we're killing (same logic that rejected binary formats);
+  (b) it **breaks structural equivalence** with XStream, so it's not a drop-in — every
+  `node["@class"]` read in `parser.ts`/`printer.ts` would need an index→name pass and
+  the M5 oracle couldn't diff. So it's a *separate* experiment AFTER cutover, gated on
+  the native baseline (M6) showing the deser/transport buckets are worth attacking. The
+  `AstSink` seam is the right home: a dictionary-encoding sink variant could do it
+  without touching the generator. (Note: Java-side string interning is already free —
+  generated code emits `@class` as string literals, which the JVM constant-pool interns.)
