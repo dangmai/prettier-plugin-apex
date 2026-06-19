@@ -59,6 +59,11 @@ reflection-free generator regardless of format.
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☐ |
 | M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☐ |
 | M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☐ |
+| M8 | Write the ADR in `adr/` documenting the decision + rationale (this is the repo's first ADR) | ☐ |
+
+> The ADR is deliberately deferred until the work is essentially done (too many
+> unknowns now). It's required by the project CLAUDE.md for big feature work and
+> lives in `adr/` at the repo root.
 
 ## Harness numbers
 
