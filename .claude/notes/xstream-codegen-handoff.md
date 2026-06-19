@@ -23,7 +23,8 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
 - ☑ Worktree + this hand-off file created.
 - ☑ M1 done (commit 75221992) — `serializer-generator` subproject scaffolded.
 - ☑ M2 done (commit 9ae8cf88) — shared `jorje-discovery.gradle`; `jorje.d.ts` byte-identical.
-- ☐ **M3 next** — `AstSink` + `JsonAstSink`, unit-tested in isolation.
+- ☑ M3 done (commit 53192afa) — `AstSink` + `JsonAstSink` (Jackson Core), 12 unit tests.
+- ☐ **M4 next** — generator emits `GeneratedAstSerializer`; wire into parser; smoke test.
 
 ## Decisions (settled, do not re-litigate)
 
@@ -56,7 +57,7 @@ reflection-free generator regardless of format.
 |---|---|---|
 | M1 | Scaffold `serializer-generator` subproject; scan jorje, print type count | ☑ |
 | M2 | Extract shared `jorje-discovery.gradle`; `jorje.d.ts` regenerates identical | ☑ |
-| M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☐ |
+| M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☑ |
 | M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☐ |
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☐ |
 | M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☐ |
@@ -88,6 +89,25 @@ is the signal. Saved: `/tmp/xstream-baseline-jvm.json`.) A native baseline built
 instrumented source is still TODO — capture it before/at M6 for the real adopter delta.
 
 ### Latest — (none yet; update per milestone)
+
+## Wire format (verified empirically from XStream output, M3)
+
+Captured by running `:parser:run` on `public class A { Integer x = 1; /* c */ }`:
+
+- **Root**: `{"<root FQCN>": { ...fields... }}` — wrapper keyed by class name, the
+  inner object has **no** `@class`. (`startDocument`/`endDocument`.)
+- **Classed node** (field value / list item): `{"@class":"<FQCN>", ...fields}`.
+- **`$` is just a field name.** Enum → `{"@class":C,"$":"NAME"}`. A *boxed scalar as a
+  collection element* → `{"@class":"int","$":1}` (and map keys too). So no special
+  sink method — `startObject(class); name("$"); value...; endObject()`.
+- **Named scalar field** (primitive/String/BigDecimal): emitted inline, `"startIndex":0`
+  — NOT wrapped. Only collection *elements* get the `@class`+`$` wrapping.
+- **BigDecimal**: always a JSON string (`"1.0"`), as field or `$` value.
+- **List**: `[item,...]`, empty `[]`. **Map** (TreeMap): `[[k,v],...]`, empty `[]`.
+- **Optional**: present `{"value":<v>}`, empty `{}` (plain object, no `@class`).
+
+Key-order/whitespace are irrelevant (JS `JSON.parse`); Jackson compact has no
+space after `:` where XStream had one — structurally identical, fine.
 
 ## Gotchas / risks
 
