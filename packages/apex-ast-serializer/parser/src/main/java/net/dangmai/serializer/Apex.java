@@ -90,11 +90,9 @@ public class Apex {
     );
     long parseEndNs = System.nanoTime();
 
-    // Serializing the output. Note: the serialize timing recorded below spans
-    // XStream construction and setup in addition to toXML, not just marshalling.
-    // The generated, reflection-free serializer is opt-in for now (dual path);
-    // M6 flips the default. Select it via -DapexSerializer=generated or
-    // APEX_SERIALIZER=generated.
+    // Serializing the output. The generated, reflection-free serializer is the
+    // default; XStream stays reachable as an escape hatch during the migration.
+    // Opt back into XStream with -DapexSerializer=xstream or APEX_SERIALIZER=xstream.
     if (useGeneratedSerializer()) {
       GeneratedAstSerializer.serialize(output, writer, prettyPrint);
     } else {
@@ -131,7 +129,8 @@ public class Apex {
       "apexSerializer",
       System.getenv("APEX_SERIALIZER")
     );
-    return "generated".equalsIgnoreCase(value);
+    // Generated is the default; only an explicit "xstream" opt-out falls back.
+    return !"xstream".equalsIgnoreCase(value);
   }
 
   /**

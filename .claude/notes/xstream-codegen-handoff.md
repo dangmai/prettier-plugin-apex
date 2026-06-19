@@ -34,8 +34,15 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
   `error`→getUserError, was wrongly getError); oracle date-time tolerance scoped to
   `.literal`. **CI fix**: `generateAstSerializer` was being instrumented by the GraalVM
   agent (broke CI test+CodeQL jobs since M4); excluded it from the agent predicate.
-- ☐ **M6 next** — flip default to generated; full JS suite (built-in+native+AST_COMPARE);
-  native build still has the Feature. Re-measure `--mode native`; record delta.
+- ☑ M6 done — flipped default to generated (`useGeneratedSerializer()` now defaults true;
+  opt back into XStream with `APEX_SERIALIZER=xstream`/`-DapexSerializer=xstream`). Full JS
+  suite green with generated as default: built-in 95, AST_COMPARE 273, native 95. Native
+  image still has the Feature (M6 isolates the swap from dep removal). Jackson Core survives
+  the closed-world analysis. Native end-to-end A/B (same binary, flag-switched): **total
+  format time −44% to −69%, java-serialize −94% to −98%** (numbers below).
+- ☐ **M7 next** — cleanup: delete XStream code/dep, `RuntimeReflectionRegistrationFeature`,
+  parity test/dual-path, unneeded `--add-opens`/`--features`/graalvm source set —
+  incrementally, re-running tests + native build after each removal.
 
 ## Decisions (settled, do not re-litigate)
 
@@ -71,7 +78,7 @@ reflection-free generator regardless of format.
 | M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☑ |
 | M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☑ |
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☑ |
-| M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☐ |
+| M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☑ |
 | M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☐ |
 | M8 | Write the ADR in `adr/` documenting the decision + rationale (this is the repo's first ADR) | ☐ |
 
@@ -105,6 +112,33 @@ instrumented source is still TODO — capture it before/at M6 for the real adopt
 XStream **174ms** → generated **24ms** median = **~7.3x**. This is the serialize step
 alone (parse done once up front), so cleaner than the harness's startup-inflated numbers.
 A real `--mode native` end-to-end delta is still TODO at M6.
+
+### M6 — native end-to-end A/B (the real adopter delta), 2026-06-18
+
+True same-binary A/B on the PGO native image: head = generated (default), base = forced
+XStream via `APEX_SERIALIZER=xstream`. Both labelled `14204c2d` (source edits uncommitted
+at measure time). `pnpm run benchmark -- --mode native --obtain existing`, median ms:
+
+| file | java-serialize base→head | total base→head |
+|---|---|---|
+| Comments | 62.0 → 1.4 (−97.8%) | 95.9 → 32.4 (−66.2%) |
+| SOQLClass | 42.3 → 1.5 (−96.4%) | 97.7 → 54.6 (−44.1%) |
+| ExpressionClass | 61.6 → 1.2 (−98.1%) | 90.5 → 27.7 (−69.4%) |
+| PerfBenchmarkLarge (4k) | 293.7 → 16.1 (−94.5%) | 446.3 → 161.3 (−63.9%) |
+
+java-serialize is now a rounding error on small files and ~16ms on the 4k-line class
+(was the single largest bucket). Secondary wins observed: spawn-ipc −23% to −27% and
+deserialize −6% to −8% (smaller compact payload, no inter-token spaces). Saved:
+`/tmp/baseline-xstream-native.json` (XStream) and `/tmp/head-m6.json` (generated).
+
+> Local native-build gotcha (this dev box, not CI): `build:musl` produced a broken
+> toolchain — zlib 1.3.2 failed on musl (`errno`/`EWOULDBLOCK` undeclared; configure
+> mis-probe) so `libz.a` was missing, and GCC 16's specs emit a `-latomic_asneeded`
+> pseudo-token musl-gcc can't rewrite, breaking every static link. Fixes applied by hand
+> into `musl-toolchain/`: built `libz.a` with `CFLAGS="-O2 -include errno.h"` and dropped
+> an empty `libatomic_asneeded.a` stub (x86_64 atomics inline). Both live in the gitignored
+> `musl-toolchain/`, so a fresh checkout will hit this again until `build-musl-toolchain.sh`
+> is patched. CI is unaffected (older toolchain image).
 
 ### M5 oracle outcome (parity gaps found & resolved)
 
