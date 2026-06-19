@@ -45,12 +45,21 @@ final class TypeModel {
     final String accessSuffix;
     /** Non-null for inline scalars; null means "dispatch on runtime type". */
     final InlineKind inlineKind;
+    /** True if the field's type is a Java primitive (never null; always emitted). */
+    final boolean primitive;
 
-    FieldModel(String jsonName, String castType, String accessSuffix, InlineKind inlineKind) {
+    FieldModel(
+      String jsonName,
+      String castType,
+      String accessSuffix,
+      InlineKind inlineKind,
+      boolean primitive
+    ) {
       this.jsonName = jsonName;
       this.castType = castType;
       this.accessSuffix = accessSuffix;
       this.inlineKind = inlineKind;
+      this.primitive = primitive;
     }
   }
 
@@ -102,6 +111,7 @@ final class TypeModel {
 
   private static FieldModel buildField(Class<?> clazz, Field f) {
     InlineKind kind = inlineKind(f.getType());
+    boolean primitive = f.getType().isPrimitive();
     boolean fieldAccessible =
       Modifier.isPublic(f.getModifiers())
         && Modifier.isPublic(f.getDeclaringClass().getModifiers());
@@ -112,7 +122,7 @@ final class TypeModel {
       if (castType == null) {
         return null;
       }
-      return new FieldModel(f.getName(), castType, "." + f.getName(), kind);
+      return new FieldModel(f.getName(), castType, "." + f.getName(), kind, primitive);
     }
     // Fall back to an accessible getter cast to a public declaring type.
     Method getter = findGetter(clazz, f);
@@ -124,7 +134,7 @@ final class TypeModel {
       return null;
     }
     return new FieldModel(
-      f.getName(), publicOwner.getCanonicalName(), "." + getter.getName() + "()", kind
+      f.getName(), publicOwner.getCanonicalName(), "." + getter.getName() + "()", kind, primitive
     );
   }
 
@@ -156,13 +166,19 @@ final class TypeModel {
   private static List<Field> instanceFields(Class<?> clazz) {
     List<Field> fields = new ArrayList<>();
     for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+      // getDeclaredFields() order is not JVM-guaranteed, so sort each level by
+      // name to keep the generated source deterministic across builds. JSON key
+      // order is irrelevant to the consumer, so this changes nothing structurally.
+      List<Field> level = new ArrayList<>();
       for (Field f : c.getDeclaredFields()) {
         int m = f.getModifiers();
         if (Modifier.isStatic(m) || Modifier.isTransient(m) || f.isSynthetic()) {
           continue;
         }
-        fields.add(f);
+        level.add(f);
       }
+      level.sort((a, b) -> a.getName().compareTo(b.getName()));
+      fields.addAll(level);
     }
     return fields;
   }

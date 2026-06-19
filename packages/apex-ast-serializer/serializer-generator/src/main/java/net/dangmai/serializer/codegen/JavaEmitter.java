@@ -15,6 +15,18 @@ final class JavaEmitter {
   private JavaEmitter() {}
 
   static String emit(List<TypeModel> models) {
+    // Generated field-writer method names must be unique (the . -> _ / $ -> _
+    // mapping is not injective in theory). Fail loudly rather than emit a
+    // duplicate-method compile error.
+    java.util.Set<String> methodNames = new java.util.HashSet<>();
+    for (TypeModel model : models) {
+      if (!methodNames.add(methodName(model.className))) {
+        throw new IllegalStateException(
+          "Duplicate generated method name for type: " + model.className
+        );
+      }
+    }
+
     StringBuilder sb = new StringBuilder();
     sb.append("package ").append(PACKAGE).append(";\n\n");
     sb.append("""
@@ -122,10 +134,22 @@ final class JavaEmitter {
     for (TypeModel model : models) {
       sb.append("\n  private static void ").append(methodName(model.className))
         .append("(Object o, AstSink sink) {\n");
+      int localVar = 0;
       for (TypeModel.FieldModel field : model.fields) {
-        sb.append("    sink.name(\"").append(field.jsonName).append("\");\n");
         String read = "((" + field.castType + ") o)" + field.accessSuffix;
-        sb.append("    ").append(valueCall(field, read)).append(";\n");
+        if (field.primitive) {
+          sb.append("    sink.name(\"").append(field.jsonName).append("\");\n");
+          sb.append("    ").append(valueCall(field, read)).append(";\n");
+        } else {
+          // XStream omits null fields entirely; also, reading a null wrapper
+          // inline would NPE on unboxing. Read once and skip when null.
+          String var = "v" + (localVar++);
+          sb.append("    var ").append(var).append(" = ").append(read).append(";\n");
+          sb.append("    if (").append(var).append(" != null) {\n");
+          sb.append("      sink.name(\"").append(field.jsonName).append("\");\n");
+          sb.append("      ").append(valueCall(field, var)).append(";\n");
+          sb.append("    }\n");
+        }
       }
       sb.append("  }\n");
     }
