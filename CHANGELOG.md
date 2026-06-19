@@ -15,6 +15,7 @@
 
 ## Internal Changes
 
+- Improve AST post-processing performance by ~1.7X, thanks to @lukecotter.
 - Replace runtime XStream reflection with a build-time code-generated serializer, substantially improving serialization performance.
 - Initialize the jorje parser stack at native-image build time, cutting per-file process startup (~4x faster cold start in spawn-per-file native mode) - thanks to @lukecotter for the technique in [#2405](https://github.com/dangmai/prettier-plugin-apex/pull/2405).
 - Replace `eslint` with `biome` for linting purpose.

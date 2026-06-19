@@ -90,16 +90,25 @@ export function printDanglingComment(
     return "";
   }
   fromPos += 1;
-  const leadingSpace = sourceCode.slice(fromPos, loc.startIndex);
-  const numberOfNewLines = isFirstComment
-    ? 0
-    : /* v8 ignore next 1 */
-      (leadingSpace.match(/\n/g) || []).length;
+  // Count newlines in the whitespace run before the comment, capped at the
+  // two that can actually be inserted - no need to slice the source or
+  // materialize every match.
+  let numberOfNewLines = 0;
+  if (!isFirstComment) {
+    let newlineIndex = sourceCode.indexOf("\n", fromPos);
+    while (
+      newlineIndex !== -1 &&
+      newlineIndex < loc.startIndex &&
+      numberOfNewLines < 2
+    ) {
+      numberOfNewLines += 1;
+      newlineIndex = sourceCode.indexOf("\n", newlineIndex + 1);
+    }
+  }
 
   if (numberOfNewLines > 0) {
     // If the leading space contains newlines, then add at most 2 new lines
-    const numberOfNewLinesToInsert = Math.min(numberOfNewLines, 2);
-    parts.push(...Array(numberOfNewLinesToInsert).fill(hardline));
+    parts.push(...Array(numberOfNewLines).fill(hardline));
   }
   if (comment["@class"] === APEX_TYPES.INLINE_COMMENT) {
     parts.push(lineSuffix(printComment(commentPath)));
@@ -152,11 +161,15 @@ export function getTrailingComments(node: any): AnnotatedComment[] {
   return node.comments.filter((comment: AnnotatedComment) => comment.trailing);
 }
 
+const ALLOW_DANGLING_COMMENTS_SET: Set<string> = new Set(
+  ALLOW_DANGLING_COMMENTS,
+);
+
 function handleDanglingComment(comment: AnnotatedComment): boolean {
   const { enclosingNode } = comment;
   if (
     enclosingNode &&
-    ALLOW_DANGLING_COMMENTS.indexOf(enclosingNode["@class"]) !== -1 &&
+    ALLOW_DANGLING_COMMENTS_SET.has(enclosingNode["@class"]) &&
     ((enclosingNode.stmnts && enclosingNode.stmnts.length === 0) ||
       (enclosingNode.members && enclosingNode.members.length === 0))
   ) {
@@ -455,8 +468,5 @@ export function handleRemainingComment(
  */
 export function hasPrettierIgnore(path: AstPath): boolean {
   const node = path.getNode();
-  return (
-    node?.comments?.length > 0 &&
-    node.comments.filter(isPrettierIgnore).length > 0
-  );
+  return node?.comments?.length > 0 && node.comments.some(isPrettierIgnore);
 }

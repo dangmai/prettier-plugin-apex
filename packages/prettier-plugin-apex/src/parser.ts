@@ -22,6 +22,15 @@ import {
 
 const { getNextNonSpaceNonCommentCharacterIndex } = prettier.util;
 
+// Set-based copies of the type tables: metadataVisitor consults these for
+// every AST node, where Array#includes would be a linear scan.
+const ALLOW_TRAILING_EMPTY_LINE_SET: Set<string> = new Set(
+  ALLOW_TRAILING_EMPTY_LINE,
+);
+const TRAILING_EMPTY_LINE_AFTER_LAST_NODE_SET: Set<string> = new Set(
+  TRAILING_EMPTY_LINE_AFTER_LAST_NODE,
+);
+
 type MinimalLocation = {
   startIndex: number;
   endIndex: number;
@@ -278,7 +287,7 @@ function handleLimitValueLocation(
     endIndex:
       findNextUncommentedCharacter(
         sourceCode,
-        node.i.toString(),
+        valueString,
         location.endIndex,
         commentNodes,
         /* backwards */ false,
@@ -490,8 +499,8 @@ type AnyNode = any;
 type ApplyFn<AccumulatedResult, Context> = (
   node: AnyNode,
   accumulatedResult: AccumulatedResult,
-  context: Context,
-  childrenContext: Context,
+  context?: Context,
+  childrenContext?: Context,
 ) => AccumulatedResult;
 type DfsVisitor<AccumulatedResult, Context> = {
   accumulator?: (
@@ -502,57 +511,67 @@ type DfsVisitor<AccumulatedResult, Context> = {
   gatherChildrenContext?: (node: AnyNode, currentContext?: Context) => Context;
 };
 /*
- * Generic Depth-First Search algorithm that applies a list of functions to each
- * node in the tree.
- * Each function can hook into various parts of the DFS process:
- * - gatherChildrenContext: gathering contexts for children nodes. When the
- * children nodes are visited, they will be passed this context.
- * - accumulator: accumulating results from children nodes. This is run after
- * every individual child node is visited.
- * - apply: applying the function to the current node. This is run after all
- * children nodes have been visited.
+ * Depth-First Search that applies the three post-processing visitors to every
+ * node in the tree, post-order (children before the node itself).
+ * This is specialized for its only call site instead of taking a generic
+ * visitor list: only the location visitor accumulates results up the tree,
+ * and only the metadata visitor uses a context, so generic bookkeeping
+ * (per-visitor context/result arrays allocated for every node) would be pure
+ * overhead on the hottest loop in the plugin.
  */
 function dfsPostOrderApply(
-  node: AnyNode,
-  fns: DfsVisitor<any, any>[],
-  currentContexts?: any,
-): AnyNode {
-  const finalChildrenResults = new Array(fns.length);
-  const childrenContexts = new Array(fns.length);
-  for (let i = 0; i < fns.length; i++) {
-    childrenContexts[i] = fns[i]?.gatherChildrenContext?.(
-      node,
-      currentContexts ? currentContexts[i] : undefined,
-    );
+  root: AnyNode,
+  locationVisitor: DfsVisitor<MinimalLocation | null, undefined>,
+  lineVisitor: DfsVisitor<undefined, undefined>,
+  metadataVisitorInstance: DfsVisitor<undefined, MetadataVisitorContext>,
+): void {
+  const accumulateLocation = locationVisitor.accumulator;
+  const applyLocation = locationVisitor.apply;
+  const applyLineIndexes = lineVisitor.apply;
+  const gatherMetadataContext = metadataVisitorInstance.gatherChildrenContext;
+  const applyMetadata = metadataVisitorInstance.apply;
+  /* v8 ignore next 3 */
+  if (!accumulateLocation || !gatherMetadataContext) {
+    throw new Error("Post-processing visitors are missing expected hooks");
   }
-  // Optimized: cache keys length and check for null before typeof check
-  const keys = Object.keys(node);
-  const keysLength = keys.length;
-  for (let i = 0; i < keysLength; i++) {
-    const key = keys[i] as string;
-    const value = node[key];
-    if (typeof value === "object") {
-      const childrenResults = dfsPostOrderApply(value, fns, childrenContexts);
-      for (let j = 0; j < fns.length; j++) {
-        finalChildrenResults[j] = fns[j]?.accumulator?.(
-          childrenResults[j],
-          finalChildrenResults[j],
+  const walk = (
+    node: AnyNode,
+    metadataContext: MetadataVisitorContext | undefined,
+  ): MinimalLocation | null => {
+    const childrenMetadataContext = gatherMetadataContext(
+      node,
+      metadataContext,
+    );
+    let accumulatedLocation: MinimalLocation | null = null;
+    // for...in instead of Object.keys: the nodes come from JSON.parse, so
+    // there are no inherited enumerable properties, and this avoids
+    // allocating a key array for every node in the tree.
+    for (const key in node) {
+      const value = node[key];
+      if (value !== null && typeof value === "object") {
+        // Location objects are leaves with only scalar fields; all visitor
+        // work on them happens through their parent node (getNodeLocation),
+        // so recursing into them is pure overhead. They make up a large share
+        // of all objects in the AST.
+        if (
+          (key === "loc" || key === "location") &&
+          typeof value.startIndex === "number" &&
+          typeof value.endIndex === "number"
+        ) {
+          continue;
+        }
+        accumulatedLocation = accumulateLocation(
+          walk(value, childrenMetadataContext),
+          accumulatedLocation,
         );
       }
     }
-  }
-  const results = [];
-  for (let i = 0; i < fns.length; i++) {
-    results.push(
-      fns[i]?.apply(
-        node,
-        finalChildrenResults[i],
-        currentContexts ? currentContexts[i] : undefined,
-        childrenContexts[i],
-      ),
-    );
-  }
-  return results;
+    const nodeLocation = applyLocation(node, accumulatedLocation);
+    applyLineIndexes(node, undefined);
+    applyMetadata(node, undefined, metadataContext, childrenMetadataContext);
+    return nodeLocation;
+  };
+  walk(root, undefined);
 }
 
 /**
@@ -609,7 +628,12 @@ const nodeLocationVisitor: (
 
     const nodeLoc = node.loc;
     if (!nodeLoc) {
-      delete node.loc;
+      // A location handler may have nulled an existing location (e.g.
+      // WhereCompoundOp); normalize it to undefined. Assignment is used
+      // instead of `delete`, which would force a hidden-class transition.
+      if (node.loc !== undefined) {
+        node.loc = undefined;
+      }
     } else if (nodeLoc && currentLocation) {
       if (nodeLoc.startIndex > currentLocation.startIndex) {
         nodeLoc.startIndex = currentLocation.startIndex;
@@ -653,7 +677,7 @@ type MetadataVisitorContext = {
   arraySiblings?: any[];
 };
 const metadataVisitor: (
-  emptyLineLocations: number[],
+  emptyLineLocations: Set<number>,
 ) => DfsVisitor<undefined, MetadataVisitorContext> = (emptyLineLocations) => ({
   apply: (node: any, _accumulated, context, childrenContext) => {
     const apexClass = node["@class"];
@@ -666,28 +690,29 @@ const metadataVisitor: (
     // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
     // `ifBlockIndex` into the node for handling code to differentiate them.
     else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
-      node.ifBlocks.forEach((ifBlock: jorje.IfBlock, index: number) => {
-        (ifBlock as EnrichedIfBlock).ifBlockIndex = index;
-      });
+      const ifBlocks: jorje.IfBlock[] = node.ifBlocks;
+      for (let i = 0, length = ifBlocks.length; i < length; i++) {
+        (ifBlocks[i] as EnrichedIfBlock).ifBlockIndex = i;
+      }
     }
 
-    if ("inputParameters" in node && Array.isArray(node.inputParameters)) {
-      node.inputParameters.forEach((inputParameter: any) => {
-        inputParameter.insideParenthesis = true;
-      });
+    const inputParameters = node.inputParameters;
+    if (Array.isArray(inputParameters)) {
+      for (let i = 0, length = inputParameters.length; i < length; i++) {
+        inputParameters[i].insideParenthesis = true;
+      }
     }
 
     const trailingEmptyLineAllowed =
-      ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+      ALLOW_TRAILING_EMPTY_LINE_SET.has(apexClass);
     const nodeLoc = getNodeLocation(node);
     let isLastNodeInArray = false;
 
     // Here we flag the current node as the last node in the array, because
     // we don't want a trailing empty line after it.
-    if (context?.arraySiblings) {
-      isLastNodeInArray =
-        context.arraySiblings.indexOf(node) ===
-        context.arraySiblings.length - 1;
+    const currentSiblings = context?.arraySiblings;
+    if (currentSiblings) {
+      isLastNodeInArray = node === currentSiblings[currentSiblings.length - 1];
     }
 
     // Here we turn off trailing empty line for a child node when its next
@@ -703,33 +728,33 @@ const metadataVisitor: (
     // We are doing this at the parent node level, because when we run the
     // Depth-First search, we don't have enough context at the child node level
     // to determine if its next sibling is on the same line or not.
-    if (childrenContext.arraySiblings) {
-      for (let i = 0; i < childrenContext.arraySiblings.length; i++) {
-        const currentChild = childrenContext.arraySiblings[i];
-        const nextChildIndex = i + 1;
-        if (nextChildIndex < childrenContext.arraySiblings.length) {
-          const nextChild = childrenContext.arraySiblings[nextChildIndex];
-          if (
-            currentChild.trailingEmptyLine &&
-            currentChild.loc &&
-            nextChild.loc &&
-            currentChild.loc.endLine === nextChild.loc.startLine
-          ) {
-            currentChild.trailingEmptyLine = false;
-          }
+    const childrenSiblings = childrenContext?.arraySiblings;
+    if (childrenSiblings) {
+      for (let i = 0, length = childrenSiblings.length - 1; i < length; i++) {
+        const currentChild = childrenSiblings[i];
+        if (!currentChild.trailingEmptyLine) {
+          continue;
+        }
+        const currentChildLoc = currentChild.loc;
+        const nextChildLoc = childrenSiblings[i + 1].loc;
+        if (
+          currentChildLoc &&
+          nextChildLoc &&
+          currentChildLoc.endLine === nextChildLoc.startLine
+        ) {
+          currentChild.trailingEmptyLine = false;
         }
       }
     }
     if (
       apexClass &&
       nodeLoc &&
-      context.allowTrailingEmptyLine &&
+      context?.allowTrailingEmptyLine &&
       trailingEmptyLineAllowed &&
       !isLastNodeInArray
     ) {
       const nextLine = nodeLoc.endLine + 1;
-      const nextEmptyLine = emptyLineLocations.indexOf(nextLine);
-      if (nextEmptyLine !== -1) {
+      if (emptyLineLocations.has(nextLine)) {
         node.trailingEmptyLine = true;
       }
     }
@@ -738,9 +763,9 @@ const metadataVisitor: (
     const apexClass = node["@class"];
     let allowTrailingEmptyLineWithin: boolean;
     const isSpecialClass =
-      TRAILING_EMPTY_LINE_AFTER_LAST_NODE.includes(apexClass);
+      TRAILING_EMPTY_LINE_AFTER_LAST_NODE_SET.has(apexClass);
     const trailingEmptyLineAllowed =
-      ALLOW_TRAILING_EMPTY_LINE.includes(apexClass);
+      ALLOW_TRAILING_EMPTY_LINE_SET.has(apexClass);
     if (isSpecialClass) {
       allowTrailingEmptyLineWithin = false;
     } else if (trailingEmptyLineAllowed) {
@@ -792,14 +817,17 @@ const lineIndexVisitor: (
 ) => DfsVisitor<undefined, undefined> = (lineIndexes) => ({
   apply: (node: AnyNode) => {
     const nodeLoc = getNodeLocation(node);
-    if (nodeLoc && !("startLine" in nodeLoc)) {
+    if (!nodeLoc) {
+      return;
+    }
+    if (!("startLine" in nodeLoc)) {
       // The location node that we manually generate do not contain startLine
       // information, so we will create them here.
       nodeLoc.startLine =
         nodeLoc.line ?? getLineNumber(lineIndexes, nodeLoc.startIndex);
     }
 
-    if (nodeLoc && !("endLine" in nodeLoc)) {
+    if (!("endLine" in nodeLoc)) {
       nodeLoc.endLine = getLineNumber(lineIndexes, nodeLoc.endIndex);
 
       // Edge case: root node
@@ -808,11 +836,9 @@ const lineIndexVisitor: (
       }
     }
 
-    if (nodeLoc && !("column" in nodeLoc)) {
-      const nodeStartLineIndex =
-        lineIndexes[
-          nodeLoc.startLine ?? getLineNumber(lineIndexes, nodeLoc.startIndex)
-        ];
+    if (!("column" in nodeLoc)) {
+      // startLine is guaranteed to be present by the first branch.
+      const nodeStartLineIndex = lineIndexes[nodeLoc.startLine];
       if (nodeStartLineIndex !== undefined) {
         nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
       }
@@ -820,10 +846,31 @@ const lineIndexVisitor: (
   },
 });
 
-// Get a map of line number to the index of its first character
-function getLineIndexes(sourceCode: string) {
+// A single pass over the source that produces both the line-boundary map
+// consumed by getLineNumber (same array layout as the previous
+// getLineIndexes: entry 0 is 0 and entry k is the start index of line k+1,
+// with the final entry holding the source length) and the set of
+// empty/whitespace-only line numbers.
+function getLineInfo(sourceCode: string): {
+  lineIndexes: number[];
+  emptyLineLocations: Set<number>;
+} {
+  // A line is empty when its next non-whitespace character sits at or beyond
+  // the end of the line. The probe result is cached so consecutive empty
+  // lines don't re-scan, and no per-line substring is allocated.
+  const nonWhitespace = /\S/g;
+  let nextContentIndex = -1;
+  const isEmptyLine = (lineStart: number, lineEnd: number): boolean => {
+    if (nextContentIndex < lineStart) {
+      nonWhitespace.lastIndex = lineStart;
+      const match = nonWhitespace.exec(sourceCode);
+      nextContentIndex = match ? match.index : Number.POSITIVE_INFINITY;
+    }
+    return nextContentIndex >= lineEnd;
+  };
   // First line always start with index 0
   const lineIndexes = [0];
+  const emptyLineLocations = new Set<number>();
   let characterIndex = 0;
   let lineIndex = 1;
   while (characterIndex < sourceCode.length) {
@@ -831,33 +878,26 @@ function getLineIndexes(sourceCode: string) {
     if (eolIndex < 0) {
       break;
     }
+    if (isEmptyLine(characterIndex, eolIndex)) {
+      emptyLineLocations.add(lineIndex);
+    }
     const lastLineIndex = lineIndexes[lineIndex - 1];
     /* v8 ignore next 3 */
     if (lastLineIndex === undefined) {
-      return lineIndexes;
+      return { lineIndexes, emptyLineLocations };
     }
     lineIndexes[lineIndex] = lastLineIndex + (eolIndex - characterIndex) + 1;
     characterIndex = eolIndex + 1;
     lineIndex += 1;
   }
+  // The text after the final newline (or the entire source when it contains
+  // no newline) forms the last line; a source ending in a newline yields an
+  // empty trailing line, matching the previous per-line scan.
+  if (isEmptyLine(characterIndex, sourceCode.length)) {
+    emptyLineLocations.add(lineIndex);
+  }
   lineIndexes[lineIndex] = sourceCode.length;
-  return lineIndexes;
-}
-
-function getEmptyLineLocations(sourceCode: string): number[] {
-  const whiteSpaceRegEx = /^\s*$/;
-  const lines = sourceCode.split("\n");
-  return lines
-    .map((line: string) => whiteSpaceRegEx.test(line))
-    .reduce(
-      (accumulator: number[], currentValue: boolean, currentIndex: number) => {
-        if (currentValue) {
-          accumulator.push(currentIndex + 1);
-        }
-        return accumulator;
-      },
-      [],
-    );
+  return { lineIndexes, emptyLineLocations };
 }
 
 export default async function parse(
@@ -865,7 +905,6 @@ export default async function parse(
   options: prettier.RequiredOptions,
 ): Promise<SerializedAst | Record<string, never>> {
   let serializedAst: string;
-  let stderr: string = "";
   // Perf harness boundary: start of "transport" (process spawn / HTTP +
   // jorje parse + Java-side serialization + receiving the payload).
   perfMark("transportStart");
@@ -879,24 +918,24 @@ export default async function parse(
     );
   } else if (options.apexStandaloneParser === "native") {
     const serializerBin = await getNativeExecutableWithFallback();
-    const result = await parseTextWithSpawn(
-      serializerBin,
-      sourceCode,
-      options.parser === "apex-anonymous",
-    );
-    serializedAst = result.stdout;
-    stderr = result.stderr;
+    serializedAst = (
+      await parseTextWithSpawn(
+        serializerBin,
+        sourceCode,
+        options.parser === "apex-anonymous",
+      )
+    ).stdout;
   } else {
-    const result = await parseTextWithSpawn(
-      path.join(
-        await getSerializerBinDirectory(),
-        `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`,
-      ),
-      sourceCode,
-      options.parser === "apex-anonymous",
-    );
-    serializedAst = result.stdout;
-    stderr = result.stderr;
+    serializedAst = (
+      await parseTextWithSpawn(
+        path.join(
+          await getSerializerBinDirectory(),
+          `apex-ast-serializer${process.platform === "win32" ? ".bat" : ""}`,
+        ),
+        sourceCode,
+        options.parser === "apex-anonymous",
+      )
+    ).stdout;
   }
   // Perf harness boundary: end of "transport", start of "deserialize".
   perfMark("transportEnd");
@@ -905,22 +944,27 @@ export default async function parse(
     // Perf harness boundary: end of "deserialize" (JSON.parse), start of
     // "prepping" (comment extraction, line indexes, and the DFS enrichment).
     perfMark("deserializeEnd");
-    if (
-      ast[APEX_TYPES.PARSER_OUTPUT] &&
-      ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.length > 0
-    ) {
-      const errors = ast[APEX_TYPES.PARSER_OUTPUT].parseErrors.map(
+
+    const parserOutput = ast[APEX_TYPES.PARSER_OUTPUT];
+    if (parserOutput && parserOutput.parseErrors.length > 0) {
+      const errors = parserOutput.parseErrors.map(
         (err: jorje.ParseException) => `${err.message}.`,
       );
       throw new Error(errors.join("\r\n"));
     }
-    ast.comments = ast[APEX_TYPES.PARSER_OUTPUT].hiddenTokenMap
-      .map((item) => item[1])
-      .filter(
-        (node) =>
-          node["@class"] === APEX_TYPES.BLOCK_COMMENT ||
-          node["@class"] === APEX_TYPES.INLINE_COMMENT,
-      );
+    const hiddenTokenMap = parserOutput.hiddenTokenMap;
+    const comments = [];
+    for (let i = 0, length = hiddenTokenMap.length; i < length; i++) {
+      const token = (hiddenTokenMap[i] as any[])[1];
+      const tokenClass = token["@class"];
+      if (
+        tokenClass === APEX_TYPES.BLOCK_COMMENT ||
+        tokenClass === APEX_TYPES.INLINE_COMMENT
+      ) {
+        comments.push(token);
+      }
+    }
+    ast.comments = comments;
     const lastComment = ast.comments.at(-1);
     if (lastComment) {
       const nextCharAfterLastCommentIndex =
@@ -934,13 +978,13 @@ export default async function parse(
         (lastComment as AnnotatedComment).trailingEmptyLine = false;
       }
     }
-    const lineIndexes = getLineIndexes(sourceCode);
-    const emptyLineLocations = getEmptyLineLocations(sourceCode);
-    dfsPostOrderApply(ast, [
+    const { lineIndexes, emptyLineLocations } = getLineInfo(sourceCode);
+    dfsPostOrderApply(
+      ast,
       nodeLocationVisitor(sourceCode, ast.comments),
       lineIndexVisitor(lineIndexes),
       metadataVisitor(emptyLineLocations),
-    ]);
+    );
 
     // Perf harness boundary: end of "prepping". Everything after parse()
     // returns (comment attachment + the print walk) is attributed to
@@ -948,5 +992,5 @@ export default async function parse(
     perfMark("prepEnd");
     return ast;
   }
-  throw new Error(`Failed to parse Apex code: ${stderr}`);
+  throw new Error("Failed to parse Apex code: the parser returned no output");
 }
