@@ -151,12 +151,13 @@ class SerializerParityTest {
         collectDiffs(a.get(i), b.get(i), path + "[" + i + "]", out);
       }
     } else if (!a.equals(b)) {
-      if (isDateTimeLiteral(a) && isDateTimeLiteral(b)) {
+      if (path.endsWith(".literal") && isDateTimeLiteral(a) && isDateTimeLiteral(b)) {
         // SOQL date-time/time literals (java.time): XStream and toString() format
         // them differently, but the printer reprints these from the source text
         // (QueryDateTime/QueryTime use originalText.slice), so output is
         // unaffected. QueryDate (LocalDate) round-trips identically, so it never
-        // lands here.
+        // lands here. Scoped to `.literal` so it can't mask an unrelated
+        // datetime-shaped string value elsewhere.
         return;
       }
       out.add(path + ": value " + truncate(a) + " != " + truncate(b));

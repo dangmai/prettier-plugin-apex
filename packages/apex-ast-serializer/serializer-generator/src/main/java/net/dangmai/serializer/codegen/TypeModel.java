@@ -81,7 +81,12 @@ final class TypeModel {
     // is its only public accessor. internalErrors is never populated in practice
     // nor read by the plugin — this just keeps the type generatable so a non-empty
     // internalErrors wouldn't hit the dispatcher's throw.
-    "apex.jorje.services.exception.InternalException#detailedMessage", "getError"
+    "apex.jorje.services.exception.InternalException#detailedMessage", "getError",
+    // ParseException's `error` field (a UserError) collides with the unrelated
+    // getError() (which returns the String message); the real accessor is
+    // getUserError(). The return-type check in findGetter also guards this, but
+    // the override picks the correct getter so the field serializes faithfully.
+    "apex.jorje.services.exception.ParseException#error", "getUserError"
   );
 
   private static final Set<String> INLINE_WRAPPERS = Set.of(
@@ -212,7 +217,11 @@ final class TypeModel {
     for (String name : candidates) {
       try {
         Method m = clazz.getMethod(name);
-        if (m.getParameterCount() == 0) {
+        // Require a no-arg getter whose return type actually fits the field —
+        // get<Field> can collide with an unrelated method (e.g. ParseException's
+        // `error` field vs getError():String), which would silently emit the
+        // wrong value.
+        if (m.getParameterCount() == 0 && f.getType().isAssignableFrom(m.getReturnType())) {
           return m;
         }
       } catch (NoSuchMethodException ignored) {
