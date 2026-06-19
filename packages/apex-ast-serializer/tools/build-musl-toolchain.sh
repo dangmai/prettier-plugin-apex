@@ -28,6 +28,13 @@ popd
 # Install a symlink for use by native-image
 ln -sf $MUSL_HOME/bin/musl-gcc $MUSL_HOME/bin/x86_64-linux-musl-gcc
 
+# GCC 14+ emits an internal "-latomic_asneeded" spec token that musl-gcc's -specs
+# override leaks straight through to ld ("cannot find -latomic_asneeded"), because it
+# bypasses the driver rewriting that would normally resolve it. x86_64 atomics are
+# inlined, so satisfy the token with an empty static archive -- a no-op at link time,
+# and an unused file on older GCC that never emits the token.
+ar rcs "$MUSL_HOME/lib/libatomic_asneeded.a"
+
 # Extend the system path and confirm that musl is available by printing its version
 export PATH="$MUSL_HOME/bin:$PATH"
 x86_64-linux-musl-gcc --version
@@ -35,8 +42,21 @@ x86_64-linux-musl-gcc --version
 # Build zlib with musl from source and install into the MUSL_HOME directory
 tar -xzvf zlib-${ZLIB_VERSION}.tar.gz
 pushd zlib-${ZLIB_VERSION}
-CC=musl-gcc ./configure --prefix=$MUSL_HOME --static
+# zlib's ./configure feature-probes rely on implicit function declarations, which
+# GCC 14+ promotes to hard errors -- so the probes false-negative and gzread.c
+# builds without <errno.h> (errno/EAGAIN/EWOULDBLOCK undeclared). These -Wno-* flags
+# restore the pre-GCC-14 probe behavior. The upstream source-level fix is unmerged
+# (tracking: madler/zlib#1168, candidate PRs #1196/#1022) and isn't in any release
+# yet -- 1.3.2, pinned above, still reproduces. Next time renovate bumps ZLIB_VERSION,
+# retest the native build without these flags and drop them if it's clean.
+CC=musl-gcc CFLAGS="-Wno-implicit-function-declaration -Wno-implicit-int -Wno-int-conversion" \
+  ./configure --prefix=$MUSL_HOME --static
 make && make install
 popd
+
+# Fail loudly if zlib mis-built and produced no static lib (e.g. a future toolchain
+# breaks the configure probes in a new way) instead of surfacing later as a confusing
+# native-image link error.
+test -f "$MUSL_HOME/lib/libz.a" || { echo "zlib build did not produce libz.a" >&2; exit 1; }
 
 rm -rf musl-${MUSL_VERSION}.tar.gz musl-${MUSL_VERSION} zlib-${ZLIB_VERSION}.tar.gz zlib-${ZLIB_VERSION}
