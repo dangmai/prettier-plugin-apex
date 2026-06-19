@@ -20,6 +20,16 @@ paths:
 Tooling to understand where time goes when formatting Apex, so optimizations are
 driven by numbers rather than guesses.
 
+## When to use it
+
+Any change that could plausibly affect formatting performance — the printer, the
+parser/prep DFS walk, comment attachment, or the Java `apex-ast-serializer` —
+should be measured, not just reasoned about. The simplest path is the CI
+workflow below: add the `benchmark` label to the PR and read the bot's
+comparison comment (`gh pr view <N> --json comments`). Treat a few-% delta as
+runner noise; act on consistent, sizeable shifts. Locally, `pnpm run benchmark`
+does the same against your working tree.
+
 ## Running it
 
 - `pnpm run benchmark` — interactive wizard (`tests_perf/setup.ts`). Picks the
