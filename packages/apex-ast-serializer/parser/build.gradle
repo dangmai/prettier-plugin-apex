@@ -92,6 +92,10 @@ dependencies {
   // https://mvnrepository.com/artifact/commons-io/commons-io
   api("commons-io:commons-io:2.22.0")
 
+  // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+  // Test-only: parse both serializers' JSON into trees for structural comparison.
+  testImplementation("com.fasterxml.jackson.core:jackson-databind:2.18.2")
+
   // https://mvnrepository.com/artifact/org.junit.jupiter/junit-jupiter-api
   testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
   testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")

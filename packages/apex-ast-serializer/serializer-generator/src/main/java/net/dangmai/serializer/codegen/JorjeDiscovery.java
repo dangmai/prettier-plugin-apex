@@ -28,6 +28,15 @@ public final class JorjeDiscovery {
   // ClassGraph scans bytecode here; the patterns then narrow the result set.
   private static final String SCAN_PACKAGE = "apex.jorje";
 
+  // Serializer-only extras: types XStream reaches at runtime via ParserOutput's
+  // error collections, but which aren't part of the typed AST surface and so are
+  // NOT in the shared discovery config (the typescript-generator doesn't need
+  // them). Kept here, not in jorje-discovery.gradle, to avoid changing jorje.d.ts.
+  private static final List<String> EXTRA_CLASS_PATTERNS = List.of(
+    "apex.jorje.services.exception.**",
+    "apex.jorje.data.errors.**"
+  );
+
   private final List<String> classes;
   private final List<Pattern> acceptPatterns;
   private final List<Pattern> excludePatterns;
@@ -35,8 +44,9 @@ public final class JorjeDiscovery {
   public JorjeDiscovery() {
     Properties config = loadConfig();
     this.classes = splitList(config.getProperty("classes"));
-    this.acceptPatterns =
-      splitList(config.getProperty("classPatterns")).stream().map(JorjeDiscovery::globToRegex).toList();
+    List<String> classPatterns = new ArrayList<>(splitList(config.getProperty("classPatterns")));
+    classPatterns.addAll(EXTRA_CLASS_PATTERNS);
+    this.acceptPatterns = classPatterns.stream().map(JorjeDiscovery::globToRegex).toList();
     this.excludePatterns =
       splitList(config.getProperty("excludeClassPatterns")).stream()
         .map(JorjeDiscovery::globToRegex)

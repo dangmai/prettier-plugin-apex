@@ -76,7 +76,12 @@ final class TypeModel {
   // reflectively, but we need an accessible getter).
   private static final Map<String, String> GETTER_OVERRIDES = Map.of(
     "apex.jorje.data.ast.ParameterRefs$ModifierParameterRef#typeRef", "getType",
-    "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef#typeRef", "getType"
+    "apex.jorje.data.ast.ParameterRefs$EmptyModifierParameterRef#typeRef", "getType",
+    // InternalException's private detailedMessage has no matching getter; getError
+    // is its only public accessor. internalErrors is never populated in practice
+    // nor read by the plugin — this just keeps the type generatable so a non-empty
+    // internalErrors wouldn't hit the dispatcher's throw.
+    "apex.jorje.services.exception.InternalException#detailedMessage", "getError"
   );
 
   private static final Set<String> INLINE_WRAPPERS = Set.of(
@@ -165,7 +170,17 @@ final class TypeModel {
 
   private static List<Field> instanceFields(Class<?> clazz) {
     List<Field> fields = new ArrayList<>();
-    for (Class<?> c = clazz; c != null && c != Object.class; c = c.getSuperclass()) {
+    // Walk only jorje-declared classes. This stops at the java.lang.Throwable
+    // boundary for the exception types (apex.jorje.services.exception.**), so we
+    // serialize their jorje fields (error, message) without the Throwable noise
+    // — cause, stackTrace, suppressedExceptions — that XStream dumped and the
+    // plugin never reads. Normal AST types extend Object or jorje bases, so this
+    // changes nothing for them.
+    for (
+      Class<?> c = clazz;
+      c != null && c.getName().startsWith("apex.jorje");
+      c = c.getSuperclass()
+    ) {
       // getDeclaredFields() order is not JVM-guaranteed, so sort each level by
       // name to keep the generated source deterministic across builds. JSON key
       // order is irrelevant to the consumer, so this changes nothing structurally.
@@ -185,6 +200,12 @@ final class TypeModel {
 
   private static Method findGetter(Class<?> clazz, Field f) {
     String override = GETTER_OVERRIDES.get(clazz.getName() + "#" + f.getName());
+    // jorje exceptions store the user-facing text in a private `message` field;
+    // the conventional getMessage() is Throwable's (the raw detail message), so
+    // read it via the public getError() that CompilationException declares.
+    if (override == null && f.getName().equals("message") && hasNoArgMethod(clazz, "getError")) {
+      override = "getError";
+    }
     String cap = Character.toUpperCase(f.getName().charAt(0)) + f.getName().substring(1);
     String[] candidates =
       override != null ? new String[] {override} : new String[] {"get" + cap, "is" + cap};
@@ -222,6 +243,15 @@ final class TypeModel {
       }
     }
     return null;
+  }
+
+  private static boolean hasNoArgMethod(Class<?> clazz, String name) {
+    try {
+      clazz.getMethod(name);
+      return true;
+    } catch (NoSuchMethodException e) {
+      return false;
+    }
   }
 
   private static boolean declaresMethod(Class<?> c, String name) {

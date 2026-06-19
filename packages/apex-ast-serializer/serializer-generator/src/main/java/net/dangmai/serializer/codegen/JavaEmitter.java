@@ -108,6 +108,12 @@ final class JavaEmitter {
             sink.startArray();
             for (Object e : v) { writeValue(e, sink); }
             sink.endArray();
+          } else if (o instanceof java.time.temporal.TemporalAccessor) {
+            // jorje stores SOQL date/time literals as java.time values; XStream
+            // rendered them as bare strings. The printer reprints date-time/time
+            // from the source text and QueryDate (LocalDate) round-trips via
+            // toString(), so emitting toString() here is output-safe.
+            sink.valueString(o.toString());
           } else {
             writeNode(o, sink);
           }

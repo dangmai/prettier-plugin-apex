@@ -17,6 +17,7 @@ import com.thoughtworks.xstream.io.json.JsonHierarchicalStreamDriver;
 import com.thoughtworks.xstream.io.json.JsonWriter;
 import com.thoughtworks.xstream.mapper.Mapper;
 import com.thoughtworks.xstream.mapper.MapperWrapper;
+import net.dangmai.serializer.generated.GeneratedAstSerializer;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -91,33 +92,14 @@ public class Apex {
 
     // Serializing the output. Note: the serialize timing recorded below spans
     // XStream construction and setup in addition to toXML, not just marshalling.
-    int mode = XStream.NO_REFERENCES;
-    Mapper defaultMapper = (new XStream()).getMapper();
-    XStream xstream;
-    xstream = new XStream(
-      null,
-      new JsonHierarchicalStreamDriver() {
-        @Override
-        public HierarchicalStreamWriter createWriter(Writer writer) {
-          if (prettyPrint) {
-            // By default, JSON is pretty printed
-            return super.createWriter(writer);
-          }
-          JsonWriter.Format format = new JsonWriter.Format(
-            new char[0],
-            "".toCharArray(),
-            JsonWriter.Format.SPACE_AFTER_LABEL |
-              JsonWriter.Format.COMPACT_EMPTY_ELEMENT
-          );
-          return new CustomJsonWriter(writer, format);
-        }
-      },
-      new ClassLoaderReference(new CompositeClassLoader()),
-      new WithClassMapper(defaultMapper)
-    );
-    setUpXStream(xstream, mode);
-
-    xstream.toXML(output, writer);
+    // The generated, reflection-free serializer is opt-in for now (dual path);
+    // M6 flips the default. Select it via -DapexSerializer=generated or
+    // APEX_SERIALIZER=generated.
+    if (useGeneratedSerializer()) {
+      GeneratedAstSerializer.serialize(output, writer, prettyPrint);
+    } else {
+      serializeToXStream(output, writer, prettyPrint);
+    }
     long serializeEndNs = System.nanoTime();
 
     // Performance harness: when a perf file is configured, write jorje parse
@@ -142,6 +124,51 @@ public class Apex {
           "}"
       );
     }
+  }
+
+  static boolean useGeneratedSerializer() {
+    String value = System.getProperty(
+      "apexSerializer",
+      System.getenv("APEX_SERIALIZER")
+    );
+    return "generated".equalsIgnoreCase(value);
+  }
+
+  /**
+   * Serializes a parsed AST to JSON using XStream. Extracted so the parity test
+   * can drive the exact same XStream configuration over a parsed {@link
+   * ParserOutput} and diff it against the generated serializer.
+   */
+  static void serializeToXStream(
+    ParserOutput output,
+    Writer writer,
+    boolean prettyPrint
+  ) {
+    int mode = XStream.NO_REFERENCES;
+    Mapper defaultMapper = (new XStream()).getMapper();
+    XStream xstream = new XStream(
+      null,
+      new JsonHierarchicalStreamDriver() {
+        @Override
+        public HierarchicalStreamWriter createWriter(Writer writer) {
+          if (prettyPrint) {
+            // By default, JSON is pretty printed
+            return super.createWriter(writer);
+          }
+          JsonWriter.Format format = new JsonWriter.Format(
+            new char[0],
+            "".toCharArray(),
+            JsonWriter.Format.SPACE_AFTER_LABEL |
+              JsonWriter.Format.COMPACT_EMPTY_ELEMENT
+          );
+          return new CustomJsonWriter(writer, format);
+        }
+      },
+      new ClassLoaderReference(new CompositeClassLoader()),
+      new WithClassMapper(defaultMapper)
+    );
+    setUpXStream(xstream, mode);
+    xstream.toXML(output, writer);
   }
 
   public static void main(String[] args) throws ParseException, IOException {
