@@ -26,7 +26,12 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
 - ☑ M3 done (commit 53192afa) — `AstSink` + `JsonAstSink` (Jackson Core), 12 unit tests.
 - ☑ M4 done (commit 7d9e91c9) — generator emits `GeneratedAstSerializer` (304 types),
   wired into parser compile, smoke tests green. XStream still the only runtime path.
-- ☐ **M5 next** — dual-path + `SerializerParityTest` over full corpus; iterate until clean.
+- ☑ M4 review fixes (commit a3394cd1) — null-field omission/NPE, deterministic field order.
+- ☑ M5 done (commit 956a52c5) — `SerializerParityTest` structurally clean over the full
+  corpus (307 types). Dual path added (`APEX_SERIALIZER=generated`, default still XStream).
+  Benchmark: **~7x faster serialize** (174ms→24ms warm, ~2400-line class).
+- ☐ **M6 next** — flip default to generated; full JS suite (built-in+native+AST_COMPARE);
+  native build still has the Feature. Re-measure `--mode native`; record delta.
 
 ## Decisions (settled, do not re-litigate)
 
@@ -61,7 +66,7 @@ reflection-free generator regardless of format.
 | M2 | Extract shared `jorje-discovery.gradle`; `jorje.d.ts` regenerates identical | ☑ |
 | M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☑ |
 | M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☑ |
-| M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☐ |
+| M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☑ |
 | M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☐ |
 | M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☐ |
 | M8 | Write the ADR in `adr/` documenting the decision + rationale (this is the repo's first ADR) | ☐ |
@@ -90,7 +95,27 @@ a downloaded `main` CI artifact predates the instrumentation. Build from source 
 is the signal. Saved: `/tmp/xstream-baseline-jvm.json`.) A native baseline built from
 instrumented source is still TODO — capture it before/at M6 for the real adopter delta.
 
-### Latest — (none yet; update per milestone)
+### Latest — M5 warm serialize micro-benchmark (in-JVM, isolates serialize step)
+
+`SerializerBenchmark` (run with `RUN_BENCHMARK=true`), ~2400-line class, ~5MB JSON:
+XStream **174ms** → generated **24ms** median = **~7.3x**. This is the serialize step
+alone (parse done once up front), so cleaner than the harness's startup-inflated numbers.
+A real `--mode native` end-to-end delta is still TODO at M6.
+
+### M5 oracle outcome (parity gaps found & resolved)
+
+Only 3 of 87 corpus files differed, all from XStream reflecting beyond the typed AST:
+- `ParseException` (InvalidClass.cls, parse errors) and `ZonedDateTime`/`LocalDate`
+  (SOQLClass.cls, SOQL date literals) hit the dispatcher's throw.
+- Fixes: java.time → bare string (toString); exception types generated with jorje fields
+  only (walk stops at Throwable boundary), `message` via `getError()`, added as
+  serializer-only discovery extras (`apex.jorje.services.exception.**`,
+  `apex.jorje.data.errors.**`) so jorje.d.ts is untouched.
+- Oracle relaxations (documented in the test, behaviorally safe): under
+  parseErrors/internalErrors compare only `message` (plugin reads only that; printer
+  never runs on error files); tolerate java.time **date-time** value format diffs
+  (printer reprints those from source via originalText.slice). LocalDate round-trips
+  exactly so it's checked normally.
 
 ## Wire format (verified empirically from XStream output, M3)
 
