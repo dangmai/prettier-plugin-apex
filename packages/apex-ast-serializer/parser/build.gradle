@@ -29,12 +29,9 @@ sourceSets {
 
 application {
   mainClass.set("net.dangmai.serializer.Apex")
-  applicationDefaultJvmArgs = [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED",
-    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-    "--add-opens=java.base/java.util=ALL-UNNAMED",
-    "--add-opens=java.base/java.text=ALL-UNNAMED"
-  ]
+  // The reflection-free generated serializer needs no module opens; the old
+  // --add-opens existed solely for XStream's Optional ReflectionConverter.
+  applicationDefaultJvmArgs = []
 }
 
 java {

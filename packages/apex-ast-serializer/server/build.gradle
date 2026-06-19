@@ -29,12 +29,9 @@ sourceSets {
 task parserStartScripts(type: CreateStartScripts) {
   mainClass.set('net.dangmai.serializer.Apex')
   applicationName = 'apex-ast-serializer'
-  defaultJvmOpts = [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED",
-    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-    "--add-opens=java.base/java.util=ALL-UNNAMED",
-    "--add-opens=java.base/java.text=ALL-UNNAMED"
-  ]
+  // The reflection-free generated serializer needs no module opens; the old
+  // --add-opens existed solely for XStream.
+  defaultJvmOpts = []
   classpath = startScripts.classpath
   outputDir = startScripts.outputDir
 }
@@ -42,12 +39,7 @@ task parserStartScripts(type: CreateStartScripts) {
 application {
   mainClass.set("net.dangmai.serializer.server.HttpServer")
   applicationName = "apex-ast-serializer-http"
-  applicationDefaultJvmArgs = [
-    "--add-opens=java.base/java.lang=ALL-UNNAMED",
-    "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED",
-    "--add-opens=java.base/java.util=ALL-UNNAMED",
-    "--add-opens=java.base/java.text=ALL-UNNAMED"
-  ]
+  applicationDefaultJvmArgs = []
   applicationDistribution.into("bin") {
     from(parserStartScripts)
     filePermissions {
