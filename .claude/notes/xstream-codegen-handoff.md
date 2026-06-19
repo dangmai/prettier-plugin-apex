@@ -40,9 +40,16 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
   image still has the Feature (M6 isolates the swap from dep removal). Jackson Core survives
   the closed-world analysis. Native end-to-end A/B (same binary, flag-switched): **total
   format time −44% to −69%, java-serialize −94% to −98%** (numbers below).
-- ☐ **M7 next** — cleanup: delete XStream code/dep, `RuntimeReflectionRegistrationFeature`,
-  parity test/dual-path, unneeded `--add-opens`/`--features`/graalvm source set —
-  incrementally, re-running tests + native build after each removal.
+- ☑ M7 done — XStream fully removed in three verified commits: (1) `Default to the
+  generated serializer` (M6); (2) `Remove XStream now that the generated serializer is the
+  only path` — Apex cutover, deleted `RuntimeReflectionRegistrationFeature` + `--features` +
+  graalvm source set + ClassGraph dep + xstream dep + parity/benchmark tests; (3) `Drop the
+  XStream-only --add-opens JVM args` (parser CLI, native buildArgs, and the Jetty/Jersey
+  server — none needed them). Native image builds & passes **without** the reflection
+  Feature and **without** any `--add-opens`. All modes green: built-in 95, AST_COMPARE 273,
+  native 95. Stale docs updated (`.claude/rules/java-serializer.md`, perf comments).
+- ☐ **M8 next** — write the repo's first ADR in `adr/` documenting the decision + rationale
+  (perf lever, codegen approach, JSON parity, dual-path migration, reflection/opens removal).
 
 ## Decisions (settled, do not re-litigate)
 
@@ -79,7 +86,7 @@ reflection-free generator regardless of format.
 | M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☑ |
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☑ |
 | M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☑ |
-| M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☐ |
+| M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☑ |
 | M8 | Write the ADR in `adr/` documenting the decision + rationale (this is the repo's first ADR) | ☐ |
 
 > The ADR is deliberately deferred until the work is essentially done (too many

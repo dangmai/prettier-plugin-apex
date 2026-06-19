@@ -1,9 +1,9 @@
 ---
 description: >-
   The Java component that parses Apex (via Salesforce's jorje) and serializes the
-  AST to JSON for the plugin. Covers the pinned jorje dependency, XStream
-  serialization, generated typings, and the GraalVM native-image build. Read
-  this before changing anything under apex-ast-serializer.
+  AST to JSON for the plugin. Covers the pinned jorje dependency, the build-time
+  code-generated serializer, generated typings, and the GraalVM native-image
+  build. Read this before changing anything under apex-ast-serializer.
 paths:
   - packages/apex-ast-serializer/**/*
 ---
@@ -11,9 +11,13 @@ paths:
 # apex-ast-serializer (Java)
 
 Parses an Apex class/trigger with jorje and serializes the AST to JSON on
-`stdout` (`parser/src/main/java/.../Apex.java`, via XStream with custom
-converters for Optional/TreeMap/enums). A long-running HTTP server
-(`server/...`) is the backend for the plugin's `built-in` mode.
+`stdout` (`parser/src/main/java/.../Apex.java`). Serialization is **reflection-
+free and code-generated at build time**: the `serializer-generator` subproject
+scans jorje (ClassGraph) and emits `GeneratedAstSerializer`, which reads each
+node via public fields/getters and writes through Jackson's streaming API
+(`sink/AstSink` + `JsonAstSink`). A long-running HTTP server (`server/...`) is
+the backend for the plugin's `built-in` mode. (The original XStream pipeline was
+replaced for performance — see `adr/` — and the JSON shape is unchanged.)
 
 ## jorje is proprietary and pinned — do not upgrade casually
 
@@ -31,9 +35,11 @@ generator config (`server/.../types/Custom*Extension.java`), not the output.
 
 ## Native image & reflection
 
-- XStream serializes via runtime reflection, so the GraalVM native image needs
-  every jorje class/field registered: `RuntimeReflectionRegistrationFeature.java`
-  (uses ClassGraph). New reflective types may need attention there.
+- The generated serializer uses no runtime reflection, so the GraalVM native
+  image needs no jorje reflection registration (the old
+  `RuntimeReflectionRegistrationFeature` and the XStream-only `--add-opens` were
+  removed). The native build still relies on the native-image-agent metadata
+  under `parser/build/native/agent-output/` for proxies/resources.
 - Requires Java >= 17; native images require GraalVM.
 
 ## Build / test
