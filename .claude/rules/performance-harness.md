@@ -43,8 +43,10 @@ driven by numbers rather than guesses.
 `.github/workflows/benchmark.yml` runs the harness on a PR when it carries the
 `benchmark` label (report-only — it never fails the PR; GitHub runners are too
 noisy for a hard gate). In one job on one runner it builds the head native
-binary from source (sharing the scheduled build's NX cache, so a PR that doesn't
-touch the Java serializer skips the slow native-image build), downloads the
+binary from source (reusing the scheduled build's NX cache via `restore-keys`
+for reads — so a PR that doesn't touch the Java serializer skips the slow
+native-image build — while saving under a `benchmark-` prefixed key so it never
+displaces main's canonical cache), downloads the
 latest scheduled `main` native artifact for the base side, benchmarks both
 back-to-back to cancel hardware variance, then renders `compare --markdown` into
 the job summary, a `benchmark-results` artifact, and a sticky PR comment.

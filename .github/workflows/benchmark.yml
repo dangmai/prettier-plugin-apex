@@ -122,16 +122,22 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x packages/apex-ast-serializer/gradlew
 
-      # Share the native-build NX cache with the scheduled build job (same key):
-      # a build that doesn't touch the Java serializer reuses main's compiled
-      # binary and skips the slow native-image build entirely.
+      # Reuse the scheduled build's native-image cache for READS, but never write
+      # the shared key: a GitHub cache key is single-owner per repo, so saving the
+      # `ubuntu-latest-nx-build-native-*` key here would displace main's canonical
+      # copy (re-scoping it to the PR ref). Instead, save under a `benchmark-`
+      # prefixed key and fall back to main's key via restore-keys. A build that
+      # doesn't touch the Java serializer still replays main's cached binary; a
+      # branch's own repeat runs hit the benchmark- key; main's cache is untouched.
       - name: Restore native build NX cache
         id: nx-cache-restore
         uses: actions/cache/restore@v5.0.5
         with:
           path: |
             .nx
-          key: ubuntu-latest-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle', 'packages/apex-ast-serializer/libs/*.jar', 'packages/apex-ast-serializer/tools/build-native-binary.mjs') }}
+          key: benchmark-ubuntu-latest-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle', 'packages/apex-ast-serializer/libs/*.jar', 'packages/apex-ast-serializer/tools/build-native-binary.mjs') }}
+          restore-keys: |
+            ubuntu-latest-nx-build-native-${{ hashFiles('packages/apex-ast-serializer/parser/**/*.java', 'packages/apex-ast-serializer/parser/**/*.properties', 'packages/apex-ast-serializer/parser/build.gradle', 'packages/apex-ast-serializer/libs/*.jar', 'packages/apex-ast-serializer/tools/build-native-binary.mjs') }}
 
       - name: Build Linux musl toolchain
         run: pnpm nx run apex-ast-serializer:build:musl
