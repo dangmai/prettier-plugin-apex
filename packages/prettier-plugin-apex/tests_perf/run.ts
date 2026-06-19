@@ -363,11 +363,30 @@ function compareMarkdown(baseFile: string, headFile: string): string {
     "> ⚠️ Run on a shared GitHub-hosted runner, report-only. Both sides ran back-to-back on the same machine to cancel hardware variance, but small deltas (a few %) are still noise — look for consistent, sizeable shifts.",
   );
 
+  const emittedSub = (r: FileResult): boolean =>
+    r["java-parse"].median > 0 || r["java-serialize"].median > 0;
+  // The base binary can predate the Java-side timing instrumentation (e.g. the
+  // latest scheduled main build is older than that change), in which case it
+  // emits no transport sub-split. Detect that so we don't print misleading
+  // sub-bucket deltas against an all-zero base.
+  const baseMissingSplit = Object.keys(head.results).some((name) => {
+    const b: FileResult | undefined = base.results[name];
+    const h: FileResult = head.results[name];
+    return b && emittedSub(h) && !emittedSub(b);
+  });
+  if (baseMissingSplit) {
+    out.push("");
+    out.push(
+      "> ℹ️ The base binary emitted no transport breakdown (it predates the Java-side timing instrumentation), so its sub-buckets show `n/a`. This resolves once main's scheduled native build includes the instrumentation.",
+    );
+  }
+
   for (const name of Object.keys(head.results)) {
     const b: FileResult | undefined = base.results[name];
     const h: FileResult = head.results[name];
     if (!b) continue;
-    const hasSub = h["java-parse"].median > 0 || h["java-serialize"].median > 0;
+    const hasSub = emittedSub(h);
+    const baseHasSub = emittedSub(b);
     out.push("");
     out.push(`### ${name}`);
     out.push("");
@@ -387,6 +406,12 @@ function compareMarkdown(baseFile: string, headFile: string): string {
           : isSub
             ? `└ ${bucket}`
             : bucket;
+      // When the base lacks the Java split, comparing head's sub-buckets to an
+      // all-zero base is meaningless — show the head value but suppress the delta.
+      if (isSub && !baseHasSub) {
+        out.push(`| ${label} | n/a | ${hm.toFixed(3)} | — | — |`);
+        continue;
+      }
       const pctStr = `${pct >= 0 ? "+" : ""}${pct.toFixed(1)}%`;
       out.push(
         `| ${label} | ${bm.toFixed(3)} | ${hm.toFixed(3)} | ${delta >= 0 ? "+" : ""}${delta.toFixed(3)} | ${pctStr} |`,
