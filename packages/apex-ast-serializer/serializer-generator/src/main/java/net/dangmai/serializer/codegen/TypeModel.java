@@ -89,19 +89,6 @@ final class TypeModel {
     "apex.jorje.services.exception.ParseException#error", "getUserError"
   );
 
-  private static final Set<String> INLINE_WRAPPERS = Set.of(
-    "java.lang.String",
-    "java.lang.Integer",
-    "java.lang.Long",
-    "java.lang.Short",
-    "java.lang.Byte",
-    "java.lang.Boolean",
-    "java.lang.Double",
-    "java.lang.Float",
-    "java.lang.Character",
-    "java.math.BigDecimal"
-  );
-
   /**
    * Builds the model for a concrete type, or returns {@code null} if any field
    * can't be read accessibly (e.g. builder classes with private fields and no
