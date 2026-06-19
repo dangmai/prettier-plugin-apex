@@ -1,0 +1,27 @@
+// Shared jorje AST discovery config: the single source of truth for which jorje
+// classes get processed. Both consumers apply this file so they can't drift on a
+// jorje bump:
+//   - server/build.gradle's `generateTypeScript` (emits vendor/typings/jorje.d.ts)
+//   - serializer-generator (emits the reflection-free runtime serializer)
+//
+// `classes`/`classPatterns`/`excludeClassPatterns` use typescript-generator glob
+// semantics: `**` matches any characters, a single `*` matches any character
+// except the package separator `.`.
+ext.jorjeDiscovery = [
+  classes: [
+    'apex.jorje.semantic.compiler.parser.ParserOutput',
+  ],
+  classPatterns: [
+    'apex.jorje.data.**',
+    'apex.jorje.parser.impl.HiddenToken**',
+  ],
+  excludeClassPatterns: [
+    'apex.jorje.**$MatchBlock',
+    'apex.jorje.**$MatchBlockWithDefault',
+    'apex.jorje.**$SwitchBlock',
+    'apex.jorje.**$SwitchBlockWithDefault',
+    'apex.jorje.**$Visitor',
+    'apex.jorje.**Factory',
+    'apex.jorje.**Decorator',
+  ],
+]

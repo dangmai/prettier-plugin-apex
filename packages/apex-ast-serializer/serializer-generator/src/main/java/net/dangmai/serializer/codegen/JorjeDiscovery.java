@@ -3,55 +3,66 @@ package net.dangmai.serializer.codegen;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Pattern;
 
 /**
- * Discovers the jorje AST classes the serializer must handle, using the same
- * class/package patterns as the {@code generateTypeScript} config in
- * {@code server/build.gradle}. Keeping the two consumers on identical patterns
- * is what guarantees the runtime JSON and the generated {@code jorje.d.ts}
- * can't drift on a jorje bump.
+ * Discovers the jorje AST classes the serializer must handle.
  *
- * <p>For now the patterns are mirrored here verbatim. M2 will extract them into
- * a shared Gradle config consumed by both this generator and
- * {@code generateTypeScript}.
+ * <p>The class/package patterns are loaded from {@code jorje-discovery.properties},
+ * a resource generated at build time from the shared
+ * {@code ../jorje-discovery.gradle}. That same Gradle file drives the
+ * {@code generateTypeScript} config in {@code server/build.gradle}, so the runtime
+ * JSON and the generated {@code jorje.d.ts} can't drift on a jorje bump.
  */
 public final class JorjeDiscovery {
 
-  /** Mirrors {@code generateTypeScript.classes}. */
-  private static final List<String> CLASSES = List.of(
-    "apex.jorje.semantic.compiler.parser.ParserOutput"
-  );
+  private static final String CONFIG_RESOURCE = "/jorje-discovery.properties";
 
-  /** Mirrors {@code generateTypeScript.classPatterns}. */
-  private static final List<String> CLASS_PATTERNS = List.of(
-    "apex.jorje.data.**",
-    "apex.jorje.parser.impl.HiddenToken**"
-  );
-
-  /** Mirrors {@code generateTypeScript.excludeClassPatterns}. */
-  private static final List<String> EXCLUDE_CLASS_PATTERNS = List.of(
-    "apex.jorje.**$MatchBlock",
-    "apex.jorje.**$MatchBlockWithDefault",
-    "apex.jorje.**$SwitchBlock",
-    "apex.jorje.**$SwitchBlockWithDefault",
-    "apex.jorje.**$Visitor",
-    "apex.jorje.**Factory",
-    "apex.jorje.**Decorator"
-  );
-
-  // The widest package that contains everything the patterns above can match.
+  // The widest package that contains everything the patterns can match.
   // ClassGraph scans bytecode here; the patterns then narrow the result set.
   private static final String SCAN_PACKAGE = "apex.jorje";
 
+  private final List<String> classes;
   private final List<Pattern> acceptPatterns;
   private final List<Pattern> excludePatterns;
 
   public JorjeDiscovery() {
-    this.acceptPatterns = CLASS_PATTERNS.stream().map(JorjeDiscovery::globToRegex).toList();
-    this.excludePatterns = EXCLUDE_CLASS_PATTERNS.stream().map(JorjeDiscovery::globToRegex).toList();
+    Properties config = loadConfig();
+    this.classes = splitList(config.getProperty("classes"));
+    this.acceptPatterns =
+      splitList(config.getProperty("classPatterns")).stream().map(JorjeDiscovery::globToRegex).toList();
+    this.excludePatterns =
+      splitList(config.getProperty("excludeClassPatterns")).stream()
+        .map(JorjeDiscovery::globToRegex)
+        .toList();
+  }
+
+  private static Properties loadConfig() {
+    try (InputStream in = JorjeDiscovery.class.getResourceAsStream(CONFIG_RESOURCE)) {
+      if (in == null) {
+        throw new IllegalStateException(
+          "Missing " + CONFIG_RESOURCE + " — run the generateDiscoveryConfig Gradle task"
+        );
+      }
+      Properties props = new Properties();
+      props.load(in);
+      return props;
+    } catch (IOException e) {
+      throw new UncheckedIOException("Failed to read " + CONFIG_RESOURCE, e);
+    }
+  }
+
+  private static List<String> splitList(String value) {
+    if (value == null || value.isBlank()) {
+      return List.of();
+    }
+    return List.of(value.split(","));
   }
 
   /**
@@ -78,7 +89,7 @@ public final class JorjeDiscovery {
 
   private boolean matches(String fqn) {
     boolean accepted =
-      CLASSES.contains(fqn) || acceptPatterns.stream().anyMatch(p -> p.matcher(fqn).matches());
+      classes.contains(fqn) || acceptPatterns.stream().anyMatch(p -> p.matcher(fqn).matches());
     if (!accepted) {
       return false;
     }
