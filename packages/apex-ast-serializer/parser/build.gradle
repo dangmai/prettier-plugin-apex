@@ -175,8 +175,13 @@ graalvmNative {
 
     // Weird syntax: https://github.com/graalvm/native-build-tools/issues/303
     // This is here because we don't want to set up the full native-image
-    // system while running tests in CI/CD.
-    java.util.function.Predicate predicate = { t -> t.name != 'test' && t.name != 'run' }
+    // system while running tests in CI/CD. generateAstSerializer is also
+    // excluded: it's a plain build-time JavaExec (the serializer codegen) that
+    // would otherwise be launched with -agentlib:native-image-agent and fail
+    // wherever the native-image agent isn't installed (e.g. CI test jobs).
+    java.util.function.Predicate predicate = { t ->
+      t.name != 'test' && t.name != 'run' && t.name != 'generateAstSerializer'
+    }
     tasksToInstrumentPredicate = predicate
   }
   binaries {
