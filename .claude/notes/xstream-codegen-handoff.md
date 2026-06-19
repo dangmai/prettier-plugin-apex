@@ -24,7 +24,9 @@ Branch: `xstream-codegen-serializer` (worktree). Personal repo → bare-slug bra
 - ☑ M1 done (commit 75221992) — `serializer-generator` subproject scaffolded.
 - ☑ M2 done (commit 9ae8cf88) — shared `jorje-discovery.gradle`; `jorje.d.ts` byte-identical.
 - ☑ M3 done (commit 53192afa) — `AstSink` + `JsonAstSink` (Jackson Core), 12 unit tests.
-- ☐ **M4 next** — generator emits `GeneratedAstSerializer`; wire into parser; smoke test.
+- ☑ M4 done (commit 7d9e91c9) — generator emits `GeneratedAstSerializer` (304 types),
+  wired into parser compile, smoke tests green. XStream still the only runtime path.
+- ☐ **M5 next** — dual-path + `SerializerParityTest` over full corpus; iterate until clean.
 
 ## Decisions (settled, do not re-litigate)
 
@@ -58,7 +60,7 @@ reflection-free generator regardless of format.
 | M1 | Scaffold `serializer-generator` subproject; scan jorje, print type count | ☑ |
 | M2 | Extract shared `jorje-discovery.gradle`; `jorje.d.ts` regenerates identical | ☑ |
 | M3 | `AstSink` + `JsonAstSink`, unit-tested in isolation | ☑ |
-| M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☐ |
+| M4 | Generator emits `GeneratedAstSerializer`; wire into parser compile; smoke test | ☑ |
 | M5 | Dual-path + `SerializerParityTest` over full corpus; iterate until diff clean | ☐ |
 | M6 | Flip default to generated; full JS suite built-in+native+AST_COMPARE; native build | ☐ |
 | M7 | Cleanup: delete XStream/Feature/parity-test/`--add-opens` incrementally | ☐ |
@@ -111,10 +113,23 @@ space after `:` where XStream had one — structurally identical, fine.
 
 ## Gotchas / risks
 
-- M1 pattern-based discovery finds **338** types (283 concrete classes, 7 enums, 42
-  abstract, 6 interfaces) — not the ~347 estimated. The gap is transitive types
-  typescript-generator pulls in beyond the patterns (referenced exception/collection
-  types). The generator dispatcher must cover those too; the M5 oracle surfaces which.
+- Discovery uses `ignoreClassVisibility()` (added M4) — without it, ClassGraph silently
+  skips package-private types like `apex.jorje.data.IndexLocation`, which ARE serialized
+  at runtime. With it: **306** concrete classes; generator emits **304** field writers
+  (skips 2 `*Builder` types with no accessible fields — not reachable in a real AST).
+- **M4 access model** (`TypeModel`): read each field via public field directly, else a
+  getter cast to a public supertype (transitive interface search — e.g. `loc` via the
+  public default `Locatable.getLoc()`). Generated casts use *canonical* (dotted) names;
+  binary `$` names only appear as runtime strings (switch cases, `@class`). Anonymous
+  classes (no canonical name) → field writer is empty or the type is skipped. Enums
+  dispatch in `writeValue` via `getDeclaringClass()` (handles enum-constant bodies like
+  `BinaryOp$1` → `@class` = `BinaryOp`). Field/getter name mismatches handled by a small
+  `GETTER_OVERRIDES` map (currently `*ParameterRef#typeRef` → `getType`).
+- **M5 must verify** (likely parity gaps): XStream primitive `@class` aliases
+  (`"string"`, `"big-decimal"`, `"int"`, …) — guessed from XStream defaults, confirm via
+  oracle; how `Object`-typed fields holding String/primitives wrap; null field rendering
+  (none seen so far — jorje prefers `Optional`); whether anonymous `*Blocks$N` Location
+  impls ever appear at runtime (dispatcher would throw); the `typeRef` override coverage.
 - `ParserOutput` fields are private → use getters; generator must prefer public field,
   fall back to public getter, fail-fast otherwise.
 - Format quirks to replicate structurally: `@class` everywhere, enum
