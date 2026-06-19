@@ -19,6 +19,7 @@
 - Add a performance benchmark harness for profiling where time goes during formatting.
 - Add a CI workflow that benchmarks a labeled PR against its base branch, and can also be run manually on any branch or against a contributor's PR.
 - Replace runtime XStream reflection with a build-time code-generated serializer, substantially improving serialization performance.
+- Initialize the jorje parser stack at native-image build time, cutting per-file process startup (~4x faster cold start in spawn-per-file native mode).
 
 # 2.2.6
 

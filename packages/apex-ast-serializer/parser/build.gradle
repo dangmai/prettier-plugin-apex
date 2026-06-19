@@ -176,6 +176,21 @@ graalvmNative {
       )
       imageName = 'apex-ast-serializer'
       sharedLibrary = false
+      // Initialize the parser + serializer stack at image build time so a fresh
+      // process pays no jorje setup cost at first parse (the dominant cost in
+      // spawn-per-file native mode). This is a closure: a class is
+      // build-time-initializable only if everything it touches at init is too.
+      buildArgs.add('--initialize-at-build-time=org.antlr.runtime')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.parser.impl')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.data')
+      buildArgs.add('--initialize-at-build-time=apex.common')
+      buildArgs.add('--initialize-at-build-time=apex.jorje.semantic')
+      buildArgs.add('--initialize-at-build-time=com.google.common')
+      // Note: net.dangmai.serializer is intentionally NOT build-time
+      // initialized -- its only static state is JsonAstSink's Jackson
+      // JsonFactory, which the image builder can't snapshot (unresolved
+      // ErrorReportConfiguration/OutputDecorator fields). The serializer is
+      // stateless static methods anyway, so there is nothing to bake in.
       buildArgs.addAll(application.applicationDefaultJvmArgs)
       // Certain Linux distribution doesn't allow dynamic-linked binaries to be
       // run, for example, NixOS, so we need to build a static binary.

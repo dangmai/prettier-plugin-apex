@@ -27,6 +27,13 @@ import org.apache.commons.io.IOUtils;
 
 public class Apex {
 
+  static {
+    // Required for correct comment retention. Run once at class init (baked
+    // into the native image via --initialize-at-build-time) instead of on
+    // every parse.
+    Locations.useIndexFactory();
+  }
+
   public static void getAST(
     Boolean anonymous,
     Boolean prettyPrint,
@@ -43,7 +50,6 @@ public class Apex {
     } else {
       engine = ParserEngine.get(ParserEngine.Type.NAMED);
     }
-    Locations.useIndexFactory(); // without this, comments won't be retained correctly
     ParserOutput output = engine.parse(
       sourceFile,
       ParserEngine.HiddenTokenBehavior.COLLECT_COMMENTS,
