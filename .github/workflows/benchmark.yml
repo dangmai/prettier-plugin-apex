@@ -145,9 +145,12 @@ jobs:
       - name: Build head native executable
         run: pnpm nx run apex-ast-serializer:build:native
         env:
-          # Withhold the Nx Cloud token from untrusted fork-PR code (pr input);
-          # trusted contexts (own branches, same-repo PRs) still get the cache.
-          NX_KEY: ${{ github.event.inputs.pr == '' && secrets.NX_KEY || '' }}
+          # This build caches via the GitHub Actions `.nx` cache restored above,
+          # not Nx Cloud — so disable Nx Cloud. A fork PR can't read secrets, so
+          # NX_KEY would be empty, and nx fails ("Failed to decode the Nx key")
+          # on a defined-but-empty key. Disabling cloud also keeps the token out
+          # of untrusted fork-PR code entirely.
+          NX_NO_CLOUD: "true"
 
       # Only cache a SUCCESSFUL build — saving after a failure would poison the
       # write-once cache key with an empty/partial .nx for the whole branch.
