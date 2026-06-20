@@ -23,7 +23,12 @@ import {
   QUERY_WHERE,
   TRIGGER_USAGE,
 } from "./constants.js";
-import type { EnrichedIfBlock } from "./jorje-nodes.js";
+import {
+  asConcrete,
+  asEnriched,
+  type Enriched,
+  type EnrichedIfBlock,
+} from "./jorje-nodes.js";
 import type { ApexParserOptions } from "./options.js";
 import {
   type AnnotatedComment,
@@ -86,8 +91,11 @@ function escapeString(text: string): string {
   );
 }
 
-function handleReturnStatement(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleReturnStatement(
+  path: AstPath<Enriched<jorje.ReturnStmnt>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const docs: Doc[] = [];
   docs.push("return");
   const childDocs: Doc = path.call(print, "expr", "value");
@@ -980,7 +988,10 @@ function handleStatement(
   return groupConcat(parts);
 }
 
-function handleDmlMergeStatement(path: AstPath, print: PrintFn): Doc {
+function handleDmlMergeStatement(
+  path: AstPath<Enriched<jorje.DmlMergeStmnt>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("merge");
   parts.push(" ");
@@ -1017,7 +1028,10 @@ function handleEnumDeclaration(
   return parts;
 }
 
-function handleSwitchStatement(path: AstPath, print: PrintFn): Doc {
+function handleSwitchStatement(
+  path: AstPath<Enriched<jorje.SwitchStmnt>>,
+  print: PrintFn,
+): Doc {
   const whenBlocks: Doc[] = path.map(print, "whenBlocks");
 
   const parts: Doc[] = [];
@@ -1032,7 +1046,10 @@ function handleSwitchStatement(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleValueWhen(path: AstPath, print: PrintFn): Doc {
+function handleValueWhen(
+  path: AstPath<Enriched<jorje.ValueWhen>>,
+  print: PrintFn,
+): Doc {
   const whenCaseDocs: Doc[] = path.map(print, "whenCases");
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1046,7 +1063,10 @@ function handleValueWhen(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleElseWhen(path: AstPath, print: PrintFn): Doc {
+function handleElseWhen(
+  path: AstPath<Enriched<jorje.ElseWhen>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt");
 
   const parts: Doc[] = [];
@@ -1058,7 +1078,10 @@ function handleElseWhen(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleTypeWhen(path: AstPath, print: PrintFn): Doc {
+function handleTypeWhen(
+  path: AstPath<Enriched<jorje.TypeWhen>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt");
 
   const parts: Doc[] = [];
@@ -1072,7 +1095,10 @@ function handleTypeWhen(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleEnumCase(path: AstPath, print: PrintFn): Doc {
+function handleEnumCase(
+  path: AstPath<Enriched<jorje.EnumCase>>,
+  print: PrintFn,
+): Doc {
   return join(".", path.map(print, "identifiers"));
 }
 
@@ -1084,7 +1110,10 @@ function handleInputParameters(path: AstPath, print: PrintFn): Doc[] {
   return path.map(print, "inputParameters").map((paramDoc) => group(paramDoc));
 }
 
-function handleRunAsBlock(path: AstPath, print: PrintFn): Doc {
+function handleRunAsBlock(
+  path: AstPath<Enriched<jorje.RunAsBlock>>,
+  print: PrintFn,
+): Doc {
   const paramDocs: Doc[] = handleInputParameters(path, print);
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1099,7 +1128,7 @@ function handleRunAsBlock(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleBlockStatement(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.BlockStmnt>>,
   print: PrintFn,
   options: any,
 ): Doc {
@@ -1129,7 +1158,7 @@ function handleBlockStatement(
         path.call(
           (innerPath) =>
             hasPrettierIgnore(innerPath) &&
-            innerPath.getNode().trailingEmptyLine,
+            asEnriched(innerPath.getNode()).trailingEmptyLine,
           "stmnts",
           i,
         )
@@ -1143,8 +1172,11 @@ function handleBlockStatement(
   return groupIndentConcat(parts);
 }
 
-function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleTryCatchFinallyBlock(
+  path: AstPath<Enriched<jorje.TryCatchFinallyBlock>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const tryStatementDoc: Doc = path.call(print, "tryBlock");
   const catchBlockDocs: Doc[] = path.map(print, "catchBlocks");
   const finallyBlockDoc: Doc = path.call(print, "finallyBlock", "value");
@@ -1155,25 +1187,23 @@ function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
   pushIfExist(parts, tryStatementDoc);
 
   const tryBlockContainsTrailingComments: boolean =
-    node.tryBlock.comments?.some(
-      (comment: AnnotatedComment) => comment.trailing,
-    );
+    asEnriched(node.tryBlock).comments?.some((comment) => comment.trailing) ??
+    false;
 
   let catchBlockContainsLeadingOwnLineComments: boolean[] = [];
   let catchBlockContainsTrailingComments: boolean[] = [];
   if (catchBlockDocs.length > 0) {
     catchBlockContainsLeadingOwnLineComments = node.catchBlocks.map(
-      (catchBlock: jorje.CatchBlock & { comments?: AnnotatedComment[] }) =>
-        catchBlock.comments?.some(
-          (comment: AnnotatedComment) =>
-            comment.leading && comment.placement === "ownLine",
-        ),
+      (catchBlock) =>
+        asEnriched(catchBlock).comments?.some(
+          (comment) => comment.leading && comment.placement === "ownLine",
+        ) ?? false,
     );
     catchBlockContainsTrailingComments = node.catchBlocks.map(
-      (catchBlock: jorje.CatchBlock & { comments?: AnnotatedComment[] }) =>
-        catchBlock.comments?.some(
-          (comment: AnnotatedComment) => comment.trailing,
-        ),
+      (catchBlock) =>
+        asEnriched(catchBlock).comments?.some(
+          (comment) => comment.trailing,
+        ) ?? false,
     );
     catchBlockDocs.forEach((catchBlockDoc: Doc, index: number) => {
       const shouldAddHardLineBeforeCatch =
@@ -1188,11 +1218,11 @@ function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
       parts.push(catchBlockDoc);
     });
   }
-  const finallyBlockContainsLeadingOwnLineComments =
-    node.finallyBlock?.value?.comments?.some(
-      (comment: AnnotatedComment) =>
-        comment.leading && comment.placement === "ownLine",
-    );
+  const finallyBlockContainsLeadingOwnLineComments = asEnriched(
+    node.finallyBlock?.value,
+  )?.comments?.some(
+    (comment) => comment.leading && comment.placement === "ownLine",
+  );
   const shouldAddHardLineBeforeFinally =
     finallyBlockContainsLeadingOwnLineComments ||
     (catchBlockContainsTrailingComments.length > 0 &&
@@ -1207,7 +1237,10 @@ function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleCatchBlock(path: AstPath, print: PrintFn): Doc {
+function handleCatchBlock(
+  path: AstPath<Enriched<jorje.CatchBlock>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("catch");
   parts.push(" ");
@@ -1219,7 +1252,10 @@ function handleCatchBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleFinallyBlock(path: AstPath, print: PrintFn): Doc {
+function handleFinallyBlock(
+  path: AstPath<Enriched<jorje.FinallyBlock>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("finally");
   parts.push(" ");
@@ -1227,7 +1263,10 @@ function handleFinallyBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
+function handleVariableDeclarations(
+  path: AstPath<Enriched<jorje.VariableDecls>>,
+  print: PrintFn,
+): Doc {
   const modifierDocs: Doc[] = path.map(print, "modifiers");
 
   const parts: Doc[] = [];
@@ -1249,7 +1288,7 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleVariableDeclarationStatement(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.VariableDeclStmnt>>,
   print: PrintFn,
 ): Doc {
   return path.call(print, "variableDecls");
@@ -1259,7 +1298,10 @@ function handleLocationIdentifier(path: AstPath, print: PrintFn): Doc {
   return path.call(print, "value");
 }
 
-function handleLiteralCase(path: AstPath, print: PrintFn): Doc {
+function handleLiteralCase(
+  path: AstPath<Enriched<jorje.LiteralCase>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
@@ -1731,8 +1773,11 @@ function handleNewExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleIfElseBlock(
+  path: AstPath<Enriched<jorje.IfElseBlock>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   const ifBlockDocs: Doc[] = path.map(print, "ifBlocks");
   const elseBlockDoc: Doc = path.call(print, "elseBlock", "value");
@@ -1749,14 +1794,14 @@ function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
       ifBlock.stmnt["@class"] === APEX_TYPES.BLOCK_STATEMENT,
   );
   const ifBlockContainsLeadingOwnLineComments: boolean[] = node.ifBlocks.map(
-    (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
-      ifBlock.comments?.some(
+    (ifBlock) =>
+      asEnriched(ifBlock).comments?.some(
         (comment) => comment.leading && comment.placement === "ownLine",
-      ),
+      ) ?? false,
   );
   const ifBlockContainsTrailingComments: boolean[] = node.ifBlocks.map(
-    (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
-      ifBlock.comments?.some((comment) => comment.trailing),
+    (ifBlock) =>
+      asEnriched(ifBlock).comments?.some((comment) => comment.trailing) ?? false,
   );
 
   let lastIfBlockHardLineInserted = false;
@@ -1785,11 +1830,11 @@ function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
     }
   });
   if (elseBlockDoc) {
-    const elseBlockContainsLeadingOwnLineComments =
-      node.elseBlock?.value?.comments?.some(
-        (comment: AnnotatedComment) =>
-          comment.leading && comment.placement === "ownLine",
-      );
+    const elseBlockContainsLeadingOwnLineComments = asEnriched(
+      node.elseBlock?.value,
+    )?.comments?.some(
+      (comment) => comment.leading && comment.placement === "ownLine",
+    );
     const lastIfBlockContainsTrailingComments =
       ifBlockContainsTrailingComments[
         ifBlockContainsTrailingComments.length - 1
@@ -1806,8 +1851,11 @@ function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleIfBlock(path: AstPath, print: PrintFn): Doc {
-  const node: EnrichedIfBlock = path.getNode();
+function handleIfBlock(
+  path: AstPath<EnrichedIfBlock>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const statementType: Doc = path.call(print, "stmnt", "@class");
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1836,7 +1884,10 @@ function handleIfBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleElseBlock(path: AstPath, print: PrintFn): Doc {
+function handleElseBlock(
+  path: AstPath<Enriched<jorje.ElseBlock>>,
+  print: PrintFn,
+): Doc {
   const statementType: Doc = path.call(print, "stmnt", "@class");
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1947,7 +1998,10 @@ function handleNullCoalescingExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleExpressionStatement(path: AstPath, print: PrintFn): Doc {
+function handleExpressionStatement(
+  path: AstPath<Enriched<jorje.ExpressionStmnt>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(";");
@@ -2881,8 +2935,11 @@ function handlePrefixOperator(path: AstPath): Doc {
   return PREFIX[node.$];
 }
 
-function handleWhileLoop(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleWhileLoop(
+  path: AstPath<Enriched<jorje.WhileLoop>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const conditionDoc: Doc = path.call(print, "condition");
 
   const parts: Doc[] = [];
@@ -2908,7 +2965,10 @@ function handleWhileLoop(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleDoLoop(path: AstPath, print: PrintFn): Doc {
+function handleDoLoop(
+  path: AstPath<Enriched<jorje.DoLoop>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt");
   const conditionDoc: Doc = path.call(print, "condition");
 
@@ -2928,8 +2988,11 @@ function handleDoLoop(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleForLoop(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleForLoop(
+  path: AstPath<Enriched<jorje.ForLoop>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const forControlDoc: Doc = path.call(print, "forControl");
 
   const parts: Doc[] = [];
@@ -2950,21 +3013,34 @@ function handleForLoop(path: AstPath, print: PrintFn): Doc {
   // for (Contact c: [SELECT Id FROM Contact]) {
   // }
   // ```
-  const isQueryOrSearch =
-    node.forControl?.init?.expr?.value["@class"] ===
-      APEX_TYPES.SOQL_EXPRESSION ||
-    node.forControl?.init?.expr?.value["@class"] === APEX_TYPES.SOSL_EXPRESSION;
+  // `init` only exists on the enhanced-for variant; the C-style variant has no
+  // single SOQL/SOSL initializer expression.
+  const forControl = asConcrete(node.forControl);
+  const initExprValue =
+    forControl["@class"] === APEX_TYPES.FOR_ENHANCED_CONTROL
+      ? forControl.init.expr.value
+      : undefined;
+  const initExpr = initExprValue ? asConcrete(initExprValue) : undefined;
+  const queryNode =
+    initExpr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION
+      ? initExpr.query
+      : undefined;
+  const searchNode =
+    initExpr?.["@class"] === APEX_TYPES.SOSL_EXPRESSION
+      ? initExpr.search
+      : undefined;
+  const isQueryOrSearch = queryNode !== undefined || searchNode !== undefined;
   // #511 - For queries that the user opts in to manual breaks, we *don't* want
   // the leading newline either
   const hasForcedHardline =
     isQueryOrSearch &&
-    (node.forControl?.init?.expr?.value?.query?.forcedHardline ||
-      node.forControl?.init?.expr?.value?.search?.forcedHardline);
+    (asEnriched(queryNode)?.forcedHardline ||
+      asEnriched(searchNode)?.forcedHardline);
 
   // If there are own line comments in the forControl, we need to be conservative
   // and group the doc
-  const hasOwnLineComments = node.forControl?.comments?.some(
-    (comment: AnnotatedComment) => comment.placement === "ownLine",
+  const hasOwnLineComments = forControl.comments?.some(
+    (comment) => comment.placement === "ownLine",
   );
   if (
     isQueryOrSearch &&
@@ -2991,7 +3067,10 @@ function handleForLoop(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleForEnhancedControl(path: AstPath, print: PrintFn): Doc {
+function handleForEnhancedControl(
+  path: AstPath<Enriched<jorje.EnhancedForControl>>,
+  print: PrintFn,
+): Doc {
   // See the note in handleForInit to see why we have to do this
   const initDocParts: Doc = path.call(print, "init");
   const initDoc = join([" ", ":", " "], initDocParts as Doc[]);
@@ -3003,7 +3082,10 @@ function handleForEnhancedControl(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleForCStyleControl(path: AstPath, print: PrintFn): Doc {
+function handleForCStyleControl(
+  path: AstPath<Enriched<jorje.CStyleForControl>>,
+  print: PrintFn,
+): Doc {
   const initsDoc: Doc = path.call(print, "inits", "value");
   const conditionDoc: Doc = path.call(print, "condition", "value");
   const controlDoc: Doc = path.call(print, "control", "value");
@@ -3017,7 +3099,10 @@ function handleForCStyleControl(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleForInits(path: AstPath, print: PrintFn): Doc {
+function handleForInits(
+  path: AstPath<Enriched<jorje.ForInits>>,
+  print: PrintFn,
+): Doc {
   const typeDoc: Doc = path.call(print, "type", "value");
   const initDocsParts = path.map(print, "inits") as [Doc, Doc][];
 
@@ -3035,7 +3120,10 @@ function handleForInits(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleForInit(path: AstPath, print: PrintFn): Doc[] {
+function handleForInit(
+  path: AstPath<Enriched<jorje.ForInit>>,
+  print: PrintFn,
+): Doc[] {
   // This is one of the weird cases that does not really match the way that we print things.
   // ForInit is used by both C style for loop and enhanced for loop, and there's no way to tell
   // which operator we should use for init in this context, for example:

@@ -20,6 +20,43 @@ export interface ApexEnrichment {
 export type Enriched<T> = T & ApexEnrichment;
 
 /**
+ * Assert that a jorje node carries the parser's enrichment fields. Every node
+ * the printer walks has been through the enrichment pass, but jorje's generated
+ * types don't declare those fields and Prettier's path navigation
+ * (`path.call`/`path.map`) hands back the raw, un-enriched child type. Reading
+ * e.g. `.trailingEmptyLine` off a navigated child therefore needs this single,
+ * centralized assertion rather than a cast scattered at each call site.
+ */
+export function asEnriched<T>(node: T): Enriched<T> {
+  return node as Enriched<T>;
+}
+
+/**
+ * The concrete, enrichable union of every jorje node whose `@class` is one of
+ * `T`'s. typescript-generator emits abstract parents (`Expr`, `Stmnt`,
+ * `ForControl`, …) as a base interface that carries only the `@class` literal
+ * union — not a discriminated union of the concrete subtypes — so a field typed
+ * as the parent can't be narrowed to a subtype by `@class`. Re-viewing it as
+ * `Concrete<T>` (drawn from the generated {@link jorje.ApexNode} union, which is
+ * a real discriminated union) restores narrowing.
+ */
+export type Concrete<T extends { "@class": string }> = Enriched<
+  Extract<jorje.ApexNode, { "@class": T["@class"] }>
+>;
+
+/**
+ * Re-view an abstract-parent-typed node as its {@link Concrete} subtype union so
+ * the printer can narrow it by `@class`. Centralizes that single justified
+ * assertion (the runtime value is always one of the concrete subtypes; the
+ * abstract base is only how the generator models the type hierarchy).
+ */
+export function asConcrete<T extends { "@class": string }>(
+  node: T,
+): Concrete<T> {
+  return node as unknown as Concrete<T>;
+}
+
+/**
  * The discriminated union of every concrete jorje node (emitted into
  * `jorje.d.ts` by `ApexNodeUnionExtension`), enriched with the parser's
  * metadata. This is the type the printer's `@class` -> handler dispatch is built

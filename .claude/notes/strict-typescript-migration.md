@@ -162,9 +162,54 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
     child handler wouldn't fit `SingleNodeHandler`, so `tsc` would catch it.
     Verified: prod+wider tsc, lint, 98 plain + 276 `AST_COMPARE` tests — output
     unchanged.
-  - [ ] **M3c — Parameterize handler bodies** to `AstPath<Enriched<T>>` /
-    typed `path.getNode()` by category (statements/expressions vs SOQL/SOSL). The
-    bulk; pairs with M6's null handling. **BLOCKED on M3c-pre (below).**
+  - [~] **M3c — Parameterize handler bodies** to `AstPath<Enriched<T>>` /
+    typed `path.node` by category. **IN PROGRESS.**
+    - [x] **Statements category DONE.** Typed ~26 single handlers
+      (return/expression/block/run-as/dml-merge, switch + value/else/type-when +
+      enum/literal-case, try/catch/finally, variable-decls, if/else-block, all
+      loops + for-control/inits/init). prod+wider tsc, lint, 276 AST_COMPARE green;
+      output unchanged. Added two centralized helpers in `jorje-nodes.ts`
+      (see findings below): `asEnriched` and `asConcrete`/`Concrete<T>`.
+    - [ ] Remaining single-handler categories: expressions, declarations/members,
+      SOQL, SOSL, type-refs/annotations/misc.
+    - [ ] **Child handlers (18)** — separate sub-step. Their `path` holds a
+      heterogeneous node per `childClass`, so the abstract-parent path generic
+      can't type the per-case `path.call(...)` navigation. Type their bodies
+      last, narrowing `path.node` via `asConcrete` per case.
+
+  > **MAJOR FINDING — `strict: true` is already ON via the base config.**
+  > `tsconfig.prod.json` *comments out* `noImplicitAny`/`strictNullChecks`/etc.
+  > (implying they're deferred to M4/M6), but it `extends @tsconfig/node22`, whose
+  > `tsconfig.json` sets **`"strict": true`**. So the whole strict family —
+  > including `strictNullChecks` and `noImplicitAny` — has been enforced the entire
+  > time. The printer only compiles because pervasive `any` (untyped
+  > `path.getNode()` → `any`, untyped handler params) MASKS it. Implications:
+  > (a) the moment a handler's node is typed, `strictNullChecks` bites, so use
+  > `path.node` (typed `T`, non-null) instead of `path.getNode()` (`T | null`);
+  > (b) M4/M6 are reframed — they're not "flip the flag" (already on) but "remove
+  > the remaining `any` that masks it" + flip the explicit/redundant lines for
+  > clarity. No big-bang risk — strict is incrementally satisfied as `any` is
+  > removed. Re-confirm with M7 that an explicit `strict: true` adds nothing.
+
+  > **FINDING — abstract jorje parents aren't narrowable; `asConcrete` fixes it.**
+  > typescript-generator emits abstract parents (`Expr`, `Stmnt`, `ForControl`,
+  > `TypeRef`, …) as a base *interface* carrying only the `@class` literal union,
+  > with concrete children `extends`-ing it — NOT as a discriminated union of the
+  > subtypes. So a field typed as the parent (`forControl: ForControl`) can't be
+  > narrowed to a subtype by `@class` (TS2339 on subtype props). The plan's
+  > "friction note" (claiming `path.call` is loosely typed) was also wrong:
+  > Prettier 3.8's `call`/`map`/`each` constrain keys to `keyof T`, so typing the
+  > path param DOES type navigation — which is good (post-JorjeOptional,
+  > `path.call(print,"expr","value")` resolves), but means abstract-field
+  > narrowing must be solved. Fix: `Concrete<T> = Enriched<Extract<jorje.ApexNode,
+  > {"@class": T["@class"]}>>` + `asConcrete(node)` re-view the node as the
+  > concrete (and enriched) subtype union drawn from the codegen `ApexNode` union
+  > (a real discriminated union). One centralized, justified assertion, same
+  > pattern as `asEnriched`. **The M3c handler pattern:** param
+  > `path: AstPath<Enriched<jorje.T>>`; `const node = path.node`; read child
+  > enrichment via `asEnriched(child)`; narrow abstract-typed children via
+  > `asConcrete(child)`; coerce `boolean | undefined` comment-check results with
+  > `?? false`.
 
   > **BLOCKER discovered starting M3c — `Optional<T>` types are wrong.** jorje
   > serializes `Optional<T>` fields as a `{value?: T}` wrapper at runtime (verified:
@@ -272,3 +317,8 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   hit a blocker: generated `Optional<T>` types are wrong (modeled `field?: T`,
   runtime is `{value?: T}`; ~115 access sites). Added **M3c-pre** (codegen fix)
   as prerequisite. Paused for direction.
+- **2026-06-19** — **M3c statements category DONE.** Calibration surfaced two
+  major findings (see M3c block): `strict: true` is already on via
+  `@tsconfig/node22` (masked by `any`), and abstract jorje parents aren't
+  `@class`-narrowable. Added `asEnriched` + `asConcrete`/`Concrete<T>` helpers and
+  typed ~26 statement handlers. prod+wider tsc, lint, 276 AST_COMPARE green.
