@@ -4,6 +4,7 @@ import process from "node:process";
 import prettier from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type { EnrichedIfBlock } from "./jorje-nodes.js";
 import {
   ALLOW_TRAILING_EMPTY_LINE,
   APEX_TYPES,
@@ -660,10 +661,6 @@ const nodeLocationVisitor: (
     return null;
   },
 });
-
-export type EnrichedIfBlock = jorje.IfBlock & {
-  ifBlockIndex: number;
-};
 
 /**
  * Generate extra metadata for nodes, e.g. trailing empty lines, forced hard lines.

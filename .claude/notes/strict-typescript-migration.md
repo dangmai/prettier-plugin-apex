@@ -110,9 +110,22 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   > explicit, reviewable, TS-side place for this.) Note `ParserOutput` (the root)
   > IS in the union and IS handled — keep it. Re-derive the exact denylist at M3
   > by diffing registry keys against `ApexNode["@class"]`.
-- [ ] **M1 — Foundations, no flag flips.** Add `src/jorje-nodes.ts`
-  (`ApexEnrichment`, `Enriched<>`, `EnrichedApexNode`), add `ApexParserOptions`,
-  fold in `EnrichedIfBlock`/`AnnotatedComment`. Additive only. Lowest risk.
+- [x] **M1 — Foundations, no flag flips. DONE.** Added `src/jorje-nodes.ts`
+  (`ApexEnrichment`, `Enriched<>`, `EnrichedApexNode`, and `EnrichedIfBlock`
+  rebased onto `Enriched<>`) and `src/options.ts` (`ApexParserOptions extends
+  ParserOptions`). Moved `EnrichedIfBlock` out of `parser.ts` into
+  `jorje-nodes.ts`; `parser.ts` and `printer.ts` now import it from there.
+  `options.ts` isn't consumed yet (M4 wires it in). Build (prod + wider tsc incl.
+  tests) + lint + 95 built-in tests all green.
+
+  > **Plan deviation (deliberate).** The plan's M1 bullet said to retype
+  > `AnnotatedComment.enclosingNode/precedingNode/followingNode` from `any` to
+  > `EnrichedApexNode | undefined`. Deferred to **M4**: those fields are read
+  > with subtype-specific props (`enclosingNode.stmnts/.members/.dottedExpr/
+  > .expr`, `followingNode.stmnts`, `precedingNode.loc/.right`), and accessing a
+  > non-common property on a union errors *regardless* of `strictNullChecks` —
+  > so the retype can't land until the narrowing work in M4. Keeping them `any`
+  > kept M1 truly additive/green as the plan prioritizes.
 - [ ] **M2 — Cheap strict flags.** Flip `alwaysStrict`, `noImplicitThis`,
   `strictBindCallApply`, `strictFunctionTypes`, `useUnknownInCatchVariables`.
   Narrow the two `catch (e: any)` (parser.ts:108, util.ts:327).
@@ -172,5 +185,8 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   written.
 - **2026-06-19** — **M0 done.** Added `ApexNodeUnionExtension` (repurposed the
   `GenericNodeExtension` stub), emitting `ApexNode` (296 members). Build + lint +
-  built-in tests green. Recorded the phantom-member finding above for M3. Next:
-  **M1** (`src/jorje-nodes.ts` `Enriched<>` layer + `ApexParserOptions`).
+  built-in tests green. Recorded the phantom-member finding above for M3.
+- **2026-06-19** — **M1 done.** Added `src/jorje-nodes.ts` + `src/options.ts`,
+  moved `EnrichedIfBlock` into `jorje-nodes.ts`. All green (build/lint/95 tests).
+  Deferred the `AnnotatedComment` node-ref retype to M4 (see deviation note).
+  Next: **M2** (cheap strict flags + the two `catch` narrowings).

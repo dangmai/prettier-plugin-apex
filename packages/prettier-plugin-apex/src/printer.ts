@@ -23,7 +23,7 @@ import {
   QUERY_WHERE,
   TRIGGER_USAGE,
 } from "./constants.js";
-import type { EnrichedIfBlock } from "./parser.js";
+import type { EnrichedIfBlock } from "./jorje-nodes.js";
 import {
   type AnnotatedComment,
   checkIfParentIsDottedExpression,
