@@ -9,6 +9,11 @@ class SOQLWithTuple {
     Account[] mixed = [SELECT Id FROM Account WITH Foo(bar = 1, baz = 'qux', flag = true)];
   }
 
+  void stringEscaping() {
+    Account[] embeddedQuote = [SELECT Id FROM Account WITH Foo(bar = 'a\'b')];
+    Account[] backslash = [SELECT Id FROM Account WITH Foo(bar = 'a\\b')];
+  }
+
   void caseAndSpacing() {
     Account[] lower = [SELECT Id FROM Account with Foo(bar=1)];
     Account[] extraSpaces = [SELECT Id FROM Account WITH    Foo(  bar   =   1  )];
