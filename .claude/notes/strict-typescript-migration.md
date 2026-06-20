@@ -299,14 +299,37 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   > These break a strict `[K in ApexNode["@class"]]` mapped type, so the typed
   > single map (M3b) must allow them explicitly. Full compile-time exhaustiveness
   > is impractical (parent reachability is runtime), hence the M3a runtime test.
-- [ ] **M4 — `noImplicitAny`.** Type remaining `options: any`,
-  `handleTrailingEmptyLines(node)`, `comments.ts` `canAttachComment`/
-  `getTrailingComments`, parser location handlers (~203/220/267/442),
-  `util.ts massageAstNode`.
+- [x] **M4 — Remove residual `any`. DONE.** (Recall: `strict` is already on via
+  the base, so this is "remove the masking `any`", not a flag flip.) Five logical
+  commits: (1) **codegen fix** — `ParameterRef.type`→`typeRef` rename in
+  `CustomFieldExtension` (a jorje getter/field-name divergence: getter `getType()`
+  over field `typeRef`; confirmed it's the only such divergence affecting a handled
+  node by diffing the serializer's `sink.name(...)` keys against the typings),
+  dropped the two localized `(path as AstPath)` casts. (2) printer `options: any`
+  (7 sites) → `ApexParserOptions`; `handleTrailingEmptyLines` node →
+  `EnrichedApexNode | null`. (3) `comments.ts` `canAttachComment`/
+  `getTrailingComments` + `AnnotatedComment`'s enclosing/preceding/followingNode
+  (the M1-deferred retype) → `EnrichedApexNode`; narrowed read sites via `@class`
+  discriminants and `"x" in node` checks (`canAttachComment` reorders its checks so
+  the comment-class guards run on the full union before narrowing on `loc`).
+  (4) `util.ts massageAstNode` → `(ast: EnrichedApexNode, newObj: Record<string,
+  unknown>)`; Expr/WhereExpr abstract bases expose `@class` directly for branch
+  conditions, `asConcrete` narrows only where a subtype field is read, newObj
+  writes use bracket access (noPropertyAccessFromIndexSignature); the one test mock
+  casts via `Parameters<typeof massageAstNode>[0]`. (5) parser
+  `locationGenerationHandler` map signature + the three node-reading handlers
+  (method-decl/annotation/limit-value) → `EnrichedApexNode`, each narrows by
+  `@class` to its exact dispatched type. prod+wider tsc, lint, 287 AST_COMPARE green
+  after each. `handleInputParameters` stays a polymorphic `AstPath` helper (not
+  `any`; won't trip `noExplicitAny`). **All remaining `any` (6 sites) are the
+  parser DFS-walk infra → M5.**
 - [ ] **M5 — Parser DFS-walk typing.** Type the enrichment visitor (`AnyNode`,
   `dfsPostOrderApply`, `arraySiblings`, `MetadataVisitorContext`) generic over
   `<Accumulated, Context>` with `node: EnrichedApexNode`. Watch the `value[key]`
-  recursion under `noUncheckedIndexedAccess`.
+  recursion under `noUncheckedIndexedAccess`. **The 6 remaining `any` sites all
+  live here:** `parser.ts:127` `getNodeLocation(node)`, `:504` `type AnyNode = any`,
+  `:679` `arraySiblings?: any[]`, `:684` `metadataVisitor apply(node)`, `:781`
+  `arraySiblings`, `:960` `(hiddenTokenMap[i] as any[])[1]`.
 - [ ] **M6 — `strictNullChecks` (RISKIEST).** Add a typed non-null
   `getNode(path): Enriched<T>` helper (dispatch guarantees a current node).
   Handle `delete node.loc`/`delete node.danglingComments` (TS2790 → optional) and
@@ -401,6 +424,14 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   `typeRef` field-name typings bug (localized cast + codegen-follow-up TODO).
   Only `handleInputParameters` (polymorphic helper) + the 19 child handlers
   remain in M3c. prod+wider tsc, lint, 287 AST_COMPARE green.
+- **2026-06-19** — **M4 DONE + codegen fix.** Fixed the `ParameterRef.type`→
+  `typeRef` codegen divergence (`CustomFieldExtension` rename; verified it's the
+  only getter/field name mismatch affecting a handled node) and dropped the two
+  workaround casts. Then removed every residual `: any` in printer.ts/comments.ts/
+  util.ts across four more commits (printer options + trailing line; comment node
+  refs incl. the M1-deferred `AnnotatedComment` retype; `massageAstNode`; parser
+  location handlers). prod+wider tsc, lint, 287 AST_COMPARE green throughout. Only
+  the parser DFS-walk `any` (6 sites) remain → M5.
 - **2026-06-19** — **M3c child handlers DONE → M3 COMPLETE.** Child-handler paths
   stay `AstPath` by design (dynamic `childClass` dispatch); typed the two node-
   prop readers (`handleStatement`, `handleWhereQueryLiteral`) via
