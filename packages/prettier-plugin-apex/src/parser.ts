@@ -37,6 +37,35 @@ type MinimalLocation = {
   endIndex: number;
 };
 
+// A jorje location, plus the line/column fields the enrichment pass derives for
+// manually-generated locations that don't carry them (see lineIndexVisitor).
+type NodeLocation = MinimalLocation & {
+  startLine?: number;
+  endLine?: number;
+  line?: number;
+  column?: number;
+};
+
+/**
+ * A value visited during the AST enrichment walk: a jorje node carrying the
+ * parser's metadata, or any nested object/array reached from one. The walk
+ * recurses generically and indexes nodes by arbitrary key, so an index
+ * signature backs that dynamic access while the named fields give the visitors
+ * typed reads of the metadata they probe and attach.
+ */
+interface AstNode {
+  "@class"?: string;
+  loc?: NodeLocation | null;
+  location?: NodeLocation;
+  forcedHardline?: boolean;
+  trailingEmptyLine?: boolean;
+  insideParenthesis?: boolean;
+  ifBlocks?: jorje.IfBlock[];
+  ifBlockIndex?: number;
+  inputParameters?: AstNode[];
+  [key: string]: unknown;
+}
+
 interface SpawnOutput {
   stdout: string;
   stderr: string;
@@ -124,7 +153,7 @@ async function parseTextWithHttp(
 
 // jorje calls the location node differently for different types of nodes,
 // so we use this method to abstract away that difference
-function getNodeLocation(node: any) {
+function getNodeLocation(node: AstNode): NodeLocation | null {
   if (node.loc) {
     return node.loc;
   }
@@ -501,9 +530,8 @@ const locationGenerationHandler: {
   [APEX_TYPES.WITH_IDENTIFIER]: handleWithIdentifierLocation,
 };
 
-type AnyNode = any;
 type ApplyFn<AccumulatedResult, Context> = (
-  node: AnyNode,
+  node: AstNode,
   accumulatedResult: AccumulatedResult,
   context?: Context,
   childrenContext?: Context,
@@ -514,7 +542,7 @@ type DfsVisitor<AccumulatedResult, Context> = {
     accumulated: AccumulatedResult,
   ) => AccumulatedResult;
   apply: ApplyFn<AccumulatedResult, Context>;
-  gatherChildrenContext?: (node: AnyNode, currentContext?: Context) => Context;
+  gatherChildrenContext?: (node: AstNode, currentContext?: Context) => Context;
 };
 /*
  * Depth-First Search that applies the three post-processing visitors to every
@@ -526,7 +554,7 @@ type DfsVisitor<AccumulatedResult, Context> = {
  * overhead on the hottest loop in the plugin.
  */
 function dfsPostOrderApply(
-  root: AnyNode,
+  root: AstNode,
   locationVisitor: DfsVisitor<MinimalLocation | null, undefined>,
   lineVisitor: DfsVisitor<undefined, undefined>,
   metadataVisitorInstance: DfsVisitor<undefined, MetadataVisitorContext>,
@@ -541,7 +569,7 @@ function dfsPostOrderApply(
     throw new Error("Post-processing visitors are missing expected hooks");
   }
   const walk = (
-    node: AnyNode,
+    node: AstNode,
     metadataContext: MetadataVisitorContext | undefined,
   ): MinimalLocation | null => {
     const childrenMetadataContext = gatherMetadataContext(
@@ -555,19 +583,20 @@ function dfsPostOrderApply(
     for (const key in node) {
       const value = node[key];
       if (value !== null && typeof value === "object") {
+        const childNode = value as AstNode;
         // Location objects are leaves with only scalar fields; all visitor
         // work on them happens through their parent node (getNodeLocation),
         // so recursing into them is pure overhead. They make up a large share
         // of all objects in the AST.
         if (
           (key === "loc" || key === "location") &&
-          typeof value.startIndex === "number" &&
-          typeof value.endIndex === "number"
+          typeof childNode["startIndex"] === "number" &&
+          typeof childNode["endIndex"] === "number"
         ) {
           continue;
         }
         accumulatedLocation = accumulateLocation(
-          walk(value, childrenMetadataContext),
+          walk(childNode, childrenMetadataContext),
           accumulatedLocation,
         );
       }
@@ -613,8 +642,8 @@ const nodeLocationVisitor: (
     }
     return accumulated;
   },
-  apply: (node: AnyNode, currentLocation: MinimalLocation | null) => {
-    const apexClass: string = node["@class"];
+  apply: (node: AstNode, currentLocation: MinimalLocation | null) => {
+    const apexClass = node["@class"];
     let handlerFn: (typeof locationGenerationHandler)[string] | undefined;
     if (apexClass) {
       handlerFn = locationGenerationHandler[apexClass];
@@ -626,10 +655,18 @@ const nodeLocationVisitor: (
       }
     }
 
+    // The location handlers narrow `node` by @class internally; the generic
+    // walk only knows it as the structural AstNode, so bridge to the union here.
+    const enrichedNode = node as EnrichedApexNode;
     if (handlerFn && currentLocation) {
-      node.loc = handlerFn(currentLocation, sourceCode, commentNodes, node);
+      node.loc = handlerFn(
+        currentLocation,
+        sourceCode,
+        commentNodes,
+        enrichedNode,
+      );
     } else if (handlerFn && node.loc) {
-      node.loc = handlerFn(node.loc, sourceCode, commentNodes, node);
+      node.loc = handlerFn(node.loc, sourceCode, commentNodes, enrichedNode);
     }
 
     const nodeLoc = node.loc;
@@ -676,23 +713,24 @@ const nodeLocationVisitor: (
  */
 type MetadataVisitorContext = {
   allowTrailingEmptyLine: boolean;
-  arraySiblings?: any[];
+  arraySiblings?: AstNode[];
 };
 const metadataVisitor: (
   emptyLineLocations: Set<number>,
 ) => DfsVisitor<undefined, MetadataVisitorContext> = (emptyLineLocations) => ({
-  apply: (node: any, _accumulated, context, childrenContext) => {
-    const apexClass = node["@class"];
+  apply: (node: AstNode, _accumulated, context, childrenContext) => {
+    const apexClass = node["@class"] ?? "";
     // #511 - If the user manually specify linebreaks in their original query,
     // we will use that as a heuristic to manually add hardlines to the result
     // query as well.
     if (apexClass === APEX_TYPES.SEARCH || apexClass === APEX_TYPES.QUERY) {
-      node.forcedHardline = node.loc.startLine !== node.loc.endLine;
+      const loc = node.loc;
+      node.forcedHardline = !!loc && loc.startLine !== loc.endLine;
     }
     // jorje parses all `if` and `else if` blocks into `ifBlocks`, so we add
     // `ifBlockIndex` into the node for handling code to differentiate them.
     else if (apexClass === APEX_TYPES.IF_ELSE_BLOCK) {
-      const ifBlocks: jorje.IfBlock[] = node.ifBlocks;
+      const ifBlocks = node.ifBlocks ?? [];
       for (let i = 0, length = ifBlocks.length; i < length; i++) {
         (ifBlocks[i] as EnrichedIfBlock).ifBlockIndex = i;
       }
@@ -701,7 +739,7 @@ const metadataVisitor: (
     const inputParameters = node.inputParameters;
     if (Array.isArray(inputParameters)) {
       for (let i = 0, length = inputParameters.length; i < length; i++) {
-        inputParameters[i].insideParenthesis = true;
+        inputParameters[i]!.insideParenthesis = true;
       }
     }
 
@@ -734,11 +772,12 @@ const metadataVisitor: (
     if (childrenSiblings) {
       for (let i = 0, length = childrenSiblings.length - 1; i < length; i++) {
         const currentChild = childrenSiblings[i];
-        if (!currentChild.trailingEmptyLine) {
+        const nextChild = childrenSiblings[i + 1];
+        if (!currentChild?.trailingEmptyLine || !nextChild) {
           continue;
         }
         const currentChildLoc = currentChild.loc;
-        const nextChildLoc = childrenSiblings[i + 1].loc;
+        const nextChildLoc = nextChild.loc;
         if (
           currentChildLoc &&
           nextChildLoc &&
@@ -755,14 +794,16 @@ const metadataVisitor: (
       trailingEmptyLineAllowed &&
       !isLastNodeInArray
     ) {
-      const nextLine = nodeLoc.endLine + 1;
+      // endLine is guaranteed here: the line-index visitor runs immediately
+      // before this metadata visitor on each node and populates it.
+      const nextLine = nodeLoc.endLine! + 1;
       if (emptyLineLocations.has(nextLine)) {
         node.trailingEmptyLine = true;
       }
     }
   },
   gatherChildrenContext: (node, currentContext) => {
-    const apexClass = node["@class"];
+    const apexClass = node["@class"] ?? "";
     let allowTrailingEmptyLineWithin: boolean;
     const isSpecialClass =
       TRAILING_EMPTY_LINE_AFTER_LAST_NODE_SET.has(apexClass);
@@ -778,9 +819,9 @@ const metadataVisitor: (
       allowTrailingEmptyLineWithin =
         currentContext?.allowTrailingEmptyLine ?? true;
     }
-    let arraySiblings: any[] | undefined;
+    let arraySiblings: AstNode[] | undefined;
     if (Array.isArray(node) && node.length > 0) {
-      arraySiblings = node;
+      arraySiblings = node as AstNode[];
     }
     return {
       allowTrailingEmptyLine: allowTrailingEmptyLineWithin,
@@ -817,7 +858,7 @@ function getLineNumber(lineIndexes: number[], charIndex: number) {
 const lineIndexVisitor: (
   lineIndexes: number[],
 ) => DfsVisitor<undefined, undefined> = (lineIndexes) => ({
-  apply: (node: AnyNode) => {
+  apply: (node: AstNode) => {
     const nodeLoc = getNodeLocation(node);
     if (!nodeLoc) {
       return;
@@ -840,7 +881,7 @@ const lineIndexVisitor: (
 
     if (!("column" in nodeLoc)) {
       // startLine is guaranteed to be present by the first branch.
-      const nodeStartLineIndex = lineIndexes[nodeLoc.startLine];
+      const nodeStartLineIndex = lineIndexes[nodeLoc.startLine!];
       if (nodeStartLineIndex !== undefined) {
         nodeLoc.column = nodeLoc.startIndex - nodeStartLineIndex;
       }
@@ -955,9 +996,9 @@ export default async function parse(
       throw new Error(errors.join("\r\n"));
     }
     const hiddenTokenMap = parserOutput.hiddenTokenMap;
-    const comments = [];
+    const comments: jorje.HiddenToken[] = [];
     for (let i = 0, length = hiddenTokenMap.length; i < length; i++) {
-      const token = (hiddenTokenMap[i] as any[])[1];
+      const token = hiddenTokenMap[i]![1];
       const tokenClass = token["@class"];
       if (
         tokenClass === APEX_TYPES.BLOCK_COMMENT ||
