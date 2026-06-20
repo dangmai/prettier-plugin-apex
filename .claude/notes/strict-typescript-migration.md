@@ -1,6 +1,7 @@
 # Strict-TypeScript migration — handoff note
 
 > **Living progress doc for a multi-session effort.** Branch: `strict-typescript`.
+> Draft PR: **#2422** (https://github.com/dangmai/prettier-plugin-apex/pull/2422).
 > Session scaffolding — **delete before the final merge** (per global CLAUDE.md).
 > The full approved plan lives at
 > `~/.claude/plans/this-repo-does-use-scalable-lighthouse.md`; this note tracks
