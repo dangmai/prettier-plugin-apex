@@ -126,9 +126,14 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   > non-common property on a union errors *regardless* of `strictNullChecks` —
   > so the retype can't land until the narrowing work in M4. Keeping them `any`
   > kept M1 truly additive/green as the plan prioritizes.
-- [ ] **M2 — Cheap strict flags.** Flip `alwaysStrict`, `noImplicitThis`,
-  `strictBindCallApply`, `strictFunctionTypes`, `useUnknownInCatchVariables`.
-  Narrow the two `catch (e: any)` (parser.ts:108, util.ts:327).
+- [x] **M2 — Cheap strict flags. DONE.** Flipped `strictFunctionTypes`,
+  `strictBindCallApply`, `noImplicitThis`, `alwaysStrict`,
+  `useUnknownInCatchVariables` in `tsconfig.prod.json` (the wider `tsconfig.json`
+  inherits them, so tests are covered too). Narrowed the two `catch` clauses:
+  `util.ts` (`typeof e === "object" && e !== null && "code" in e`) and
+  `parser.ts` (`String(err)` instead of `err.toString()`). Zero other fallout —
+  no classes/`this`, little function-type variance. Build (prod + wider) + lint +
+  95 built-in tests all green.
 - [ ] **M3 — Typed registry + dispatch.** Convert `nodeHandler` to the typed
   registry + `satisfies`, replace dispatch casts with the `kind` branch,
   parameterize handlers `path: AstPath<Enriched<T>>`. Largest, mechanical; may
@@ -189,4 +194,6 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
 - **2026-06-19** — **M1 done.** Added `src/jorje-nodes.ts` + `src/options.ts`,
   moved `EnrichedIfBlock` into `jorje-nodes.ts`. All green (build/lint/95 tests).
   Deferred the `AnnotatedComment` node-ref retype to M4 (see deviation note).
-  Next: **M2** (cheap strict flags + the two `catch` narrowings).
+- **2026-06-19** — **M2 done.** Flipped 5 cheap strict flags + narrowed the two
+  `catch` clauses. All green. Next: **M3** (typed registry + dispatch — the big
+  mechanical one; remember the M0 phantom-class denylist).

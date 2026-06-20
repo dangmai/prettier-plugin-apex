@@ -368,8 +368,13 @@ export async function getNativeExecutableWithFallback(): Promise<string> {
     );
     const require = module.createRequire(import.meta.url);
     return nodePath.relative(process.cwd(), require.resolve(nativeBin));
-  } catch (e: any) {
-    if ("code" in e && e.code === "MODULE_NOT_FOUND") {
+  } catch (e) {
+    if (
+      typeof e === "object" &&
+      e !== null &&
+      "code" in e &&
+      e.code === "MODULE_NOT_FOUND"
+    ) {
       console.warn(
         `Your platform ${platform}-${arch} is natively supported by Prettier Apex, but the executable cannot be found.`,
       );

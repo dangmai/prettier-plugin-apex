@@ -115,9 +115,9 @@ async function parseTextWithHttp(
       },
     );
     return await result.text();
-  } catch (err: any) {
+  } catch (err) {
     throw new Error(
-      `Failed to connect to Apex parsing server\r\n${err.toString()}`,
+      `Failed to connect to Apex parsing server\r\n${String(err)}`,
     );
   }
 }
