@@ -96,20 +96,23 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   with 296 members, the `AstNode` stub is gone, and plugin `build` + `lint` +
   built-in `test:parser` (95 tests) all pass.
 
-  > **Finding for M3 — phantom union members.** The simple
-  > `discriminantLiteral != null` filter is intentionally complete (never drops a
-  > real node), so the union also includes ~14 jorje-internal classes that the
-  > printer never formats. M3's `UnhandledClass` denylist must cover these
-  > alongside `InvalidDeclUnit`: `Identifiers`, `Locatables`, `Locations`,
-  > `LocationBlocks`, `ParameterRefs`, `TypeRefs`, `SoslValues`, `PrinterBlocks`,
-  > `HiddenTokens`, `InternalException`, `CompilationUnitBuilder`,
-  > `TypeRefBuilder`, `JadtTester`, `SwitchTester`. (They're the concrete
-  > single-`@class` beans that are never referenced as a field type — verified
-  > via grep. Filtering them in Java codegen was rejected: graph-reachability is
-  > fragile and its failure mode silently drops real nodes. The denylist is the
-  > explicit, reviewable, TS-side place for this.) Note `ParserOutput` (the root)
-  > IS in the union and IS handled — keep it. Re-derive the exact denylist at M3
-  > by diffing registry keys against `ApexNode["@class"]`.
+  > **Finding for M3 — phantom union members.** Codegen excludes Java stdlib
+  > (`java.lang.*`) and jorje exception (`apex.jorje.services.exception.*`) types,
+  > which removed `Exception`/`Throwable`/`RuntimeException`/`StackTraceElement`/
+  > `InternalException`/`ParseException` (union 296→290; see the reviewer
+  > follow-up commit). The filter is otherwise deliberately complete (never drops
+  > a real node), so the union still includes ~13 jorje-internal builder/factory
+  > phantoms that M3's `UnhandledClass` denylist must cover alongside
+  > `InvalidDeclUnit`: `Identifiers`, `Locatables`, `Locations`, `LocationBlocks`,
+  > `ParameterRefs`, `TypeRefs`, `SoslValues`, `PrinterBlocks`, `HiddenTokens`,
+  > `CompilationUnitBuilder`, `TypeRefBuilder`, `JadtTester`, `SwitchTester`.
+  > (Concrete single-`@class` beans never referenced as a field type. Filtering
+  > these in codegen too was rejected: telling them from real nodes needs
+  > reachability analysis whose failure mode silently drops a real node — whereas
+  > a missed denylist entry FAILS the exhaustiveness check instead.) `ParserOutput`
+  > (root) and `BlockComment`/`InlineComment`/`HiddenTokens` ARE in the union and
+  > ARE handled — keep them. Re-derive the exact denylist at M3 by diffing
+  > registry keys against `ApexNode["@class"]`.
 - [x] **M1 — Foundations, no flag flips. DONE.** Added `src/jorje-nodes.ts`
   (`ApexEnrichment`, `Enriched<>`, `EnrichedApexNode`, and `EnrichedIfBlock`
   rebased onto `Enriched<>`) and `src/options.ts` (`ApexParserOptions extends
