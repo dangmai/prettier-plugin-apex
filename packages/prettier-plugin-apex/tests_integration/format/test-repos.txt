@@ -33,3 +33,9 @@ https://github.com/trailheadapps/coral-cloud.git
 https://github.com/apex-enterprise-patterns/at4dx.git
 https://github.com/jamessimone/apex-dml-mocking.git
 https://github.com/bobalicious/amoss.git
+https://github.com/choudharymanish8585/Apex-Development-Course.git
+https://github.com/box/box-salesforce-sdk.git
+https://github.com/benedwards44/Apex-for-Xero.git
+https://github.com/rsoesemann/apex-domainbuilder.git
+https://github.com/jamessimone/salesforce-round-robin.git
+https://github.com/jamessimone/apex-async-processor.git
