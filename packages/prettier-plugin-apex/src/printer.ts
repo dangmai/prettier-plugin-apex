@@ -2422,6 +2422,42 @@ function handleWithValue(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
+function handleWithIdentifierTuple(path: AstPath, print: PrintFn): Doc {
+  const keyValueDocs: Doc[] = path.map(print, "keyValues");
+  return groupIndentConcat([
+    "WITH",
+    " ",
+    path.call(print, "identifier"),
+    "(",
+    softline,
+    join([",", line], keyValueDocs),
+    dedent(softline),
+    ")",
+  ]);
+}
+
+function handleWithKeyValue(
+  childClass: string,
+  path: AstPath,
+  print: PrintFn,
+): Doc {
+  const parts: Doc[] = [];
+  parts.push(path.call(print, "identifier"));
+  parts.push(" ");
+  parts.push("=");
+  parts.push(" ");
+  if (childClass === APEX_TYPES.WITH_KEY_VALUE_STRING) {
+    // The string value is stored unquoted, so we re-add the single quotes.
+    parts.push("'");
+    parts.push(path.call(print, "value"));
+    parts.push("'");
+  } else {
+    // Boolean and number values print themselves verbatim.
+    parts.push(path.call(print, "value"));
+  }
+  return parts;
+}
+
 function handleWithDataCategories(path: AstPath, print: PrintFn): Doc {
   const categoryDocs: Doc[] = path.map(print, "categories");
 
@@ -3270,6 +3306,8 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
     " ",
     path.call(print, "identifier"),
   ],
+  [APEX_TYPES.WITH_IDENTIFIER_TUPLE]: handleWithIdentifierTuple,
+  [APEX_TYPES.WITH_KEY_VALUE]: handleWithKeyValue,
 };
 
 function handleTrailingEmptyLines(doc: Doc, node: any): Doc {

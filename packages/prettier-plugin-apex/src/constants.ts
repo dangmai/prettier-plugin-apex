@@ -319,6 +319,18 @@ export const APEX_TYPES = {
   DATA_CATEGORY_OPERATOR: "apex.jorje.data.soql.DataCategoryOperator" as const,
   WITH_IDENTIFIER:
     "apex.jorje.data.soql.WithIdentifierClause$WithIdentifier" as const,
+  WITH_IDENTIFIER_TUPLE:
+    "apex.jorje.data.soql.WithIdentifierClause$WithIdentifierTuple" as const,
+  WITH_KEY_VALUE: "apex.jorje.data.soql.WithKeyValue" as const,
+  // The subtype @class strings must stay catalogued here so that PARENT_TYPES
+  // (built from Object.values(APEX_TYPES)) maps each one back to WITH_KEY_VALUE,
+  // which is what lets genericPrint's parent fallback dispatch them.
+  WITH_KEY_VALUE_BOOLEAN:
+    "apex.jorje.data.soql.WithKeyValue$BooleanKeyValue" as const,
+  WITH_KEY_VALUE_NUMBER:
+    "apex.jorje.data.soql.WithKeyValue$NumberKeyValue" as const,
+  WITH_KEY_VALUE_STRING:
+    "apex.jorje.data.soql.WithKeyValue$StringKeyValue" as const,
 };
 export const BINARY = {
   ADDITION: "+" as const,
