@@ -137,11 +137,45 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   `parser.ts` (`String(err)` instead of `err.toString()`). Zero other fallout —
   no classes/`this`, little function-type variance. Build (prod + wider) + lint +
   95 built-in tests all green.
-- [ ] **M3 — Typed registry + dispatch.** Convert `nodeHandler` to the typed
-  registry + `satisfies`, replace dispatch casts with the `kind` branch,
-  parameterize handlers `path: AstPath<Enriched<T>>`. Largest, mechanical; may
-  split M3a/M3b (statements/expressions vs SOQL/SOSL). Add exhaustiveness
-  assertion. Run `AST_COMPARE`.
+- **M3 — Typed dispatch.** Split per the dispatch findings below (the plan's
+  single compile-time-exhaustiveness assumption didn't hold). Confirmed approach:
+  exhaustiveness test FIRST (runtime), then the typed split, then handler bodies.
+  - [x] **M3a — Runtime exhaustiveness test. DONE.** `tests/dispatch_exhaustiveness/
+    dispatch.spec.ts` parses the generated `ApexNode` union, resolves each member's
+    `@class`, and asserts every one is dispatched (own key in `NODE_HANDLER_CLASSES`,
+    or parent via `getParentType`) or in an explicit `UNHANDLED_CLASSES` denylist.
+    A second test keeps the denylist honest (fails on stale/now-handled entries).
+    Exported `NODE_HANDLER_CLASSES` from `printer.ts`. 98 tests green. **It surfaced
+    a pre-existing gap:** the SOQL `WITH` tuple form (`WithIdentifierTuple` +
+    `WithKeyValue$*`) has no handler — `genericPrint` would throw on it; no fixture
+    hits it. Denylisted + flagged as currently-unsupported grammar (not caused by
+    this refactor). The denylist also documents comments/root/locations/errors/
+    phantoms as non-dispatched.
+  - [ ] **M3b — Typed two-map split.** Split `nodeHandler` into typed
+    `singleNodeHandlers` / `childNodeHandlers` (18 child handlers = those whose
+    first param is `childClass`; verified list in commit/analysis), thread
+    `ApexParserOptions`, remove the `as SingleNodeHandler`/`as ChildNodeHandler`
+    casts. Behavior-preserving; verify with snapshots + `AST_COMPARE`.
+  - [ ] **M3c — Parameterize handler bodies** to `AstPath<Enriched<T>>` /
+    typed `path.getNode()` by category (statements/expressions vs SOQL/SOSL). The
+    bulk; pairs with M6's null handling.
+
+  > **Dispatch model (discovered in M3a — the plan underestimated this).** Two
+  > dispatch paths: exact `@class` → single handler `(path, …)`; else parent via
+  > `getParentType` (runtime `$`-split) → child handler `(childClass, path, …)`.
+  > 18 child handlers (first param `childClass`): `handleStatement`,
+  > `handleOrderOperation`, `handleNullOrderOperation`, `handleModifier`,
+  > `handleAnnotationValue`, `handleFindValue`, `handleDivisionValue`,
+  > `handleSearchWithClauseValue`, `handleGroupByType`, `handleWhereQueryLiteral`,
+  > `handleOrderByExpression`, `handleDataCategoryOperator`, `handleTrackingType`,
+  > `handleQueryOption`, `handleUpdateStatsOption`, `handleUsingExpression`, plus
+  > inline `QUERY_OPERATOR`/`WHERE_COMPOUND_OPERATOR`. Also: 6 single-handler keys
+  > are NOT union members — the enum-wrappers (`BINARY/BOOLEAN/ASSIGNMENT/POSTFIX/
+  > PREFIX_OPERATOR`, `TRIGGER_USAGE`) whose node serializes its `@class` as an
+  > abstract FQCN and carries the value in `$`; and `int`/`string` pseudo-keys.
+  > These break a strict `[K in ApexNode["@class"]]` mapped type, so the typed
+  > single map (M3b) must allow them explicitly. Full compile-time exhaustiveness
+  > is impractical (parent reachability is runtime), hence the M3a runtime test.
 - [ ] **M4 — `noImplicitAny`.** Type remaining `options: any`,
   `handleTrailingEmptyLines(node)`, `comments.ts` `canAttachComment`/
   `getTrailingComments`, parser location handlers (~203/220/267/442),
@@ -198,5 +232,10 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   moved `EnrichedIfBlock` into `jorje-nodes.ts`. All green (build/lint/95 tests).
   Deferred the `AnnotatedComment` node-ref retype to M4 (see deviation note).
 - **2026-06-19** — **M2 done.** Flipped 5 cheap strict flags + narrowed the two
-  `catch` clauses. All green. Next: **M3** (typed registry + dispatch — the big
-  mechanical one; remember the M0 phantom-class denylist).
+  `catch` clauses. All green.
+- **2026-06-19** — Reviewer (M0–M2): clean; one LOW finding fixed (union
+  excludes Java/exception infra types, 296→290). CI green (30/30).
+- **2026-06-19** — **M3a done.** Runtime exhaustiveness test (98 tests green).
+  Mapped the real dispatch model; chose test-first + runtime exhaustiveness per
+  user. Surfaced a pre-existing SOQL `WITH`-tuple gap (denylisted, flagged).
+  Next: **M3b** (typed single/child map split + `ApexParserOptions` + drop casts).

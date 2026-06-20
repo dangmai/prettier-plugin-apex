@@ -3310,6 +3310,16 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.WITH_KEY_VALUE]: handleWithKeyValue,
 };
 
+/**
+ * The `@class` strings the printer dispatches on directly (exact match) or as a
+ * parent fallback. Exported so the exhaustiveness test can assert every concrete
+ * jorje node in the `ApexNode` union is reachable. See
+ * `tests/dispatch_exhaustiveness/dispatch.spec.ts`.
+ */
+export const NODE_HANDLER_CLASSES: ReadonlySet<string> = new Set(
+  Object.keys(nodeHandler),
+);
+
 function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
   // Early return optimization: if node has no trailingEmptyLine, return immediately
   if (!node?.trailingEmptyLine) {
