@@ -170,8 +170,19 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
       loops + for-control/inits/init). prod+wider tsc, lint, 276 AST_COMPARE green;
       output unchanged. Added two centralized helpers in `jorje-nodes.ts`
       (see findings below): `asEnriched` and `asConcrete`/`Concrete<T>`.
-    - [ ] Remaining single-handler categories: expressions, declarations/members,
-      SOQL, SOSL, type-refs/annotations/misc.
+    - [x] **Expressions category DONE.** Typed ~32 single handlers (binaryish,
+      assignment, dotted/variable/method-call, literal, new-expression +
+      new-object-init set, ternary/instanceof/cast/array/null-coalescing,
+      this/super/java method calls, soql/sosl expr wrappers, the 5 operator
+      handlers). Two infra additions: `isBinaryish` is now a **type guard**
+      (`node is BinaryExpr | BooleanExpr`, widened param to `{"@class":string} |
+      null`) so the existing `const isX = isBinaryish(localConst)` narrows via
+      TS alias-narrowing (needs a simple-const ref, not a property access — hence
+      `const { left, right } = node`); and a `getParentNode(path):
+      EnrichedApexNode | null` helper (Prettier mistypes the parent as the same
+      `T`). prod+wider tsc, lint, 276 AST_COMPARE green.
+    - [ ] Remaining single-handler categories: declarations/members, SOQL, SOSL,
+      type-refs/annotations/misc.
     - [ ] **Child handlers (18)** — separate sub-step. Their `path` holds a
       heterogeneous node per `childClass`, so the abstract-parent path generic
       can't type the per-case `path.call(...)` navigation. Type their bodies
@@ -322,3 +333,6 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   `@tsconfig/node22` (masked by `any`), and abstract jorje parents aren't
   `@class`-narrowable. Added `asEnriched` + `asConcrete`/`Concrete<T>` helpers and
   typed ~26 statement handlers. prod+wider tsc, lint, 276 AST_COMPARE green.
+- **2026-06-19** — **M3c expressions category DONE.** Typed ~32 expression single
+  handlers. Made `isBinaryish` a type guard and added the `getParentNode` helper
+  (both reusable by later categories). prod+wider tsc, lint, 276 AST_COMPARE green.

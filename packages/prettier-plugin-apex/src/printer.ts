@@ -27,6 +27,7 @@ import {
   asConcrete,
   asEnriched,
   type Enriched,
+  type EnrichedApexNode,
   type EnrichedIfBlock,
 } from "./jorje-nodes.js";
 import type { ApexParserOptions } from "./options.js";
@@ -43,6 +44,16 @@ const { align, join, hardline, line, softline, group, indent, dedent } =
   docBuilders;
 
 type PrintFn = (path: AstPath) => Doc;
+
+/**
+ * The parent of the current node. Prettier types `getParentNode()` as the same
+ * `T` as the current path node, but the parent is a different node — so we view
+ * it as the full enriched node union, which lets `@class` checks and discriminant
+ * narrowing work. Returns null at the root.
+ */
+function getParentNode(path: AstPath): EnrichedApexNode | null {
+  return path.getParentNode() as EnrichedApexNode | null;
+}
 
 function indentConcat(docs: Doc[]): Doc {
   return indent(docs);
@@ -122,21 +133,25 @@ function getOperator(node: jorje.BinaryExpr | jorje.BooleanExpr): string {
   return BINARY[node.op.$];
 }
 
-function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleBinaryishExpression(
+  path: AstPath<Enriched<jorje.BinaryExpr | jorje.BooleanExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const { left, right } = node;
   const nodeOp = getOperator(node);
   const nodePrecedence = getPrecedence(nodeOp);
-  const parentNode = path.getParentNode();
+  const parentNode = getParentNode(path);
 
-  const isLeftNodeBinaryish = isBinaryish(node.left);
-  const isRightNodeBinaryish = isBinaryish(node.right);
+  const isLeftNodeBinaryish = isBinaryish(left);
+  const isRightNodeBinaryish = isBinaryish(right);
   const isNestedExpression = isBinaryish(parentNode);
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
 
   const isNodeSamePrecedenceAsLeftChild =
     isLeftNodeBinaryish &&
-    nodePrecedence === getPrecedence(getOperator(node.left));
+    nodePrecedence === getPrecedence(getOperator(left));
   const isNodeSamePrecedenceAsParent =
     isBinaryish(parentNode) &&
     nodePrecedence === getPrecedence(getOperator(parentNode));
@@ -175,8 +190,7 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const leftChildNodeSamePrecedenceAsRightChildNode =
     isLeftNodeBinaryish &&
     isRightNodeBinaryish &&
-    getPrecedence(getOperator(node.left)) ===
-      getPrecedence(getOperator(node.right));
+    getPrecedence(getOperator(left)) === getPrecedence(getOperator(right));
   // This variable signifies that this node is the top most binaryish node,
   // and its left child node has the same precedence, e.g:
   // a = b >
@@ -232,9 +246,8 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   // certain situation, because the EOL comment might become attached to the
   // entire binaryish expression after the first format.
   const leftChildHasEndOfLineComment =
-    node.left.comments?.some(
-      (comment: AnnotatedComment) =>
-        comment.trailing && comment.placement === "endOfLine",
+    asEnriched(node.left).comments?.some(
+      (comment) => comment.trailing && comment.placement === "endOfLine",
     ) ?? false;
 
   if (leftChildHasEndOfLineComment) {
@@ -245,8 +258,11 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(docs);
 }
 
-function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleAssignmentExpression(
+  path: AstPath<Enriched<jorje.AssignmentExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const docs: Doc[] = [];
 
   const leftDoc: Doc = path.call(print, "left");
@@ -256,7 +272,7 @@ function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
   docs.push(" ");
   docs.push(operationDoc);
 
-  const rightDocComments = node.right.comments;
+  const rightDocComments = asEnriched(node.right).comments;
   const rightDocHasLeadingComments =
     Array.isArray(rightDocComments) &&
     rightDocComments.some((comment) => comment.leading);
@@ -271,17 +287,21 @@ function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(docs);
 }
 
-function shouldDottedExpressionBreak(path: AstPath): boolean {
-  const node = path.getNode();
+function shouldDottedExpressionBreak(
+  path: AstPath<Enriched<jorje.VariableExpr | jorje.MethodCallExpr>>,
+): boolean {
+  const node = path.node;
   // #62 - `super` cannot  be followed any white spaces
   if (
-    node.dottedExpr.value["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION
+    node.dottedExpr.value?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION
   ) {
     return false;
   }
   // #98 - Even though `this` can synctactically be followed by whitespaces,
   // make the formatted output similar to `super` to provide consistency.
-  if (node.dottedExpr.value["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION) {
+  if (
+    node.dottedExpr.value?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION
+  ) {
     return false;
   }
   if (node["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION) {
@@ -296,11 +316,14 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   ) {
     return true;
   }
-  return node.dottedExpr.value;
+  return node.dottedExpr.value !== undefined;
 }
 
-function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleDottedExpression(
+  path: AstPath<Enriched<jorje.VariableExpr | jorje.MethodCallExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const dottedExpressionParts: Doc[] = [];
   const dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
 
@@ -319,11 +342,11 @@ function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleArrayExpressionIndex(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.ArrayExpr>>,
   print: PrintFn,
   withGroup = true,
 ): Doc {
-  const node = path.getNode();
+  const node = path.node;
   let parts: Doc;
   if (node.index["@class"] === APEX_TYPES.LITERAL_EXPRESSION) {
     // For literal index, we will make sure it's always attached to the [],
@@ -335,18 +358,24 @@ function handleArrayExpressionIndex(
   return withGroup ? groupIndentConcat(parts) : parts;
 }
 
-function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parentNode = path.getParentNode();
+function handleVariableExpression(
+  path: AstPath<Enriched<jorje.VariableExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const parentNode = getParentNode(path);
   const nodeName = path.getName();
   const { dottedExpr } = node;
+  const dottedExprValue = dottedExpr.value
+    ? asConcrete(dottedExpr.value)
+    : undefined;
   const parts: Doc[] = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-    (dottedExpr?.value?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-      dottedExpr.value.expr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION);
+    dottedExprValue?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (dottedExprValue?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+      dottedExprValue.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION);
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -372,7 +401,7 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   // Hence why we are deferring the printing of the [] part from handleArrayExpression
   // to here.
   if (
-    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+    parentNode?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
     path.callParent((innerPath: AstPath) => {
@@ -387,7 +416,10 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleJavaVariableExpression(path: AstPath, print: PrintFn): Doc {
+function handleJavaVariableExpression(
+  path: AstPath<Enriched<jorje.JavaVariableExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
@@ -395,11 +427,11 @@ function handleJavaVariableExpression(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleLiteralExpression(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.ExprLiteralExpr>>,
   print: PrintFn,
   options: prettier.ParserOptions,
 ): Doc {
-  const node = path.getNode();
+  const node = path.node;
   const literalType: Doc = path.call(print, "type", "$");
   if (literalType === "NULL") {
     return "null";
@@ -451,18 +483,24 @@ function handleLiteralExpression(
   return literalDoc;
 }
 
-function handleBinaryOperation(path: AstPath): Doc {
-  const node: jorje.BinaryExpr["op"] = path.getNode();
+function handleBinaryOperation(
+  path: AstPath<Enriched<jorje.BinaryExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return BINARY[node.$];
 }
 
-function handleBooleanOperation(path: AstPath): Doc {
-  const node: jorje.BooleanExpr["op"] = path.getNode();
+function handleBooleanOperation(
+  path: AstPath<Enriched<jorje.BooleanExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return BOOLEAN[node.$];
 }
 
-function handleAssignmentOperation(path: AstPath): Doc {
-  const node: jorje.AssignmentExpr["op"] = path.getNode();
+function handleAssignmentOperation(
+  path: AstPath<Enriched<jorje.AssignmentExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return ASSIGNMENT[node.$];
 }
 
@@ -1410,7 +1448,10 @@ function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
   return resultDoc;
 }
 
-function handleNewStandard(path: AstPath, print: PrintFn): Doc {
+function handleNewStandard(
+  path: AstPath<Enriched<jorje.NewStandard>>,
+  print: PrintFn,
+): Doc {
   const paramDocs: Doc[] = handleInputParameters(path, print);
   const parts: Doc[] = [];
   // Type
@@ -1426,7 +1467,10 @@ function handleNewStandard(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewKeyValue(path: AstPath, print: PrintFn): Doc {
+function handleNewKeyValue(
+  path: AstPath<Enriched<jorje.NewKeyValue>>,
+  print: PrintFn,
+): Doc {
   const keyValueDocs: Doc[] = path.map(print, "keyValues");
 
   const parts: Doc[] = [];
@@ -1459,7 +1503,10 @@ function handleNameValueParameter(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleThisMethodCallExpression(path: AstPath, print: PrintFn): Doc {
+function handleThisMethodCallExpression(
+  path: AstPath<Enriched<jorje.ThisMethodCallExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("this");
   parts.push("(");
@@ -1471,7 +1518,10 @@ function handleThisMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleSuperMethodCallExpression(path: AstPath, print: PrintFn): Doc {
+function handleSuperMethodCallExpression(
+  path: AstPath<Enriched<jorje.SuperMethodCallExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("super");
   parts.push("(");
@@ -1483,20 +1533,26 @@ function handleSuperMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parentNode = path.getParentNode();
+function handleMethodCallExpression(
+  path: AstPath<Enriched<jorje.MethodCallExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const parentNode = getParentNode(path);
   const nodeName = path.getName();
   const { dottedExpr } = node;
+  const dottedExprValue = dottedExpr.value
+    ? asConcrete(dottedExpr.value)
+    : undefined;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-    (dottedExpr?.value?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-      dottedExpr.value.expr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION);
+    dottedExprValue?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (dottedExprValue?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+      dottedExprValue.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION);
   const isDottedExpressionThisVariableExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
+    dottedExprValue?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
   const isDottedExpressionSuperVariableExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
+    dottedExprValue?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs: Doc[] = path.map(print, "names");
@@ -1530,7 +1586,7 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   // to here.
   let arrayIndexDoc: Doc = "";
   if (
-    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+    parentNode?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
     path.callParent((innerPath: AstPath) => {
@@ -1606,7 +1662,10 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return resultDoc;
 }
 
-function handleJavaMethodCallExpression(path: AstPath, print: PrintFn): Doc {
+function handleJavaMethodCallExpression(
+  path: AstPath<Enriched<jorje.JavaMethodCallExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
@@ -1618,7 +1677,10 @@ function handleJavaMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNestedExpression(path: AstPath, print: PrintFn): Doc {
+function handleNestedExpression(
+  path: AstPath<Enriched<jorje.NestedExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("(");
   parts.push(path.call(print, "expr"));
@@ -1626,7 +1688,10 @@ function handleNestedExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNewSetInit(path: AstPath, print: PrintFn): Doc {
+function handleNewSetInit(
+  path: AstPath<Enriched<jorje.NewSetInit>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr", "value");
 
@@ -1642,7 +1707,10 @@ function handleNewSetInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewSetLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewSetLiteral(
+  path: AstPath<Enriched<jorje.NewSetLiteral>>,
+  print: PrintFn,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "values");
 
   const parts: Doc[] = [];
@@ -1662,7 +1730,10 @@ function handleNewSetLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewListInit(path: AstPath, print: PrintFn): Doc {
+function handleNewListInit(
+  path: AstPath<Enriched<jorje.NewListInit>>,
+  print: PrintFn,
+): Doc {
   // We can declare lists in the following ways:
   // new Object[size];
   // new Object[] { value, ... };
@@ -1673,17 +1744,19 @@ function handleNewListInit(path: AstPath, print: PrintFn): Doc {
   // We use List<Object>(param) otherwise.
   // This should provide compatibility for all known types without knowing
   // if the parameter is a variable (copy constructor) or literal size.
-  const node = path.getNode();
+  const node = path.node;
   const expressionDoc: Doc = path.call(print, "expr", "value");
   const parts: Doc[] = [];
   const typeParts = path.map(print, "types");
+  const initExpr = node.expr.value ? asConcrete(node.expr.value) : undefined;
   const hasLiteralNumberInitializer =
     typeParts.length &&
     typeParts[0] !== undefined &&
     typeof typeParts[0] !== "string" &&
     "length" in typeParts[0] &&
     typeParts[0].length < 4 &&
-    node.expr?.value?.type?.$ === "INTEGER";
+    initExpr?.["@class"] === APEX_TYPES.LITERAL_EXPRESSION &&
+    initExpr.type.$ === "INTEGER";
 
   // Type
   if (!hasLiteralNumberInitializer) {
@@ -1700,7 +1773,10 @@ function handleNewListInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewMapInit(path: AstPath, print: PrintFn): Doc {
+function handleNewMapInit(
+  path: AstPath<Enriched<jorje.NewMapInit>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr", "value");
 
@@ -1716,7 +1792,10 @@ function handleNewMapInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewMapLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewMapLiteral(
+  path: AstPath<Enriched<jorje.NewMapLiteral>>,
+  print: PrintFn,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "pairs");
 
   const parts: Doc[] = [];
@@ -1736,7 +1815,10 @@ function handleNewMapLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleMapLiteralKeyValue(path: AstPath, print: PrintFn): Doc {
+function handleMapLiteralKeyValue(
+  path: AstPath<Enriched<jorje.MapLiteralKeyValue>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "key"));
   parts.push(" ");
@@ -1746,7 +1828,10 @@ function handleMapLiteralKeyValue(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNewListLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewListLiteral(
+  path: AstPath<Enriched<jorje.NewListLiteral>>,
+  print: PrintFn,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "values");
 
   const parts: Doc[] = [];
@@ -1765,7 +1850,10 @@ function handleNewListLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewExpression(path: AstPath, print: PrintFn): Doc {
+function handleNewExpression(
+  path: AstPath<Enriched<jorje.NewExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("new");
   parts.push(" ");
@@ -1903,7 +1991,10 @@ function handleElseBlock(
   return parts;
 }
 
-function handleTernaryExpression(path: AstPath, print: PrintFn): Doc {
+function handleTernaryExpression(
+  path: AstPath<Enriched<jorje.TernaryExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "condition"));
 
@@ -1933,7 +2024,10 @@ function handleTernaryExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleInstanceOfExpression(path: AstPath, print: PrintFn): Doc {
+function handleInstanceOfExpression(
+  path: AstPath<Enriched<jorje.InstanceOf>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
@@ -1943,7 +2037,10 @@ function handleInstanceOfExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handlePackageVersionExpression(path: AstPath, print: PrintFn): Doc {
+function handlePackageVersionExpression(
+  path: AstPath<Enriched<jorje.PackageVersionExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("Package.Version.");
   parts.push(path.call(print, "version"));
@@ -1958,8 +2055,11 @@ function handleStructuredVersion(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleArrayExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleArrayExpression(
+  path: AstPath<Enriched<jorje.ArrayExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr");
   // In certain situations we need to defer printing the [] part to be part of
@@ -1979,7 +2079,10 @@ function handleArrayExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleCastExpression(path: AstPath, print: PrintFn): Doc {
+function handleCastExpression(
+  path: AstPath<Enriched<jorje.CastExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("(");
   parts.push(path.call(print, "type"));
@@ -1989,7 +2092,10 @@ function handleCastExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNullCoalescingExpression(path: AstPath, print: PrintFn): Doc {
+function handleNullCoalescingExpression(
+  path: AstPath<Enriched<jorje.NullCoalescingExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "left"));
   parts.push(" ");
@@ -2009,7 +2115,10 @@ function handleExpressionStatement(
 }
 
 // SOSL
-function handleSoslExpression(path: AstPath, print: PrintFn): Doc {
+function handleSoslExpression(
+  path: AstPath<Enriched<jorje.SoslExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("[");
   parts.push(softline);
@@ -2188,7 +2297,10 @@ function handleSearch(path: AstPath, print: PrintFn): Doc {
 }
 
 // SOQL
-function handleSoqlExpression(path: AstPath, print: PrintFn): Doc {
+function handleSoqlExpression(
+  path: AstPath<Enriched<jorje.SoqlExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("[");
   parts.push(softline);
@@ -2911,27 +3023,37 @@ function handleModifier(childClass: string): Doc {
   return [modifierValue, " "];
 }
 
-function handlePostfixExpression(path: AstPath, print: PrintFn): Doc {
+function handlePostfixExpression(
+  path: AstPath<Enriched<jorje.PostfixExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(path.call(print, "op"));
   return parts;
 }
 
-function handlePrefixExpression(path: AstPath, print: PrintFn): Doc {
+function handlePrefixExpression(
+  path: AstPath<Enriched<jorje.PrefixExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "op"));
   parts.push(path.call(print, "expr"));
   return parts;
 }
 
-function handlePostfixOperator(path: AstPath): Doc {
-  const node: jorje.PostfixExpr["op"] = path.getNode();
+function handlePostfixOperator(
+  path: AstPath<Enriched<jorje.PostfixExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return POSTFIX[node.$];
 }
 
-function handlePrefixOperator(path: AstPath): Doc {
-  const node: jorje.PrefixExpr["op"] = path.getNode();
+function handlePrefixOperator(
+  path: AstPath<Enriched<jorje.PrefixExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return PREFIX[node.$];
 }
 

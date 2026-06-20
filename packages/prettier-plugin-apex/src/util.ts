@@ -46,10 +46,13 @@ export type AnnotatedComment = AnnotatedAstNode &
     placement: string;
   };
 
-export function isBinaryish(node: jorje.Expr): boolean {
+export function isBinaryish(
+  node: { "@class": string } | null | undefined,
+): node is jorje.BinaryExpr | jorje.BooleanExpr {
   return (
-    node["@class"] === APEX_TYPES.BOOLEAN_EXPRESSION ||
-    node["@class"] === APEX_TYPES.BINARY_EXPRESSION
+    node != null &&
+    (node["@class"] === APEX_TYPES.BOOLEAN_EXPRESSION ||
+      node["@class"] === APEX_TYPES.BINARY_EXPRESSION)
   );
 }
 
