@@ -10,7 +10,10 @@ import {
 describe("massageAstNode", () => {
   it("strips whitespace from the value of an ApexDoc block comment", () => {
     const value = "/**\n * Hello World\n */";
-    const ast = { "@class": APEX_TYPES.BLOCK_COMMENT, value };
+    const ast = {
+      "@class": APEX_TYPES.BLOCK_COMMENT,
+      value,
+    } as unknown as Parameters<typeof massageAstNode>[0];
     const newObj = { value };
 
     massageAstNode(ast, newObj);

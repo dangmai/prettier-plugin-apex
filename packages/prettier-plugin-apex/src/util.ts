@@ -5,7 +5,7 @@ import * as url from "node:url";
 import type { AstPath } from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
-import type { EnrichedApexNode } from "./jorje-nodes.js";
+import { asConcrete, type EnrichedApexNode } from "./jorje-nodes.js";
 import {
   APEX_TYPES,
   DATA_CATEGORY,
@@ -133,44 +133,44 @@ export function checkIfParentIsDottedExpression(path: AstPath): boolean {
  * @param ast the Abstract Syntax Tree to compare
  * @param newObj the newly created object
  */
-export function massageAstNode(ast: any, newObj: any): any {
+export function massageAstNode(
+  ast: EnrichedApexNode,
+  newObj: Record<string, unknown>,
+): void {
   // Handling ApexDoc
-  if (
-    ast["@class"] &&
-    ast["@class"] === APEX_TYPES.BLOCK_COMMENT &&
-    isApexDocComment(ast)
-  ) {
-    newObj.value = ast.value.replace(/\s/g, "");
+  if (ast["@class"] === APEX_TYPES.BLOCK_COMMENT && isApexDocComment(ast)) {
+    newObj["value"] = ast.value.replace(/\s/g, "");
   }
-  if (ast.scope && typeof ast.scope === "string") {
+  if ("scope" in ast && typeof ast.scope === "string") {
     // Apex is case insensitivity, but in some case we're forcing the strings
     // to be uppercase for consistency so the ASTs may be different between
     // the original and parsed strings.
-    newObj.scope = ast.scope.toUpperCase();
+    newObj["scope"] = ast.scope.toUpperCase();
   } else if (
-    ast?.dottedExpr?.value?.names &&
-    ast.dottedExpr.value["@class"] === APEX_TYPES.VARIABLE_EXPRESSION &&
-    ast.names
+    "dottedExpr" in ast &&
+    "names" in ast &&
+    ast.dottedExpr.value?.["@class"] === APEX_TYPES.VARIABLE_EXPRESSION
   ) {
     // This is a workaround for #38 - jorje sometimes groups names with
     // spaces as dottedExpr, so we can't compare AST effectively.
     // In those cases we will bring the dottedExpr out into the names.
-    newObj.names = newObj.dottedExpr.value.names.concat(newObj.names);
-    newObj.dottedExpr = newObj.dottedExpr.value.dottedExpr;
-  } else if (
-    ast["@class"] &&
-    ast["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION
-  ) {
+    const clone = newObj as unknown as jorje.VariableExpr;
+    const inner = clone.dottedExpr.value as unknown as jorje.VariableExpr;
+    newObj["names"] = inner.names.concat(clone.names);
+    newObj["dottedExpr"] = inner.dottedExpr;
+  } else if (ast["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION) {
     // This flattens the SOQL/SOSL Compound Expression, e.g.:
     // SELECT Id FROM Account WHERE Name = 'Name' AND (Status = 'Active' AND City = 'Boston')
     // is equivalent to:
     // SELECT Id FROM Account WHERE Name = 'Name' AND Status = 'Active' AND City = 'Boston'
-    for (let i = newObj.expr.length - 1; i >= 0; i -= 1) {
+    const clone = newObj as unknown as jorje.WhereCompoundExpr;
+    for (let i = clone.expr.length - 1; i >= 0; i -= 1) {
+      const child = asConcrete(clone.expr[i]!);
       if (
-        newObj.expr[i]["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION &&
-        newObj.expr[i].op["@class"] === newObj.op["@class"]
+        child["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION &&
+        child.op["@class"] === clone.op["@class"]
       ) {
-        newObj.expr.splice(i, 1, ...newObj.expr[i].expr);
+        clone.expr.splice(i, 1, ...child.expr);
       }
     }
   }
