@@ -18,7 +18,7 @@ jobs:
     outputs:
       musl-script: ${{ steps.filter.outputs.musl-script }}
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4.0.1
         id: filter
         with:
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
@@ -136,7 +136,7 @@ jobs:
           - macos-15-intel
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Setup Node.js
@@ -196,7 +196,7 @@ jobs:
       run:
         working-directory: ./packages/apex-ast-serializer
     steps:
-      - uses: actions/checkout@v6.0.3
+      - uses: actions/checkout@v7
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9
       - name: Setup Node.js
@@ -259,7 +259,7 @@ jobs:
       - build-native-executables
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6.0.9

@@ -91,7 +91,7 @@ jobs:
           echo "Resolved: head_ref=$head_ref base_ref=$base_ref compare=$compare"
 
       - name: Checkout head
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.setup.outputs.head_ref }}
 
@@ -188,7 +188,7 @@ jobs:
       # The base side runs only tsx, never Nx.
       - name: Checkout base branch
         if: steps.setup.outputs.compare == 'true'
-        uses: actions/checkout@v6.0.3
+        uses: actions/checkout@v7
         with:
           ref: ${{ steps.setup.outputs.base_ref }}
           path: base
