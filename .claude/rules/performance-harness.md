@@ -59,7 +59,16 @@ native-image build — while saving under a `benchmark-` prefixed key so it neve
 displaces main's canonical cache), downloads the
 latest scheduled `main` native artifact for the base side, benchmarks both
 back-to-back to cancel hardware variance, then renders `compare --markdown` into
-the job summary, a `benchmark-results` artifact, and a sticky PR comment.
+the job summary and a `benchmark-results` artifact.
+
+The sticky PR comment is posted by a **separate** `benchmark-comment.yml`
+(`workflow_run`), not by `benchmark.yml` itself. That's what lets it comment on
+**fork** PRs: the benchmark run gets a read-only token for fork code (it can't
+comment), so it uploads the report + PR number in the artifact, and the
+`workflow_run` job — which runs in the base repo with a write token and never
+touches fork code — downloads it and posts. Maintainer dispatches
+(`workflow_dispatch`, incl. `-f pr=<N>`) don't comment; their numbers live in
+the job summary + artifact only.
 
 The harness benchmarks whatever the plugin's **default** mode is (currently
 `native`) unless `--parser` overrides it, so the numbers reflect a zero-config
