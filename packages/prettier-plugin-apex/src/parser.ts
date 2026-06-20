@@ -4,7 +4,7 @@ import process from "node:process";
 import prettier from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
-import type { EnrichedIfBlock } from "./jorje-nodes.js";
+import type { EnrichedApexNode, EnrichedIfBlock } from "./jorje-nodes.js";
 import {
   ALLOW_TRAILING_EMPTY_LINE,
   APEX_TYPES,
@@ -210,11 +210,11 @@ function handleMethodDeclarationLocation(
   location: MinimalLocation,
   sourceCode: string,
   commentNodes: GenericComment[],
-  node: any,
+  node: EnrichedApexNode,
 ): MinimalLocation {
   // This is a method declaration with a body, so we can safely use the identity
   // location.
-  if (node.stmnt.value) {
+  if (node["@class"] === APEX_TYPES.METHOD_DECLARATION && node.stmnt.value) {
     return location;
   }
   // This is a Method Declaration with no body, in which case we need to use the
@@ -227,11 +227,11 @@ function handleAnnotationLocation(
   location: MinimalLocation,
   sourceCode: string,
   commentNodes: GenericComment[],
-  node: any,
+  node: EnrichedApexNode,
 ): MinimalLocation {
   // This is an annotation without parameters, so we only need to worry about
   // the starting character
-  if (!node.parameters || node.parameters.length === 0) {
+  if (node["@class"] !== APEX_TYPES.ANNOTATION || node.parameters.length === 0) {
     return handleNodeStartedWithCharacter("@")(
       location,
       sourceCode,
@@ -274,13 +274,18 @@ function handleLimitValueLocation(
   location: MinimalLocation,
   sourceCode: string,
   commentNodes: GenericComment[],
-  node: any,
+  node: EnrichedApexNode,
 ): MinimalLocation {
   // #1891 - the LIMIT node returned by jorje always gives us the location of
   // the world LIMIT itself (i.e. 5 character long), but that leads to wrong
   // format if the LIMIT (or the surrounding QUERY) is prettier ignored.
   // Because of that, we will need to generate the location of the LIMIT value
   // manually.
+  if (node["@class"] !== APEX_TYPES.LIMIT_VALUE) {
+    // This handler is only ever dispatched for LIMIT_VALUE nodes; fall back to
+    // the identity location for the impossible case so `node.i` stays typed.
+    return location;
+  }
   const valueString = node.i.toString();
   return {
     startIndex: location.startIndex,
@@ -449,7 +454,7 @@ const locationGenerationHandler: {
     location: MinimalLocation,
     sourceCode: string,
     commentNodes: GenericComment[],
-    node: any,
+    node: EnrichedApexNode,
   ) => MinimalLocation | null;
 } = {
   [APEX_TYPES.QUERY]: identityFunction,
