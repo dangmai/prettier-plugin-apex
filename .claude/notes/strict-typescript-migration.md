@@ -190,8 +190,15 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
       `(path as AstPath).call(...)` escape (2 sites: anon-block + trigger units;
       the 2-level `"members", index` navs type fine). prod+wider tsc, lint, 276
       AST_COMPARE green.
-    - [ ] Remaining single-handler categories: SOQL, SOSL,
-      type-refs/annotations/misc.
+    - [x] **SOQL & SOSL category DONE.** Typed ~53 single query handlers
+      (search/find/in/division/returning/with clauses; query/select/column/field/
+      from/where/group-by/having/order-by/limit/offset; case/when/else; bind/
+      colon/geolocation/number/distance/formula). One extra sanctioned cast:
+      `handleNumberLiteral` does `(path as AstPath).call(print, "number", "$")`
+      because `NumberLiteral.number` is typed as a primitive `number` but jorje
+      serializes it boxed as `{ "$": number }` (typings-vs-runtime mismatch, like
+      JorjeOptional). prod+wider tsc, lint, 276 AST_COMPARE green.
+    - [ ] Remaining single-handler categories: type-refs/annotations/misc.
     - [ ] **Child handlers (18)** — separate sub-step. Their `path` holds a
       heterogeneous node per `childClass`, so the abstract-parent path generic
       can't type the per-case `path.call(...)` navigation. Type their bodies
@@ -349,3 +356,7 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   declaration/unit/member handlers. Localized `(path as AstPath)` cast for the
   abstract `BlockMember[]` deep navigation (2 sites). prod+wider tsc, lint, 276
   AST_COMPARE green.
+- **2026-06-19** — **M3c SOQL & SOSL category DONE.** Typed ~53 query handlers
+  (delegated to a subagent against the now-proven pattern, then reviewed +
+  re-verified). One extra cast in `handleNumberLiteral` (boxed `{$}` vs primitive
+  `number` typing mismatch). prod+wider tsc, lint, 276 AST_COMPARE green.

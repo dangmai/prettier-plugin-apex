@@ -1426,39 +1426,69 @@ function handleInnerInterfaceMember(
   return path.call(print, "body");
 }
 
-function handleSelectCaseExpression(path: AstPath, print: PrintFn): Doc {
+function handleSelectCaseExpression(
+  path: AstPath<Enriched<jorje.SelectCaseExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleWhenOperator(path: AstPath, print: PrintFn): Doc {
+function handleWhenOperator(
+  path: AstPath<Enriched<jorje.WhenOp>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "identifier");
 }
 
-function handleCaseOperator(path: AstPath, print: PrintFn): Doc {
+function handleCaseOperator(
+  path: AstPath<Enriched<jorje.CaseOp>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "identifier");
 }
 
-function handleGroupByExpression(path: AstPath, print: PrintFn): Doc {
+function handleGroupByExpression(
+  path: AstPath<Enriched<jorje.GroupByExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "field");
 }
 
-function handleGeolocationExpression(path: AstPath, print: PrintFn): Doc {
+function handleGeolocationExpression(
+  path: AstPath<Enriched<jorje.GeolocationExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleNumberLiteral(path: AstPath, print: PrintFn): Doc {
-  return path.call(print, "number", "$");
+function handleNumberLiteral(
+  path: AstPath<Enriched<jorje.NumberLiteral>>,
+  print: PrintFn,
+): Doc {
+  // The generated typings model `number` as a primitive, but jorje serializes
+  // it as a boxed Double (`{ "$": number }`), so we navigate into "$". Cast to
+  // the untyped AstPath to escape Prettier's key-checking against the typings.
+  return (path as AstPath).call(print, "number", "$");
 }
 
-function handleNumberExpression(path: AstPath, print: PrintFn): Doc {
+function handleNumberExpression(
+  path: AstPath<Enriched<jorje.NumberExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleQueryLiteralExpression(path: AstPath, print: PrintFn): Doc {
+function handleQueryLiteralExpression(
+  path: AstPath<Enriched<jorje.QueryExprLiteralExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "literal");
 }
 
-function handleApexExpression(path: AstPath, print: PrintFn): Doc {
+function handleApexExpression(
+  path: AstPath<Enriched<jorje.ApexExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
@@ -2178,7 +2208,10 @@ function handleSoslExpression(
   return groupIndentConcat(parts);
 }
 
-function handleFindClause(path: AstPath, print: PrintFn): Doc {
+function handleFindClause(
+  path: AstPath<Enriched<jorje.FindClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(indentConcat(["FIND", line, path.call(print, "search")]));
   return groupConcat(parts);
@@ -2201,7 +2234,10 @@ function handleFindValue(
   return doc;
 }
 
-function handleInClause(path: AstPath, print: PrintFn): Doc {
+function handleInClause(
+  path: AstPath<Enriched<jorje.InClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("IN");
   parts.push(" ");
@@ -2211,7 +2247,10 @@ function handleInClause(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleDivisionClause(path: AstPath, print: PrintFn): Doc {
+function handleDivisionClause(
+  path: AstPath<Enriched<jorje.WithDivisionClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WITH DIVISION = ");
   parts.push(path.call(print, "value"));
@@ -2235,7 +2274,10 @@ function handleDivisionValue(
   return doc;
 }
 
-function handleSearchWithClause(path: AstPath, print: PrintFn): Doc {
+function handleSearchWithClause(
+  path: AstPath<Enriched<jorje.SearchWithClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WITH");
   parts.push(" ");
@@ -2285,7 +2327,10 @@ function handleSearchWithClauseValue(
   return groupIndentConcat(parts);
 }
 
-function handleReturningClause(path: AstPath, print: PrintFn): Doc {
+function handleReturningClause(
+  path: AstPath<Enriched<jorje.ReturningClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(
     indentConcat([
@@ -2297,7 +2342,10 @@ function handleReturningClause(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleReturningExpression(path: AstPath, print: PrintFn): Doc {
+function handleReturningExpression(
+  path: AstPath<Enriched<jorje.ReturningExpr>>,
+  print: PrintFn,
+): Doc {
   const selectDoc: Doc = path.call(print, "select", "value");
 
   const parts: Doc[] = [];
@@ -2311,7 +2359,10 @@ function handleReturningExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleReturningSelectExpression(path: AstPath, print: PrintFn): Doc {
+function handleReturningSelectExpression(
+  path: AstPath<Enriched<jorje.ReturningSelectExpr>>,
+  print: PrintFn,
+): Doc {
   const fieldDocs: Doc[] = path.map(print, "fields");
 
   const parts: Doc[] = [];
@@ -2326,8 +2377,11 @@ function handleReturningSelectExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat([softline, join(line, parts)]);
 }
 
-function handleSearch(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleSearch(
+  path: AstPath<Enriched<jorje.Search>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const withDocs: Doc[] = path.map(print, "withs");
 
   const parts: Doc[] = [];
@@ -2360,7 +2414,10 @@ function handleSoqlExpression(
   return groupIndentConcat(parts);
 }
 
-function handleSelectInnerQuery(path: AstPath, print: PrintFn): Doc {
+function handleSelectInnerQuery(
+  path: AstPath<Enriched<jorje.SelectInnerQuery>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("(");
   parts.push(softline);
@@ -2373,7 +2430,10 @@ function handleSelectInnerQuery(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhereInnerExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereInnerExpression(
+  path: AstPath<Enriched<jorje.WhereInnerExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2387,8 +2447,11 @@ function handleWhereInnerExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleQuery(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleQuery(
+  path: AstPath<Enriched<jorje.Query>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const withIdentifierDocs: Doc[] = path.map(print, "withIdentifiers");
   const parts: Doc[] = [];
   parts.push(path.call(print, "select"));
@@ -2409,7 +2472,10 @@ function handleQuery(path: AstPath, print: PrintFn): Doc {
   return join(node.forcedHardline ? hardline : line, parts);
 }
 
-function handleBindClause(path: AstPath, print: PrintFn): Doc {
+function handleBindClause(
+  path: AstPath<Enriched<jorje.BindClause>>,
+  print: PrintFn,
+): Doc {
   const expressionDocs: Doc[] = path.map(print, "exprs");
   const parts: Doc[] = [];
   parts.push("BIND");
@@ -2418,7 +2484,10 @@ function handleBindClause(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleBindExpression(path: AstPath, print: PrintFn): Doc {
+function handleBindExpression(
+  path: AstPath<Enriched<jorje.BindExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2428,7 +2497,10 @@ function handleBindExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleCaseExpression(path: AstPath, print: PrintFn): Doc {
+function handleCaseExpression(
+  path: AstPath<Enriched<jorje.CaseExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const whenBranchDocs: Doc[] = path.map(print, "whenBranches");
   const elseBranchDoc: Doc = path.call(print, "elseBranch", "value");
@@ -2446,7 +2518,10 @@ function handleCaseExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhenExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhenExpression(
+  path: AstPath<Enriched<jorje.WhenExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WHEN");
   parts.push(" ");
@@ -2460,7 +2535,10 @@ function handleWhenExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleElseExpression(path: AstPath, print: PrintFn): Doc {
+function handleElseExpression(
+  path: AstPath<Enriched<jorje.ElseExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("ELSE");
   parts.push(" ");
@@ -2470,7 +2548,10 @@ function handleElseExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleColumnClause(path: AstPath, print: PrintFn): Doc {
+function handleColumnClause(
+  path: AstPath<Enriched<jorje.SelectColumnClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(
     indentConcat(["SELECT", line, join([",", line], path.map(print, "exprs"))]),
@@ -2478,14 +2559,20 @@ function handleColumnClause(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleColumnExpression(path: AstPath, print: PrintFn): Doc {
+function handleColumnExpression(
+  path: AstPath<Enriched<jorje.SelectColumnExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
   return groupConcat(parts);
 }
 
-function handleFieldIdentifier(path: AstPath, print: PrintFn): Doc {
+function handleFieldIdentifier(
+  path: AstPath<Enriched<jorje.FieldIdentifier>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const entity: Doc = path.call(print, "entity", "value");
   if (entity) {
@@ -2496,7 +2583,10 @@ function handleFieldIdentifier(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleField(path: AstPath, print: PrintFn): Doc {
+function handleField(
+  path: AstPath<Enriched<jorje.Field>>,
+  print: PrintFn,
+): Doc {
   const functionOneDoc: Doc = path.call(print, "function1", "value");
   const functionTwoDoc: Doc = path.call(print, "function2", "value");
   const fieldDoc = path.call(print, "field");
@@ -2527,7 +2617,10 @@ function handleField(path: AstPath, print: PrintFn): Doc {
   return fieldDoc;
 }
 
-function handleFromClause(path: AstPath, print: PrintFn): Doc {
+function handleFromClause(
+  path: AstPath<Enriched<jorje.FromClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(
     indentConcat(["FROM", line, join(", ", path.map(print, "exprs"))]),
@@ -2535,7 +2628,10 @@ function handleFromClause(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleFromExpression(path: AstPath, print: PrintFn): Doc {
+function handleFromExpression(
+  path: AstPath<Enriched<jorje.FromExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "table"));
   pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
@@ -2548,13 +2644,19 @@ function handleFromExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhereClause(path: AstPath, print: PrintFn): Doc {
+function handleWhereClause(
+  path: AstPath<Enriched<jorje.WhereClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(indentConcat(["WHERE", line, path.call(print, "expr")]));
   return groupConcat(parts);
 }
 
-function handleSelectDistanceExpression(path: AstPath, print: PrintFn): Doc {
+function handleSelectDistanceExpression(
+  path: AstPath<Enriched<jorje.SelectDistanceExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
@@ -2562,7 +2664,10 @@ function handleSelectDistanceExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleWhereDistanceExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereDistanceExpression(
+  path: AstPath<Enriched<jorje.WhereDistanceExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "distance"));
   parts.push(" ");
@@ -2572,7 +2677,10 @@ function handleWhereDistanceExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleDistanceFunctionExpression(path: AstPath, print: PrintFn): Doc {
+function handleDistanceFunctionExpression(
+  path: AstPath<Enriched<jorje.DistanceFunctionExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const distanceDocs: Doc[] = [];
   parts.push("DISTANCE");
@@ -2587,7 +2695,10 @@ function handleDistanceFunctionExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhereFormulaExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereFormulaExpression(
+  path: AstPath<Enriched<jorje.WhereFormulaExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "formula"));
   parts.push(" ");
@@ -2598,7 +2709,7 @@ function handleWhereFormulaExpression(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleFormulaFunctionExpression(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.FormulaFunctionExpr>>,
   _print: PrintFn,
   options: prettier.ParserOptions,
 ): Doc {
@@ -2606,7 +2717,7 @@ function handleFormulaFunctionExpression(
   // we print its body verbatim from the source. The node location spans the
   // whole `FORMULA('...')` call. We uppercase the `FORMULA` keyword to stay
   // consistent with the other SOQL functions (e.g. DISTANCE, GEOLOCATION).
-  const node = path.getNode();
+  const node = path.node;
   const source = options.originalText.slice(
     node.loc.startIndex,
     node.loc.endIndex,
@@ -2614,7 +2725,10 @@ function handleFormulaFunctionExpression(
   return source.replace(/^formula/i, "FORMULA");
 }
 
-function handleGeolocationLiteral(path: AstPath, print: PrintFn): Doc {
+function handleGeolocationLiteral(
+  path: AstPath<Enriched<jorje.GeolocationLiteral>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const childParts: Doc[] = [];
   parts.push("GEOLOCATION");
@@ -2627,7 +2741,10 @@ function handleGeolocationLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWithValue(path: AstPath, print: PrintFn): Doc {
+function handleWithValue(
+  path: AstPath<Enriched<jorje.WithValue>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WITH");
   parts.push(" ");
@@ -2675,7 +2792,10 @@ function handleWithKeyValue(
   return parts;
 }
 
-function handleWithDataCategories(path: AstPath, print: PrintFn): Doc {
+function handleWithDataCategories(
+  path: AstPath<Enriched<jorje.WithDataCategories>>,
+  print: PrintFn,
+): Doc {
   const categoryDocs: Doc[] = path.map(print, "categories");
 
   // Only AND logical operator is supported
@@ -2687,7 +2807,10 @@ function handleWithDataCategories(path: AstPath, print: PrintFn): Doc {
   ]);
 }
 
-function handleDataCategory(path: AstPath, print: PrintFn): Doc {
+function handleDataCategory(
+  path: AstPath<Enriched<jorje.DataCategory>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   let categoryDocs: Doc[] = path.map(print, "categories");
   categoryDocs = categoryDocs.filter((doc: Doc) => doc);
@@ -2711,7 +2834,10 @@ function handleDataCategoryOperator(childClass: string): Doc {
   return DATA_CATEGORY[childClass as jorje.DataCategoryOperator["@class"]];
 }
 
-function handleWhereCalcExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereCalcExpression(
+  path: AstPath<Enriched<jorje.WhereCalcExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field1"));
   parts.push(" ");
@@ -2725,7 +2851,10 @@ function handleWhereCalcExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleWhereOperationExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereOperationExpression(
+  path: AstPath<Enriched<jorje.WhereOpExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2735,7 +2864,10 @@ function handleWhereOperationExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleWhereOperationExpressions(path: AstPath, print: PrintFn): Doc {
+function handleWhereOperationExpressions(
+  path: AstPath<Enriched<jorje.WhereOpExprs>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2797,15 +2929,21 @@ function handleWhereQueryLiteral(
   return "";
 }
 
-function handleWhereCompoundExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parentNode = path.getParentNode();
+function handleWhereCompoundExpression(
+  path: AstPath<Enriched<jorje.WhereCompoundExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const parentNode = getParentNode(path);
   const isNestedExpression =
-    parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
-    parentNode["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
+    parentNode?.["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
+    parentNode?.["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
   const nodeOp = node.op["@class"];
   const isSamePrecedenceWithParent =
-    parentNode.op && nodeOp === parentNode.op["@class"];
+    parentNode != null &&
+    "op" in parentNode &&
+    parentNode.op &&
+    nodeOp === parentNode.op["@class"];
 
   const parts: Doc[] = [];
 
@@ -2821,11 +2959,14 @@ function handleWhereCompoundExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleWhereUnaryExpression(path: AstPath, print: PrintFn): Doc {
-  const parentNode = path.getParentNode();
+function handleWhereUnaryExpression(
+  path: AstPath<Enriched<jorje.WhereUnaryExpr>>,
+  print: PrintFn,
+): Doc {
+  const parentNode = getParentNode(path);
   const isNestedExpression =
-    parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
-    parentNode["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
+    parentNode?.["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
+    parentNode?.["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
   const parts: Doc[] = [];
   if (isNestedExpression) {
     parts.push("(");
@@ -2839,14 +2980,20 @@ function handleWhereUnaryExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleColonExpression(path: AstPath, print: PrintFn): Doc {
+function handleColonExpression(
+  path: AstPath<Enriched<jorje.ColonExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(":");
   parts.push(path.call(print, "expr"));
   return parts;
 }
 
-function handleOrderByClause(path: AstPath, print: PrintFn): Doc {
+function handleOrderByClause(
+  path: AstPath<Enriched<jorje.OrderByClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("ORDER BY");
   parts.push(indentConcat([line, join([",", line], path.map(print, "exprs"))]));
@@ -2909,7 +3056,10 @@ function handleNullOrderOperation(
   return "";
 }
 
-function handleGroupByClause(path: AstPath, print: PrintFn): Doc {
+function handleGroupByClause(
+  path: AstPath<Enriched<jorje.GroupByClause>>,
+  print: PrintFn,
+): Doc {
   const expressionDocs: Doc[] = path.map(print, "exprs");
   const typeDoc: Doc = path.call(print, "type", "value");
   const havingDoc: Doc = path.call(print, "having", "value");
@@ -2951,7 +3101,10 @@ function handleGroupByType(childClass: string): Doc {
   return doc;
 }
 
-function handleHavingClause(path: AstPath, print: PrintFn): Doc {
+function handleHavingClause(
+  path: AstPath<Enriched<jorje.HavingClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("HAVING");
   parts.push(line);
@@ -2959,7 +3112,10 @@ function handleHavingClause(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleQueryUsingClause(path: AstPath, print: PrintFn): Doc {
+function handleQueryUsingClause(
+  path: AstPath<Enriched<jorje.QueryUsingClause>>,
+  print: PrintFn,
+): Doc {
   const expressionDocs: Doc[] = path.map(print, "exprs");
   const parts: Doc[] = [];
   parts.push("USING");
@@ -3030,7 +3186,10 @@ function handleQueryOption(childClass: string): Doc {
   return doc;
 }
 
-function handleUpdateStatsClause(path: AstPath, print: PrintFn): Doc {
+function handleUpdateStatsClause(
+  path: AstPath<Enriched<jorje.UpdateStatsClause>>,
+  print: PrintFn,
+): Doc {
   const optionDocs: Doc[] = path.map(print, "options");
   const parts: Doc[] = [];
   parts.push("UPDATE");
@@ -3053,7 +3212,10 @@ function handleUpdateStatsOption(childClass: string): Doc {
   return doc;
 }
 
-function handleUsingType(path: AstPath, print: PrintFn): Doc {
+function handleUsingType(
+  path: AstPath<Enriched<jorje.UsingType>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "filter"));
   parts.push(" ");
