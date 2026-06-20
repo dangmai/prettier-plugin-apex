@@ -175,14 +175,16 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   > `expr?: Expr` (no `value` wrapper). So typing a handler's node and reading
   > `.value` is a *false* type error everywhere. M3c can't proceed cleanly until
   > this is fixed.
-  - [ ] **M3c-pre — Model `Optional<T>` as `{value?: T}` in codegen.** New
-    typescript-generator customization (a TypeProcessor/extension mapping
-    `java.util.Optional<T>` → `{ value?: T }`, likely a named generic alias
-    `JorjeOptional<T>`). Regenerate `jorje.d.ts`, fix fallout in the 7
-    already-typed handlers + `util.ts`/`parser.ts` `jorje.*` usages. Verify output
-    unchanged (type-only). Then M3c is unblocked. Watch: empty Optional serializes
-    as `{}` (value absent) — so `value` must be optional, and confirm whether the
-    wrapper field itself is always present (it is — Java `Optional` is never null).
+  - [x] **M3c-pre — Model `Optional<T>` as `{value?: T}` in codegen. DONE.**
+    Added `CustomTypeProcessor.OptionalProcessor` (maps `java.util.Optional<T>` →
+    a `JorjeOptional<T>` reference) + `JorjeOptionalExtension` (emits
+    `export type JorjeOptional<T> = { value?: T };`). They share one `Symbol`
+    instance so the reference and declaration resolve identically (no rename).
+    Registered in `server/build.gradle`. Regenerated: `expr?: Expr` →
+    `expr: JorjeOptional<Expr>` (73 usages, field now required since the wrapper
+    is always present — Java `Optional` is never null). Zero fallout in existing
+    typed code; prod+wider tsc, lint, 276 `AST_COMPARE` tests all green (type-only,
+    output unchanged). **M3c now unblocked.**
 
   > **Dispatch model (discovered in M3a — the plan underestimated this).** Two
   > dispatch paths: exact `@class` → single handler `(path, …)`; else parent via
