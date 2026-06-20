@@ -323,13 +323,26 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   after each. `handleInputParameters` stays a polymorphic `AstPath` helper (not
   `any`; won't trip `noExplicitAny`). **All remaining `any` (6 sites) are the
   parser DFS-walk infra → M5.**
-- [ ] **M5 — Parser DFS-walk typing.** Type the enrichment visitor (`AnyNode`,
-  `dfsPostOrderApply`, `arraySiblings`, `MetadataVisitorContext`) generic over
-  `<Accumulated, Context>` with `node: EnrichedApexNode`. Watch the `value[key]`
-  recursion under `noUncheckedIndexedAccess`. **The 6 remaining `any` sites all
-  live here:** `parser.ts:127` `getNodeLocation(node)`, `:504` `type AnyNode = any`,
-  `:679` `arraySiblings?: any[]`, `:684` `metadataVisitor apply(node)`, `:781`
-  `arraySiblings`, `:960` `(hiddenTokenMap[i] as any[])[1]`.
+- [x] **M5 — Parser DFS-walk typing. DONE.** Replaced `type AnyNode = any` with a
+  structural **`AstNode`** interface — the named metadata/location fields the
+  visitors probe (`@class?`, `loc?`, `forcedHardline?`, `trailingEmptyLine?`,
+  `inputParameters?`, `ifBlocks?`, …) plus a `[key: string]: unknown` index
+  signature backing the generic key-by-key recursion — and a **`NodeLocation`**
+  type (`MinimalLocation` + the optional `startLine/endLine/line/column` the
+  enrichment derives). Typed `getNodeLocation`, `dfsPostOrderApply`/`walk`,
+  `ApplyFn`/`DfsVisitor`, all three visitors, and `MetadataVisitorContext`.
+  `hiddenTokenMap[i][1]` was already typed (`[{@class},HiddenToken][]`), so the
+  `as any[]` cast is gone; `comments` typed `jorje.HiddenToken[]`. **This removed
+  the last `any` in `src/`** (`grep` confirms none). Handling notes:
+  `apexClass = node["@class"] ?? ""` (coerce the now-`string|undefined` discriminant
+  for the `Set<string>.has` calls — `""` matches nothing, so equality/truthiness
+  is preserved); `node.loc!`/`startLine!`/`endLine!`/`inputParameters[i]!`
+  assertions where the walk pipeline guarantees presence (line-index visitor runs
+  before metadata per node); the location handlers stay `EnrichedApexNode`-typed
+  (M4) and the walk bridges `AstNode → EnrichedApexNode` at the single dispatch
+  site. prod+wider tsc, lint, 287 built-in AST_COMPARE green. (Built-in is
+  representative: M5 is pure TS-enrichment typing, no Java change, so native mode
+  exercises the identical code path.)
 - [ ] **M6 — `strictNullChecks` (RISKIEST).** Add a typed non-null
   `getNode(path): Enriched<T>` helper (dispatch guarantees a current node).
   Handle `delete node.loc`/`delete node.danglingComments` (TS2790 → optional) and
@@ -424,6 +437,10 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   `typeRef` field-name typings bug (localized cast + codegen-follow-up TODO).
   Only `handleInputParameters` (polymorphic helper) + the 19 child handlers
   remain in M3c. prod+wider tsc, lint, 287 AST_COMPARE green.
+- **2026-06-19** — **M5 DONE.** Typed the parser DFS enrichment walk: `AstNode`
+  structural interface + `NodeLocation`, replacing the last `any` in `src/`.
+  prod+wider tsc, lint, 287 built-in AST_COMPARE green. M6/M7 remain (mostly
+  verification + the Biome `noExplicitAny` flip — strict is already enforced).
 - **2026-06-19** — **M4 DONE + codegen fix.** Fixed the `ParameterRef.type`→
   `typeRef` codegen divergence (`CustomFieldExtension` rename; verified it's the
   only getter/field name mismatch affecting a handled node) and dropped the two
