@@ -504,7 +504,11 @@ function handleAssignmentOperation(
   return ASSIGNMENT[node.$];
 }
 
-function getDanglingCommentDocs(path: AstPath, _print: PrintFn, options: any) {
+function getDanglingCommentDocs(
+  path: AstPath,
+  _print: PrintFn,
+  options: ApexParserOptions,
+) {
   const node = path.getNode();
   if (!node.comments) {
     return [];
@@ -566,7 +570,7 @@ function handleAnonymousBlockUnit(
 function handleTriggerDeclarationUnit(
   path: AstPath<Enriched<jorje.TriggerDeclUnit>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ) {
   const usageDocs: Doc[] = path.map(print, "usages");
   const targetDocs: Doc[] = path.map(print, "target");
@@ -635,7 +639,7 @@ function handleTriggerDeclarationUnit(
 function handleInterfaceDeclaration(
   path: AstPath<Enriched<jorje.InterfaceDecl>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ) {
   const node = path.node;
 
@@ -692,7 +696,7 @@ function handleInterfaceDeclaration(
 function handleClassDeclaration(
   path: AstPath<Enriched<jorje.ClassDecl>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
   const node = path.node;
 
@@ -1088,7 +1092,7 @@ function handleDmlMergeStatement(
 function handleEnumDeclaration(
   path: AstPath<Enriched<jorje.EnumDecl>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
   const modifierDocs: Doc[] = path.map(print, "modifiers");
   const memberDocs: Doc[] = path.map(print, "members");
@@ -1212,7 +1216,7 @@ function handleRunAsBlock(
 function handleBlockStatement(
   path: AstPath<Enriched<jorje.BlockStmnt>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
   const parts: Doc[] = [];
   const danglingCommentDocs = getDanglingCommentDocs(path, print, options);
@@ -2925,7 +2929,7 @@ function handleWhereQueryLiteral(
   _childClass: string,
   path: AstPath,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
   // Switch on the node's own `@class` (identical to `childClass`) so the
   // subtype-specific reads below — `node.literal`, `node.loc` — narrow.
@@ -3795,7 +3799,10 @@ export const NODE_HANDLER_CLASSES: ReadonlySet<string> = new Set([
   ...Object.keys(childNodeHandlers),
 ]);
 
-function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
+function handleTrailingEmptyLines(
+  doc: Doc,
+  node: EnrichedApexNode | null,
+): Doc {
   // Early return optimization: if node has no trailingEmptyLine, return immediately
   if (!node?.trailingEmptyLine) {
     return doc;
@@ -3892,7 +3899,7 @@ export default function printGenerically(
   if (typeof opts === "object") {
     options = opts as ApexParserOptions;
   }
-  const node = path.getNode();
+  const node = path.getNode() as EnrichedApexNode | null;
   const doc = genericPrint(path, options, print);
   return handleTrailingEmptyLines(doc, node);
 }
