@@ -74,15 +74,6 @@ const UNHANDLED_CLASSES = new Set<string>([
   "apex.jorje.data.errors.SyntaxError$UnmatchedSyntax",
   "apex.jorje.data.errors.UserError$Lexical",
   "apex.jorje.data.errors.UserError$Syntax",
-
-  // PRE-EXISTING GAP (not introduced by this refactor), tracked in #2423: the
-  // SOQL `WITH` tuple form. `genericPrint` would throw "No handler found" if a
-  // query used it. No fixture exercises it today. Remove from this list when a
-  // handler + fixtures are added.
-  "apex.jorje.data.soql.WithIdentifierClause$WithIdentifierTuple",
-  "apex.jorje.data.soql.WithKeyValue$BooleanKeyValue",
-  "apex.jorje.data.soql.WithKeyValue$NumberKeyValue",
-  "apex.jorje.data.soql.WithKeyValue$StringKeyValue",
 ]);
 
 /**

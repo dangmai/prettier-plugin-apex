@@ -199,10 +199,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
       serializes it boxed as `{ "$": number }` (typings-vs-runtime mismatch, like
       JorjeOptional). prod+wider tsc, lint, 276 AST_COMPARE green.
     - [ ] Remaining single-handler categories: type-refs/annotations/misc.
-    - [ ] **Child handlers (18)** — separate sub-step. Their `path` holds a
-      heterogeneous node per `childClass`, so the abstract-parent path generic
-      can't type the per-case `path.call(...)` navigation. Type their bodies
-      last, narrowing `path.node` via `asConcrete` per case.
+    - [ ] **Child handlers (19, incl. main's `handleWithKeyValue`)** — separate
+      sub-step. Their `path` holds a heterogeneous node per `childClass`, so the
+      abstract-parent path generic can't type the per-case `path.call(...)`
+      navigation. Type their bodies last, narrowing `path.node` via `asConcrete`
+      per case.
 
   > **MAJOR FINDING — `strict: true` is already ON via the base config.**
   > `tsconfig.prod.json` *comments out* `noImplicitAny`/`strictNullChecks`/etc.
@@ -360,3 +361,14 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   (delegated to a subagent against the now-proven pattern, then reviewed +
   re-verified). One extra cast in `handleNumberLiteral` (boxed `{$}` vs primitive
   `number` typing mismatch). prod+wider tsc, lint, 276 AST_COMPARE green.
+- **2026-06-19** — **Rebased onto origin/main** (15 commits incl. nx v23, perf
+  optimizations, and the **#2423 fix** "Support the SOQL WITH tuple/key-value
+  form"). Conflicts only in `printer.ts` (expressions + SOQL commits, both
+  resolved keeping our typed versions; main had independently rewritten the same
+  binaryish comment-check to `.some() ?? false`). Regenerated `jorje.d.ts` (Java
+  codegen extensions intact on the new base). #2423 follow-up: dropped the 4
+  WITH-tuple entries from the exhaustiveness denylist (now enforced), typed
+  main's new `handleWithIdentifierTuple`, and moved `handleWithKeyValue` (a child
+  handler) from `singleNodeHandlers` to `childNodeHandlers` (M3b's split replayed
+  without knowing main had added it to the pre-split map). 287 tests green
+  (AST_COMPARE), up from 276.

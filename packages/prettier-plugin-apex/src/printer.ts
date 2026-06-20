@@ -2756,7 +2756,10 @@ function handleWithValue(
   return parts;
 }
 
-function handleWithIdentifierTuple(path: AstPath, print: PrintFn): Doc {
+function handleWithIdentifierTuple(
+  path: AstPath<Enriched<jorje.WithIdentifierTuple>>,
+  print: PrintFn,
+): Doc {
   const keyValueDocs: Doc[] = path.map(print, "keyValues");
   return groupIndentConcat([
     "WITH",
@@ -3711,7 +3714,6 @@ const singleNodeHandlers: { [key: string]: SingleNodeHandler } = {
     path.call(print, "identifier"),
   ],
   [APEX_TYPES.WITH_IDENTIFIER_TUPLE]: handleWithIdentifierTuple,
-  [APEX_TYPES.WITH_KEY_VALUE]: handleWithKeyValue,
 };
 
 // Dispatched as a fallback when a node's exact `@class` has no single handler:
@@ -3738,6 +3740,7 @@ const childNodeHandlers: { [key: string]: ChildNodeHandler } = {
   [APEX_TYPES.UPDATE_STATS_OPTION]: handleUpdateStatsOption,
   [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: (childClass: string) =>
     QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]],
+  [APEX_TYPES.WITH_KEY_VALUE]: handleWithKeyValue,
 };
 
 /**
