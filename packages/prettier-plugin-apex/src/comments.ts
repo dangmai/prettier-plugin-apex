@@ -3,6 +3,7 @@ import * as prettier from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import { ALLOW_DANGLING_COMMENTS, APEX_TYPES } from "./constants.js";
+import type { EnrichedApexNode } from "./jorje-nodes.js";
 import {
   type AnnotatedComment,
   type GenericComment,
@@ -126,12 +127,15 @@ export function printDanglingComment(
  * @param node The current node
  * @returns {boolean} whether a comment can be attached to this node or not.
  */
-export function canAttachComment(node: any): boolean {
+export function canAttachComment(node: EnrichedApexNode): boolean {
+  // Comment nodes (which carry a `location`, not a `loc`) and any node without a
+  // `loc` can't have comments attached. Check `@class` before narrowing on `loc`
+  // so the comment comparisons run against the full node union.
   return (
-    node.loc &&
-    node["@class"] &&
     node["@class"] !== APEX_TYPES.INLINE_COMMENT &&
-    node["@class"] !== APEX_TYPES.BLOCK_COMMENT
+    node["@class"] !== APEX_TYPES.BLOCK_COMMENT &&
+    "loc" in node &&
+    node.loc != null
   );
 }
 
@@ -157,8 +161,8 @@ export function willPrintOwnComments(path: AstPath): boolean {
   return !node || !node["@class"] || node["@class"] === APEX_TYPES.ANNOTATION;
 }
 
-export function getTrailingComments(node: any): AnnotatedComment[] {
-  return node.comments.filter((comment: AnnotatedComment) => comment.trailing);
+export function getTrailingComments(node: EnrichedApexNode): AnnotatedComment[] {
+  return (node.comments ?? []).filter((comment) => comment.trailing);
 }
 
 const ALLOW_DANGLING_COMMENTS_SET: Set<string> = new Set(
@@ -170,8 +174,8 @@ function handleDanglingComment(comment: AnnotatedComment): boolean {
   if (
     enclosingNode &&
     ALLOW_DANGLING_COMMENTS_SET.has(enclosingNode["@class"]) &&
-    ((enclosingNode.stmnts && enclosingNode.stmnts.length === 0) ||
-      (enclosingNode.members && enclosingNode.members.length === 0))
+    (("stmnts" in enclosingNode && enclosingNode.stmnts.length === 0) ||
+      ("members" in enclosingNode && enclosingNode.members.length === 0))
   ) {
     addDanglingComment(enclosingNode, comment, null);
     return true;
@@ -215,6 +219,7 @@ function handleWhereExpression(
     !followingNode ||
     !precedingNode["@class"] ||
     !followingNode["@class"] ||
+    !("loc" in precedingNode) ||
     enclosingNode["@class"] !== APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
     comment.location === undefined ||
     comment.location.startIndex === undefined

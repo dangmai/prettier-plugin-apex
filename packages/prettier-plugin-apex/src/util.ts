@@ -5,6 +5,7 @@ import * as url from "node:url";
 import type { AstPath } from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+import type { EnrichedApexNode } from "./jorje-nodes.js";
 import {
   APEX_TYPES,
   DATA_CATEGORY,
@@ -40,9 +41,9 @@ export type AnnotatedComment = AnnotatedAstNode &
     trailing?: boolean;
     leading?: boolean;
     printed?: boolean;
-    enclosingNode?: any;
-    followingNode?: any;
-    precedingNode?: any;
+    enclosingNode?: EnrichedApexNode;
+    followingNode?: EnrichedApexNode;
+    precedingNode?: EnrichedApexNode;
     placement: string;
   };
 
