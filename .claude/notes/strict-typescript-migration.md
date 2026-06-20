@@ -164,7 +164,25 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
     unchanged.
   - [ ] **M3c — Parameterize handler bodies** to `AstPath<Enriched<T>>` /
     typed `path.getNode()` by category (statements/expressions vs SOQL/SOSL). The
-    bulk; pairs with M6's null handling.
+    bulk; pairs with M6's null handling. **BLOCKED on M3c-pre (below).**
+
+  > **BLOCKER discovered starting M3c — `Optional<T>` types are wrong.** jorje
+  > serializes `Optional<T>` fields as a `{value?: T}` wrapper at runtime (verified:
+  > `"expr": {"value": {…Expr…}}`, `"stmnt": {"value": {…}}`), and the printer
+  > reads them that way (`node.expr.value`, `path.call(print, "expr", "value")` —
+  > ~115 sites: 86 `"value"` navigations + 29 `.value` reads). But
+  > `typescript-generator` mis-modeled `Optional<T>` as a bare optional property
+  > `expr?: Expr` (no `value` wrapper). So typing a handler's node and reading
+  > `.value` is a *false* type error everywhere. M3c can't proceed cleanly until
+  > this is fixed.
+  - [ ] **M3c-pre — Model `Optional<T>` as `{value?: T}` in codegen.** New
+    typescript-generator customization (a TypeProcessor/extension mapping
+    `java.util.Optional<T>` → `{ value?: T }`, likely a named generic alias
+    `JorjeOptional<T>`). Regenerate `jorje.d.ts`, fix fallout in the 7
+    already-typed handlers + `util.ts`/`parser.ts` `jorje.*` usages. Verify output
+    unchanged (type-only). Then M3c is unblocked. Watch: empty Optional serializes
+    as `{}` (value absent) — so `value` must be optional, and confirm whether the
+    wrapper field itself is always present (it is — Java `Optional` is never null).
 
   > **Dispatch model (discovered in M3a — the plan underestimated this).** Two
   > dispatch paths: exact `@class` → single handler `(path, …)`; else parent via
@@ -244,9 +262,11 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
 - **2026-06-19** — **M3a done.** Runtime exhaustiveness test (98 tests green).
   Mapped the real dispatch model; chose test-first + runtime exhaustiveness per
   user. Surfaced a pre-existing SOQL `WITH`-tuple gap (denylisted, flagged).
-  Opened a tracking-issue request for the gap (blocked by permission gate —
-  pending user approval).
+  Tracking issue #2423 filed for the gap.
 - **2026-06-19** — **M3b done.** Split dispatch into typed `singleNodeHandlers`/
   `childNodeHandlers`, threaded `ApexParserOptions`, removed the `as` casts. 98 +
-  276 (`AST_COMPARE`) tests green, output unchanged. Next: **M3c** (parameterize
-  handler bodies to typed nodes) or **M4** (`noImplicitAny`).
+  276 (`AST_COMPARE`) tests green, output unchanged.
+- **2026-06-19** — Filed issue #2423 (SOQL WITH-tuple gap). Started **M3c**,
+  hit a blocker: generated `Optional<T>` types are wrong (modeled `field?: T`,
+  runtime is `{value?: T}`; ~115 access sites). Added **M3c-pre** (codegen fix)
+  as prerequisite. Paused for direction.
