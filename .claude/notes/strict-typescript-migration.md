@@ -343,14 +343,33 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
   site. prod+wider tsc, lint, 287 built-in AST_COMPARE green. (Built-in is
   representative: M5 is pure TS-enrichment typing, no Java change, so native mode
   exercises the identical code path.)
-- [ ] **M6 — `strictNullChecks` (RISKIEST).** Add a typed non-null
-  `getNode(path): Enriched<T>` helper (dispatch guarantees a current node).
-  Handle `delete node.loc`/`delete node.danglingComments` (TS2790 → optional) and
-  `node.loc.*` reads. Full `AST_COMPARE` + **both** `built-in` and `native`
-  parser configs.
-- [ ] **M7 — `strict: true` consolidation + lint.** Replace individual flags with
-  `strict: true` (+ `noImplicitOverride`); verify zero new errors. Flip Biome
-  `suspicious.noExplicitAny` → `error`; confirm no residual `any`.
+- [x] **M6 — `strictNullChecks`. DONE (no-op verification).** Already enforced via
+  the base the whole time (see MAJOR FINDING), and the null-handling was done
+  incrementally as each area was typed (M3c `?? false`, M4 `in`-narrowing +
+  `?? []`, M5 `node.loc!`/`startLine!` + guards). The plan's M6-specific tasks are
+  moot: the printer already reads non-null `path.node` (no `getNode` helper
+  needed), and the parser nulls `loc` by **assignment, not `delete`** (existing
+  comment at the location visitor), so there's no TS2790. Confirmed by M7's
+  explicit `strict: true` compiling green.
+- [x] **M7 — `strict: true` consolidation + lint. DONE.** Replaced the per-flag
+  strict options in `tsconfig.prod.json` with an explicit `"strict": true` (+
+  `noImplicitOverride`) — restates the bar at the package level instead of relying
+  on the `@tsconfig/node22` base; green compile confirms `strictNullChecks`/
+  `noImplicitAny`/`strictPropertyInitialization` add nothing. Flipped Biome
+  `suspicious.noExplicitAny` → **error**; the one remaining `any` in the lint scope
+  (`tests_config/run-spec.ts` `parse(): Promise<any>`, only consumed by
+  `expect().toEqual()`) became `Promise<unknown>`. prod+wider tsc, lint, 287
+  built-in AST_COMPARE green.
+
+## ✅ MIGRATION COMPLETE (M0–M7)
+
+`packages/prettier-plugin-apex` is at the strictest practical TypeScript:
+`strict: true` package-wide (incl. tests/config via the wider tsconfig), Biome
+`noExplicitAny` as an error, zero `any` in `src/`, and a typed `@class`→handler
+dispatch where every printer handler is checked against its exact jorje node.
+Formatter output is byte-identical throughout (287 AST_COMPARE green at every
+step). **Before the final merge: delete this note** (session scaffolding, per
+global CLAUDE.md).
 
 **Riskiest: M6** — sequenced strictly after M1/M3/M4/M5 to de-risk. M3 is the
 largest but is snapshot-guarded and mechanical.
@@ -439,8 +458,11 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   remain in M3c. prod+wider tsc, lint, 287 AST_COMPARE green.
 - **2026-06-19** — **M5 DONE.** Typed the parser DFS enrichment walk: `AstNode`
   structural interface + `NodeLocation`, replacing the last `any` in `src/`.
-  prod+wider tsc, lint, 287 built-in AST_COMPARE green. M6/M7 remain (mostly
-  verification + the Biome `noExplicitAny` flip — strict is already enforced).
+  prod+wider tsc, lint, 287 built-in AST_COMPARE green.
+- **2026-06-19** — **M6 (no-op verify) + M7 DONE → MIGRATION COMPLETE.** Explicit
+  `strict: true` + `noImplicitOverride` in `tsconfig.prod.json`; Biome
+  `noExplicitAny` flipped to error; last lint-scope `any` (`run-spec.ts`) →
+  `unknown`. All green. Remember to delete this note before the final merge.
 - **2026-06-19** — **M4 DONE + codegen fix.** Fixed the `ParameterRef.type`→
   `typeRef` codegen divergence (`CustomFieldExtension` rename; verified it's the
   only getter/field name mismatch affecting a handled node) and dropped the two
