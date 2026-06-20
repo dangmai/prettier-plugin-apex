@@ -181,7 +181,16 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
       `const { left, right } = node`); and a `getParentNode(path):
       EnrichedApexNode | null` helper (Prettier mistypes the parent as the same
       `T`). prod+wider tsc, lint, 276 AST_COMPARE green.
-    - [ ] Remaining single-handler categories: declarations/members, SOQL, SOSL,
+    - [x] **Declarations & members category DONE.** Typed class/interface/enum/
+      method/variable declarations, the 5 compilation units, the 8 block members
+      (incl. the `handleStatementBlockMember`/`handlePropertyGetterSetter`
+      factories), property decl/getter/setter. New friction: deep `path.call(cb,
+      "members", i, "stmnt")` navigation can't be key-checked because
+      `members: BlockMember[]` is abstract — used a localized, commented
+      `(path as AstPath).call(...)` escape (2 sites: anon-block + trigger units;
+      the 2-level `"members", index` navs type fine). prod+wider tsc, lint, 276
+      AST_COMPARE green.
+    - [ ] Remaining single-handler categories: SOQL, SOSL,
       type-refs/annotations/misc.
     - [ ] **Child handlers (18)** — separate sub-step. Their `path` holds a
       heterogeneous node per `childClass`, so the abstract-parent path generic
@@ -336,3 +345,7 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
 - **2026-06-19** — **M3c expressions category DONE.** Typed ~32 expression single
   handlers. Made `isBinaryish` a type guard and added the `getParentNode` helper
   (both reusable by later categories). prod+wider tsc, lint, 276 AST_COMPARE green.
+- **2026-06-19** — **M3c declarations & members category DONE.** Typed ~22
+  declaration/unit/member handlers. Localized `(path as AstPath)` cast for the
+  abstract `BlockMember[]` deep navigation (2 sites). prod+wider tsc, lint, 276
+  AST_COMPARE green.

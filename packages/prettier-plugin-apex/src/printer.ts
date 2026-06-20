@@ -522,7 +522,10 @@ function getDanglingCommentDocs(path: AstPath, _print: PrintFn, options: any) {
   return danglingCommentParts;
 }
 
-function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
+function handleAnonymousBlockUnit(
+  path: AstPath<Enriched<jorje.AnonymousBlockUnit>>,
+  print: PrintFn,
+): Doc {
   // Unlike other compilation units, Anonymous Unit cannot have dangling comments,
   // so we don't have to handle them here.
   const parts: Doc[] = [];
@@ -541,11 +544,14 @@ function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
       parts.push(memberDoc);
     }
 
-    // #1892 - respect trailing empty line even for ignored nodes
+    // #1892 - respect trailing empty line even for ignored nodes.
+    // `members` is `BlockMember[]` (abstract), so Prettier can't type the
+    // navigation into `[i].stmnt`; the cast escapes its key-checking only.
     if (
-      path.call(
-        (innerPath) =>
-          hasPrettierIgnore(innerPath) && innerPath.getNode().trailingEmptyLine,
+      (path as AstPath).call(
+        (innerPath: AstPath) =>
+          hasPrettierIgnore(innerPath) &&
+          asEnriched(innerPath.getNode()).trailingEmptyLine,
         "members",
         i,
         "stmnt",
@@ -558,7 +564,7 @@ function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleTriggerDeclarationUnit(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.TriggerDeclUnit>>,
   print: PrintFn,
   options: any,
 ) {
@@ -599,12 +605,14 @@ function handleTriggerDeclarationUnit(
       if (index !== allMemberDocs.length - 1) {
         innerDocs.push(hardline);
       }
-      // #1892 - respect trailing empty line even for ignored nodes
+      // #1892 - respect trailing empty line even for ignored nodes.
+      // `members` is `BlockMember[]` (abstract), so Prettier can't type the
+      // navigation into `[index].stmnt`; the cast escapes its key-checking only.
       if (
-        path.call(
-          (innerPath) =>
+        (path as AstPath).call(
+          (innerPath: AstPath) =>
             hasPrettierIgnore(innerPath) &&
-            innerPath.getNode().trailingEmptyLine,
+            asEnriched(innerPath.getNode()).trailingEmptyLine,
           "members",
           index,
           "stmnt",
@@ -625,11 +633,11 @@ function handleTriggerDeclarationUnit(
 }
 
 function handleInterfaceDeclaration(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.InterfaceDecl>>,
   print: PrintFn,
   options: any,
 ) {
-  const node = path.getNode();
+  const node = path.node;
 
   const superInterface: Doc = path.call(print, "superInterface", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
@@ -682,11 +690,11 @@ function handleInterfaceDeclaration(
 }
 
 function handleClassDeclaration(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.ClassDecl>>,
   print: PrintFn,
   options: any,
 ): Doc {
-  const node = path.getNode();
+  const node = path.node;
 
   const superClass: Doc = path.call(print, "superClass", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
@@ -710,7 +718,7 @@ function handleClassDeclaration(
         path.call(
           (innerPath) =>
             hasPrettierIgnore(innerPath) &&
-            innerPath.getNode().trailingEmptyLine,
+            asEnriched(innerPath.getNode()).trailingEmptyLine,
           "members",
           index,
         )
@@ -864,8 +872,11 @@ function handleJavaTypeRef(path: AstPath, print: PrintFn): Doc {
 
 function handleStatementBlockMember(
   modifier?: string,
-): (path: AstPath, print: PrintFn) => Doc {
-  return (path: AstPath, print: PrintFn) => {
+): (
+  path: AstPath<Enriched<jorje.StmntBlockMember | jorje.StaticStmntBlockMember>>,
+  print: PrintFn,
+) => Doc {
+  return (path, print) => {
     const statementDoc: Doc = path.call(print, "stmnt");
 
     const parts: Doc[] = [];
@@ -878,7 +889,10 @@ function handleStatementBlockMember(
   };
 }
 
-function handlePropertyDeclaration(path: AstPath, print: PrintFn): Doc {
+function handlePropertyDeclaration(
+  path: AstPath<Enriched<jorje.PropertyDecl>>,
+  print: PrintFn,
+): Doc {
   const modifierDocs: Doc[] = path.map(print, "modifiers");
   const getterDoc: Doc = path.call(print, "getter", "value");
   const setterDoc: Doc = path.call(print, "setter", "value");
@@ -910,8 +924,11 @@ function handlePropertyDeclaration(path: AstPath, print: PrintFn): Doc {
 
 function handlePropertyGetterSetter(
   action: "get" | "set",
-): (path: AstPath, print: PrintFn) => Doc {
-  return (path: AstPath, print: PrintFn) => {
+): (
+  path: AstPath<Enriched<jorje.PropertyGetter | jorje.PropertySetter>>,
+  print: PrintFn,
+) => Doc {
+  return (path, print) => {
     const statementDoc: Doc = path.call(print, "stmnt", "value");
 
     const parts: Doc[] = [];
@@ -927,7 +944,10 @@ function handlePropertyGetterSetter(
   };
 }
 
-function handleMethodDeclaration(path: AstPath, print: PrintFn): Doc {
+function handleMethodDeclaration(
+  path: AstPath<Enriched<jorje.MethodDecl>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
   const parameterDocs: Doc[] = path.map(print, "parameters");
@@ -1042,7 +1062,7 @@ function handleDmlMergeStatement(
 }
 
 function handleEnumDeclaration(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.EnumDecl>>,
   print: PrintFn,
   options: any,
 ): Doc {
@@ -1343,39 +1363,66 @@ function handleLiteralCase(
   return path.call(print, "expr");
 }
 
-function handleClassDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+function handleClassDeclarationUnit(
+  path: AstPath<Enriched<jorje.ClassDeclUnit>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleEnumDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+function handleEnumDeclarationUnit(
+  path: AstPath<Enriched<jorje.EnumDeclUnit>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleInterfaceDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+function handleInterfaceDeclarationUnit(
+  path: AstPath<Enriched<jorje.InterfaceDeclUnit>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handlePropertyMember(path: AstPath, print: PrintFn): Doc {
+function handlePropertyMember(
+  path: AstPath<Enriched<jorje.PropertyMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "propertyDecl");
 }
 
-function handleFieldMember(path: AstPath, print: PrintFn): Doc {
+function handleFieldMember(
+  path: AstPath<Enriched<jorje.FieldMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "variableDecls");
 }
 
-function handleMethodMember(path: AstPath, print: PrintFn): Doc {
+function handleMethodMember(
+  path: AstPath<Enriched<jorje.MethodMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "methodDecl");
 }
 
-function handleInnerClassMember(path: AstPath, print: PrintFn): Doc {
+function handleInnerClassMember(
+  path: AstPath<Enriched<jorje.InnerClassMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleInnerEnumMember(path: AstPath, print: PrintFn): Doc {
+function handleInnerEnumMember(
+  path: AstPath<Enriched<jorje.InnerEnumMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleInnerInterfaceMember(path: AstPath, print: PrintFn): Doc {
+function handleInnerInterfaceMember(
+  path: AstPath<Enriched<jorje.InnerInterfaceMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
@@ -1415,14 +1462,17 @@ function handleApexExpression(path: AstPath, print: PrintFn): Doc {
   return path.call(print, "expr");
 }
 
-function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleVariableDeclaration(
+  path: AstPath<Enriched<jorje.VariableDecl>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   let resultDoc: Doc;
 
   parts.push(path.call(print, "name"));
   const assignmentDocs: Doc = path.call(print, "assignment", "value");
-  const assignmentComments = node.assignment?.value?.comments;
+  const assignmentComments = asEnriched(node.assignment.value)?.comments;
   const assignmentHasLeadingComment =
     Array.isArray(assignmentComments) &&
     assignmentComments.some((comment) => comment.leading);
