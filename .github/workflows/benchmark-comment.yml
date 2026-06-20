@@ -22,8 +22,8 @@ permissions:
 jobs:
   comment:
     name: Post benchmark comment
-    # Only PR-triggered benchmark runs that produced results. Dispatches benchmark
-    # a branch (no PR to comment on) and failed runs have nothing to post.
+    # Only PR-triggered benchmark runs that produced results. Dispatched runs
+    # benchmark a branch (no PR to comment on) and failed runs have nothing to post.
     if: >-
       github.event.workflow_run.event == 'pull_request' &&
       github.event.workflow_run.conclusion == 'success'
