@@ -29,7 +29,7 @@ async function prettyPrint(
   });
 }
 
-async function parse(string: string, opts: prettier.Options): Promise<any> {
+async function parse(string: string, opts: prettier.Options): Promise<unknown> {
   const result = await prettier.__debug.parse(
     string,
     {

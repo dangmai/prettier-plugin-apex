@@ -25,16 +25,12 @@
     // "isolatedModules": true,                     /* Transpile each file as a separate module (similar to 'ts.transpileModule'). */
 
     /* Strict Type-Checking Options */
-    /* Enabled incrementally — see .claude/notes/strict-typescript-migration.md */
-    // "strict": true,                              /* Final consolidation (M7). */
-    // "noImplicitAny": true,                       /* M4. */
-    // "strictNullChecks": true,                    /* M6 (riskiest). */
-    "strictFunctionTypes": true /* Enable strict checking of function types. */,
-    "strictBindCallApply": true /* Enable strict 'bind', 'call', and 'apply' methods on functions. */,
-    // "strictPropertyInitialization": true,        /* No-op here (no class fields); flip with strict (M7). */
-    "noImplicitThis": true /* Raise error on 'this' expressions with an implied 'any' type. */,
-    "alwaysStrict": true /* Parse in strict mode and emit "use strict" for each source file. */,
-    "useUnknownInCatchVariables": true /* Type catch clause variables as 'unknown' instead of 'any'. */,
+    /* The whole strict family is enforced. The @tsconfig/node22 base already
+       sets "strict": true; we restate it here so the package's strictness bar
+       doesn't depend on reading the base, and add the extra check strict
+       doesn't cover. */
+    "strict": true /* noImplicitAny, strictNullChecks, strictFunctionTypes, strictBindCallApply, strictPropertyInitialization, noImplicitThis, alwaysStrict, useUnknownInCatchVariables. */,
+    "noImplicitOverride": true /* Require 'override' on members that override a base class member. */,
 
     /* Additional Checks */
     "noUnusedLocals": true /* Report errors on unused locals. */,
