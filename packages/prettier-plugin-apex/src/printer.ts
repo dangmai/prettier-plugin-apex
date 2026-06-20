@@ -24,6 +24,7 @@ import {
   TRIGGER_USAGE,
 } from "./constants.js";
 import type { EnrichedIfBlock } from "./jorje-nodes.js";
+import type { ApexParserOptions } from "./options.js";
 import {
   type AnnotatedComment,
   checkIfParentIsDottedExpression,
@@ -3054,16 +3055,17 @@ function handleForInit(path: AstPath, print: PrintFn): Doc[] {
 type SingleNodeHandler = (
   path: AstPath,
   print: PrintFn,
-  options: prettier.ParserOptions,
+  options: ApexParserOptions,
 ) => Doc;
 type ChildNodeHandler = (
   childClass: string,
   path: AstPath,
   print: PrintFn,
-  options: prettier.ParserOptions,
+  options: ApexParserOptions,
 ) => Doc;
 
-const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
+// Dispatched when a node's exact `@class` matches the key.
+const singleNodeHandlers: { [key: string]: SingleNodeHandler } = {
   [APEX_TYPES.IF_ELSE_BLOCK]: handleIfElseBlock,
   [APEX_TYPES.IF_BLOCK]: handleIfBlock,
   [APEX_TYPES.ELSE_BLOCK]: handleElseBlock,
@@ -3081,9 +3083,7 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.NAME_VALUE_PARAMETER]: handleNameValueParameter,
   [APEX_TYPES.ANNOTATION]: handleAnnotation,
   [APEX_TYPES.ANNOTATION_KEY_VALUE]: handleAnnotationKeyValue,
-  [APEX_TYPES.ANNOTATION_VALUE]: handleAnnotationValue,
   [APEX_TYPES.ANNOTATION_STRING]: handleAnnotationString,
-  [APEX_TYPES.MODIFIER]: handleModifier,
   [APEX_TYPES.RUN_AS_BLOCK]: handleRunAsBlock,
   [APEX_TYPES.DO_LOOP]: handleDoLoop,
   [APEX_TYPES.WHILE_LOOP]: handleWhileLoop,
@@ -3103,7 +3103,6 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.TRY_CATCH_FINALLY_BLOCK]: handleTryCatchFinallyBlock,
   [APEX_TYPES.CATCH_BLOCK]: handleCatchBlock,
   [APEX_TYPES.FINALLY_BLOCK]: handleFinallyBlock,
-  [APEX_TYPES.STATEMENT]: handleStatement,
   [APEX_TYPES.DML_MERGE_STATEMENT]: handleDmlMergeStatement,
   [APEX_TYPES.SWITCH_STATEMENT]: handleSwitchStatement,
   [APEX_TYPES.VALUE_WHEN]: handleValueWhen,
@@ -3201,13 +3200,10 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   // SOSL
   [APEX_TYPES.SEARCH]: handleSearch,
   [APEX_TYPES.FIND_CLAUSE]: handleFindClause,
-  [APEX_TYPES.FIND_VALUE]: handleFindValue,
   [APEX_TYPES.IN_CLAUSE]: handleInClause,
   [APEX_TYPES.WITH_DIVISION_CLAUSE]: handleDivisionClause,
-  [APEX_TYPES.DIVISION_VALUE]: handleDivisionValue,
   [APEX_TYPES.WITH_DATA_CATEGORY_CLAUSE]: handleWithDataCategories,
   [APEX_TYPES.SEARCH_WITH_CLAUSE]: handleSearchWithClause,
-  [APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE]: handleSearchWithClauseValue,
   [APEX_TYPES.RETURNING_CLAUSE]: handleReturningClause,
   [APEX_TYPES.RETURNING_EXPRESSION]: handleReturningExpression,
   [APEX_TYPES.RETURNING_SELECT_EXPRESSION]: handleReturningSelectExpression,
@@ -3230,7 +3226,6 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.FROM_EXPRESSION]: handleFromExpression,
   [APEX_TYPES.GROUP_BY_CLAUSE]: handleGroupByClause,
   [APEX_TYPES.GROUP_BY_EXPRESSION]: handleGroupByExpression,
-  [APEX_TYPES.GROUP_BY_TYPE]: handleGroupByType,
   [APEX_TYPES.HAVING_CLAUSE]: handleHavingClause,
   [APEX_TYPES.WHERE_CLAUSE]: handleWhereClause,
   [APEX_TYPES.WHERE_INNER_EXPRESSION]: handleWhereInnerExpression,
@@ -3249,15 +3244,12 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.NUMBER_LITERAL]: handleNumberLiteral,
   [APEX_TYPES.NUMBER_EXPRESSION]: handleNumberExpression,
   [APEX_TYPES.QUERY_LITERAL_EXPRESSION]: handleQueryLiteralExpression,
-  [APEX_TYPES.QUERY_LITERAL]: handleWhereQueryLiteral,
   [APEX_TYPES.APEX_EXPRESSION]: handleApexExpression,
   [APEX_TYPES.COLON_EXPRESSION]: handleColonExpression,
   [APEX_TYPES.ORDER_BY_CLAUSE]: handleOrderByClause,
-  [APEX_TYPES.ORDER_BY_EXPRESSION]: handleOrderByExpression,
   [APEX_TYPES.WITH_VALUE]: handleWithValue,
   [APEX_TYPES.WITH_DATA_CATEGORIES]: handleWithDataCategories,
   [APEX_TYPES.DATA_CATEGORY]: handleDataCategory,
-  [APEX_TYPES.DATA_CATEGORY_OPERATOR]: handleDataCategoryOperator,
   [APEX_TYPES.LIMIT_VALUE]: (path: AstPath, print: PrintFn) => [
     "LIMIT",
     " ",
@@ -3278,21 +3270,11 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
     " ",
     path.call(print, "expr"),
   ],
-  [APEX_TYPES.QUERY_OPERATOR]: (childClass: string) =>
-    QUERY[childClass as jorje.QueryOp["@class"]],
-  [APEX_TYPES.SOQL_ORDER]: handleOrderOperation,
-  [APEX_TYPES.SOQL_ORDER_NULL]: handleNullOrderOperation,
-  [APEX_TYPES.TRACKING_TYPE]: handleTrackingType,
-  [APEX_TYPES.QUERY_OPTION]: handleQueryOption,
   [APEX_TYPES.QUERY_USING_CLAUSE]: handleQueryUsingClause,
-  [APEX_TYPES.USING_EXPRESSION]: handleUsingExpression,
   [APEX_TYPES.UPDATE_STATS_CLAUSE]: handleUpdateStatsClause,
-  [APEX_TYPES.UPDATE_STATS_OPTION]: handleUpdateStatsOption,
   [APEX_TYPES.WHERE_CALC_EXPRESSION]: handleWhereCalcExpression,
   [APEX_TYPES.WHERE_CALC_OPERATOR_PLUS]: () => "+",
   [APEX_TYPES.WHERE_CALC_OPERATOR_MINUS]: () => "-",
-  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: (childClass: string) =>
-    QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]],
   [APEX_TYPES.SEARCH_USING_CLAUSE]: (path: AstPath, print: PrintFn) => [
     "USING",
     " ",
@@ -3310,15 +3292,42 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.WITH_KEY_VALUE]: handleWithKeyValue,
 };
 
+// Dispatched as a fallback when a node's exact `@class` has no single handler:
+// the node's class is an abstract parent (e.g. a `Stmnt` subclass or an enum-like
+// operator), so its concrete `@class` is passed to the parent's handler.
+const childNodeHandlers: { [key: string]: ChildNodeHandler } = {
+  [APEX_TYPES.ANNOTATION_VALUE]: handleAnnotationValue,
+  [APEX_TYPES.MODIFIER]: handleModifier,
+  [APEX_TYPES.STATEMENT]: handleStatement,
+  [APEX_TYPES.FIND_VALUE]: handleFindValue,
+  [APEX_TYPES.DIVISION_VALUE]: handleDivisionValue,
+  [APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE]: handleSearchWithClauseValue,
+  [APEX_TYPES.GROUP_BY_TYPE]: handleGroupByType,
+  [APEX_TYPES.QUERY_LITERAL]: handleWhereQueryLiteral,
+  [APEX_TYPES.ORDER_BY_EXPRESSION]: handleOrderByExpression,
+  [APEX_TYPES.DATA_CATEGORY_OPERATOR]: handleDataCategoryOperator,
+  [APEX_TYPES.QUERY_OPERATOR]: (childClass: string) =>
+    QUERY[childClass as jorje.QueryOp["@class"]],
+  [APEX_TYPES.SOQL_ORDER]: handleOrderOperation,
+  [APEX_TYPES.SOQL_ORDER_NULL]: handleNullOrderOperation,
+  [APEX_TYPES.TRACKING_TYPE]: handleTrackingType,
+  [APEX_TYPES.QUERY_OPTION]: handleQueryOption,
+  [APEX_TYPES.USING_EXPRESSION]: handleUsingExpression,
+  [APEX_TYPES.UPDATE_STATS_OPTION]: handleUpdateStatsOption,
+  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: (childClass: string) =>
+    QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]],
+};
+
 /**
  * The `@class` strings the printer dispatches on directly (exact match) or as a
  * parent fallback. Exported so the exhaustiveness test can assert every concrete
  * jorje node in the `ApexNode` union is reachable. See
  * `tests/dispatch_exhaustiveness/dispatch.spec.ts`.
  */
-export const NODE_HANDLER_CLASSES: ReadonlySet<string> = new Set(
-  Object.keys(nodeHandler),
-);
+export const NODE_HANDLER_CLASSES: ReadonlySet<string> = new Set([
+  ...Object.keys(singleNodeHandlers),
+  ...Object.keys(childNodeHandlers),
+]);
 
 function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
   // Early return optimization: if node has no trailingEmptyLine, return immediately
@@ -3359,7 +3368,7 @@ function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
 
 function genericPrint(
   path: AstPath,
-  options: prettier.ParserOptions,
+  options: ApexParserOptions,
   print: PrintFn,
 ) {
   const n = path.getNode();
@@ -3387,17 +3396,16 @@ function genericPrint(
   if (!apexClass) {
     return "";
   }
-  if (apexClass in nodeHandler) {
-    return (nodeHandler[apexClass] as SingleNodeHandler)(path, print, options);
+  const singleHandler = singleNodeHandlers[apexClass];
+  if (singleHandler) {
+    return singleHandler(path, print, options);
   }
   const parentClass = getParentType(apexClass);
-  if (parentClass && parentClass in nodeHandler) {
-    return (nodeHandler[parentClass] as ChildNodeHandler)(
-      apexClass,
-      path,
-      print,
-      options,
-    );
+  if (parentClass !== undefined) {
+    const childHandler = childNodeHandlers[parentClass];
+    if (childHandler) {
+      return childHandler(apexClass, path, print, options);
+    }
   }
   /* v8 ignore start */
   throw new Error(
@@ -3406,14 +3414,17 @@ function genericPrint(
   /* v8 ignore stop */
 }
 
-let options: prettier.ParserOptions;
+let options: ApexParserOptions;
 export default function printGenerically(
   path: AstPath,
+  // Prettier hands us a plain ParserOptions; the apex* options it was configured
+  // with are present at runtime (see `options` in index.ts), so we view it as an
+  // ApexParserOptions for the rest of the printer.
   opts: prettier.ParserOptions,
   print: PrintFn,
 ): Doc {
   if (typeof opts === "object") {
-    options = opts;
+    options = opts as ApexParserOptions;
   }
   const node = path.getNode();
   const doc = genericPrint(path, options, print);

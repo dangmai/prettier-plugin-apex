@@ -151,11 +151,17 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
     hits it. Denylisted + flagged as currently-unsupported grammar (not caused by
     this refactor). The denylist also documents comments/root/locations/errors/
     phantoms as non-dispatched.
-  - [ ] **M3b — Typed two-map split.** Split `nodeHandler` into typed
-    `singleNodeHandlers` / `childNodeHandlers` (18 child handlers = those whose
-    first param is `childClass`; verified list in commit/analysis), thread
-    `ApexParserOptions`, remove the `as SingleNodeHandler`/`as ChildNodeHandler`
-    casts. Behavior-preserving; verify with snapshots + `AST_COMPARE`.
+  - [x] **M3b — Typed two-map split. DONE.** Split `nodeHandler` into typed
+    `singleNodeHandlers` (`{[key]: SingleNodeHandler}`) and `childNodeHandlers`
+    (`{[key]: ChildNodeHandler}`, the 18 child entries). Dispatch now indexes the
+    two maps with no `as` casts (guarded by `noUncheckedIndexedAccess`). Threaded
+    `ApexParserOptions` through `genericPrint`/`printGenerically` (cast once at the
+    prettier boundary — `opts as ApexParserOptions` — since prettier's Printer
+    interface hands a plain `ParserOptions` and `strictFunctionTypes` forbids
+    narrowing the param). The handler types were the safety net: a mis-sorted
+    child handler wouldn't fit `SingleNodeHandler`, so `tsc` would catch it.
+    Verified: prod+wider tsc, lint, 98 plain + 276 `AST_COMPARE` tests — output
+    unchanged.
   - [ ] **M3c — Parameterize handler bodies** to `AstPath<Enriched<T>>` /
     typed `path.getNode()` by category (statements/expressions vs SOQL/SOSL). The
     bulk; pairs with M6's null handling.
@@ -238,4 +244,9 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
 - **2026-06-19** — **M3a done.** Runtime exhaustiveness test (98 tests green).
   Mapped the real dispatch model; chose test-first + runtime exhaustiveness per
   user. Surfaced a pre-existing SOQL `WITH`-tuple gap (denylisted, flagged).
-  Next: **M3b** (typed single/child map split + `ApexParserOptions` + drop casts).
+  Opened a tracking-issue request for the gap (blocked by permission gate —
+  pending user approval).
+- **2026-06-19** — **M3b done.** Split dispatch into typed `singleNodeHandlers`/
+  `childNodeHandlers`, threaded `ApexParserOptions`, removed the `as` casts. 98 +
+  276 (`AST_COMPARE`) tests green, output unchanged. Next: **M3c** (parameterize
+  handler bodies to typed nodes) or **M4** (`noImplicitAny`).
