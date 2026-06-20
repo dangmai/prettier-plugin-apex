@@ -82,9 +82,33 @@ by `Enriched<>` + discriminant narrowing. **Do not** build a `callChild`/
 
 Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 
-- [~] **M0 — Handoff note + codegen union.** Note: **done** (this file). Still
-  todo: add the codegen extension emitting `ApexNode`, regenerate `jorje.d.ts`,
-  verify the union appears and the package builds. Document the regen command.
+- [x] **M0 — Handoff note + codegen union. DONE.** Repurposed the abandoned
+  `GenericNodeExtension` stub (it emitted a stray empty `AstNode` interface) into
+  `ApexNodeUnionExtension` (`packages/apex-ast-serializer/server/src/main/java/
+  net/dangmai/serializer/types/ApexNodeUnionExtension.java`), registered in
+  `server/build.gradle` `extensionClasses`. It runs a `TsModelTransformer` at
+  `BeforeSymbolResolution` and emits `export type ApexNode = <union>;` of every
+  bean with a non-null `getDiscriminantLiteral()` (i.e. a single-literal
+  `@class`; abstract parents have a null literal and are excluded), sorted by
+  name for stable output. Regenerate with **`pnpm nx run apex-ast-serializer:build`**
+  (~3s; needs `libs/apex-jorje-lsp.jar`, present). Verified: `ApexNode` appears
+  with 296 members, the `AstNode` stub is gone, and plugin `build` + `lint` +
+  built-in `test:parser` (95 tests) all pass.
+
+  > **Finding for M3 — phantom union members.** The simple
+  > `discriminantLiteral != null` filter is intentionally complete (never drops a
+  > real node), so the union also includes ~14 jorje-internal classes that the
+  > printer never formats. M3's `UnhandledClass` denylist must cover these
+  > alongside `InvalidDeclUnit`: `Identifiers`, `Locatables`, `Locations`,
+  > `LocationBlocks`, `ParameterRefs`, `TypeRefs`, `SoslValues`, `PrinterBlocks`,
+  > `HiddenTokens`, `InternalException`, `CompilationUnitBuilder`,
+  > `TypeRefBuilder`, `JadtTester`, `SwitchTester`. (They're the concrete
+  > single-`@class` beans that are never referenced as a field type — verified
+  > via grep. Filtering them in Java codegen was rejected: graph-reachability is
+  > fragile and its failure mode silently drops real nodes. The denylist is the
+  > explicit, reviewable, TS-side place for this.) Note `ParserOutput` (the root)
+  > IS in the union and IS handled — keep it. Re-derive the exact denylist at M3
+  > by diffing registry keys against `ApexNode["@class"]`.
 - [ ] **M1 — Foundations, no flag flips.** Add `src/jorje-nodes.ts`
   (`ApexEnrichment`, `Enriched<>`, `EnrichedApexNode`), add `ApexParserOptions`,
   fold in `EnrichedIfBlock`/`AnnotatedComment`. Additive only. Lowest risk.
@@ -143,5 +167,9 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
 
 - **2026-06-19** — Exploration + plan. Confirmed jorje.d.ts is generated and
   union-ready; confirmed the printer-dispatch weakness; locked the three
-  decisions above. Plan approved. Worktree `strict-typescript` created, this note
-  written. **No code changed yet** — M0 codegen + M1 onward are next.
+  decisions above. Plan approved. Worktree `strict-typescript` created, note
+  written.
+- **2026-06-19** — **M0 done.** Added `ApexNodeUnionExtension` (repurposed the
+  `GenericNodeExtension` stub), emitting `ApexNode` (296 members). Build + lint +
+  built-in tests green. Recorded the phantom-member finding above for M3. Next:
+  **M1** (`src/jorje-nodes.ts` `Enriched<>` layer + `ApexParserOptions`).

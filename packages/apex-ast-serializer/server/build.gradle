@@ -201,7 +201,7 @@ generateTypeScript {
     'net.dangmai.serializer.types.CustomEnumExtension',
     'net.dangmai.serializer.types.CustomFieldExtension',
     'net.dangmai.serializer.types.UnionTypeExtension',
-    'net.dangmai.serializer.types.GenericNodeExtension',
+    'net.dangmai.serializer.types.ApexNodeUnionExtension',
   ]
   sortDeclarations = true
   noFileComment = true
