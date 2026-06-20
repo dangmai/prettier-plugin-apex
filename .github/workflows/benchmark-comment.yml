@@ -1,0 +1,59 @@
+name: Benchmark comment
+
+# Posts the benchmark comparison as a sticky PR comment. This is split out from
+# the Benchmark workflow so it can comment on FORK PRs: a `pull_request` run from
+# a fork gets a read-only token (it can't comment — "Resource not accessible by
+# integration"). This workflow instead runs via `workflow_run`, in the base
+# repo's context with a write token. Crucially it NEVER checks out or runs the
+# fork's code — it only downloads the inert results artifact and posts — so the
+# write token can't be abused by untrusted code. (This is the secure alternative
+# to pull_request_target, which would run fork code with elevated permissions.)
+
+on:
+  workflow_run:
+    workflows: ["Benchmark"]
+    types: [completed]
+
+permissions:
+  contents: read
+  actions: read # download the artifact from the triggering run
+  pull-requests: write # post the comment
+
+jobs:
+  comment:
+    name: Post benchmark comment
+    # Only PR-triggered benchmark runs that produced results. Dispatches benchmark
+    # a branch (no PR to comment on) and failed runs have nothing to post.
+    if: >-
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download benchmark results from the triggering run
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: benchmark-results
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifact
+
+      # The PR number was written by the benchmark run (workflow_run.pull_requests
+      # is empty for forks). Validate it's a number before trusting it.
+      - name: Read PR number
+        id: meta
+        run: |
+          set -euo pipefail
+          pr=""
+          if [ -f artifact/pr-number.txt ]; then
+            pr=$(tr -dc '0-9' < artifact/pr-number.txt)
+          fi
+          echo "pr=$pr" >> "$GITHUB_OUTPUT"
+          echo "PR number: ${pr:-<none>}"
+
+      - name: Post sticky comment
+        if: steps.meta.outputs.pr != '' && hashFiles('artifact/report.md') != ''
+        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        with:
+          number: ${{ steps.meta.outputs.pr }}
+          header: benchmark
+          path: artifact/report.md

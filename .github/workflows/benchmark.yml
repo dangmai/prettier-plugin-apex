@@ -29,11 +29,12 @@ on:
         required: false
         type: string
 
-# Read prior workflow artifacts (main's native build) and write a sticky comment.
+# Reads prior workflow artifacts (main's native build). Commenting is handled by
+# the separate benchmark-comment.yml (workflow_run) so it works for fork PRs too,
+# so this workflow — which runs untrusted fork code — needs no write scope.
 permissions:
   contents: read
   actions: read
-  pull-requests: write
 
 # A new push / dispatch supersedes an in-flight run for the same PR or branch.
 concurrency:
@@ -65,11 +66,9 @@ jobs:
           head_ref="$GH_REF"
           base_ref=""
           compare=false
-          comment=false
           if [ "$EVENT_NAME" = "pull_request" ]; then
             base_ref="$PR_BASE_REF"
             compare=true
-            comment=true
           elif [ -n "${PR_INPUT:-}" ]; then
             if ! printf '%s' "$PR_INPUT" | grep -Eq '^[0-9]+$'; then
               echo "::error::The 'pr' input must be a PR number."
@@ -88,9 +87,8 @@ jobs:
             echo "head_ref=$head_ref"
             echo "base_ref=$base_ref"
             echo "compare=$compare"
-            echo "comment=$comment"
           } >> "$GITHUB_OUTPUT"
-          echo "Resolved: head_ref=$head_ref base_ref=$base_ref compare=$compare comment=$comment"
+          echo "Resolved: head_ref=$head_ref base_ref=$base_ref compare=$compare"
 
       - name: Checkout head
         uses: actions/checkout@v6.0.3
@@ -244,19 +242,26 @@ jobs:
             report "$RUNNER_TEMP/head.json" \
             | tee "$RUNNER_TEMP/report.md" >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload result JSON
+      # Record the PR number so the workflow_run comment job knows where to post.
+      # github.event.workflow_run.pull_requests is empty for fork PRs, so the
+      # number must travel via the artifact.
+      - name: Save PR number for the comment workflow
+        if: github.event_name == 'pull_request'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: echo "$PR_NUMBER" > "$RUNNER_TEMP/pr-number.txt"
+
+      # The rendered report.md and pr-number.txt ride along so benchmark-comment.yml
+      # (workflow_run) can post the comment with a write token — which this
+      # fork-code-running workflow doesn't have.
+      - name: Upload benchmark results
         uses: actions/upload-artifact@v7.0.1
         with:
           name: benchmark-results
           path: |
             ${{ runner.temp }}/base.json
             ${{ runner.temp }}/head.json
+            ${{ runner.temp }}/report.md
+            ${{ runner.temp }}/pr-number.txt
           if-no-files-found: ignore
           retention-days: 30
-
-      - name: Post sticky PR comment
-        if: steps.setup.outputs.comment == 'true'
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
-        with:
-          header: benchmark
-          path: ${{ runner.temp }}/report.md
