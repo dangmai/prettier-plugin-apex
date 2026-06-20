@@ -213,11 +213,21 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
       wrong field NAME (not just a structural wrapper), so `node.type` would
       compile but be undefined at runtime. prod+wider tsc, lint, 287 AST_COMPARE
       green.
-    - [ ] **Child handlers (19, incl. main's `handleWithKeyValue`)** — separate
-      sub-step. Their `path` holds a heterogeneous node per `childClass`, so the
-      abstract-parent path generic can't type the per-case `path.call(...)`
-      navigation. Type their bodies last, narrowing `path.node` via `asConcrete`
-      per case.
+    - [x] **Child handlers DONE — M3c COMPLETE.** Their `path` stays the untyped
+      `AstPath` *by design*: dispatched by the runtime `childClass`, they switch
+      on it and navigate per concrete subtype, so one typed generic over the
+      parent's subtype union can't express the per-case `path.call(...)` keys
+      (not common across the union) — typing it would break navigation for zero
+      node-read safety. Documented this on the `ChildNodeHandler` type. The only
+      real `any` exposure was the two handlers that read node *props* directly:
+      `handleStatement` (`node.id`) and `handleWhereQueryLiteral` (`node.literal`,
+      `node.loc`) — both now narrow a typed node via `asConcrete<Parent>(
+      path.getNode())` and switch on `node["@class"]` (identical to `childClass`).
+      The lookup-only child handlers (`handleModifier`, `handleGroupByType`,
+      `handleTrackingType`, `handleQueryOption`, `handleUpdateStatsOption`,
+      `handleDataCategoryOperator`, the inline QUERY_OPERATOR/WHERE_COMPOUND_OPERATOR)
+      take only `childClass: string` and were already fully typed. prod+wider tsc,
+      lint, 287 AST_COMPARE green.
 
   > **MAJOR FINDING — `strict: true` is already ON via the base config.**
   > `tsconfig.prod.json` *comments out* `noImplicitAny`/`strictNullChecks`/etc.
@@ -391,3 +401,13 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   `typeRef` field-name typings bug (localized cast + codegen-follow-up TODO).
   Only `handleInputParameters` (polymorphic helper) + the 19 child handlers
   remain in M3c. prod+wider tsc, lint, 287 AST_COMPARE green.
+- **2026-06-19** — **M3c child handlers DONE → M3 COMPLETE.** Child-handler paths
+  stay `AstPath` by design (dynamic `childClass` dispatch); typed the two node-
+  prop readers (`handleStatement`, `handleWhereQueryLiteral`) via
+  `asConcrete` + `node["@class"]` switch; documented the rationale on
+  `ChildNodeHandler`. Every dispatch handler is now either typed against its node
+  or a pure `childClass` lookup. prod+wider tsc, lint, 287 AST_COMPARE green.
+  **Next: M4** (remove remaining `any`; recall strict is already enforced via the
+  base — see the MAJOR FINDING above — so M4/M6 are "remove masking `any`", not
+  flag flips). Also pending: the `ParameterRef.type`→`typeRef` codegen fix, and
+  typing `handleInputParameters` if a clean union param presents itself.

@@ -1058,14 +1058,14 @@ function handleStatement(
       );
     /* v8 ignore stop */
   }
-  const node = path.getNode();
+  const node = asConcrete<jorje.Stmnt>(path.getNode());
   const parts: Doc[] = [];
   parts.push(doc);
   parts.push(" ");
   pushIfExist(parts, path.call(print, "runAsMode", "value"), [" "], ["as "]);
   parts.push(path.call(print, "expr"));
   // upsert statement has an extra param that can be tacked on at the end
-  if (node.id) {
+  if (node["@class"] === APEX_TYPES.DML_UPSERT_STATEMENT) {
     pushIfExist(parts, path.call(print, "id", "value"), null, [indent(line)]);
   }
   parts.push(";");
@@ -2924,15 +2924,17 @@ function handleWhereOperationExpressions(
 }
 
 function handleWhereQueryLiteral(
-  childClass: string,
+  _childClass: string,
   path: AstPath,
   print: PrintFn,
   options: any,
 ): Doc {
-  const node = path.getNode();
+  // Switch on the node's own `@class` (identical to `childClass`) so the
+  // subtype-specific reads below — `node.literal`, `node.loc` — narrow.
+  const node = asConcrete<jorje.QueryLiteral>(path.getNode());
 
   let doc: Doc;
-  switch (childClass as jorje.QueryLiteral["@class"]) {
+  switch (node["@class"]) {
     case APEX_TYPES.QUERY_LITERAL_STRING:
       doc = ["'", node.literal, "'"];
       break;
@@ -3517,6 +3519,12 @@ type SingleNodeHandler = (
   print: PrintFn,
   options: ApexParserOptions,
 ) => Doc;
+// Child handlers are dispatched by the runtime `childClass` and switch on it to
+// navigate per concrete subtype, so their `path` stays the untyped `AstPath`:
+// a single typed generic over the parent's subtype union can't express the
+// per-case `path.call(...)` keys (they aren't common across the union). Where a
+// child handler reads a node property directly (rather than navigating), it
+// narrows a typed node via `asConcrete(path.getNode())` instead.
 type ChildNodeHandler = (
   childClass: string,
   path: AstPath,
