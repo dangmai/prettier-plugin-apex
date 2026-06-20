@@ -1004,10 +1004,8 @@ function handleModifierParameterRef(
   const parts: Doc[] = [];
   // Modifiers
   parts.push(join("", path.map(print, "modifiers")));
-  // Type. The generated typings name this field `type`, but the serializer
-  // emits it as `typeRef` (a typings-vs-runtime field-name mismatch); cast to
-  // the untyped AstPath to navigate the real runtime key.
-  parts.push((path as AstPath).call(print, "typeRef"));
+  // Type
+  parts.push(path.call(print, "typeRef"));
   parts.push(" ");
   // Value
   parts.push(path.call(print, "name"));
@@ -1019,8 +1017,8 @@ function handleEmptyModifierParameterRef(
   print: PrintFn,
 ): Doc {
   const parts: Doc[] = [];
-  // Type. See handleModifierParameterRef: runtime key is `typeRef`, not `type`.
-  parts.push((path as AstPath).call(print, "typeRef"));
+  // Type
+  parts.push(path.call(print, "typeRef"));
   parts.push(" ");
   // Value
   parts.push(path.call(print, "name"));

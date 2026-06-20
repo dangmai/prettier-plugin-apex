@@ -11,12 +11,26 @@ import cz.habarta.typescript.generator.emitter.TsPropertyModel;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * This class is used to add custom properties to the generated types
  */
 public class CustomFieldExtension extends Extension {
+
+  // A few jorje nodes have a getter whose name doesn't match the field it reads,
+  // so typescript-generator (which derives property names from getters) names the
+  // TS property after the getter while the runtime serializer emits the field
+  // name. We rename the TS property to match the wire format. Keyed by the origin
+  // class name, mapping the generated (getter-derived) name to the field name.
+  //
+  // ParameterRef exposes its `typeRef` field through a `getType()` getter, so the
+  // generator emits `type` but the serializer emits `typeRef`.
+  private static final Map<String, Map<String, String>> PROPERTY_RENAMES = Map.of(
+    "apex.jorje.data.ast.ParameterRef",
+    Map.of("type", "typeRef")
+  );
 
   @Override
   public EmitterExtensionFeatures getFeatures() {
@@ -81,6 +95,29 @@ public class CustomFieldExtension extends Extension {
           null
         )
       );
+    }
+
+    Map<String, String> renames = PROPERTY_RENAMES.get(originClass.getName());
+    if (renames != null) {
+      allProperties =
+        allProperties
+          .stream()
+          .map(property -> {
+            String newName = renames.get(property.getName());
+            if (newName == null) {
+              return property;
+            }
+            return new TsPropertyModel(
+              newName,
+              property.tsType,
+              property.decorators,
+              property.modifiers,
+              property.ownProperty,
+              property.defaultValue,
+              property.comments
+            );
+          })
+          .collect(Collectors.toList());
     }
     return bean.withProperties(allProperties);
   }
