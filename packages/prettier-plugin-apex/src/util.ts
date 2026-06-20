@@ -47,6 +47,15 @@ export type AnnotatedComment = AnnotatedAstNode &
     placement: string;
   };
 
+// Exhaustiveness guard for child-handler dispatch. In a `switch` that covers
+// every subtype of an abstract jorje parent, the `default` branch narrows its
+// scrutinee to `never`, so a newly-generated subtype that lacks a case becomes
+// a compile error right here. It also throws at runtime as a backstop for
+// out-of-spec input the type system can't see.
+export function assertNever(value: never): never {
+  throw new Error(`Unhandled subtype: ${value}. Please file a bug report.`);
+}
+
 export function isBinaryish(
   node: { "@class": string } | null | undefined,
 ): node is jorje.BinaryExpr | jorje.BooleanExpr {

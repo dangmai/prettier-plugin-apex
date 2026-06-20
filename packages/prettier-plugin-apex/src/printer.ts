@@ -33,6 +33,7 @@ import {
 import type { ApexParserOptions } from "./options.js";
 import {
   type AnnotatedComment,
+  assertNever,
   checkIfParentIsDottedExpression,
   getParentType,
   getPrecedence,
@@ -830,7 +831,8 @@ function handleAnnotationValue(
   print: PrintFn,
 ): Doc {
   const parts: Doc[] = [];
-  switch (childClass as jorje.AnnotationValue["@class"]) {
+  const cls = childClass as jorje.AnnotationValue["@class"];
+  switch (cls) {
     case APEX_TYPES.TRUE_ANNOTATION_VALUE:
       parts.push("true");
       break;
@@ -842,6 +844,8 @@ function handleAnnotationValue(
       parts.push(path.call(print, "value"));
       parts.push("'");
       break;
+    default:
+      return assertNever(cls);
   }
   return parts;
 }
@@ -2260,13 +2264,16 @@ function handleFindValue(
   print: PrintFn,
 ): Doc {
   let doc: Doc;
-  switch (childClass as jorje.FindValue["@class"]) {
+  const cls = childClass as jorje.FindValue["@class"];
+  switch (cls) {
     case APEX_TYPES.FIND_VALUE_STRING:
       doc = ["'", path.call(print, "value"), "'"];
       break;
     case APEX_TYPES.FIND_VALUE_EXPRESSION:
       doc = path.call(print, "expr");
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }
@@ -2300,13 +2307,16 @@ function handleDivisionValue(
   print: PrintFn,
 ): Doc {
   let doc: Doc;
-  switch (childClass as jorje.DivisionValue["@class"]) {
+  const cls = childClass as jorje.DivisionValue["@class"];
+  switch (cls) {
     case APEX_TYPES.DIVISION_VALUE_LITERAL:
       doc = ["'", path.call(print, "literal"), "'"];
       break;
     case APEX_TYPES.DIVISION_VALUE_EXPRESSION:
       doc = path.call(print, "expr");
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }
@@ -2330,7 +2340,8 @@ function handleSearchWithClauseValue(
 ): Doc {
   const parts: Doc[] = [];
   let valueDocs: Doc[];
-  switch (childClass as jorje.SearchWithClauseValue["@class"]) {
+  const cls = childClass as jorje.SearchWithClauseValue["@class"];
+  switch (cls) {
     case APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE_STRING:
       valueDocs = path.map(print, "values");
       if (valueDocs.length === 1 && valueDocs[0] !== undefined) {
@@ -2360,6 +2371,8 @@ function handleSearchWithClauseValue(
       parts.push(" = ");
       parts.push("false");
       break;
+    default:
+      return assertNever(cls);
   }
   return groupIndentConcat(parts);
 }
@@ -2820,14 +2833,21 @@ function handleWithKeyValue(
   parts.push(" ");
   parts.push("=");
   parts.push(" ");
-  if (childClass === APEX_TYPES.WITH_KEY_VALUE_STRING) {
-    // The string value is stored unquoted, so we re-add the single quotes.
-    parts.push("'");
-    parts.push(path.call(print, "value"));
-    parts.push("'");
-  } else {
-    // Boolean and number values print themselves verbatim.
-    parts.push(path.call(print, "value"));
+  const cls = childClass as jorje.WithKeyValue["@class"];
+  switch (cls) {
+    case APEX_TYPES.WITH_KEY_VALUE_STRING:
+      // The string value is stored unquoted, so we re-add the single quotes.
+      parts.push("'");
+      parts.push(path.call(print, "value"));
+      parts.push("'");
+      break;
+    case APEX_TYPES.WITH_KEY_VALUE_BOOLEAN:
+    case APEX_TYPES.WITH_KEY_VALUE_NUMBER:
+      // Boolean and number values print themselves verbatim.
+      parts.push(path.call(print, "value"));
+      break;
+    default:
+      return assertNever(cls);
   }
   return parts;
 }
@@ -2963,12 +2983,10 @@ function handleWhereQueryLiteral(
     case APEX_TYPES.QUERY_LITERAL_MULTI_CURRENCY:
       doc = path.call(print, "literal");
       break;
+    default:
+      return assertNever(node["@class"]);
   }
-  if (doc) {
-    return doc;
-  }
-  /* v8 ignore next 1 */
-  return "";
+  return doc;
 }
 
 function handleWhereCompoundExpression(
@@ -3049,13 +3067,16 @@ function handleOrderByExpression(
 ): Doc {
   const parts: Doc[] = [];
   let expressionField: string;
-  switch (childClass as jorje.OrderByExpr["@class"]) {
+  const cls = childClass as jorje.OrderByExpr["@class"];
+  switch (cls) {
     case APEX_TYPES.ORDER_BY_EXPRESSION_DISTANCE:
       expressionField = "distance";
       break;
     case APEX_TYPES.ORDER_BY_EXPRESSION_VALUE:
       expressionField = "field";
       break;
+    default:
+      return assertNever(cls);
   }
   parts.push(path.call(print, expressionField));
 
@@ -3131,14 +3152,17 @@ function handleGroupByClause(
 }
 
 function handleGroupByType(childClass: string): Doc {
-  let doc: Doc | undefined;
-  switch (childClass as jorje.GroupByType["@class"]) {
+  let doc: Doc;
+  const cls = childClass as jorje.GroupByType["@class"];
+  switch (cls) {
     case APEX_TYPES.GROUP_BY_TYPE_ROLL_UP:
       doc = "ROLLUP";
       break;
     case APEX_TYPES.GROUP_BY_TYPE_CUBE:
       doc = "CUBE";
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }
@@ -3172,8 +3196,9 @@ function handleUsingExpression(
   path: AstPath,
   print: PrintFn,
 ): Doc {
-  let doc: Doc | undefined;
-  switch (childClass as jorje.UsingExpr["@class"]) {
+  let doc: Doc;
+  const cls = childClass as jorje.UsingExpr["@class"];
+  switch (cls) {
     case APEX_TYPES.USING_EXPRESSION_USING:
       doc = [
         path.call(print, "name", "value"),
@@ -3198,32 +3223,40 @@ function handleUsingExpression(
         ")",
       ];
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }
 
 function handleTrackingType(childClass: string): Doc {
-  let doc: Doc | undefined;
-  switch (childClass as jorje.TrackingType["@class"]) {
+  let doc: Doc;
+  const cls = childClass as jorje.TrackingType["@class"];
+  switch (cls) {
     case APEX_TYPES.TRACKING_TYPE_FOR_VIEW:
       doc = "FOR VIEW";
       break;
     case APEX_TYPES.TRACKING_TYPE_FOR_REFERENCE:
       doc = "FOR REFERENCE";
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }
 
 function handleQueryOption(childClass: string): Doc {
-  let doc: Doc | undefined;
-  switch (childClass as jorje.QueryOption["@class"]) {
+  let doc: Doc;
+  const cls = childClass as jorje.QueryOption["@class"];
+  switch (cls) {
     case APEX_TYPES.QUERY_OPTION_LOCK_ROWS:
       doc = "FOR UPDATE";
       break;
     case APEX_TYPES.QUERY_OPTION_INCLUDE_DELETED:
       doc = "ALL ROWS";
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }
@@ -3242,14 +3275,17 @@ function handleUpdateStatsClause(
 }
 
 function handleUpdateStatsOption(childClass: string): Doc {
-  let doc: Doc | undefined;
-  switch (childClass as jorje.UpdateStatsOption["@class"]) {
+  let doc: Doc;
+  const cls = childClass as jorje.UpdateStatsOption["@class"];
+  switch (cls) {
     case APEX_TYPES.UPDATE_STATS_OPTION_TRACKING:
       doc = "TRACKING";
       break;
     case APEX_TYPES.UPDATE_STATS_OPTION_VIEW_STAT:
       doc = "VIEWSTAT";
       break;
+    default:
+      return assertNever(cls);
   }
   return doc;
 }

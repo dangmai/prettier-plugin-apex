@@ -1,3 +1,5 @@
+import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
+
 export const APEX_TYPES = {
   TRIGGER_USAGE: "apex.jorje.data.ast.TriggerUsage" as const,
   LOCATION_IDENTIFIER:
@@ -397,24 +399,23 @@ export const QUERY = {
   "apex.jorje.data.soql.QueryOp$QueryGreaterThan": ">" as const,
   "apex.jorje.data.soql.QueryOp$QueryIn": "IN" as const,
   "apex.jorje.data.soql.QueryOp$QueryNotIn": "NOT IN" as const,
-};
+} satisfies Record<jorje.QueryOp["@class"], string>;
 export const ORDER = {
   "apex.jorje.data.soql.Order$OrderDesc": "DESC" as const,
   "apex.jorje.data.soql.Order$OrderAsc": "ASC" as const,
-};
+} satisfies Record<jorje.Order["@class"], string>;
 export const ORDER_NULL = {
   "apex.jorje.data.soql.OrderNull$OrderNullFirst": "NULLS FIRST" as const,
   "apex.jorje.data.soql.OrderNull$OrderNullLast": "NULLS LAST" as const,
-};
+} satisfies Record<jorje.OrderNull["@class"], string>;
 export const QUERY_WHERE = {
   "apex.jorje.data.soql.WhereCompoundOp$QueryAnd": "AND" as const,
   "apex.jorje.data.soql.WhereCompoundOp$QueryOr": "OR" as const,
-};
+} satisfies Record<jorje.WhereCompoundOp["@class"], string>;
 export const MODIFIER = {
   "apex.jorje.data.ast.Modifier$PublicModifier": "public" as const,
   "apex.jorje.data.ast.Modifier$PrivateModifier": "private" as const,
   "apex.jorje.data.ast.Modifier$VirtualModifier": "virtual" as const,
-  "apex.jorje.data.ast.Modifier$HiddenModifier": "hidden" as const,
   "apex.jorje.data.ast.Modifier$ProtectedModifier": "protected" as const,
   "apex.jorje.data.ast.Modifier$AbstractModifier": "abstract" as const,
   "apex.jorje.data.ast.Modifier$StaticModifier": "static" as const,
@@ -432,7 +433,7 @@ export const MODIFIER = {
   // This is a special case, it is actually handled in a separate method, but
   // we still need to specify it here to satisfy Typescript exhaustive check.
   "apex.jorje.data.ast.Modifier$Annotation": "" as const,
-};
+} satisfies Record<jorje.Modifier["@class"], string>;
 export const DATA_CATEGORY = {
   "apex.jorje.data.soql.DataCategoryOperator$DataCategoryAt": "AT" as const,
   "apex.jorje.data.soql.DataCategoryOperator$DataCategoryAbove":
@@ -441,7 +442,7 @@ export const DATA_CATEGORY = {
     "BELOW" as const,
   "apex.jorje.data.soql.DataCategoryOperator$DataCategoryAboveOrBelow":
     "ABOVE_OR_BELOW" as const,
-};
+} satisfies Record<jorje.DataCategoryOperator["@class"], string>;
 export const TRIGGER_USAGE = {
   BEFORE_DELETE: "before delete" as const,
   BEFORE_INSERT: "before insert" as const,
