@@ -198,7 +198,21 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
       because `NumberLiteral.number` is typed as a primitive `number` but jorje
       serializes it boxed as `{ "$": number }` (typings-vs-runtime mismatch, like
       JorjeOptional). prod+wider tsc, lint, 276 AST_COMPARE green.
-    - [ ] Remaining single-handler categories: type-refs/annotations/misc.
+    - [x] **Type-refs/annotations/misc category DONE.** Typed the last 11 single
+      handlers (annotation/annotation-key-value/annotation-string, class/array/
+      java type-refs, modifier/empty-modifier parameter-refs, location-identifier,
+      name-value-parameter, structured-version). **ALL single handlers are now
+      typed** — only the polymorphic `handleInputParameters` helper (shared across
+      many caller node types, intentionally left `AstPath`) and the child
+      handlers remain. Found a third typings-vs-runtime mismatch: `ParameterRef`'s
+      type field is generated as `type` but the serializer emits `typeRef`
+      (verified against the live AST) — handled with the localized `(path as
+      AstPath)` escape in both parameter-ref handlers. **TODO (codegen follow-up,
+      maybe M4+):** fix the `ParameterRef.type`→`typeRef` field name in the
+      typescript-generator config so the cast can be removed; it's an actively
+      wrong field NAME (not just a structural wrapper), so `node.type` would
+      compile but be undefined at runtime. prod+wider tsc, lint, 287 AST_COMPARE
+      green.
     - [ ] **Child handlers (19, incl. main's `handleWithKeyValue`)** — separate
       sub-step. Their `path` holds a heterogeneous node per `childClass`, so the
       abstract-parent path generic can't type the per-case `path.call(...)`
@@ -372,3 +386,8 @@ new fixtures** (output unchanged). M6 also runs `--configuration native`. No
   handler) from `singleNodeHandlers` to `childNodeHandlers` (M3b's split replayed
   without knowing main had added it to the pre-split map). 287 tests green
   (AST_COMPARE), up from 276.
+- **2026-06-19** — **M3c type-refs/annotations/misc category DONE — ALL single
+  handlers typed.** Last 11 handlers. Found the `ParameterRef.type` vs runtime
+  `typeRef` field-name typings bug (localized cast + codegen-follow-up TODO).
+  Only `handleInputParameters` (polymorphic helper) + the 19 child handlers
+  remain in M3c. prod+wider tsc, lint, 287 AST_COMPARE green.

@@ -766,8 +766,11 @@ function handleClassDeclaration(
   return parts;
 }
 
-function handleAnnotation(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleAnnotation(
+  path: AstPath<Enriched<jorje.Annotation>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   const trailingParts: Doc[] = [];
   const parameterParts = [];
@@ -781,11 +784,11 @@ function handleAnnotation(path: AstPath, print: PrintFn): Doc {
     // // Trailing Comment
     // void method() {}
     // ```
-    path.each((innerPath: AstPath) => {
+    path.each((innerPath) => {
       const commentNode = innerPath.getNode();
       // This can only be a trailing comment, because if it is a leading one,
       // it will be attached to the Annotation's parent node (e.g. MethodDecl)
-      if (commentNode.trailing) {
+      if (commentNode?.trailing) {
         trailingParts.push(" ");
         trailingParts.push(printComment(innerPath));
       }
@@ -806,7 +809,10 @@ function handleAnnotation(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleAnnotationKeyValue(path: AstPath, print: PrintFn): Doc {
+function handleAnnotationKeyValue(
+  path: AstPath<Enriched<jorje.AnnotationKeyValue>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "key", "value"));
   parts.push("=");
@@ -836,7 +842,10 @@ function handleAnnotationValue(
   return parts;
 }
 
-function handleAnnotationString(path: AstPath, print: PrintFn): Doc {
+function handleAnnotationString(
+  path: AstPath<Enriched<jorje.AnnotationString>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("'");
   parts.push(path.call(print, "value"));
@@ -844,7 +853,10 @@ function handleAnnotationString(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleClassTypeRef(path: AstPath, print: PrintFn): Doc {
+function handleClassTypeRef(
+  path: AstPath<Enriched<jorje.ClassTypeRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(join(".", path.map(print, "names")));
   const typeArgumentDocs: Doc[] = path.map(print, "typeArguments");
@@ -856,14 +868,20 @@ function handleClassTypeRef(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleArrayTypeRef(path: AstPath, print: PrintFn): Doc {
+function handleArrayTypeRef(
+  path: AstPath<Enriched<jorje.ArrayTypeRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "heldType"));
   parts.push("[]");
   return parts;
 }
 
-function handleJavaTypeRef(path: AstPath, print: PrintFn): Doc {
+function handleJavaTypeRef(
+  path: AstPath<Enriched<jorje.JavaTypeRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
@@ -979,22 +997,30 @@ function handleMethodDeclaration(
   return parts;
 }
 
-function handleModifierParameterRef(path: AstPath, print: PrintFn): Doc {
+function handleModifierParameterRef(
+  path: AstPath<Enriched<jorje.ModifierParameterRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   // Modifiers
   parts.push(join("", path.map(print, "modifiers")));
-  // Type
-  parts.push(path.call(print, "typeRef"));
+  // Type. The generated typings name this field `type`, but the serializer
+  // emits it as `typeRef` (a typings-vs-runtime field-name mismatch); cast to
+  // the untyped AstPath to navigate the real runtime key.
+  parts.push((path as AstPath).call(print, "typeRef"));
   parts.push(" ");
   // Value
   parts.push(path.call(print, "name"));
   return parts;
 }
 
-function handleEmptyModifierParameterRef(path: AstPath, print: PrintFn): Doc {
+function handleEmptyModifierParameterRef(
+  path: AstPath<Enriched<jorje.EmptyModifierParameterRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
-  // Type
-  parts.push(path.call(print, "typeRef"));
+  // Type. See handleModifierParameterRef: runtime key is `typeRef`, not `type`.
+  parts.push((path as AstPath).call(print, "typeRef"));
   parts.push(" ");
   // Value
   parts.push(path.call(print, "name"));
@@ -1352,7 +1378,10 @@ function handleVariableDeclarationStatement(
   return path.call(print, "variableDecls");
 }
 
-function handleLocationIdentifier(path: AstPath, print: PrintFn): Doc {
+function handleLocationIdentifier(
+  path: AstPath<Enriched<jorje.LocationIdentifier>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "value");
 }
 
@@ -1565,8 +1594,11 @@ function handleNewKeyValue(
   return groupIndentConcat(parts);
 }
 
-function handleNameValueParameter(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleNameValueParameter(
+  path: AstPath<Enriched<jorje.NameValueParameter>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
 
   const parts: Doc[] = [];
   parts.push(path.call(print, "name"));
@@ -2127,7 +2159,10 @@ function handlePackageVersionExpression(
   return parts;
 }
 
-function handleStructuredVersion(path: AstPath, print: PrintFn): Doc {
+function handleStructuredVersion(
+  path: AstPath<Enriched<jorje.StructuredVersion>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "major"));
   parts.push(".");
