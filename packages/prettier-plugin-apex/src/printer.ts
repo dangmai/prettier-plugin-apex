@@ -23,7 +23,14 @@ import {
   QUERY_WHERE,
   TRIGGER_USAGE,
 } from "./constants.js";
-import type { EnrichedIfBlock } from "./parser.js";
+import {
+  asConcrete,
+  asEnriched,
+  type Enriched,
+  type EnrichedApexNode,
+  type EnrichedIfBlock,
+} from "./jorje-nodes.js";
+import type { ApexParserOptions } from "./options.js";
 import {
   type AnnotatedComment,
   checkIfParentIsDottedExpression,
@@ -37,6 +44,16 @@ const { align, join, hardline, line, softline, group, indent, dedent } =
   docBuilders;
 
 type PrintFn = (path: AstPath) => Doc;
+
+/**
+ * The parent of the current node. Prettier types `getParentNode()` as the same
+ * `T` as the current path node, but the parent is a different node — so we view
+ * it as the full enriched node union, which lets `@class` checks and discriminant
+ * narrowing work. Returns null at the root.
+ */
+function getParentNode(path: AstPath): EnrichedApexNode | null {
+  return path.getParentNode() as EnrichedApexNode | null;
+}
 
 function indentConcat(docs: Doc[]): Doc {
   return indent(docs);
@@ -85,8 +102,11 @@ function escapeString(text: string): string {
   );
 }
 
-function handleReturnStatement(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleReturnStatement(
+  path: AstPath<Enriched<jorje.ReturnStmnt>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const docs: Doc[] = [];
   docs.push("return");
   const childDocs: Doc = path.call(print, "expr", "value");
@@ -113,21 +133,25 @@ function getOperator(node: jorje.BinaryExpr | jorje.BooleanExpr): string {
   return BINARY[node.op.$];
 }
 
-function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleBinaryishExpression(
+  path: AstPath<Enriched<jorje.BinaryExpr | jorje.BooleanExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const { left, right } = node;
   const nodeOp = getOperator(node);
   const nodePrecedence = getPrecedence(nodeOp);
-  const parentNode = path.getParentNode();
+  const parentNode = getParentNode(path);
 
-  const isLeftNodeBinaryish = isBinaryish(node.left);
-  const isRightNodeBinaryish = isBinaryish(node.right);
+  const isLeftNodeBinaryish = isBinaryish(left);
+  const isRightNodeBinaryish = isBinaryish(right);
   const isNestedExpression = isBinaryish(parentNode);
   const isNestedRightExpression =
     isNestedExpression && node === parentNode.right;
 
   const isNodeSamePrecedenceAsLeftChild =
     isLeftNodeBinaryish &&
-    nodePrecedence === getPrecedence(getOperator(node.left));
+    nodePrecedence === getPrecedence(getOperator(left));
   const isNodeSamePrecedenceAsParent =
     isBinaryish(parentNode) &&
     nodePrecedence === getPrecedence(getOperator(parentNode));
@@ -166,8 +190,7 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   const leftChildNodeSamePrecedenceAsRightChildNode =
     isLeftNodeBinaryish &&
     isRightNodeBinaryish &&
-    getPrecedence(getOperator(node.left)) ===
-      getPrecedence(getOperator(node.right));
+    getPrecedence(getOperator(left)) === getPrecedence(getOperator(right));
   // This variable signifies that this node is the top most binaryish node,
   // and its left child node has the same precedence, e.g:
   // a = b >
@@ -223,9 +246,8 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   // certain situation, because the EOL comment might become attached to the
   // entire binaryish expression after the first format.
   const leftChildHasEndOfLineComment =
-    node.left.comments?.some(
-      (comment: AnnotatedComment) =>
-        comment.trailing && comment.placement === "endOfLine",
+    asEnriched(node.left).comments?.some(
+      (comment) => comment.trailing && comment.placement === "endOfLine",
     ) ?? false;
 
   if (leftChildHasEndOfLineComment) {
@@ -236,8 +258,11 @@ function handleBinaryishExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(docs);
 }
 
-function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleAssignmentExpression(
+  path: AstPath<Enriched<jorje.AssignmentExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const docs: Doc[] = [];
 
   const leftDoc: Doc = path.call(print, "left");
@@ -247,7 +272,7 @@ function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
   docs.push(" ");
   docs.push(operationDoc);
 
-  const rightDocComments = node.right.comments;
+  const rightDocComments = asEnriched(node.right).comments;
   const rightDocHasLeadingComments =
     Array.isArray(rightDocComments) &&
     rightDocComments.some((comment) => comment.leading);
@@ -262,17 +287,21 @@ function handleAssignmentExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(docs);
 }
 
-function shouldDottedExpressionBreak(path: AstPath): boolean {
-  const node = path.getNode();
+function shouldDottedExpressionBreak(
+  path: AstPath<Enriched<jorje.VariableExpr | jorje.MethodCallExpr>>,
+): boolean {
+  const node = path.node;
   // #62 - `super` cannot  be followed any white spaces
   if (
-    node.dottedExpr.value["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION
+    node.dottedExpr.value?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION
   ) {
     return false;
   }
   // #98 - Even though `this` can synctactically be followed by whitespaces,
   // make the formatted output similar to `super` to provide consistency.
-  if (node.dottedExpr.value["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION) {
+  if (
+    node.dottedExpr.value?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION
+  ) {
     return false;
   }
   if (node["@class"] !== APEX_TYPES.METHOD_CALL_EXPRESSION) {
@@ -287,11 +316,14 @@ function shouldDottedExpressionBreak(path: AstPath): boolean {
   ) {
     return true;
   }
-  return node.dottedExpr.value;
+  return node.dottedExpr.value !== undefined;
 }
 
-function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleDottedExpression(
+  path: AstPath<Enriched<jorje.VariableExpr | jorje.MethodCallExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const dottedExpressionParts: Doc[] = [];
   const dottedExpressionDoc: Doc = path.call(print, "dottedExpr", "value");
 
@@ -310,11 +342,11 @@ function handleDottedExpression(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleArrayExpressionIndex(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.ArrayExpr>>,
   print: PrintFn,
   withGroup = true,
 ): Doc {
-  const node = path.getNode();
+  const node = path.node;
   let parts: Doc;
   if (node.index["@class"] === APEX_TYPES.LITERAL_EXPRESSION) {
     // For literal index, we will make sure it's always attached to the [],
@@ -326,18 +358,24 @@ function handleArrayExpressionIndex(
   return withGroup ? groupIndentConcat(parts) : parts;
 }
 
-function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parentNode = path.getParentNode();
+function handleVariableExpression(
+  path: AstPath<Enriched<jorje.VariableExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const parentNode = getParentNode(path);
   const nodeName = path.getName();
   const { dottedExpr } = node;
+  const dottedExprValue = dottedExpr.value
+    ? asConcrete(dottedExpr.value)
+    : undefined;
   const parts: Doc[] = [];
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-    (dottedExpr?.value?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-      dottedExpr.value.expr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION);
+    dottedExprValue?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (dottedExprValue?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+      dottedExprValue.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION);
 
   parts.push(dottedExpressionDoc);
   // Name chain
@@ -363,7 +401,7 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   // Hence why we are deferring the printing of the [] part from handleArrayExpression
   // to here.
   if (
-    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+    parentNode?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
     path.callParent((innerPath: AstPath) => {
@@ -378,7 +416,10 @@ function handleVariableExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleJavaVariableExpression(path: AstPath, print: PrintFn): Doc {
+function handleJavaVariableExpression(
+  path: AstPath<Enriched<jorje.JavaVariableExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
@@ -386,11 +427,11 @@ function handleJavaVariableExpression(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleLiteralExpression(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.ExprLiteralExpr>>,
   print: PrintFn,
   options: prettier.ParserOptions,
 ): Doc {
-  const node = path.getNode();
+  const node = path.node;
   const literalType: Doc = path.call(print, "type", "$");
   if (literalType === "NULL") {
     return "null";
@@ -442,22 +483,32 @@ function handleLiteralExpression(
   return literalDoc;
 }
 
-function handleBinaryOperation(path: AstPath): Doc {
-  const node: jorje.BinaryExpr["op"] = path.getNode();
+function handleBinaryOperation(
+  path: AstPath<Enriched<jorje.BinaryExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return BINARY[node.$];
 }
 
-function handleBooleanOperation(path: AstPath): Doc {
-  const node: jorje.BooleanExpr["op"] = path.getNode();
+function handleBooleanOperation(
+  path: AstPath<Enriched<jorje.BooleanExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return BOOLEAN[node.$];
 }
 
-function handleAssignmentOperation(path: AstPath): Doc {
-  const node: jorje.AssignmentExpr["op"] = path.getNode();
+function handleAssignmentOperation(
+  path: AstPath<Enriched<jorje.AssignmentExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return ASSIGNMENT[node.$];
 }
 
-function getDanglingCommentDocs(path: AstPath, _print: PrintFn, options: any) {
+function getDanglingCommentDocs(
+  path: AstPath,
+  _print: PrintFn,
+  options: ApexParserOptions,
+) {
   const node = path.getNode();
   if (!node.comments) {
     return [];
@@ -475,7 +526,10 @@ function getDanglingCommentDocs(path: AstPath, _print: PrintFn, options: any) {
   return danglingCommentParts;
 }
 
-function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
+function handleAnonymousBlockUnit(
+  path: AstPath<Enriched<jorje.AnonymousBlockUnit>>,
+  print: PrintFn,
+): Doc {
   // Unlike other compilation units, Anonymous Unit cannot have dangling comments,
   // so we don't have to handle them here.
   const parts: Doc[] = [];
@@ -494,11 +548,14 @@ function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
       parts.push(memberDoc);
     }
 
-    // #1892 - respect trailing empty line even for ignored nodes
+    // #1892 - respect trailing empty line even for ignored nodes.
+    // `members` is `BlockMember[]` (abstract), so Prettier can't type the
+    // navigation into `[i].stmnt`; the cast escapes its key-checking only.
     if (
-      path.call(
-        (innerPath) =>
-          hasPrettierIgnore(innerPath) && innerPath.getNode().trailingEmptyLine,
+      (path as AstPath).call(
+        (innerPath: AstPath) =>
+          hasPrettierIgnore(innerPath) &&
+          asEnriched(innerPath.getNode()).trailingEmptyLine,
         "members",
         i,
         "stmnt",
@@ -511,9 +568,9 @@ function handleAnonymousBlockUnit(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleTriggerDeclarationUnit(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.TriggerDeclUnit>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ) {
   const usageDocs: Doc[] = path.map(print, "usages");
   const targetDocs: Doc[] = path.map(print, "target");
@@ -552,12 +609,14 @@ function handleTriggerDeclarationUnit(
       if (index !== allMemberDocs.length - 1) {
         innerDocs.push(hardline);
       }
-      // #1892 - respect trailing empty line even for ignored nodes
+      // #1892 - respect trailing empty line even for ignored nodes.
+      // `members` is `BlockMember[]` (abstract), so Prettier can't type the
+      // navigation into `[index].stmnt`; the cast escapes its key-checking only.
       if (
-        path.call(
-          (innerPath) =>
+        (path as AstPath).call(
+          (innerPath: AstPath) =>
             hasPrettierIgnore(innerPath) &&
-            innerPath.getNode().trailingEmptyLine,
+            asEnriched(innerPath.getNode()).trailingEmptyLine,
           "members",
           index,
           "stmnt",
@@ -578,11 +637,11 @@ function handleTriggerDeclarationUnit(
 }
 
 function handleInterfaceDeclaration(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.InterfaceDecl>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ) {
-  const node = path.getNode();
+  const node = path.node;
 
   const superInterface: Doc = path.call(print, "superInterface", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
@@ -635,11 +694,11 @@ function handleInterfaceDeclaration(
 }
 
 function handleClassDeclaration(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.ClassDecl>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
-  const node = path.getNode();
+  const node = path.node;
 
   const superClass: Doc = path.call(print, "superClass", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
@@ -663,7 +722,7 @@ function handleClassDeclaration(
         path.call(
           (innerPath) =>
             hasPrettierIgnore(innerPath) &&
-            innerPath.getNode().trailingEmptyLine,
+            asEnriched(innerPath.getNode()).trailingEmptyLine,
           "members",
           index,
         )
@@ -711,8 +770,11 @@ function handleClassDeclaration(
   return parts;
 }
 
-function handleAnnotation(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleAnnotation(
+  path: AstPath<Enriched<jorje.Annotation>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   const trailingParts: Doc[] = [];
   const parameterParts = [];
@@ -726,11 +788,11 @@ function handleAnnotation(path: AstPath, print: PrintFn): Doc {
     // // Trailing Comment
     // void method() {}
     // ```
-    path.each((innerPath: AstPath) => {
+    path.each((innerPath) => {
       const commentNode = innerPath.getNode();
       // This can only be a trailing comment, because if it is a leading one,
       // it will be attached to the Annotation's parent node (e.g. MethodDecl)
-      if (commentNode.trailing) {
+      if (commentNode?.trailing) {
         trailingParts.push(" ");
         trailingParts.push(printComment(innerPath));
       }
@@ -751,7 +813,10 @@ function handleAnnotation(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleAnnotationKeyValue(path: AstPath, print: PrintFn): Doc {
+function handleAnnotationKeyValue(
+  path: AstPath<Enriched<jorje.AnnotationKeyValue>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "key", "value"));
   parts.push("=");
@@ -781,7 +846,10 @@ function handleAnnotationValue(
   return parts;
 }
 
-function handleAnnotationString(path: AstPath, print: PrintFn): Doc {
+function handleAnnotationString(
+  path: AstPath<Enriched<jorje.AnnotationString>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("'");
   parts.push(path.call(print, "value"));
@@ -789,7 +857,10 @@ function handleAnnotationString(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleClassTypeRef(path: AstPath, print: PrintFn): Doc {
+function handleClassTypeRef(
+  path: AstPath<Enriched<jorje.ClassTypeRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(join(".", path.map(print, "names")));
   const typeArgumentDocs: Doc[] = path.map(print, "typeArguments");
@@ -801,14 +872,20 @@ function handleClassTypeRef(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleArrayTypeRef(path: AstPath, print: PrintFn): Doc {
+function handleArrayTypeRef(
+  path: AstPath<Enriched<jorje.ArrayTypeRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "heldType"));
   parts.push("[]");
   return parts;
 }
 
-function handleJavaTypeRef(path: AstPath, print: PrintFn): Doc {
+function handleJavaTypeRef(
+  path: AstPath<Enriched<jorje.JavaTypeRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
@@ -817,8 +894,11 @@ function handleJavaTypeRef(path: AstPath, print: PrintFn): Doc {
 
 function handleStatementBlockMember(
   modifier?: string,
-): (path: AstPath, print: PrintFn) => Doc {
-  return (path: AstPath, print: PrintFn) => {
+): (
+  path: AstPath<Enriched<jorje.StmntBlockMember | jorje.StaticStmntBlockMember>>,
+  print: PrintFn,
+) => Doc {
+  return (path, print) => {
     const statementDoc: Doc = path.call(print, "stmnt");
 
     const parts: Doc[] = [];
@@ -831,7 +911,10 @@ function handleStatementBlockMember(
   };
 }
 
-function handlePropertyDeclaration(path: AstPath, print: PrintFn): Doc {
+function handlePropertyDeclaration(
+  path: AstPath<Enriched<jorje.PropertyDecl>>,
+  print: PrintFn,
+): Doc {
   const modifierDocs: Doc[] = path.map(print, "modifiers");
   const getterDoc: Doc = path.call(print, "getter", "value");
   const setterDoc: Doc = path.call(print, "setter", "value");
@@ -863,8 +946,11 @@ function handlePropertyDeclaration(path: AstPath, print: PrintFn): Doc {
 
 function handlePropertyGetterSetter(
   action: "get" | "set",
-): (path: AstPath, print: PrintFn) => Doc {
-  return (path: AstPath, print: PrintFn) => {
+): (
+  path: AstPath<Enriched<jorje.PropertyGetter | jorje.PropertySetter>>,
+  print: PrintFn,
+) => Doc {
+  return (path, print) => {
     const statementDoc: Doc = path.call(print, "stmnt", "value");
 
     const parts: Doc[] = [];
@@ -880,7 +966,10 @@ function handlePropertyGetterSetter(
   };
 }
 
-function handleMethodDeclaration(path: AstPath, print: PrintFn): Doc {
+function handleMethodDeclaration(
+  path: AstPath<Enriched<jorje.MethodDecl>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt", "value");
   const modifierDocs: Doc[] = path.map(print, "modifiers");
   const parameterDocs: Doc[] = path.map(print, "parameters");
@@ -912,7 +1001,10 @@ function handleMethodDeclaration(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleModifierParameterRef(path: AstPath, print: PrintFn): Doc {
+function handleModifierParameterRef(
+  path: AstPath<Enriched<jorje.ModifierParameterRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   // Modifiers
   parts.push(join("", path.map(print, "modifiers")));
@@ -924,7 +1016,10 @@ function handleModifierParameterRef(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleEmptyModifierParameterRef(path: AstPath, print: PrintFn): Doc {
+function handleEmptyModifierParameterRef(
+  path: AstPath<Enriched<jorje.EmptyModifierParameterRef>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   // Type
   parts.push(path.call(print, "typeRef"));
@@ -965,21 +1060,24 @@ function handleStatement(
       );
     /* v8 ignore stop */
   }
-  const node = path.getNode();
+  const node = asConcrete<jorje.Stmnt>(path.getNode());
   const parts: Doc[] = [];
   parts.push(doc);
   parts.push(" ");
   pushIfExist(parts, path.call(print, "runAsMode", "value"), [" "], ["as "]);
   parts.push(path.call(print, "expr"));
   // upsert statement has an extra param that can be tacked on at the end
-  if (node.id) {
+  if (node["@class"] === APEX_TYPES.DML_UPSERT_STATEMENT) {
     pushIfExist(parts, path.call(print, "id", "value"), null, [indent(line)]);
   }
   parts.push(";");
   return groupConcat(parts);
 }
 
-function handleDmlMergeStatement(path: AstPath, print: PrintFn): Doc {
+function handleDmlMergeStatement(
+  path: AstPath<Enriched<jorje.DmlMergeStmnt>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("merge");
   parts.push(" ");
@@ -992,9 +1090,9 @@ function handleDmlMergeStatement(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleEnumDeclaration(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.EnumDecl>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
   const modifierDocs: Doc[] = path.map(print, "modifiers");
   const memberDocs: Doc[] = path.map(print, "members");
@@ -1016,7 +1114,10 @@ function handleEnumDeclaration(
   return parts;
 }
 
-function handleSwitchStatement(path: AstPath, print: PrintFn): Doc {
+function handleSwitchStatement(
+  path: AstPath<Enriched<jorje.SwitchStmnt>>,
+  print: PrintFn,
+): Doc {
   const whenBlocks: Doc[] = path.map(print, "whenBlocks");
 
   const parts: Doc[] = [];
@@ -1031,7 +1132,10 @@ function handleSwitchStatement(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleValueWhen(path: AstPath, print: PrintFn): Doc {
+function handleValueWhen(
+  path: AstPath<Enriched<jorje.ValueWhen>>,
+  print: PrintFn,
+): Doc {
   const whenCaseDocs: Doc[] = path.map(print, "whenCases");
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1045,7 +1149,10 @@ function handleValueWhen(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleElseWhen(path: AstPath, print: PrintFn): Doc {
+function handleElseWhen(
+  path: AstPath<Enriched<jorje.ElseWhen>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt");
 
   const parts: Doc[] = [];
@@ -1057,7 +1164,10 @@ function handleElseWhen(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleTypeWhen(path: AstPath, print: PrintFn): Doc {
+function handleTypeWhen(
+  path: AstPath<Enriched<jorje.TypeWhen>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt");
 
   const parts: Doc[] = [];
@@ -1071,7 +1181,10 @@ function handleTypeWhen(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleEnumCase(path: AstPath, print: PrintFn): Doc {
+function handleEnumCase(
+  path: AstPath<Enriched<jorje.EnumCase>>,
+  print: PrintFn,
+): Doc {
   return join(".", path.map(print, "identifiers"));
 }
 
@@ -1083,7 +1196,10 @@ function handleInputParameters(path: AstPath, print: PrintFn): Doc[] {
   return path.map(print, "inputParameters").map((paramDoc) => group(paramDoc));
 }
 
-function handleRunAsBlock(path: AstPath, print: PrintFn): Doc {
+function handleRunAsBlock(
+  path: AstPath<Enriched<jorje.RunAsBlock>>,
+  print: PrintFn,
+): Doc {
   const paramDocs: Doc[] = handleInputParameters(path, print);
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1098,9 +1214,9 @@ function handleRunAsBlock(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleBlockStatement(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.BlockStmnt>>,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
   const parts: Doc[] = [];
   const danglingCommentDocs = getDanglingCommentDocs(path, print, options);
@@ -1128,7 +1244,7 @@ function handleBlockStatement(
         path.call(
           (innerPath) =>
             hasPrettierIgnore(innerPath) &&
-            innerPath.getNode().trailingEmptyLine,
+            asEnriched(innerPath.getNode()).trailingEmptyLine,
           "stmnts",
           i,
         )
@@ -1142,8 +1258,11 @@ function handleBlockStatement(
   return groupIndentConcat(parts);
 }
 
-function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleTryCatchFinallyBlock(
+  path: AstPath<Enriched<jorje.TryCatchFinallyBlock>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const tryStatementDoc: Doc = path.call(print, "tryBlock");
   const catchBlockDocs: Doc[] = path.map(print, "catchBlocks");
   const finallyBlockDoc: Doc = path.call(print, "finallyBlock", "value");
@@ -1154,25 +1273,23 @@ function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
   pushIfExist(parts, tryStatementDoc);
 
   const tryBlockContainsTrailingComments: boolean =
-    node.tryBlock.comments?.some(
-      (comment: AnnotatedComment) => comment.trailing,
-    );
+    asEnriched(node.tryBlock).comments?.some((comment) => comment.trailing) ??
+    false;
 
   let catchBlockContainsLeadingOwnLineComments: boolean[] = [];
   let catchBlockContainsTrailingComments: boolean[] = [];
   if (catchBlockDocs.length > 0) {
     catchBlockContainsLeadingOwnLineComments = node.catchBlocks.map(
-      (catchBlock: jorje.CatchBlock & { comments?: AnnotatedComment[] }) =>
-        catchBlock.comments?.some(
-          (comment: AnnotatedComment) =>
-            comment.leading && comment.placement === "ownLine",
-        ),
+      (catchBlock) =>
+        asEnriched(catchBlock).comments?.some(
+          (comment) => comment.leading && comment.placement === "ownLine",
+        ) ?? false,
     );
     catchBlockContainsTrailingComments = node.catchBlocks.map(
-      (catchBlock: jorje.CatchBlock & { comments?: AnnotatedComment[] }) =>
-        catchBlock.comments?.some(
-          (comment: AnnotatedComment) => comment.trailing,
-        ),
+      (catchBlock) =>
+        asEnriched(catchBlock).comments?.some(
+          (comment) => comment.trailing,
+        ) ?? false,
     );
     catchBlockDocs.forEach((catchBlockDoc: Doc, index: number) => {
       const shouldAddHardLineBeforeCatch =
@@ -1187,11 +1304,11 @@ function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
       parts.push(catchBlockDoc);
     });
   }
-  const finallyBlockContainsLeadingOwnLineComments =
-    node.finallyBlock?.value?.comments?.some(
-      (comment: AnnotatedComment) =>
-        comment.leading && comment.placement === "ownLine",
-    );
+  const finallyBlockContainsLeadingOwnLineComments = asEnriched(
+    node.finallyBlock?.value,
+  )?.comments?.some(
+    (comment) => comment.leading && comment.placement === "ownLine",
+  );
   const shouldAddHardLineBeforeFinally =
     finallyBlockContainsLeadingOwnLineComments ||
     (catchBlockContainsTrailingComments.length > 0 &&
@@ -1206,7 +1323,10 @@ function handleTryCatchFinallyBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleCatchBlock(path: AstPath, print: PrintFn): Doc {
+function handleCatchBlock(
+  path: AstPath<Enriched<jorje.CatchBlock>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("catch");
   parts.push(" ");
@@ -1218,7 +1338,10 @@ function handleCatchBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleFinallyBlock(path: AstPath, print: PrintFn): Doc {
+function handleFinallyBlock(
+  path: AstPath<Enriched<jorje.FinallyBlock>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("finally");
   parts.push(" ");
@@ -1226,7 +1349,10 @@ function handleFinallyBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
+function handleVariableDeclarations(
+  path: AstPath<Enriched<jorje.VariableDecls>>,
+  print: PrintFn,
+): Doc {
   const modifierDocs: Doc[] = path.map(print, "modifiers");
 
   const parts: Doc[] = [];
@@ -1248,100 +1374,166 @@ function handleVariableDeclarations(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleVariableDeclarationStatement(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.VariableDeclStmnt>>,
   print: PrintFn,
 ): Doc {
   return path.call(print, "variableDecls");
 }
 
-function handleLocationIdentifier(path: AstPath, print: PrintFn): Doc {
+function handleLocationIdentifier(
+  path: AstPath<Enriched<jorje.LocationIdentifier>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "value");
 }
 
-function handleLiteralCase(path: AstPath, print: PrintFn): Doc {
+function handleLiteralCase(
+  path: AstPath<Enriched<jorje.LiteralCase>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleClassDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+function handleClassDeclarationUnit(
+  path: AstPath<Enriched<jorje.ClassDeclUnit>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleEnumDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+function handleEnumDeclarationUnit(
+  path: AstPath<Enriched<jorje.EnumDeclUnit>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleInterfaceDeclarationUnit(path: AstPath, print: PrintFn): Doc {
+function handleInterfaceDeclarationUnit(
+  path: AstPath<Enriched<jorje.InterfaceDeclUnit>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handlePropertyMember(path: AstPath, print: PrintFn): Doc {
+function handlePropertyMember(
+  path: AstPath<Enriched<jorje.PropertyMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "propertyDecl");
 }
 
-function handleFieldMember(path: AstPath, print: PrintFn): Doc {
+function handleFieldMember(
+  path: AstPath<Enriched<jorje.FieldMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "variableDecls");
 }
 
-function handleMethodMember(path: AstPath, print: PrintFn): Doc {
+function handleMethodMember(
+  path: AstPath<Enriched<jorje.MethodMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "methodDecl");
 }
 
-function handleInnerClassMember(path: AstPath, print: PrintFn): Doc {
+function handleInnerClassMember(
+  path: AstPath<Enriched<jorje.InnerClassMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleInnerEnumMember(path: AstPath, print: PrintFn): Doc {
+function handleInnerEnumMember(
+  path: AstPath<Enriched<jorje.InnerEnumMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleInnerInterfaceMember(path: AstPath, print: PrintFn): Doc {
+function handleInnerInterfaceMember(
+  path: AstPath<Enriched<jorje.InnerInterfaceMember>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "body");
 }
 
-function handleSelectCaseExpression(path: AstPath, print: PrintFn): Doc {
+function handleSelectCaseExpression(
+  path: AstPath<Enriched<jorje.SelectCaseExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleWhenOperator(path: AstPath, print: PrintFn): Doc {
+function handleWhenOperator(
+  path: AstPath<Enriched<jorje.WhenOp>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "identifier");
 }
 
-function handleCaseOperator(path: AstPath, print: PrintFn): Doc {
+function handleCaseOperator(
+  path: AstPath<Enriched<jorje.CaseOp>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "identifier");
 }
 
-function handleGroupByExpression(path: AstPath, print: PrintFn): Doc {
+function handleGroupByExpression(
+  path: AstPath<Enriched<jorje.GroupByExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "field");
 }
 
-function handleGeolocationExpression(path: AstPath, print: PrintFn): Doc {
+function handleGeolocationExpression(
+  path: AstPath<Enriched<jorje.GeolocationExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleNumberLiteral(path: AstPath, print: PrintFn): Doc {
-  return path.call(print, "number", "$");
+function handleNumberLiteral(
+  path: AstPath<Enriched<jorje.NumberLiteral>>,
+  print: PrintFn,
+): Doc {
+  // The generated typings model `number` as a primitive, but jorje serializes
+  // it as a boxed Double (`{ "$": number }`), so we navigate into "$". Cast to
+  // the untyped AstPath to escape Prettier's key-checking against the typings.
+  return (path as AstPath).call(print, "number", "$");
 }
 
-function handleNumberExpression(path: AstPath, print: PrintFn): Doc {
+function handleNumberExpression(
+  path: AstPath<Enriched<jorje.NumberExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleQueryLiteralExpression(path: AstPath, print: PrintFn): Doc {
+function handleQueryLiteralExpression(
+  path: AstPath<Enriched<jorje.QueryExprLiteralExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "literal");
 }
 
-function handleApexExpression(path: AstPath, print: PrintFn): Doc {
+function handleApexExpression(
+  path: AstPath<Enriched<jorje.ApexExpr>>,
+  print: PrintFn,
+): Doc {
   return path.call(print, "expr");
 }
 
-function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleVariableDeclaration(
+  path: AstPath<Enriched<jorje.VariableDecl>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   let resultDoc: Doc;
 
   parts.push(path.call(print, "name"));
   const assignmentDocs: Doc = path.call(print, "assignment", "value");
-  const assignmentComments = node.assignment?.value?.comments;
+  const assignmentComments = asEnriched(node.assignment.value)?.comments;
   const assignmentHasLeadingComment =
     Array.isArray(assignmentComments) &&
     assignmentComments.some((comment) => comment.leading);
@@ -1367,7 +1559,10 @@ function handleVariableDeclaration(path: AstPath, print: PrintFn): Doc {
   return resultDoc;
 }
 
-function handleNewStandard(path: AstPath, print: PrintFn): Doc {
+function handleNewStandard(
+  path: AstPath<Enriched<jorje.NewStandard>>,
+  print: PrintFn,
+): Doc {
   const paramDocs: Doc[] = handleInputParameters(path, print);
   const parts: Doc[] = [];
   // Type
@@ -1383,7 +1578,10 @@ function handleNewStandard(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewKeyValue(path: AstPath, print: PrintFn): Doc {
+function handleNewKeyValue(
+  path: AstPath<Enriched<jorje.NewKeyValue>>,
+  print: PrintFn,
+): Doc {
   const keyValueDocs: Doc[] = path.map(print, "keyValues");
 
   const parts: Doc[] = [];
@@ -1398,8 +1596,11 @@ function handleNewKeyValue(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNameValueParameter(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleNameValueParameter(
+  path: AstPath<Enriched<jorje.NameValueParameter>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
 
   const parts: Doc[] = [];
   parts.push(path.call(print, "name"));
@@ -1416,7 +1617,10 @@ function handleNameValueParameter(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleThisMethodCallExpression(path: AstPath, print: PrintFn): Doc {
+function handleThisMethodCallExpression(
+  path: AstPath<Enriched<jorje.ThisMethodCallExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("this");
   parts.push("(");
@@ -1428,7 +1632,10 @@ function handleThisMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleSuperMethodCallExpression(path: AstPath, print: PrintFn): Doc {
+function handleSuperMethodCallExpression(
+  path: AstPath<Enriched<jorje.SuperMethodCallExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("super");
   parts.push("(");
@@ -1440,20 +1647,26 @@ function handleSuperMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parentNode = path.getParentNode();
+function handleMethodCallExpression(
+  path: AstPath<Enriched<jorje.MethodCallExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const parentNode = getParentNode(path);
   const nodeName = path.getName();
   const { dottedExpr } = node;
+  const dottedExprValue = dottedExpr.value
+    ? asConcrete(dottedExpr.value)
+    : undefined;
   const isParentDottedExpression = checkIfParentIsDottedExpression(path);
   const isDottedExpressionSoqlExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
-    (dottedExpr?.value?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
-      dottedExpr.value.expr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION);
+    dottedExprValue?.["@class"] === APEX_TYPES.SOQL_EXPRESSION ||
+    (dottedExprValue?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+      dottedExprValue.expr["@class"] === APEX_TYPES.SOQL_EXPRESSION);
   const isDottedExpressionThisVariableExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
+    dottedExprValue?.["@class"] === APEX_TYPES.THIS_VARIABLE_EXPRESSION;
   const isDottedExpressionSuperVariableExpression =
-    dottedExpr?.value?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
+    dottedExprValue?.["@class"] === APEX_TYPES.SUPER_VARIABLE_EXPRESSION;
 
   const dottedExpressionDoc = handleDottedExpression(path, print);
   const nameDocs: Doc[] = path.map(print, "names");
@@ -1487,7 +1700,7 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   // to here.
   let arrayIndexDoc: Doc = "";
   if (
-    parentNode["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
+    parentNode?.["@class"] === APEX_TYPES.ARRAY_EXPRESSION &&
     nodeName === "expr"
   ) {
     path.callParent((innerPath: AstPath) => {
@@ -1563,7 +1776,10 @@ function handleMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return resultDoc;
 }
 
-function handleJavaMethodCallExpression(path: AstPath, print: PrintFn): Doc {
+function handleJavaMethodCallExpression(
+  path: AstPath<Enriched<jorje.JavaMethodCallExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("java:");
   parts.push(join(".", path.map(print, "names")));
@@ -1575,7 +1791,10 @@ function handleJavaMethodCallExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNestedExpression(path: AstPath, print: PrintFn): Doc {
+function handleNestedExpression(
+  path: AstPath<Enriched<jorje.NestedExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("(");
   parts.push(path.call(print, "expr"));
@@ -1583,7 +1802,10 @@ function handleNestedExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNewSetInit(path: AstPath, print: PrintFn): Doc {
+function handleNewSetInit(
+  path: AstPath<Enriched<jorje.NewSetInit>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr", "value");
 
@@ -1599,7 +1821,10 @@ function handleNewSetInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewSetLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewSetLiteral(
+  path: AstPath<Enriched<jorje.NewSetLiteral>>,
+  print: PrintFn,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "values");
 
   const parts: Doc[] = [];
@@ -1619,7 +1844,10 @@ function handleNewSetLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewListInit(path: AstPath, print: PrintFn): Doc {
+function handleNewListInit(
+  path: AstPath<Enriched<jorje.NewListInit>>,
+  print: PrintFn,
+): Doc {
   // We can declare lists in the following ways:
   // new Object[size];
   // new Object[] { value, ... };
@@ -1630,17 +1858,19 @@ function handleNewListInit(path: AstPath, print: PrintFn): Doc {
   // We use List<Object>(param) otherwise.
   // This should provide compatibility for all known types without knowing
   // if the parameter is a variable (copy constructor) or literal size.
-  const node = path.getNode();
+  const node = path.node;
   const expressionDoc: Doc = path.call(print, "expr", "value");
   const parts: Doc[] = [];
   const typeParts = path.map(print, "types");
+  const initExpr = node.expr.value ? asConcrete(node.expr.value) : undefined;
   const hasLiteralNumberInitializer =
     typeParts.length &&
     typeParts[0] !== undefined &&
     typeof typeParts[0] !== "string" &&
     "length" in typeParts[0] &&
     typeParts[0].length < 4 &&
-    node.expr?.value?.type?.$ === "INTEGER";
+    initExpr?.["@class"] === APEX_TYPES.LITERAL_EXPRESSION &&
+    initExpr.type.$ === "INTEGER";
 
   // Type
   if (!hasLiteralNumberInitializer) {
@@ -1657,7 +1887,10 @@ function handleNewListInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewMapInit(path: AstPath, print: PrintFn): Doc {
+function handleNewMapInit(
+  path: AstPath<Enriched<jorje.NewMapInit>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr", "value");
 
@@ -1673,7 +1906,10 @@ function handleNewMapInit(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewMapLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewMapLiteral(
+  path: AstPath<Enriched<jorje.NewMapLiteral>>,
+  print: PrintFn,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "pairs");
 
   const parts: Doc[] = [];
@@ -1693,7 +1929,10 @@ function handleNewMapLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleMapLiteralKeyValue(path: AstPath, print: PrintFn): Doc {
+function handleMapLiteralKeyValue(
+  path: AstPath<Enriched<jorje.MapLiteralKeyValue>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "key"));
   parts.push(" ");
@@ -1703,7 +1942,10 @@ function handleMapLiteralKeyValue(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNewListLiteral(path: AstPath, print: PrintFn): Doc {
+function handleNewListLiteral(
+  path: AstPath<Enriched<jorje.NewListLiteral>>,
+  print: PrintFn,
+): Doc {
   const valueDocs: Doc[] = path.map(print, "values");
 
   const parts: Doc[] = [];
@@ -1722,7 +1964,10 @@ function handleNewListLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleNewExpression(path: AstPath, print: PrintFn): Doc {
+function handleNewExpression(
+  path: AstPath<Enriched<jorje.NewExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("new");
   parts.push(" ");
@@ -1730,8 +1975,11 @@ function handleNewExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleIfElseBlock(
+  path: AstPath<Enriched<jorje.IfElseBlock>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   const ifBlockDocs: Doc[] = path.map(print, "ifBlocks");
   const elseBlockDoc: Doc = path.call(print, "elseBlock", "value");
@@ -1748,14 +1996,14 @@ function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
       ifBlock.stmnt["@class"] === APEX_TYPES.BLOCK_STATEMENT,
   );
   const ifBlockContainsLeadingOwnLineComments: boolean[] = node.ifBlocks.map(
-    (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
-      ifBlock.comments?.some(
+    (ifBlock) =>
+      asEnriched(ifBlock).comments?.some(
         (comment) => comment.leading && comment.placement === "ownLine",
-      ),
+      ) ?? false,
   );
   const ifBlockContainsTrailingComments: boolean[] = node.ifBlocks.map(
-    (ifBlock: jorje.IfBlock & { comments?: AnnotatedComment[] }) =>
-      ifBlock.comments?.some((comment) => comment.trailing),
+    (ifBlock) =>
+      asEnriched(ifBlock).comments?.some((comment) => comment.trailing) ?? false,
   );
 
   let lastIfBlockHardLineInserted = false;
@@ -1784,11 +2032,11 @@ function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
     }
   });
   if (elseBlockDoc) {
-    const elseBlockContainsLeadingOwnLineComments =
-      node.elseBlock?.value?.comments?.some(
-        (comment: AnnotatedComment) =>
-          comment.leading && comment.placement === "ownLine",
-      );
+    const elseBlockContainsLeadingOwnLineComments = asEnriched(
+      node.elseBlock?.value,
+    )?.comments?.some(
+      (comment) => comment.leading && comment.placement === "ownLine",
+    );
     const lastIfBlockContainsTrailingComments =
       ifBlockContainsTrailingComments[
         ifBlockContainsTrailingComments.length - 1
@@ -1805,8 +2053,11 @@ function handleIfElseBlock(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleIfBlock(path: AstPath, print: PrintFn): Doc {
-  const node: EnrichedIfBlock = path.getNode();
+function handleIfBlock(
+  path: AstPath<EnrichedIfBlock>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const statementType: Doc = path.call(print, "stmnt", "@class");
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1835,7 +2086,10 @@ function handleIfBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleElseBlock(path: AstPath, print: PrintFn): Doc {
+function handleElseBlock(
+  path: AstPath<Enriched<jorje.ElseBlock>>,
+  print: PrintFn,
+): Doc {
   const statementType: Doc = path.call(print, "stmnt", "@class");
   const statementDoc: Doc = path.call(print, "stmnt");
 
@@ -1851,7 +2105,10 @@ function handleElseBlock(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleTernaryExpression(path: AstPath, print: PrintFn): Doc {
+function handleTernaryExpression(
+  path: AstPath<Enriched<jorje.TernaryExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "condition"));
 
@@ -1881,7 +2138,10 @@ function handleTernaryExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleInstanceOfExpression(path: AstPath, print: PrintFn): Doc {
+function handleInstanceOfExpression(
+  path: AstPath<Enriched<jorje.InstanceOf>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
@@ -1891,14 +2151,20 @@ function handleInstanceOfExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handlePackageVersionExpression(path: AstPath, print: PrintFn): Doc {
+function handlePackageVersionExpression(
+  path: AstPath<Enriched<jorje.PackageVersionExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("Package.Version.");
   parts.push(path.call(print, "version"));
   return parts;
 }
 
-function handleStructuredVersion(path: AstPath, print: PrintFn): Doc {
+function handleStructuredVersion(
+  path: AstPath<Enriched<jorje.StructuredVersion>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "major"));
   parts.push(".");
@@ -1906,8 +2172,11 @@ function handleStructuredVersion(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleArrayExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleArrayExpression(
+  path: AstPath<Enriched<jorje.ArrayExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const parts: Doc[] = [];
   const expressionDoc: Doc = path.call(print, "expr");
   // In certain situations we need to defer printing the [] part to be part of
@@ -1927,7 +2196,10 @@ function handleArrayExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleCastExpression(path: AstPath, print: PrintFn): Doc {
+function handleCastExpression(
+  path: AstPath<Enriched<jorje.CastExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("(");
   parts.push(path.call(print, "type"));
@@ -1937,7 +2209,10 @@ function handleCastExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleNullCoalescingExpression(path: AstPath, print: PrintFn): Doc {
+function handleNullCoalescingExpression(
+  path: AstPath<Enriched<jorje.NullCoalescingExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "left"));
   parts.push(" ");
@@ -1946,7 +2221,10 @@ function handleNullCoalescingExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleExpressionStatement(path: AstPath, print: PrintFn): Doc {
+function handleExpressionStatement(
+  path: AstPath<Enriched<jorje.ExpressionStmnt>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(";");
@@ -1954,7 +2232,10 @@ function handleExpressionStatement(path: AstPath, print: PrintFn): Doc {
 }
 
 // SOSL
-function handleSoslExpression(path: AstPath, print: PrintFn): Doc {
+function handleSoslExpression(
+  path: AstPath<Enriched<jorje.SoslExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("[");
   parts.push(softline);
@@ -1964,7 +2245,10 @@ function handleSoslExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleFindClause(path: AstPath, print: PrintFn): Doc {
+function handleFindClause(
+  path: AstPath<Enriched<jorje.FindClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(indentConcat(["FIND", line, path.call(print, "search")]));
   return groupConcat(parts);
@@ -1987,7 +2271,10 @@ function handleFindValue(
   return doc;
 }
 
-function handleInClause(path: AstPath, print: PrintFn): Doc {
+function handleInClause(
+  path: AstPath<Enriched<jorje.InClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("IN");
   parts.push(" ");
@@ -1997,7 +2284,10 @@ function handleInClause(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleDivisionClause(path: AstPath, print: PrintFn): Doc {
+function handleDivisionClause(
+  path: AstPath<Enriched<jorje.WithDivisionClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WITH DIVISION = ");
   parts.push(path.call(print, "value"));
@@ -2021,7 +2311,10 @@ function handleDivisionValue(
   return doc;
 }
 
-function handleSearchWithClause(path: AstPath, print: PrintFn): Doc {
+function handleSearchWithClause(
+  path: AstPath<Enriched<jorje.SearchWithClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WITH");
   parts.push(" ");
@@ -2071,7 +2364,10 @@ function handleSearchWithClauseValue(
   return groupIndentConcat(parts);
 }
 
-function handleReturningClause(path: AstPath, print: PrintFn): Doc {
+function handleReturningClause(
+  path: AstPath<Enriched<jorje.ReturningClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(
     indentConcat([
@@ -2083,7 +2379,10 @@ function handleReturningClause(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleReturningExpression(path: AstPath, print: PrintFn): Doc {
+function handleReturningExpression(
+  path: AstPath<Enriched<jorje.ReturningExpr>>,
+  print: PrintFn,
+): Doc {
   const selectDoc: Doc = path.call(print, "select", "value");
 
   const parts: Doc[] = [];
@@ -2097,7 +2396,10 @@ function handleReturningExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleReturningSelectExpression(path: AstPath, print: PrintFn): Doc {
+function handleReturningSelectExpression(
+  path: AstPath<Enriched<jorje.ReturningSelectExpr>>,
+  print: PrintFn,
+): Doc {
   const fieldDocs: Doc[] = path.map(print, "fields");
 
   const parts: Doc[] = [];
@@ -2112,8 +2414,11 @@ function handleReturningSelectExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat([softline, join(line, parts)]);
 }
 
-function handleSearch(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleSearch(
+  path: AstPath<Enriched<jorje.Search>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const withDocs: Doc[] = path.map(print, "withs");
 
   const parts: Doc[] = [];
@@ -2133,7 +2438,10 @@ function handleSearch(path: AstPath, print: PrintFn): Doc {
 }
 
 // SOQL
-function handleSoqlExpression(path: AstPath, print: PrintFn): Doc {
+function handleSoqlExpression(
+  path: AstPath<Enriched<jorje.SoqlExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("[");
   parts.push(softline);
@@ -2143,7 +2451,10 @@ function handleSoqlExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleSelectInnerQuery(path: AstPath, print: PrintFn): Doc {
+function handleSelectInnerQuery(
+  path: AstPath<Enriched<jorje.SelectInnerQuery>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("(");
   parts.push(softline);
@@ -2156,7 +2467,10 @@ function handleSelectInnerQuery(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhereInnerExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereInnerExpression(
+  path: AstPath<Enriched<jorje.WhereInnerExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2170,8 +2484,11 @@ function handleWhereInnerExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleQuery(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleQuery(
+  path: AstPath<Enriched<jorje.Query>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const withIdentifierDocs: Doc[] = path.map(print, "withIdentifiers");
   const parts: Doc[] = [];
   parts.push(path.call(print, "select"));
@@ -2192,7 +2509,10 @@ function handleQuery(path: AstPath, print: PrintFn): Doc {
   return join(node.forcedHardline ? hardline : line, parts);
 }
 
-function handleBindClause(path: AstPath, print: PrintFn): Doc {
+function handleBindClause(
+  path: AstPath<Enriched<jorje.BindClause>>,
+  print: PrintFn,
+): Doc {
   const expressionDocs: Doc[] = path.map(print, "exprs");
   const parts: Doc[] = [];
   parts.push("BIND");
@@ -2201,7 +2521,10 @@ function handleBindClause(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleBindExpression(path: AstPath, print: PrintFn): Doc {
+function handleBindExpression(
+  path: AstPath<Enriched<jorje.BindExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2211,7 +2534,10 @@ function handleBindExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleCaseExpression(path: AstPath, print: PrintFn): Doc {
+function handleCaseExpression(
+  path: AstPath<Enriched<jorje.CaseExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const whenBranchDocs: Doc[] = path.map(print, "whenBranches");
   const elseBranchDoc: Doc = path.call(print, "elseBranch", "value");
@@ -2229,7 +2555,10 @@ function handleCaseExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhenExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhenExpression(
+  path: AstPath<Enriched<jorje.WhenExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WHEN");
   parts.push(" ");
@@ -2243,7 +2572,10 @@ function handleWhenExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleElseExpression(path: AstPath, print: PrintFn): Doc {
+function handleElseExpression(
+  path: AstPath<Enriched<jorje.ElseExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("ELSE");
   parts.push(" ");
@@ -2253,7 +2585,10 @@ function handleElseExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleColumnClause(path: AstPath, print: PrintFn): Doc {
+function handleColumnClause(
+  path: AstPath<Enriched<jorje.SelectColumnClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(
     indentConcat(["SELECT", line, join([",", line], path.map(print, "exprs"))]),
@@ -2261,14 +2596,20 @@ function handleColumnClause(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleColumnExpression(path: AstPath, print: PrintFn): Doc {
+function handleColumnExpression(
+  path: AstPath<Enriched<jorje.SelectColumnExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
   return groupConcat(parts);
 }
 
-function handleFieldIdentifier(path: AstPath, print: PrintFn): Doc {
+function handleFieldIdentifier(
+  path: AstPath<Enriched<jorje.FieldIdentifier>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const entity: Doc = path.call(print, "entity", "value");
   if (entity) {
@@ -2279,7 +2620,10 @@ function handleFieldIdentifier(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleField(path: AstPath, print: PrintFn): Doc {
+function handleField(
+  path: AstPath<Enriched<jorje.Field>>,
+  print: PrintFn,
+): Doc {
   const functionOneDoc: Doc = path.call(print, "function1", "value");
   const functionTwoDoc: Doc = path.call(print, "function2", "value");
   const fieldDoc = path.call(print, "field");
@@ -2310,7 +2654,10 @@ function handleField(path: AstPath, print: PrintFn): Doc {
   return fieldDoc;
 }
 
-function handleFromClause(path: AstPath, print: PrintFn): Doc {
+function handleFromClause(
+  path: AstPath<Enriched<jorje.FromClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(
     indentConcat(["FROM", line, join(", ", path.map(print, "exprs"))]),
@@ -2318,7 +2665,10 @@ function handleFromClause(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleFromExpression(path: AstPath, print: PrintFn): Doc {
+function handleFromExpression(
+  path: AstPath<Enriched<jorje.FromExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "table"));
   pushIfExist(parts, path.call(print, "alias", "value"), null, [" "]);
@@ -2331,13 +2681,19 @@ function handleFromExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhereClause(path: AstPath, print: PrintFn): Doc {
+function handleWhereClause(
+  path: AstPath<Enriched<jorje.WhereClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(indentConcat(["WHERE", line, path.call(print, "expr")]));
   return groupConcat(parts);
 }
 
-function handleSelectDistanceExpression(path: AstPath, print: PrintFn): Doc {
+function handleSelectDistanceExpression(
+  path: AstPath<Enriched<jorje.SelectDistanceExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(" ");
@@ -2345,7 +2701,10 @@ function handleSelectDistanceExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleWhereDistanceExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereDistanceExpression(
+  path: AstPath<Enriched<jorje.WhereDistanceExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "distance"));
   parts.push(" ");
@@ -2355,7 +2714,10 @@ function handleWhereDistanceExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleDistanceFunctionExpression(path: AstPath, print: PrintFn): Doc {
+function handleDistanceFunctionExpression(
+  path: AstPath<Enriched<jorje.DistanceFunctionExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const distanceDocs: Doc[] = [];
   parts.push("DISTANCE");
@@ -2370,7 +2732,10 @@ function handleDistanceFunctionExpression(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWhereFormulaExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereFormulaExpression(
+  path: AstPath<Enriched<jorje.WhereFormulaExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "formula"));
   parts.push(" ");
@@ -2381,7 +2746,7 @@ function handleWhereFormulaExpression(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleFormulaFunctionExpression(
-  path: AstPath,
+  path: AstPath<Enriched<jorje.FormulaFunctionExpr>>,
   _print: PrintFn,
   options: prettier.ParserOptions,
 ): Doc {
@@ -2389,7 +2754,7 @@ function handleFormulaFunctionExpression(
   // we print its body verbatim from the source. The node location spans the
   // whole `FORMULA('...')` call. We uppercase the `FORMULA` keyword to stay
   // consistent with the other SOQL functions (e.g. DISTANCE, GEOLOCATION).
-  const node = path.getNode();
+  const node = path.node;
   const source = options.originalText.slice(
     node.loc.startIndex,
     node.loc.endIndex,
@@ -2397,7 +2762,10 @@ function handleFormulaFunctionExpression(
   return source.replace(/^formula/i, "FORMULA");
 }
 
-function handleGeolocationLiteral(path: AstPath, print: PrintFn): Doc {
+function handleGeolocationLiteral(
+  path: AstPath<Enriched<jorje.GeolocationLiteral>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   const childParts: Doc[] = [];
   parts.push("GEOLOCATION");
@@ -2410,7 +2778,10 @@ function handleGeolocationLiteral(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleWithValue(path: AstPath, print: PrintFn): Doc {
+function handleWithValue(
+  path: AstPath<Enriched<jorje.WithValue>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("WITH");
   parts.push(" ");
@@ -2422,7 +2793,10 @@ function handleWithValue(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleWithIdentifierTuple(path: AstPath, print: PrintFn): Doc {
+function handleWithIdentifierTuple(
+  path: AstPath<Enriched<jorje.WithIdentifierTuple>>,
+  print: PrintFn,
+): Doc {
   const keyValueDocs: Doc[] = path.map(print, "keyValues");
   return groupIndentConcat([
     "WITH",
@@ -2458,7 +2832,10 @@ function handleWithKeyValue(
   return parts;
 }
 
-function handleWithDataCategories(path: AstPath, print: PrintFn): Doc {
+function handleWithDataCategories(
+  path: AstPath<Enriched<jorje.WithDataCategories>>,
+  print: PrintFn,
+): Doc {
   const categoryDocs: Doc[] = path.map(print, "categories");
 
   // Only AND logical operator is supported
@@ -2470,7 +2847,10 @@ function handleWithDataCategories(path: AstPath, print: PrintFn): Doc {
   ]);
 }
 
-function handleDataCategory(path: AstPath, print: PrintFn): Doc {
+function handleDataCategory(
+  path: AstPath<Enriched<jorje.DataCategory>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   let categoryDocs: Doc[] = path.map(print, "categories");
   categoryDocs = categoryDocs.filter((doc: Doc) => doc);
@@ -2494,7 +2874,10 @@ function handleDataCategoryOperator(childClass: string): Doc {
   return DATA_CATEGORY[childClass as jorje.DataCategoryOperator["@class"]];
 }
 
-function handleWhereCalcExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereCalcExpression(
+  path: AstPath<Enriched<jorje.WhereCalcExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field1"));
   parts.push(" ");
@@ -2508,7 +2891,10 @@ function handleWhereCalcExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleWhereOperationExpression(path: AstPath, print: PrintFn): Doc {
+function handleWhereOperationExpression(
+  path: AstPath<Enriched<jorje.WhereOpExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2518,7 +2904,10 @@ function handleWhereOperationExpression(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleWhereOperationExpressions(path: AstPath, print: PrintFn): Doc {
+function handleWhereOperationExpressions(
+  path: AstPath<Enriched<jorje.WhereOpExprs>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "field"));
   parts.push(" ");
@@ -2537,15 +2926,17 @@ function handleWhereOperationExpressions(path: AstPath, print: PrintFn): Doc {
 }
 
 function handleWhereQueryLiteral(
-  childClass: string,
+  _childClass: string,
   path: AstPath,
   print: PrintFn,
-  options: any,
+  options: ApexParserOptions,
 ): Doc {
-  const node = path.getNode();
+  // Switch on the node's own `@class` (identical to `childClass`) so the
+  // subtype-specific reads below — `node.literal`, `node.loc` — narrow.
+  const node = asConcrete<jorje.QueryLiteral>(path.getNode());
 
   let doc: Doc;
-  switch (childClass as jorje.QueryLiteral["@class"]) {
+  switch (node["@class"]) {
     case APEX_TYPES.QUERY_LITERAL_STRING:
       doc = ["'", node.literal, "'"];
       break;
@@ -2580,15 +2971,21 @@ function handleWhereQueryLiteral(
   return "";
 }
 
-function handleWhereCompoundExpression(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
-  const parentNode = path.getParentNode();
+function handleWhereCompoundExpression(
+  path: AstPath<Enriched<jorje.WhereCompoundExpr>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
+  const parentNode = getParentNode(path);
   const isNestedExpression =
-    parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
-    parentNode["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
+    parentNode?.["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
+    parentNode?.["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
   const nodeOp = node.op["@class"];
   const isSamePrecedenceWithParent =
-    parentNode.op && nodeOp === parentNode.op["@class"];
+    parentNode != null &&
+    "op" in parentNode &&
+    parentNode.op &&
+    nodeOp === parentNode.op["@class"];
 
   const parts: Doc[] = [];
 
@@ -2604,11 +3001,14 @@ function handleWhereCompoundExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleWhereUnaryExpression(path: AstPath, print: PrintFn): Doc {
-  const parentNode = path.getParentNode();
+function handleWhereUnaryExpression(
+  path: AstPath<Enriched<jorje.WhereUnaryExpr>>,
+  print: PrintFn,
+): Doc {
+  const parentNode = getParentNode(path);
   const isNestedExpression =
-    parentNode["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
-    parentNode["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
+    parentNode?.["@class"] === APEX_TYPES.WHERE_COMPOUND_EXPRESSION ||
+    parentNode?.["@class"] === APEX_TYPES.WHERE_UNARY_EXPRESSION;
   const parts: Doc[] = [];
   if (isNestedExpression) {
     parts.push("(");
@@ -2622,14 +3022,20 @@ function handleWhereUnaryExpression(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleColonExpression(path: AstPath, print: PrintFn): Doc {
+function handleColonExpression(
+  path: AstPath<Enriched<jorje.ColonExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(":");
   parts.push(path.call(print, "expr"));
   return parts;
 }
 
-function handleOrderByClause(path: AstPath, print: PrintFn): Doc {
+function handleOrderByClause(
+  path: AstPath<Enriched<jorje.OrderByClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("ORDER BY");
   parts.push(indentConcat([line, join([",", line], path.map(print, "exprs"))]));
@@ -2692,7 +3098,10 @@ function handleNullOrderOperation(
   return "";
 }
 
-function handleGroupByClause(path: AstPath, print: PrintFn): Doc {
+function handleGroupByClause(
+  path: AstPath<Enriched<jorje.GroupByClause>>,
+  print: PrintFn,
+): Doc {
   const expressionDocs: Doc[] = path.map(print, "exprs");
   const typeDoc: Doc = path.call(print, "type", "value");
   const havingDoc: Doc = path.call(print, "having", "value");
@@ -2734,7 +3143,10 @@ function handleGroupByType(childClass: string): Doc {
   return doc;
 }
 
-function handleHavingClause(path: AstPath, print: PrintFn): Doc {
+function handleHavingClause(
+  path: AstPath<Enriched<jorje.HavingClause>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push("HAVING");
   parts.push(line);
@@ -2742,7 +3154,10 @@ function handleHavingClause(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleQueryUsingClause(path: AstPath, print: PrintFn): Doc {
+function handleQueryUsingClause(
+  path: AstPath<Enriched<jorje.QueryUsingClause>>,
+  print: PrintFn,
+): Doc {
   const expressionDocs: Doc[] = path.map(print, "exprs");
   const parts: Doc[] = [];
   parts.push("USING");
@@ -2813,7 +3228,10 @@ function handleQueryOption(childClass: string): Doc {
   return doc;
 }
 
-function handleUpdateStatsClause(path: AstPath, print: PrintFn): Doc {
+function handleUpdateStatsClause(
+  path: AstPath<Enriched<jorje.UpdateStatsClause>>,
+  print: PrintFn,
+): Doc {
   const optionDocs: Doc[] = path.map(print, "options");
   const parts: Doc[] = [];
   parts.push("UPDATE");
@@ -2836,7 +3254,10 @@ function handleUpdateStatsOption(childClass: string): Doc {
   return doc;
 }
 
-function handleUsingType(path: AstPath, print: PrintFn): Doc {
+function handleUsingType(
+  path: AstPath<Enriched<jorje.UsingType>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "filter"));
   parts.push(" ");
@@ -2856,32 +3277,45 @@ function handleModifier(childClass: string): Doc {
   return [modifierValue, " "];
 }
 
-function handlePostfixExpression(path: AstPath, print: PrintFn): Doc {
+function handlePostfixExpression(
+  path: AstPath<Enriched<jorje.PostfixExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "expr"));
   parts.push(path.call(print, "op"));
   return parts;
 }
 
-function handlePrefixExpression(path: AstPath, print: PrintFn): Doc {
+function handlePrefixExpression(
+  path: AstPath<Enriched<jorje.PrefixExpr>>,
+  print: PrintFn,
+): Doc {
   const parts: Doc[] = [];
   parts.push(path.call(print, "op"));
   parts.push(path.call(print, "expr"));
   return parts;
 }
 
-function handlePostfixOperator(path: AstPath): Doc {
-  const node: jorje.PostfixExpr["op"] = path.getNode();
+function handlePostfixOperator(
+  path: AstPath<Enriched<jorje.PostfixExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return POSTFIX[node.$];
 }
 
-function handlePrefixOperator(path: AstPath): Doc {
-  const node: jorje.PrefixExpr["op"] = path.getNode();
+function handlePrefixOperator(
+  path: AstPath<Enriched<jorje.PrefixExpr["op"]>>,
+): Doc {
+  const node = path.node;
   return PREFIX[node.$];
 }
 
-function handleWhileLoop(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleWhileLoop(
+  path: AstPath<Enriched<jorje.WhileLoop>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const conditionDoc: Doc = path.call(print, "condition");
 
   const parts: Doc[] = [];
@@ -2907,7 +3341,10 @@ function handleWhileLoop(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleDoLoop(path: AstPath, print: PrintFn): Doc {
+function handleDoLoop(
+  path: AstPath<Enriched<jorje.DoLoop>>,
+  print: PrintFn,
+): Doc {
   const statementDoc: Doc = path.call(print, "stmnt");
   const conditionDoc: Doc = path.call(print, "condition");
 
@@ -2927,8 +3364,11 @@ function handleDoLoop(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleForLoop(path: AstPath, print: PrintFn): Doc {
-  const node = path.getNode();
+function handleForLoop(
+  path: AstPath<Enriched<jorje.ForLoop>>,
+  print: PrintFn,
+): Doc {
+  const node = path.node;
   const forControlDoc: Doc = path.call(print, "forControl");
 
   const parts: Doc[] = [];
@@ -2949,21 +3389,34 @@ function handleForLoop(path: AstPath, print: PrintFn): Doc {
   // for (Contact c: [SELECT Id FROM Contact]) {
   // }
   // ```
-  const isQueryOrSearch =
-    node.forControl?.init?.expr?.value["@class"] ===
-      APEX_TYPES.SOQL_EXPRESSION ||
-    node.forControl?.init?.expr?.value["@class"] === APEX_TYPES.SOSL_EXPRESSION;
+  // `init` only exists on the enhanced-for variant; the C-style variant has no
+  // single SOQL/SOSL initializer expression.
+  const forControl = asConcrete(node.forControl);
+  const initExprValue =
+    forControl["@class"] === APEX_TYPES.FOR_ENHANCED_CONTROL
+      ? forControl.init.expr.value
+      : undefined;
+  const initExpr = initExprValue ? asConcrete(initExprValue) : undefined;
+  const queryNode =
+    initExpr?.["@class"] === APEX_TYPES.SOQL_EXPRESSION
+      ? initExpr.query
+      : undefined;
+  const searchNode =
+    initExpr?.["@class"] === APEX_TYPES.SOSL_EXPRESSION
+      ? initExpr.search
+      : undefined;
+  const isQueryOrSearch = queryNode !== undefined || searchNode !== undefined;
   // #511 - For queries that the user opts in to manual breaks, we *don't* want
   // the leading newline either
   const hasForcedHardline =
     isQueryOrSearch &&
-    (node.forControl?.init?.expr?.value?.query?.forcedHardline ||
-      node.forControl?.init?.expr?.value?.search?.forcedHardline);
+    (asEnriched(queryNode)?.forcedHardline ||
+      asEnriched(searchNode)?.forcedHardline);
 
   // If there are own line comments in the forControl, we need to be conservative
   // and group the doc
-  const hasOwnLineComments = node.forControl?.comments?.some(
-    (comment: AnnotatedComment) => comment.placement === "ownLine",
+  const hasOwnLineComments = forControl.comments?.some(
+    (comment) => comment.placement === "ownLine",
   );
   if (
     isQueryOrSearch &&
@@ -2990,7 +3443,10 @@ function handleForLoop(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleForEnhancedControl(path: AstPath, print: PrintFn): Doc {
+function handleForEnhancedControl(
+  path: AstPath<Enriched<jorje.EnhancedForControl>>,
+  print: PrintFn,
+): Doc {
   // See the note in handleForInit to see why we have to do this
   const initDocParts: Doc = path.call(print, "init");
   const initDoc = join([" ", ":", " "], initDocParts as Doc[]);
@@ -3002,7 +3458,10 @@ function handleForEnhancedControl(path: AstPath, print: PrintFn): Doc {
   return parts;
 }
 
-function handleForCStyleControl(path: AstPath, print: PrintFn): Doc {
+function handleForCStyleControl(
+  path: AstPath<Enriched<jorje.CStyleForControl>>,
+  print: PrintFn,
+): Doc {
   const initsDoc: Doc = path.call(print, "inits", "value");
   const conditionDoc: Doc = path.call(print, "condition", "value");
   const controlDoc: Doc = path.call(print, "control", "value");
@@ -3016,7 +3475,10 @@ function handleForCStyleControl(path: AstPath, print: PrintFn): Doc {
   return groupConcat(parts);
 }
 
-function handleForInits(path: AstPath, print: PrintFn): Doc {
+function handleForInits(
+  path: AstPath<Enriched<jorje.ForInits>>,
+  print: PrintFn,
+): Doc {
   const typeDoc: Doc = path.call(print, "type", "value");
   const initDocsParts = path.map(print, "inits") as [Doc, Doc][];
 
@@ -3034,7 +3496,10 @@ function handleForInits(path: AstPath, print: PrintFn): Doc {
   return groupIndentConcat(parts);
 }
 
-function handleForInit(path: AstPath, print: PrintFn): Doc[] {
+function handleForInit(
+  path: AstPath<Enriched<jorje.ForInit>>,
+  print: PrintFn,
+): Doc[] {
   // This is one of the weird cases that does not really match the way that we print things.
   // ForInit is used by both C style for loop and enhanced for loop, and there's no way to tell
   // which operator we should use for init in this context, for example:
@@ -3054,16 +3519,23 @@ function handleForInit(path: AstPath, print: PrintFn): Doc[] {
 type SingleNodeHandler = (
   path: AstPath,
   print: PrintFn,
-  options: prettier.ParserOptions,
+  options: ApexParserOptions,
 ) => Doc;
+// Child handlers are dispatched by the runtime `childClass` and switch on it to
+// navigate per concrete subtype, so their `path` stays the untyped `AstPath`:
+// a single typed generic over the parent's subtype union can't express the
+// per-case `path.call(...)` keys (they aren't common across the union). Where a
+// child handler reads a node property directly (rather than navigating), it
+// narrows a typed node via `asConcrete(path.getNode())` instead.
 type ChildNodeHandler = (
   childClass: string,
   path: AstPath,
   print: PrintFn,
-  options: prettier.ParserOptions,
+  options: ApexParserOptions,
 ) => Doc;
 
-const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
+// Dispatched when a node's exact `@class` matches the key.
+const singleNodeHandlers: { [key: string]: SingleNodeHandler } = {
   [APEX_TYPES.IF_ELSE_BLOCK]: handleIfElseBlock,
   [APEX_TYPES.IF_BLOCK]: handleIfBlock,
   [APEX_TYPES.ELSE_BLOCK]: handleElseBlock,
@@ -3081,9 +3553,7 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.NAME_VALUE_PARAMETER]: handleNameValueParameter,
   [APEX_TYPES.ANNOTATION]: handleAnnotation,
   [APEX_TYPES.ANNOTATION_KEY_VALUE]: handleAnnotationKeyValue,
-  [APEX_TYPES.ANNOTATION_VALUE]: handleAnnotationValue,
   [APEX_TYPES.ANNOTATION_STRING]: handleAnnotationString,
-  [APEX_TYPES.MODIFIER]: handleModifier,
   [APEX_TYPES.RUN_AS_BLOCK]: handleRunAsBlock,
   [APEX_TYPES.DO_LOOP]: handleDoLoop,
   [APEX_TYPES.WHILE_LOOP]: handleWhileLoop,
@@ -3103,7 +3573,6 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.TRY_CATCH_FINALLY_BLOCK]: handleTryCatchFinallyBlock,
   [APEX_TYPES.CATCH_BLOCK]: handleCatchBlock,
   [APEX_TYPES.FINALLY_BLOCK]: handleFinallyBlock,
-  [APEX_TYPES.STATEMENT]: handleStatement,
   [APEX_TYPES.DML_MERGE_STATEMENT]: handleDmlMergeStatement,
   [APEX_TYPES.SWITCH_STATEMENT]: handleSwitchStatement,
   [APEX_TYPES.VALUE_WHEN]: handleValueWhen,
@@ -3201,13 +3670,10 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   // SOSL
   [APEX_TYPES.SEARCH]: handleSearch,
   [APEX_TYPES.FIND_CLAUSE]: handleFindClause,
-  [APEX_TYPES.FIND_VALUE]: handleFindValue,
   [APEX_TYPES.IN_CLAUSE]: handleInClause,
   [APEX_TYPES.WITH_DIVISION_CLAUSE]: handleDivisionClause,
-  [APEX_TYPES.DIVISION_VALUE]: handleDivisionValue,
   [APEX_TYPES.WITH_DATA_CATEGORY_CLAUSE]: handleWithDataCategories,
   [APEX_TYPES.SEARCH_WITH_CLAUSE]: handleSearchWithClause,
-  [APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE]: handleSearchWithClauseValue,
   [APEX_TYPES.RETURNING_CLAUSE]: handleReturningClause,
   [APEX_TYPES.RETURNING_EXPRESSION]: handleReturningExpression,
   [APEX_TYPES.RETURNING_SELECT_EXPRESSION]: handleReturningSelectExpression,
@@ -3230,7 +3696,6 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.FROM_EXPRESSION]: handleFromExpression,
   [APEX_TYPES.GROUP_BY_CLAUSE]: handleGroupByClause,
   [APEX_TYPES.GROUP_BY_EXPRESSION]: handleGroupByExpression,
-  [APEX_TYPES.GROUP_BY_TYPE]: handleGroupByType,
   [APEX_TYPES.HAVING_CLAUSE]: handleHavingClause,
   [APEX_TYPES.WHERE_CLAUSE]: handleWhereClause,
   [APEX_TYPES.WHERE_INNER_EXPRESSION]: handleWhereInnerExpression,
@@ -3249,15 +3714,12 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
   [APEX_TYPES.NUMBER_LITERAL]: handleNumberLiteral,
   [APEX_TYPES.NUMBER_EXPRESSION]: handleNumberExpression,
   [APEX_TYPES.QUERY_LITERAL_EXPRESSION]: handleQueryLiteralExpression,
-  [APEX_TYPES.QUERY_LITERAL]: handleWhereQueryLiteral,
   [APEX_TYPES.APEX_EXPRESSION]: handleApexExpression,
   [APEX_TYPES.COLON_EXPRESSION]: handleColonExpression,
   [APEX_TYPES.ORDER_BY_CLAUSE]: handleOrderByClause,
-  [APEX_TYPES.ORDER_BY_EXPRESSION]: handleOrderByExpression,
   [APEX_TYPES.WITH_VALUE]: handleWithValue,
   [APEX_TYPES.WITH_DATA_CATEGORIES]: handleWithDataCategories,
   [APEX_TYPES.DATA_CATEGORY]: handleDataCategory,
-  [APEX_TYPES.DATA_CATEGORY_OPERATOR]: handleDataCategoryOperator,
   [APEX_TYPES.LIMIT_VALUE]: (path: AstPath, print: PrintFn) => [
     "LIMIT",
     " ",
@@ -3278,21 +3740,11 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
     " ",
     path.call(print, "expr"),
   ],
-  [APEX_TYPES.QUERY_OPERATOR]: (childClass: string) =>
-    QUERY[childClass as jorje.QueryOp["@class"]],
-  [APEX_TYPES.SOQL_ORDER]: handleOrderOperation,
-  [APEX_TYPES.SOQL_ORDER_NULL]: handleNullOrderOperation,
-  [APEX_TYPES.TRACKING_TYPE]: handleTrackingType,
-  [APEX_TYPES.QUERY_OPTION]: handleQueryOption,
   [APEX_TYPES.QUERY_USING_CLAUSE]: handleQueryUsingClause,
-  [APEX_TYPES.USING_EXPRESSION]: handleUsingExpression,
   [APEX_TYPES.UPDATE_STATS_CLAUSE]: handleUpdateStatsClause,
-  [APEX_TYPES.UPDATE_STATS_OPTION]: handleUpdateStatsOption,
   [APEX_TYPES.WHERE_CALC_EXPRESSION]: handleWhereCalcExpression,
   [APEX_TYPES.WHERE_CALC_OPERATOR_PLUS]: () => "+",
   [APEX_TYPES.WHERE_CALC_OPERATOR_MINUS]: () => "-",
-  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: (childClass: string) =>
-    QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]],
   [APEX_TYPES.SEARCH_USING_CLAUSE]: (path: AstPath, print: PrintFn) => [
     "USING",
     " ",
@@ -3307,10 +3759,50 @@ const nodeHandler: { [key: string]: ChildNodeHandler | SingleNodeHandler } = {
     path.call(print, "identifier"),
   ],
   [APEX_TYPES.WITH_IDENTIFIER_TUPLE]: handleWithIdentifierTuple,
+};
+
+// Dispatched as a fallback when a node's exact `@class` has no single handler:
+// the node's class is an abstract parent (e.g. a `Stmnt` subclass or an enum-like
+// operator), so its concrete `@class` is passed to the parent's handler.
+const childNodeHandlers: { [key: string]: ChildNodeHandler } = {
+  [APEX_TYPES.ANNOTATION_VALUE]: handleAnnotationValue,
+  [APEX_TYPES.MODIFIER]: handleModifier,
+  [APEX_TYPES.STATEMENT]: handleStatement,
+  [APEX_TYPES.FIND_VALUE]: handleFindValue,
+  [APEX_TYPES.DIVISION_VALUE]: handleDivisionValue,
+  [APEX_TYPES.SEARCH_WITH_CLAUSE_VALUE]: handleSearchWithClauseValue,
+  [APEX_TYPES.GROUP_BY_TYPE]: handleGroupByType,
+  [APEX_TYPES.QUERY_LITERAL]: handleWhereQueryLiteral,
+  [APEX_TYPES.ORDER_BY_EXPRESSION]: handleOrderByExpression,
+  [APEX_TYPES.DATA_CATEGORY_OPERATOR]: handleDataCategoryOperator,
+  [APEX_TYPES.QUERY_OPERATOR]: (childClass: string) =>
+    QUERY[childClass as jorje.QueryOp["@class"]],
+  [APEX_TYPES.SOQL_ORDER]: handleOrderOperation,
+  [APEX_TYPES.SOQL_ORDER_NULL]: handleNullOrderOperation,
+  [APEX_TYPES.TRACKING_TYPE]: handleTrackingType,
+  [APEX_TYPES.QUERY_OPTION]: handleQueryOption,
+  [APEX_TYPES.USING_EXPRESSION]: handleUsingExpression,
+  [APEX_TYPES.UPDATE_STATS_OPTION]: handleUpdateStatsOption,
+  [APEX_TYPES.WHERE_COMPOUND_OPERATOR]: (childClass: string) =>
+    QUERY_WHERE[childClass as jorje.WhereCompoundOp["@class"]],
   [APEX_TYPES.WITH_KEY_VALUE]: handleWithKeyValue,
 };
 
-function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
+/**
+ * The `@class` strings the printer dispatches on directly (exact match) or as a
+ * parent fallback. Exported so the exhaustiveness test can assert every concrete
+ * jorje node in the `ApexNode` union is reachable. See
+ * `tests/dispatch_exhaustiveness/dispatch.spec.ts`.
+ */
+export const NODE_HANDLER_CLASSES: ReadonlySet<string> = new Set([
+  ...Object.keys(singleNodeHandlers),
+  ...Object.keys(childNodeHandlers),
+]);
+
+function handleTrailingEmptyLines(
+  doc: Doc,
+  node: EnrichedApexNode | null,
+): Doc {
   // Early return optimization: if node has no trailingEmptyLine, return immediately
   if (!node?.trailingEmptyLine) {
     return doc;
@@ -3349,7 +3841,7 @@ function handleTrailingEmptyLines(doc: Doc, node: any): Doc {
 
 function genericPrint(
   path: AstPath,
-  options: prettier.ParserOptions,
+  options: ApexParserOptions,
   print: PrintFn,
 ) {
   const n = path.getNode();
@@ -3377,17 +3869,16 @@ function genericPrint(
   if (!apexClass) {
     return "";
   }
-  if (apexClass in nodeHandler) {
-    return (nodeHandler[apexClass] as SingleNodeHandler)(path, print, options);
+  const singleHandler = singleNodeHandlers[apexClass];
+  if (singleHandler) {
+    return singleHandler(path, print, options);
   }
   const parentClass = getParentType(apexClass);
-  if (parentClass && parentClass in nodeHandler) {
-    return (nodeHandler[parentClass] as ChildNodeHandler)(
-      apexClass,
-      path,
-      print,
-      options,
-    );
+  if (parentClass !== undefined) {
+    const childHandler = childNodeHandlers[parentClass];
+    if (childHandler) {
+      return childHandler(apexClass, path, print, options);
+    }
   }
   /* v8 ignore start */
   throw new Error(
@@ -3396,16 +3887,19 @@ function genericPrint(
   /* v8 ignore stop */
 }
 
-let options: prettier.ParserOptions;
+let options: ApexParserOptions;
 export default function printGenerically(
   path: AstPath,
+  // Prettier hands us a plain ParserOptions; the apex* options it was configured
+  // with are present at runtime (see `options` in index.ts), so we view it as an
+  // ApexParserOptions for the rest of the printer.
   opts: prettier.ParserOptions,
   print: PrintFn,
 ): Doc {
   if (typeof opts === "object") {
-    options = opts;
+    options = opts as ApexParserOptions;
   }
-  const node = path.getNode();
+  const node = path.getNode() as EnrichedApexNode | null;
   const doc = genericPrint(path, options, print);
   return handleTrailingEmptyLines(doc, node);
 }

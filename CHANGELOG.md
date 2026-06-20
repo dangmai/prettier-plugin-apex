@@ -22,6 +22,7 @@
 - Replace `eslint` with `biome` for linting purpose.
 - Add a performance benchmark harness for profiling where time goes during formatting.
 - Add a CI workflow that benchmarks a labeled PR against its base branch, and can also be run manually on any branch or against a contributor's PR.
+- Tighten the plugin to strict TypeScript (`strict: true`, no `any`), including a typed `@class`→handler dispatch in the printer. Type-safety only, no change to formatted output.
 
 # 2.2.6
 

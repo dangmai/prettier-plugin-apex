@@ -11,7 +11,7 @@
         "useLiteralKeys": "off"
       },
       "suspicious": {
-        "noExplicitAny": "off"
+        "noExplicitAny": "error"
       }
     }
   },
