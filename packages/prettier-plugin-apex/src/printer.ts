@@ -1039,7 +1039,13 @@ function handleStatement(
   print: PrintFn,
 ): Doc {
   let doc: Doc | undefined;
-  switch (childClass as jorje.Stmnt["@class"]) {
+  // `StmntViaChildHandler` excludes the statement classes that have their own
+  // single handler, so this switch only needs the statements that fall through
+  // to here. The `cls satisfies never` in the default is the exhaustiveness
+  // guard: a newly-generated `Stmnt` subtype with no handler leaves `cls`
+  // non-`never` there and fails to compile.
+  const cls = childClass as StmntViaChildHandler;
+  switch (cls) {
     case APEX_TYPES.VARIABLE_DECLARATION_STATEMENT:
       return handleVariableDeclarationStatement(path, print);
     case APEX_TYPES.DML_INSERT_STATEMENT:
@@ -1059,6 +1065,7 @@ function handleStatement(
       break;
     /* v8 ignore start */
     default:
+      cls satisfies never;
       throw new Error(
         `Statement ${childClass} is not supported. Please file a bug report.`,
       );
@@ -3570,8 +3577,12 @@ type ChildNodeHandler = (
   options: ApexParserOptions,
 ) => Doc;
 
-// Dispatched when a node's exact `@class` matches the key.
-const singleNodeHandlers: { [key: string]: SingleNodeHandler } = {
+// Dispatched when a node's exact `@class` matches the key. Declared with
+// `satisfies` rather than an index-signature annotation so the literal keys are
+// preserved in the type — `keyof typeof singleNodeHandlers` then yields the
+// exact set of single-dispatched classes, which `handleStatement` subtracts to
+// derive the statements that fall through to it (see `StmntViaChildHandler`).
+const singleNodeHandlers = {
   [APEX_TYPES.IF_ELSE_BLOCK]: handleIfElseBlock,
   [APEX_TYPES.IF_BLOCK]: handleIfBlock,
   [APEX_TYPES.ELSE_BLOCK]: handleElseBlock,
@@ -3795,7 +3806,18 @@ const singleNodeHandlers: { [key: string]: SingleNodeHandler } = {
     path.call(print, "identifier"),
   ],
   [APEX_TYPES.WITH_IDENTIFIER_TUPLE]: handleWithIdentifierTuple,
-};
+} satisfies Record<string, SingleNodeHandler>;
+
+// The `Stmnt` subtypes that reach `handleStatement`: every statement class
+// except those claimed by an exact-`@class` single handler above. Deriving this
+// (rather than hardcoding it) keeps `handleStatement`'s exhaustiveness check
+// honest — adding a single handler for a statement drops it here automatically,
+// and a newly-generated `Stmnt` subtype with no handler stays in this set so the
+// `cls satisfies never` guard fails to compile.
+type StmntViaChildHandler = Exclude<
+  jorje.Stmnt["@class"],
+  keyof typeof singleNodeHandlers
+>;
 
 // Dispatched as a fallback when a node's exact `@class` has no single handler:
 // the node's class is an abstract parent (e.g. a `Stmnt` subclass or an enum-like
@@ -3905,7 +3927,12 @@ function genericPrint(
   if (!apexClass) {
     return "";
   }
-  const singleHandler = singleNodeHandlers[apexClass];
+  // The indexed value is the union of every handler's precise signature; they
+  // all satisfy `SingleNodeHandler` (enforced on the literal above), so view it
+  // as that uniform shape to call it.
+  const singleHandler = singleNodeHandlers[
+    apexClass as keyof typeof singleNodeHandlers
+  ] as SingleNodeHandler | undefined;
   if (singleHandler) {
     return singleHandler(path, print, options);
   }
