@@ -30,6 +30,16 @@ packages/prettier-plugin-apex/vendor/apex-ast-serializer/bin/apex-ast-serializer
 .gitattributes text eol=lf
 gradlew text eol=lf
 
+# Linguist language overrides
+#
+# These files are actually JSONC (they contain `//` comments). Without an
+# override GitHub highlights them as plain JSON, so the comment lines render as
+# syntax errors. Tell Linguist to treat them as "JSON with Comments" so they
+# highlight correctly on GitHub. Linguist already auto-detects tsconfig.json and
+# devcontainer.json by name, so only the non-standard names need a hint here.
+renovate.json linguist-language=JSON-with-Comments
+packages/prettier-plugin-apex/tsconfig.prod.json linguist-language=JSON-with-Comments
+
 # Windows specific files
 *.bat text eol=crlf
 
