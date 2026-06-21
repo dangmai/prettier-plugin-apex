@@ -3,7 +3,7 @@
 ## Formatting Changes
 
 - Support Apex multiline string literals (`'''...'''`), preserving their content verbatim ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_multiline_string.htm&release=262&type=5)).
-- Support the SOQL `FORMULA('...')` function in `WHERE` clauses ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_soql_formula_function.htm&release=262&type=5)). The formula expression is printed verbatim from the source.
+- Support the SOQL `FORMULA('...')` function in `WHERE` clauses ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soql_where.htm&release=262&type=5)). The formula expression is printed verbatim from the source.
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
 - Fix standalone comments before SOQL `WITH SECURITY_ENFORCED` / `WITH USER_MODE` / `WITH SYSTEM_MODE` clauses migrating between `WITH` and the identifier across format passes.
 - Fix trailing comments on the last field of a SOSL `RETURNING X(...)` clause migrating outside the closing paren across format passes.
@@ -22,7 +22,7 @@
 - Replace `eslint` with `biome` for linting purpose.
 - Add a performance benchmark harness for profiling where time goes during formatting.
 - Add a CI workflow that benchmarks a labeled PR against its base branch, and can also be run manually on any branch or against a contributor's PR.
-- Tighten the plugin to strict TypeScript (`strict: true`, no `any`), including a typed `@class`→handler dispatch in the printer. Type-safety only, no change to formatted output.
+- Tighten the plugin to strict TypeScript (`strict: true`, no `any`), including a typed `@class` -> handler dispatch in the printer. Type-safety only, no change to formatted output.
 
 # 2.2.6
 
