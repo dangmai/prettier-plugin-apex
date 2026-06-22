@@ -309,4 +309,4 @@ jobs:
 
       - name: Create GitHub Release
         if: steps.check_prerelease.outcome == 'success'
-        uses: softprops/action-gh-release@v3.0.0
+        uses: softprops/action-gh-release@v3.0.1
