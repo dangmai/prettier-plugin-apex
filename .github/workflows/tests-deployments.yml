@@ -254,6 +254,11 @@ jobs:
     runs-on: ubuntu-latest
     name: Release to Registry
     if: startsWith(github.ref, 'refs/tags')
+    permissions:
+      # Required for NPM Trusted Publishing OIDC
+      id-token: write
+      # Required for softprops/action-gh-release to create the GitHub Release
+      contents: write
     needs:
       - functional-tests
       - build-native-executables
