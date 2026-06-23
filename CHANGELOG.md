@@ -1,13 +1,15 @@
 # Unreleased
 
+# 2.3.0
+
 ## Formatting Changes
 
 - Support Apex multiline string literals (`'''...'''`), preserving their content verbatim ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_apex_multiline_string.htm&release=262&type=5)).
 - Support the SOQL `FORMULA('...')` function in `WHERE` clauses ([release notes](https://help.salesforce.com/s/articleView?id=release-notes.rn_api_soql_where.htm&release=262&type=5)). The formula expression is printed verbatim from the source.
+- Support the SOQL `WITH` tuple/key-value form (`WITH Identifier(key = value, ...)`), which previously threw `No handler found` ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/2423)).
 - Fix trailing empty line not printed after ignored nodes in class declaration blocks ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/1892)).
 - Fix standalone comments before SOQL `WITH SECURITY_ENFORCED` / `WITH USER_MODE` / `WITH SYSTEM_MODE` clauses migrating between `WITH` and the identifier across format passes.
 - Fix trailing comments on the last field of a SOSL `RETURNING X(...)` clause migrating outside the closing paren across format passes.
-- Support the SOQL `WITH` tuple/key-value form (`WITH Identifier(key = value, ...)`), which previously threw `No handler found` ([issue](https://github.com/dangmai/prettier-plugin-apex/issues/2423)).
 
 ## Dependency Changes
 
