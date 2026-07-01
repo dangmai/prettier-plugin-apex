@@ -68,7 +68,7 @@ run {
 }
 
 ext {
-  junitVersion = '6.1.0'
+  junitVersion = '6.1.1'
 }
 
 dependencies {
