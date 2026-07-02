@@ -55,6 +55,32 @@ export function isPrettierIgnore(comment: AnnotatedComment): boolean {
   return content === "prettier-ignore";
 }
 
+/**
+ * Prettier tags every comment with a `placement` (`ownLine`, `endOfLine` or
+ * `remaining`) during comment attachment. Prettier < 3.9 left that property on
+ * the comment, and our printer reads it to lay out surrounding docs. Prettier
+ * 3.9 started deleting `placement` in its post-attachment cleanup (alongside
+ * `precedingNode`/`followingNode`/`enclosingNode`), so by print time it is
+ * always `undefined`.
+ *
+ * The placement handlers below run during attachment, before that cleanup, so
+ * we copy the placement onto a plugin-owned property that Prettier does not
+ * touch. `getCommentPlacement` reads it back, falling back to Prettier's own
+ * `placement` for versions that still keep it around.
+ */
+function recordCommentPlacement(
+  comment: AnnotatedComment,
+  placement: "ownLine" | "endOfLine" | "remaining",
+): void {
+  comment.apexPlacement = placement;
+}
+
+export function getCommentPlacement(
+  comment: AnnotatedComment,
+): string | undefined {
+  return comment.apexPlacement ?? comment.placement;
+}
+
 export function printComment(path: AstPath): Doc {
   // This handles both Inline and Block Comments.
   // We don't just pass through the value because unlike other string literals,
@@ -161,7 +187,9 @@ export function willPrintOwnComments(path: AstPath): boolean {
   return !node || !node["@class"] || node["@class"] === APEX_TYPES.ANNOTATION;
 }
 
-export function getTrailingComments(node: EnrichedApexNode): AnnotatedComment[] {
+export function getTrailingComments(
+  node: EnrichedApexNode,
+): AnnotatedComment[] {
   return (node.comments ?? []).filter((comment) => comment.trailing);
 }
 
@@ -286,7 +314,7 @@ function handleBinaryishExpressionRightChildTrailingComment(
 ) {
   const { precedingNode } = comment;
   if (
-    comment.placement !== "endOfLine" ||
+    getCommentPlacement(comment) !== "endOfLine" ||
     !precedingNode ||
     !isBinaryish(precedingNode)
   ) {
@@ -409,6 +437,7 @@ export function handleOwnLineComment(
   comment: AnnotatedComment,
   sourceCode: string,
 ): boolean {
+  recordCommentPlacement(comment, "ownLine");
   return (
     handleDanglingComment(comment) ||
     handleBlockStatementLeadingComment(comment) ||
@@ -432,6 +461,7 @@ export function handleEndOfLineComment(
   comment: AnnotatedComment,
   sourceCode: string,
 ): boolean {
+  recordCommentPlacement(comment, "endOfLine");
   return (
     handleDanglingComment(comment) ||
     handleBinaryishExpressionRightChildTrailingComment(comment) ||
@@ -457,6 +487,7 @@ export function handleRemainingComment(
   comment: AnnotatedComment,
   sourceCode: string,
 ): boolean {
+  recordCommentPlacement(comment, "remaining");
   return (
     handleWhereExpression(comment, sourceCode) ||
     handleModifierPrettierIgnoreComment(comment) ||
