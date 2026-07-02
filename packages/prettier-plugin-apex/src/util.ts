@@ -45,6 +45,11 @@ export type AnnotatedComment = AnnotatedAstNode &
     followingNode?: EnrichedApexNode;
     precedingNode?: EnrichedApexNode;
     placement: string;
+    // Prettier < 3.9 kept `placement` on the comment after attachment; 3.9
+    // deletes it during cleanup. We stash it here from the placement handlers
+    // (which run during attachment) so the printer can still read it. See
+    // `getCommentPlacement` in comments.ts.
+    apexPlacement?: string;
   };
 
 // Exhaustiveness guard for child-handler dispatch. In a `switch` that covers

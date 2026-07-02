@@ -1,5 +1,9 @@
 # Unreleased
 
+## Formatting Changes
+
+- Fix comments between a block's closing `}` and a following `else`/`catch`/`finally` (and comments inside `for (...)` headers and binaryish left-hand operands) getting glued onto the previous line under Prettier 3.9. Prettier 3.9 stopped persisting a comment's `placement` after attachment, which the printer relied on; the plugin now tracks it independently so output is unchanged across Prettier 3.x.
+
 # 2.3.0
 
 ## Formatting Changes

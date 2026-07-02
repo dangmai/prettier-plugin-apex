@@ -3,6 +3,7 @@ import * as prettier from "prettier";
 
 import type * as jorje from "../vendor/apex-ast-serializer/typings/jorje.d.js";
 import {
+  getCommentPlacement,
   getTrailingComments,
   hasPrettierIgnore,
   printComment,
@@ -248,7 +249,8 @@ function handleBinaryishExpression(
   // entire binaryish expression after the first format.
   const leftChildHasEndOfLineComment =
     asEnriched(node.left).comments?.some(
-      (comment) => comment.trailing && comment.placement === "endOfLine",
+      (comment) =>
+        comment.trailing && getCommentPlacement(comment) === "endOfLine",
     ) ?? false;
 
   if (leftChildHasEndOfLineComment) {
@@ -1293,7 +1295,7 @@ function handleTryCatchFinallyBlock(
     catchBlockContainsLeadingOwnLineComments = node.catchBlocks.map(
       (catchBlock) =>
         asEnriched(catchBlock).comments?.some(
-          (comment) => comment.leading && comment.placement === "ownLine",
+          (comment) => comment.leading && getCommentPlacement(comment) === "ownLine",
         ) ?? false,
     );
     catchBlockContainsTrailingComments = node.catchBlocks.map(
@@ -1318,7 +1320,7 @@ function handleTryCatchFinallyBlock(
   const finallyBlockContainsLeadingOwnLineComments = asEnriched(
     node.finallyBlock?.value,
   )?.comments?.some(
-    (comment) => comment.leading && comment.placement === "ownLine",
+    (comment) => comment.leading && getCommentPlacement(comment) === "ownLine",
   );
   const shouldAddHardLineBeforeFinally =
     finallyBlockContainsLeadingOwnLineComments ||
@@ -2009,7 +2011,7 @@ function handleIfElseBlock(
   const ifBlockContainsLeadingOwnLineComments: boolean[] = node.ifBlocks.map(
     (ifBlock) =>
       asEnriched(ifBlock).comments?.some(
-        (comment) => comment.leading && comment.placement === "ownLine",
+        (comment) => comment.leading && getCommentPlacement(comment) === "ownLine",
       ) ?? false,
   );
   const ifBlockContainsTrailingComments: boolean[] = node.ifBlocks.map(
@@ -2046,7 +2048,7 @@ function handleIfElseBlock(
     const elseBlockContainsLeadingOwnLineComments = asEnriched(
       node.elseBlock?.value,
     )?.comments?.some(
-      (comment) => comment.leading && comment.placement === "ownLine",
+      (comment) => comment.leading && getCommentPlacement(comment) === "ownLine",
     );
     const lastIfBlockContainsTrailingComments =
       ifBlockContainsTrailingComments[
@@ -3459,7 +3461,7 @@ function handleForLoop(
   // If there are own line comments in the forControl, we need to be conservative
   // and group the doc
   const hasOwnLineComments = forControl.comments?.some(
-    (comment) => comment.placement === "ownLine",
+    (comment) => getCommentPlacement(comment) === "ownLine",
   );
   if (
     isQueryOrSearch &&
