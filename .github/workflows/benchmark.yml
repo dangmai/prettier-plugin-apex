@@ -107,7 +107,7 @@ jobs:
       # GraalVM is needed only to build the head native binary; the harness runs
       # the binary directly, so the benchmark steps don't touch the JVM.
       - name: Set up GraalVM
-        uses: graalvm/setup-graalvm@v1.5.6
+        uses: graalvm/setup-graalvm@v1.6.0
         with:
           java-version: "23"
           distribution: graalvm
