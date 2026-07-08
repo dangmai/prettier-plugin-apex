@@ -52,7 +52,7 @@ jobs:
 
       - name: Post sticky comment
         if: steps.meta.outputs.pr != '' && hashFiles('artifact/report.md') != ''
-        uses: marocchino/sticky-pull-request-comment@v3.0.4
+        uses: marocchino/sticky-pull-request-comment@v3.0.5
         with:
           number: ${{ steps.meta.outputs.pr }}
           header: benchmark
