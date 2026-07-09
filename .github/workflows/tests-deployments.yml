@@ -205,7 +205,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - name: Set up JDK
-        uses: graalvm/setup-graalvm@v1.6.0
+        uses: graalvm/setup-graalvm@v1.6.1
         with:
           java-version: "23"
           distribution: "graalvm"
