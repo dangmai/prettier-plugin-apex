@@ -6,3 +6,11 @@ packages:
 allowBuilds:
   esbuild: true
   nx: true
+
+# Force every prettier in the graph - including the plugin's `prettier` peer -
+# to the exact version pinned in the root devDependencies. Without this the peer
+# resolves independently and can lag the devDep, so a Renovate prettier bump
+# would not actually be exercised by the test suite (see the 3.9.0
+# comment.placement regression, which merged green for exactly this reason).
+overrides:
+  prettier: "$prettier"

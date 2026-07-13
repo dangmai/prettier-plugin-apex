@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  prettier: 3.9.5
+
 importers:
 
   .:
@@ -108,7 +111,7 @@ importers:
         specifier: ^30.0.0
         version: 30.4.0
       prettier:
-        specifier: ^3.0.0
+        specifier: 3.9.5
         version: 3.9.5
       wait-on:
         specifier: ^9.0.0
@@ -1743,12 +1746,12 @@ packages:
   prettier-plugin-java@2.10.2:
     resolution: {integrity: sha512-oOXUBqb0BKfL//ZeYFcsRtbm4h8jdicg1axbBrXh2tnUcAcKAyFCl3gUL7bN7kwDwFRraQop1RF9BZk+K6pmoQ==}
     peerDependencies:
-      prettier: ^3.0.0
+      prettier: 3.9.5
 
   prettier-plugin-organize-imports@4.3.0:
     resolution: {integrity: sha512-FxFz0qFhyBsGdIsb697f/EkvHzi5SZOhWAjxcx2dLt+Q532bAlhswcXGYB1yzjZ69kW8UoadFBw7TyNwlq96Iw==}
     peerDependencies:
-      prettier: '>=2.0'
+      prettier: 3.9.5
       typescript: '>=2.9'
       vue-tsc: ^2.1.0 || 3
     peerDependenciesMeta:
