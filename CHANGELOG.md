@@ -1,5 +1,9 @@
 # Unreleased
 
+## Internal Changes
+
+- Add a scheduled CI job that runs the formatting snapshot suite against the latest published Prettier, so upstream Prettier changes that alter our output are caught on their own rather than only when a lockfile bump happens to surface them.
+
 # 2.3.0
 
 ## Formatting Changes
