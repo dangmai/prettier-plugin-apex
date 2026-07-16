@@ -9,6 +9,7 @@ on:
 
 jobs:
   warm-hosted-service:
+    if: github.repository == 'dangmai/prettier-plugin-apex'
     runs-on: ubuntu-latest
 
     steps:

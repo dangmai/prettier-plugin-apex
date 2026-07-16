@@ -10,6 +10,7 @@ on:
 
 jobs:
   jorje:
+    if: github.repository == 'dangmai/prettier-plugin-apex'
     runs-on: ubuntu-latest
 
     steps:
