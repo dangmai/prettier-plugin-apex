@@ -16,7 +16,7 @@ importers:
         version: 2.5.4
       '@nx/shared-fs-cache':
         specifier: 5.0.7
-        version: 5.0.7(nx@23.1.0)
+        version: 5.0.7(debug@4.4.3(supports-color@7.2.0))(nx@23.1.0)
       '@tsconfig/node22':
         specifier: 22.0.5
         version: 22.0.5
@@ -36,8 +36,8 @@ importers:
         specifier: 3.9.5
         version: 3.9.5
       prettier-plugin-java:
-        specifier: 2.10.2
-        version: 2.10.2(prettier@3.9.5)
+        specifier: 2.10.3
+        version: 2.10.3(prettier@3.9.5)
       prettier-plugin-organize-imports:
         specifier: 4.3.0
         version: 4.3.0(prettier@3.9.5)(typescript@7.0.2)
@@ -115,7 +115,7 @@ importers:
         version: 3.9.5
       wait-on:
         specifier: ^9.0.0
-        version: 9.0.10
+        version: 9.0.10(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
     devDependencies:
       '@inquirer/prompts':
         specifier: ^8.5.2
@@ -1746,8 +1746,8 @@ packages:
     resolution: {integrity: sha512-E6rsNU1QNJgB3sjj7OANinGncFKuK+164sLXw1/CqBjj/EkXSoSdHCtWQGBNlREIGLnL7IEUEGa08YFVUbrhVg==}
     engines: {node: '>=16'}
 
-  prettier-plugin-java@2.10.2:
-    resolution: {integrity: sha512-oOXUBqb0BKfL//ZeYFcsRtbm4h8jdicg1axbBrXh2tnUcAcKAyFCl3gUL7bN7kwDwFRraQop1RF9BZk+K6pmoQ==}
+  prettier-plugin-java@2.10.3:
+    resolution: {integrity: sha512-/g52mTbsN2ee8JjLRpBWGGmcmRhdv2zRWyj4QbsL9CQ+nKR022GRJhebwEpRyaCc8hLV6aO3JPGNQyXp1DPrCA==}
     peerDependencies:
       prettier: 3.9.5
 
@@ -2050,8 +2050,8 @@ packages:
   wcwidth@1.0.1:
     resolution: {integrity: sha512-XHPEwS0q6TaxcvG85+8EYkbiCux2XtWG2mkc47Ng2A77BQu9+DqIOJldST4HgPkuea7dvKSj5VgX3P1d4rW8Tg==}
 
-  web-tree-sitter@0.26.9:
-    resolution: {integrity: sha512-YJwSHANl6XFgeEjB8nitgj0qZYt5gkIesJ4w2srS2wcLB4GUa4xcOkM0YaMsU6WNR53YVIkDSY7Ej4pf3IXtCA==}
+  web-tree-sitter@0.26.11:
+    resolution: {integrity: sha512-Q5Dm3YTIXSXuH6FxX6RuzX2Qwpc4DPGiYMU87Wg5Z8OIStiQFiUex4zMDc0vBTw78EphaYJacncJghCHzbZptg==}
 
   which@3.0.1:
     resolution: {integrity: sha512-XA1b62dzQzLfaEOSQFTCOd5KFf/1VSzZo7/7TUjnya6u0vGGKzU96UQBZTAThCb2j4/xjBAyii1OhRLJEivHvg==}
@@ -2488,11 +2488,11 @@ snapshots:
   '@nx/key-win32-x64-msvc@5.0.7':
     optional: true
 
-  '@nx/key@5.0.7':
+  '@nx/key@5.0.7(debug@4.4.3(supports-color@7.2.0))':
     dependencies:
       '@napi-rs/wasm-runtime': 0.2.12
-      axios: 1.16.0
-      axios-retry: 4.5.0(axios@1.16.0)
+      axios: 1.16.0(debug@4.4.3(supports-color@7.2.0))
+      axios-retry: 4.5.0(axios@1.16.0(debug@4.4.3(supports-color@7.2.0)))
       chalk: 4.1.2
       enquirer: 2.4.1
       ora: 5.4.1
@@ -2539,10 +2539,10 @@ snapshots:
   '@nx/nx-win32-x64-msvc@23.1.0':
     optional: true
 
-  '@nx/shared-fs-cache@5.0.7(nx@23.1.0)':
+  '@nx/shared-fs-cache@5.0.7(debug@4.4.3(supports-color@7.2.0))(nx@23.1.0)':
     dependencies:
       '@nx/devkit': 22.6.5(nx@23.1.0)
-      '@nx/key': 5.0.7
+      '@nx/key': 5.0.7(debug@4.4.3(supports-color@7.2.0))
       nx: 23.1.0
       semver: 7.5.4
     transitivePeerDependencies:
@@ -2797,12 +2797,12 @@ snapshots:
 
   asynckit@0.4.0: {}
 
-  axios-retry@4.5.0(axios@1.16.0):
+  axios-retry@4.5.0(axios@1.16.0(debug@4.4.3(supports-color@7.2.0))):
     dependencies:
-      axios: 1.16.0
+      axios: 1.16.0(debug@4.4.3(supports-color@7.2.0))
       is-retry-allowed: 2.2.0
 
-  axios@1.16.0:
+  axios@1.16.0(debug@4.4.3(supports-color@7.2.0)):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3(supports-color@7.2.0))
       form-data: 4.0.6
@@ -2820,7 +2820,7 @@ snapshots:
       - debug
       - supports-color
 
-  axios@1.18.1:
+  axios@1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
       follow-redirects: 1.16.0(debug@4.4.3(supports-color@7.2.0))
       form-data: 4.0.6
@@ -3527,10 +3527,10 @@ snapshots:
 
   presentable-error@0.0.1: {}
 
-  prettier-plugin-java@2.10.2(prettier@3.9.5):
+  prettier-plugin-java@2.10.3(prettier@3.9.5):
     dependencies:
       prettier: 3.9.5
-      web-tree-sitter: 0.26.9
+      web-tree-sitter: 0.26.11
 
   prettier-plugin-organize-imports@4.3.0(prettier@3.9.5)(typescript@7.0.2):
     dependencies:
@@ -3770,9 +3770,9 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  wait-on@9.0.10:
+  wait-on@9.0.10(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
-      axios: 1.18.1
+      axios: 1.18.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
       joi: 18.2.3
       lodash: 4.18.1
       minimist: 1.2.8
@@ -3785,7 +3785,7 @@ snapshots:
     dependencies:
       defaults: 1.0.4
 
-  web-tree-sitter@0.26.9: {}
+  web-tree-sitter@0.26.11: {}
 
   which@3.0.1:
     dependencies:
