@@ -62,7 +62,16 @@ runs:
         # Case 2: the workflow is running on a fork's own actions (push /
         # schedule / dispatch). Query fork status at runtime rather than reading
         # github.event.repository.fork, which is absent on schedule events.
-        is_fork=$(gh api "repos/$REPO" --jq '.fork' 2>/dev/null || echo "unknown")
+        # Retry a few times so a transient API hiccup doesn't wrongly fail a
+        # fork here (this is the only signal we have for a fork's own runs).
+        is_fork="unknown"
+        for attempt in 1 2 3; do
+          if is_fork=$(gh api "repos/$REPO" --jq '.fork' 2>/dev/null); then
+            break
+          fi
+          is_fork="unknown"
+          if [ "$attempt" -lt 3 ]; then sleep 3; fi
+        done
         if [ "$is_fork" = "true" ]; then
           skip
         fi

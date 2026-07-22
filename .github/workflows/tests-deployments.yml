@@ -243,6 +243,9 @@ jobs:
       - name: Build Linux musl toolchain
         if: matrix.os == 'ubuntu-latest'
         run: pnpm nx run apex-ast-serializer:build:musl
+        env:
+          NX_KEY: ${{ steps.nx_secret.outputs.available == 'true' && secrets.NX_KEY || '' }}
+          NX_NO_CLOUD: ${{ steps.nx_secret.outputs.available == 'true' && 'false' || 'true' }}
       - name: Build native executable
         run: pnpm nx run apex-ast-serializer:build:native
         env:
