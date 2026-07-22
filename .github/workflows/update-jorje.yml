@@ -14,6 +14,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
+      # Opening the PR needs PERSONAL_TOKEN. It's absent on contributor forks,
+      # so resolve it: fail on the canonical repo, skip (with a warning) on a
+      # fork, where this maintenance workflow has nothing useful to do anyway.
+      - name: Resolve personal token
+        id: pr_secret
+        uses: ./.github/actions/resolve-secret
+        with:
+          name: PERSONAL_TOKEN
+          value: ${{ secrets.PERSONAL_TOKEN }}
       - name: Set up JDK
         uses: actions/setup-java@v5.6.0
         with:
@@ -23,6 +32,7 @@ jobs:
       - name: Run create-jorje-jar.sh
         run: ./packages/apex-ast-serializer/tools/create-jorje-jar.sh
       - name: Create Pull Request
+        if: steps.pr_secret.outputs.available == 'true'
         uses: peter-evans/create-pull-request@v8.1.1
         with:
           commit-message: Updated jorje
