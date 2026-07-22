@@ -11,12 +11,8 @@ inputs:
     description: Human-readable name of the secret, used in log annotations.
     required: true
   value:
-    description: The secret value, e.g. ${{ secrets.MY_TOKEN }}.
+    description: The secret value to check, e.g. pass secrets.MY_TOKEN here.
     required: true
-  github-token:
-    description: Token used to query the repository's fork status.
-    required: false
-    default: ${{ github.token }}
 
 outputs:
   available:
@@ -31,7 +27,7 @@ runs:
       env:
         SECRET_NAME: ${{ inputs.name }}
         SECRET_VALUE: ${{ inputs.value }}
-        GH_TOKEN: ${{ inputs.github-token }}
+        GH_TOKEN: ${{ github.token }}
         REPO: ${{ github.repository }}
         # For a pull_request from a fork this is the fork's full name, which
         # differs from REPO (the base repo the run executes in). Empty for
