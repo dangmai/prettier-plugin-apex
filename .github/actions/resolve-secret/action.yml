@@ -1,0 +1,74 @@
+name: Resolve secret
+description: >-
+  Decide whether a repository secret is usable for a step. On the canonical
+  repository (no upstream) a missing secret is a hard error, because the
+  maintainer expects it to be configured. On a fork it's a convenience skip:
+  contributors don't have the maintainer's secrets, so the dependent step is
+  simply left out with a warning annotation instead of failing their CI.
+
+inputs:
+  name:
+    description: Human-readable name of the secret, used in log annotations.
+    required: true
+  value:
+    description: The secret value, e.g. ${{ secrets.MY_TOKEN }}.
+    required: true
+  github-token:
+    description: Token used to query the repository's fork status.
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  available:
+    description: '"true" when the secret is set and the dependent step should run.'
+    value: ${{ steps.resolve.outputs.available }}
+
+runs:
+  using: composite
+  steps:
+    - id: resolve
+      shell: bash
+      env:
+        SECRET_NAME: ${{ inputs.name }}
+        SECRET_VALUE: ${{ inputs.value }}
+        GH_TOKEN: ${{ inputs.github-token }}
+        REPO: ${{ github.repository }}
+        # For a pull_request from a fork this is the fork's full name, which
+        # differs from REPO (the base repo the run executes in). Empty for
+        # non-PR events and same-repo PRs.
+        HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+      run: |
+        set -euo pipefail
+
+        # Fast path: secret is present, no need to look any further.
+        if [ -n "$SECRET_VALUE" ]; then
+          echo "available=true" >> "$GITHUB_OUTPUT"
+          exit 0
+        fi
+
+        skip() {
+          echo "::warning title=$SECRET_NAME not set::$SECRET_NAME is not available here; skipping the step that needs it. This is expected for contributor forks and does not fail the build."
+          echo "available=false" >> "$GITHUB_OUTPUT"
+          exit 0
+        }
+
+        # Case 1: a pull_request opened from a fork. GitHub withholds secrets
+        # from such runs even though they execute in the base repo's context
+        # (REPO is canonical, fork=false), so key off the PR's head repo.
+        if [ -n "$HEAD_REPO" ] && [ "$HEAD_REPO" != "$REPO" ]; then
+          skip
+        fi
+
+        # Case 2: the workflow is running on a fork's own actions (push /
+        # schedule / dispatch). Query fork status at runtime rather than reading
+        # github.event.repository.fork, which is absent on schedule events.
+        is_fork=$(gh api "repos/$REPO" --jq '.fork' 2>/dev/null || echo "unknown")
+        if [ "$is_fork" = "true" ]; then
+          skip
+        fi
+
+        # Otherwise this is the canonical repo's own trusted run with a genuinely
+        # missing secret (or a fork we couldn't confirm): fail loudly so a
+        # dropped/renamed secret is noticed instead of silently skipped.
+        echo "::error title=$SECRET_NAME not set::$SECRET_NAME is required on this repository but is not set (fork status: $is_fork)."
+        exit 1
