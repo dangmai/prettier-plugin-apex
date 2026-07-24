@@ -5,7 +5,7 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  prettier: 3.9.5
+  prettier: 3.9.6
 
 importers:
 
@@ -33,14 +33,14 @@ importers:
         specifier: 23.1.0
         version: 23.1.0
       prettier:
-        specifier: 3.9.5
-        version: 3.9.5
+        specifier: 3.9.6
+        version: 3.9.6
       prettier-plugin-java:
         specifier: 2.10.3
-        version: 2.10.3(prettier@3.9.5)
+        version: 2.10.3(prettier@3.9.6)
       prettier-plugin-organize-imports:
         specifier: 4.3.0
-        version: 4.3.0(prettier@3.9.5)(typescript@7.0.2)
+        version: 4.3.0(prettier@3.9.6)(typescript@7.0.2)
       semver:
         specifier: 7.8.5
         version: 7.8.5
@@ -111,8 +111,8 @@ importers:
         specifier: ^30.0.0
         version: 30.4.0
       prettier:
-        specifier: 3.9.5
-        version: 3.9.5
+        specifier: 3.9.6
+        version: 3.9.6
       wait-on:
         specifier: ^9.0.0
         version: 9.0.10(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
@@ -1749,20 +1749,20 @@ packages:
   prettier-plugin-java@2.10.3:
     resolution: {integrity: sha512-/g52mTbsN2ee8JjLRpBWGGmcmRhdv2zRWyj4QbsL9CQ+nKR022GRJhebwEpRyaCc8hLV6aO3JPGNQyXp1DPrCA==}
     peerDependencies:
-      prettier: 3.9.5
+      prettier: 3.9.6
 
   prettier-plugin-organize-imports@4.3.0:
     resolution: {integrity: sha512-FxFz0qFhyBsGdIsb697f/EkvHzi5SZOhWAjxcx2dLt+Q532bAlhswcXGYB1yzjZ69kW8UoadFBw7TyNwlq96Iw==}
     peerDependencies:
-      prettier: 3.9.5
+      prettier: 3.9.6
       typescript: '>=2.9'
       vue-tsc: ^2.1.0 || 3
     peerDependenciesMeta:
       vue-tsc:
         optional: true
 
-  prettier@3.9.5:
-    resolution: {integrity: sha512-/FVl766LpUfB5vXgCYOYa0MeV/441Ia99AeICQIQFTY/Nw0roZwULcXpku5i1/m5kt/baz+s4Zogspd839HSMg==}
+  prettier@3.9.6:
+    resolution: {integrity: sha512-OpN0zzVdiaiAhxpuuj5efpIS4sY9j7bY6uR5mnj5yPzGkdkjNKSJeUThPb60Jw29QuAZgA4o+/iB49kFiaBX6g==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -3527,17 +3527,17 @@ snapshots:
 
   presentable-error@0.0.1: {}
 
-  prettier-plugin-java@2.10.3(prettier@3.9.5):
+  prettier-plugin-java@2.10.3(prettier@3.9.6):
     dependencies:
-      prettier: 3.9.5
+      prettier: 3.9.6
       web-tree-sitter: 0.26.11
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.9.5)(typescript@7.0.2):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.9.6)(typescript@7.0.2):
     dependencies:
-      prettier: 3.9.5
+      prettier: 3.9.6
       typescript: 7.0.2
 
-  prettier@3.9.5: {}
+  prettier@3.9.6: {}
 
   proxy-from-env@2.1.0: {}
 
