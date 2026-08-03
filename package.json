@@ -24,7 +24,7 @@
     "@types/node": "22.19.19",
     "@types/semver": "7.7.1",
     "del-cli": "7.0.0",
-    "nx": "23.1.0",
+    "nx": "23.1.1",
     "prettier": "3.9.6",
     "prettier-plugin-java": "2.10.3",
     "prettier-plugin-organize-imports": "4.3.0",
