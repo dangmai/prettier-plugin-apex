@@ -54,5 +54,5 @@ dependencies {
   implementation(":apex-jorje-lsp")
 
   // https://mvnrepository.com/artifact/io.github.classgraph/classgraph
-  implementation("io.github.classgraph:classgraph:4.8.189")
+  implementation("io.github.classgraph:classgraph:4.8.190")
 }
