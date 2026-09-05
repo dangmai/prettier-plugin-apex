@@ -15,7 +15,7 @@
   },
   "engines": {
     "node": ">= 22",
-    "pnpm": "^11.0.0"
+    "pnpm": "^12.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.11",
@@ -36,5 +36,5 @@
   "keywords": [],
   "author": "Dang Mai <contact@dangmai.net>",
   "license": "MIT",
-  "packageManager": "pnpm@11.25.0"
+  "packageManager": "pnpm@12.3.0"
 }
