@@ -105,8 +105,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  prettier: 3.9.6
+catalogs:
+  default:
+    prettier:
+      specifier: 3.9.6
+      version: 3.9.6
 
 importers:
 
@@ -134,7 +137,7 @@ importers:
         specifier: 23.2.0
         version: 23.2.0
       prettier:
-        specifier: 3.9.6
+        specifier: 'catalog:'
         version: 3.9.6
       prettier-plugin-java:
         specifier: 2.10.3
@@ -211,9 +214,6 @@ importers:
       jest-docblock:
         specifier: ^30.0.0
         version: 30.5.0
-      prettier:
-        specifier: 3.9.6
-        version: 3.9.6
       wait-on:
         specifier: ^9.0.0
         version: 9.1.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
@@ -227,6 +227,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 5.0.0
         version: 5.0.0(vitest@5.0.0)
+      prettier:
+        specifier: 'catalog:'
+        version: 3.9.6
       vite:
         specifier: 8.2.2
         version: 8.2.2(@types/node@22.19.19)(esbuild@0.28.2)(tsx@4.23.13)(yaml@2.9.0)
@@ -1838,12 +1841,12 @@ packages:
   prettier-plugin-java@2.10.3:
     resolution: {integrity: sha512-/g52mTbsN2ee8JjLRpBWGGmcmRhdv2zRWyj4QbsL9CQ+nKR022GRJhebwEpRyaCc8hLV6aO3JPGNQyXp1DPrCA==}
     peerDependencies:
-      prettier: 3.9.6
+      prettier: ^3.0.0
 
   prettier-plugin-organize-imports@4.3.0:
     resolution: {integrity: sha512-FxFz0qFhyBsGdIsb697f/EkvHzi5SZOhWAjxcx2dLt+Q532bAlhswcXGYB1yzjZ69kW8UoadFBw7TyNwlq96Iw==}
     peerDependencies:
-      prettier: 3.9.6
+      prettier: '>=2.0'
       typescript: '>=2.9'
       vue-tsc: ^2.1.0 || 3
     peerDependenciesMeta:
