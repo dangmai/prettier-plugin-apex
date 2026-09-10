@@ -175,7 +175,19 @@ jobs:
   build-native-executables:
     name: Build Native Executables
     needs: changes
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags') || needs.changes.outputs.musl-script == 'true'
+    # Renovate branches build natively too. A dependency or action bump can
+    # break the toolchain in a way nothing else here would catch: the rest of
+    # PR CI is ubuntu-only, so anything Windows- or macOS-specific sails
+    # through green and only surfaces on the nightly, after automerge.
+    # Matching on ref_name catches the push event on the renovate branch,
+    # which is what branch automerge waits for; those checks show up on the
+    # PR too for the bumps that open one.
+    if: >-
+      github.event_name == 'schedule'
+      || github.event_name == 'workflow_dispatch'
+      || startsWith(github.ref, 'refs/tags')
+      || needs.changes.outputs.musl-script == 'true'
+      || startsWith(github.ref_name, 'renovate/')
     strategy:
       matrix:
         os:
@@ -279,7 +291,11 @@ jobs:
           key: ${{ steps.nx-cache-restore.outputs.cache-primary-key }}
       - name: Rename executable
         run: mv parser/build/native/nativeCompile/${{ env.ASSET_NAME }} parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
+      # Renovate branches build to prove the toolchain still works, not to
+      # produce anything. Without this they'd each upload four ~100MB binaries
+      # on every push, and Renovate rebases its branches whenever main moves.
       - name: Upload artifact
+        if: ${{ !startsWith(github.ref_name, 'renovate/') }}
         uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{ env.OUTPUT_NAME }}
