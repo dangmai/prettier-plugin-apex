@@ -49,6 +49,19 @@
       "allowedVersions": "!/^5\\.0\\.3$/"
     },
     {
+      // v6.1.0 switched the pnpm 12 bootstrap from @pnpm/exe to the plain npm
+      // package, whose .ps1 shim invokes an extensionless native binary that
+      // PowerShell silently ignores. Every pnpm step on Windows exited 0
+      // having done nothing, so the Windows jobs went false-green and the
+      // native build only failed later, on its missing executable.
+      // This blocks that one release; a later one carrying the same bug gets
+      // caught by the native build that now runs on Renovate branches.
+      // The v? matters: the github-tags datasource reports tags, so versions
+      // arrive as "v6.1.0", not "6.1.0".
+      "matchPackageNames": ["pnpm/action-setup"],
+      "allowedVersions": "!/^v?6\\.1\\.0$/"
+    },
+    {
       "matchPackageNames": ["@types/node"],
       "enabled": false
     },

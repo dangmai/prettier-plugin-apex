@@ -55,7 +55,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.0.10
 
       - name: Setup Node.js
         uses: actions/setup-node@v7.0.0
@@ -146,10 +146,17 @@ jobs:
           - macos-latest
           - macos-15-intel
     runs-on: ${{ matrix.os }}
+    # Windows runners default to pwsh, where a broken toolchain can exit 0
+    # having done nothing: that's how the pnpm shim regression stayed green
+    # here for two nights. bash resolves pnpm through a shim that works, and
+    # with -e a command that genuinely fails takes the step down with it.
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v7
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.0.10
       - name: Setup Node.js
         uses: actions/setup-node@v7.0.0
         with:
@@ -202,8 +209,11 @@ jobs:
       UPLOAD_ARTIFACTS: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags') }}
       OS: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+    # See the note on package-tests: bash so Windows resolves a working pnpm
+    # and a failing command actually fails the step.
     defaults:
       run:
+        shell: bash
         working-directory: ./packages/apex-ast-serializer
     steps:
       - uses: actions/checkout@v7
@@ -217,7 +227,7 @@ jobs:
           name: NX_KEY
           value: ${{ secrets.NX_KEY }}
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.0.10
       - name: Setup Node.js
         uses: actions/setup-node@v7.0.0
         with:
@@ -258,7 +268,6 @@ jobs:
           NX_KEY: ${{ steps.nx_secret.outputs.available == 'true' && secrets.NX_KEY || '' }}
           NX_NO_CLOUD: ${{ steps.nx_secret.outputs.available == 'true' && 'false' || 'true' }}
       - name: Sanity check native executable
-        shell: bash
         run: |
           ./parser/build/native/nativeCompile/${{ env.ASSET_NAME }} -l ../prettier-plugin-apex/tests/loop/LoopClass.cls > "$RUNNER_TEMP/sanity-check.json"
           node -e "const fs=require('fs'); JSON.parse(fs.readFileSync(process.argv[1],'utf8')); console.log('Sanity check passed');" "$RUNNER_TEMP/sanity-check.json"
@@ -293,7 +302,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6.1.0
+        uses: pnpm/action-setup@v6.0.10
 
       - name: Setup Node.js
         uses: actions/setup-node@v7.0.0
