@@ -4,7 +4,7 @@ buildscript {
   }
   dependencies {
     // https://mvnrepository.com/artifact/org.apache.groovy/groovy-json
-    classpath("org.apache.groovy:groovy-json:5.1.2")
+    classpath("org.apache.groovy:groovy-json:6.0.0")
   }
 }
 plugins {
