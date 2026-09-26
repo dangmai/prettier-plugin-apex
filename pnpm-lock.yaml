@@ -165,8 +165,8 @@ settings:
 catalogs:
   default:
     prettier:
-      specifier: 3.9.8
-      version: 3.9.8
+      specifier: 3.9.9
+      version: 3.9.9
 
 importers:
 
@@ -195,13 +195,13 @@ importers:
         version: 23.2.1
       prettier:
         specifier: 'catalog:'
-        version: 3.9.8
+        version: 3.9.9
       prettier-plugin-java:
         specifier: 2.10.4
-        version: 2.10.4(prettier@3.9.8)
+        version: 2.10.4(prettier@3.9.9)
       prettier-plugin-organize-imports:
         specifier: 4.3.0
-        version: 4.3.0(prettier@3.9.8)(typescript@7.0.2)
+        version: 4.3.0(prettier@3.9.9)(typescript@7.0.2)
       semver:
         specifier: 7.8.5
         version: 7.8.5
@@ -286,7 +286,7 @@ importers:
         version: 5.0.1(vitest@5.0.1)
       prettier:
         specifier: 'catalog:'
-        version: 3.9.8
+        version: 3.9.9
       vite:
         specifier: 8.3.0
         version: 8.3.0(@types/node@22.19.19)(esbuild@0.28.2)(tsx@4.23.15)(yaml@2.9.0)
@@ -1906,8 +1906,8 @@ packages:
       vue-tsc:
         optional: true
 
-  prettier@3.9.8:
-    resolution: {integrity: sha512-WRFq3Wn3WId7LLROfMLdH7xaFr2jR62wU8nLO6rQUOLOxNZUviyJQs1M0iIhLexSFy+L+w0ch66wtoO2jRjG0A==}
+  prettier@3.9.9:
+    resolution: {integrity: sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -3646,17 +3646,17 @@ snapshots:
 
   presentable-error@0.0.1: {}
 
-  prettier-plugin-java@2.10.4(prettier@3.9.8):
+  prettier-plugin-java@2.10.4(prettier@3.9.9):
     dependencies:
-      prettier: 3.9.8
+      prettier: 3.9.9
       web-tree-sitter: 0.27.0
 
-  prettier-plugin-organize-imports@4.3.0(prettier@3.9.8)(typescript@7.0.2):
+  prettier-plugin-organize-imports@4.3.0(prettier@3.9.9)(typescript@7.0.2):
     dependencies:
-      prettier: 3.9.8
+      prettier: 3.9.9
       typescript: 7.0.2
 
-  prettier@3.9.8: {}
+  prettier@3.9.9: {}
 
   proxy-from-env@2.1.0: {}
 
