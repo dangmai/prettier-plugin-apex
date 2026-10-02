@@ -273,7 +273,7 @@ importers:
         version: 30.5.0
       wait-on:
         specifier: ^9.0.0
-        version: 9.4.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+        version: 9.5.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
     devDependencies:
       '@inquirer/prompts':
         specifier: ^8.5.2
@@ -2189,8 +2189,8 @@ packages:
       jsdom:
         optional: true
 
-  wait-on@9.4.0:
-    resolution: {integrity: sha512-70vjt46idCEqR3THCRFOVTcEeAhzHTMwDvhZyixUYAGmLbQ05acRTbs9E/Jk1hrL3oiAn09C+uNTopbzgMt3ng==}
+  wait-on@9.5.1:
+    resolution: {integrity: sha512-bOtj1wRY6u+GPnNskZLcgZNHOaL5NC4+5hRCbEpVoVX6MbMrCLCqIBM2bjsAfrgst3ZC0siIo7vLb4LuYFfIow==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -3877,7 +3877,7 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  wait-on@9.4.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
+  wait-on@9.5.1(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0):
     dependencies:
       axios: 1.20.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
       joi: 18.2.9
