@@ -388,6 +388,40 @@ class SOQLClass {
       UPDATE VIEWSTAT
       ALL ROWS
     ];
+    Account[] setOptions = [SELECT Id FROM Account SET OPTIONS :queryOptions];
+    Account[] setOptionsWithOtherClauses = [
+      SELECT Id
+      FROM Account
+      WHERE Name = 'Acme'
+      LIMIT 10
+      SET OPTIONS :optionsByName.get('key')
+      FOR UPDATE
+    ];
+    Account[] setOptionsDataspace = [
+      SELECT Id
+      FROM Account
+      SET OPTIONS :Database.QueryOptions.builder()
+        .withDataspace('default')
+        .build()
+    ];
+    Account[] setOptionsHonorEmptyStrings = [
+      SELECT Id
+      FROM Account
+      SET OPTIONS :Database.QueryOptions.builder()
+        .withHonorEmptyStrings(true)
+        .build()
+    ];
+    Account[] setOptionsAllParams = [
+      SELECT Id
+      FROM Account
+      WHERE Name = ''
+      LIMIT 1
+      SET OPTIONS :Database.QueryOptions.builder()
+        .withDataspace('default')
+        .withHonorEmptyStrings(true)
+        .withExplicitNamespace(true)
+        .build()
+    ];
 
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
     Contact[] usingListView = [

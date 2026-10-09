@@ -314,6 +314,7 @@ export const APEX_TYPES = {
     "apex.jorje.data.soql.UpdateStatsOption$UpdateTracking" as const,
   UPDATE_STATS_OPTION_VIEW_STAT:
     "apex.jorje.data.soql.UpdateStatsOption$UpdateViewStat" as const,
+  SET_OPTIONS_CLAUSE: "apex.jorje.data.soql.SetOptionsClause" as const,
   WITH_VALUE: "apex.jorje.data.soql.WithClause$WithValue" as const,
   WITH_DATA_CATEGORIES:
     "apex.jorje.data.soql.WithClause$WithDataCategories" as const,
