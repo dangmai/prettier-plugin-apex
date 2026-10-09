@@ -1,5 +1,9 @@
 # Unreleased
 
+## Formatting Changes
+
+- Support the SOQL `SET OPTIONS :queryOptions` clause ([docs](https://developer.salesforce.com/docs/atlas.en-us.264.0.soql_sosl.meta/soql_sosl/sforce_api_calls_soql_select_set_options.htm)).
+
 # 2.3.0
 
 ## Formatting Changes

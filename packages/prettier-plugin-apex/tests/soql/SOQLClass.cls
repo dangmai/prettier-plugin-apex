@@ -219,6 +219,10 @@ class SOQLClass {
       UPDATE VIEWSTAT
       ALL ROWS
     ];
+    Account[] setOptions = [SELECT Id FROM Account SET OPTIONS :queryOptions];
+    Account[] setOptionsWithOtherClauses = [
+      SELECT Id FROM Account WHERE Name = 'Acme' LIMIT 10 set options :optionsByName.get('key') FOR UPDATE
+    ];
 
     Contact[] usingScope = [SELECT Id FROM Contact USING SCOPE Mine];
     Contact[] usingListView = [SELECT Id FROM Contact USING listView(id=listViewId)];

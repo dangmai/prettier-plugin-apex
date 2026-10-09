@@ -2525,6 +2525,7 @@ function handleQuery(
   pushIfExist(parts, path.call(print, "bind", "value"));
   pushIfExist(parts, path.call(print, "tracking", "value"));
   pushIfExist(parts, path.call(print, "updateStats", "value"));
+  pushIfExist(parts, path.call(print, "setOptions", "value"));
   pushIfExist(parts, path.call(print, "options", "value"));
   return join(node.forcedHardline ? hardline : line, parts);
 }
@@ -3789,6 +3790,13 @@ const singleNodeHandlers = {
   ],
   [APEX_TYPES.QUERY_USING_CLAUSE]: handleQueryUsingClause,
   [APEX_TYPES.UPDATE_STATS_CLAUSE]: handleUpdateStatsClause,
+  [APEX_TYPES.SET_OPTIONS_CLAUSE]: (path: AstPath, print: PrintFn) => [
+    "SET",
+    " ",
+    path.call(print, "identifier"),
+    " ",
+    path.call(print, "expr"),
+  ],
   [APEX_TYPES.WHERE_CALC_EXPRESSION]: handleWhereCalcExpression,
   [APEX_TYPES.WHERE_CALC_OPERATOR_PLUS]: () => "+",
   [APEX_TYPES.WHERE_CALC_OPERATOR_MINUS]: () => "-",
