@@ -3282,6 +3282,27 @@ function handleUpdateStatsClause(
   return groupIndentConcat(parts);
 }
 
+function handleSetOptionsClause(
+  path: AstPath<Enriched<jorje.SetOptionsClause>>,
+  print: PrintFn,
+): Doc {
+  // jorje models the OPTIONS keyword as an identifier, so it keeps its source
+  // casing. Uppercase it like other SOQL keywords, unless comments attached to
+  // it turned the doc into something other than a plain string.
+  const identifierDoc: Doc = path.call(print, "identifier");
+  const parts: Doc[] = [];
+  parts.push("SET");
+  parts.push(" ");
+  parts.push(
+    typeof identifierDoc === "string"
+      ? identifierDoc.toUpperCase()
+      : identifierDoc,
+  );
+  parts.push(" ");
+  parts.push(path.call(print, "expr"));
+  return parts;
+}
+
 function handleUpdateStatsOption(childClass: string): Doc {
   let doc: Doc;
   const cls = childClass as jorje.UpdateStatsOption["@class"];
@@ -3790,13 +3811,7 @@ const singleNodeHandlers = {
   ],
   [APEX_TYPES.QUERY_USING_CLAUSE]: handleQueryUsingClause,
   [APEX_TYPES.UPDATE_STATS_CLAUSE]: handleUpdateStatsClause,
-  [APEX_TYPES.SET_OPTIONS_CLAUSE]: (path: AstPath, print: PrintFn) => [
-    "SET",
-    " ",
-    path.call(print, "identifier"),
-    " ",
-    path.call(print, "expr"),
-  ],
+  [APEX_TYPES.SET_OPTIONS_CLAUSE]: handleSetOptionsClause,
   [APEX_TYPES.WHERE_CALC_EXPRESSION]: handleWhereCalcExpression,
   [APEX_TYPES.WHERE_CALC_OPERATOR_PLUS]: () => "+",
   [APEX_TYPES.WHERE_CALC_OPERATOR_MINUS]: () => "-",

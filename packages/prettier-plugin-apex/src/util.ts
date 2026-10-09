@@ -155,6 +155,10 @@ export function massageAstNode(
     // to be uppercase for consistency so the ASTs may be different between
     // the original and parsed strings.
     newObj["scope"] = ast.scope.toUpperCase();
+  } else if (ast["@class"] === APEX_TYPES.SET_OPTIONS_CLAUSE) {
+    // Same as above: the OPTIONS keyword is an identifier we uppercase.
+    const clone = newObj as unknown as jorje.SetOptionsClause;
+    clone.identifier.value = clone.identifier.value.toUpperCase();
   } else if (
     "dottedExpr" in ast &&
     "names" in ast &&
