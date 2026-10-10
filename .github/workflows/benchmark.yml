@@ -255,7 +255,7 @@ jobs:
       # (workflow_run) can post the comment with a write token — which this
       # fork-code-running workflow doesn't have.
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: benchmark-results
           path: |

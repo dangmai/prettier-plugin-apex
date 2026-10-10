@@ -296,7 +296,7 @@ jobs:
       # on every push, and Renovate rebases its branches whenever main moves.
       - name: Upload artifact
         if: ${{ !startsWith(github.ref_name, 'renovate/') }}
-        uses: actions/upload-artifact@v7.0.1
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: ${{ env.OUTPUT_NAME }}
           path: packages/apex-ast-serializer/parser/build/native/nativeCompile/${{ env.OUTPUT_NAME }}
