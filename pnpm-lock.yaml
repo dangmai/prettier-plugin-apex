@@ -188,8 +188,8 @@ importers:
         specifier: 7.8.0
         version: 7.8.0
       del-cli:
-        specifier: 8.0.0
-        version: 8.0.0
+        specifier: 8.0.1
+        version: 8.0.1
       nx:
         specifier: 23.2.1
         version: 23.2.1
@@ -1373,8 +1373,8 @@ packages:
     resolution: {integrity: sha512-N+MeXYoqr3pOgn8xfyRPREN7gHakLYjhsHhWGT3fWAiL4IkAt0iDw14QiiEm2bE30c5XX5q0FtAA3CK5f9/BUg==}
     engines: {node: '>=12'}
 
-  del-cli@8.0.0:
-    resolution: {integrity: sha512-H5Ad74ydhJDLp1HHQbbcWP4qq+aHOeVoE9IIqsTJdSDSeF17HxvfY8UCLpfjBBk9OR8J5olkJO3T8fOBXKeCMg==}
+  del-cli@8.0.1:
+    resolution: {integrity: sha512-Z4+xLjVJs9dMN4gDMRfY/7b7WItNOB5EOKu9BenbJD63olx9YM5SU/DEuDFWvN0B1BdGIzejCJFgPt2vIGwj1A==}
     engines: {node: '>=22'}
     hasBin: true
 
@@ -3052,7 +3052,7 @@ snapshots:
 
   define-lazy-prop@3.0.0: {}
 
-  del-cli@8.0.0:
+  del-cli@8.0.1:
     dependencies:
       del: 9.0.1
       meow: 14.1.0
