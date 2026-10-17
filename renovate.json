@@ -62,6 +62,12 @@
       "allowedVersions": "!/^v?6\\.1\\.0$/"
     },
     {
+      // ClassGraph 6 requires JDK 25. 5.x has the same API and runs on JDK 17+,
+      // so stay on it until we raise the project's Java version.
+      "matchPackageNames": ["io.github.classgraph:classgraph"],
+      "allowedVersions": "<6"
+    },
+    {
       "matchPackageNames": ["@types/node"],
       "enabled": false
     },
