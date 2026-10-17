@@ -83,6 +83,8 @@ public final class JorjeDiscovery {
     List<ClassInfo> discovered = new ArrayList<>();
     try (
       ScanResult scanResult = new ClassGraph()
+        // ClassGraph 5+ scans nothing unless a source is enabled; jorje is on the classpath.
+        .enableClasspath()
         .enableClassInfo()
         // jorje serializes package-private types too (e.g. apex.jorje.data.IndexLocation),
         // and typescript-generator includes them — match that, or the dispatcher would
