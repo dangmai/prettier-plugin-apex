@@ -160,7 +160,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: "24"
+          node-version: "26"
           cache: pnpm
       - uses: actions/setup-java@v6.1.0
         with:
@@ -243,7 +243,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7.1.0
         with:
-          node-version: 24
+          node-version: 26
           cache: pnpm
       - name: Set up JDK
         uses: graalvm/setup-graalvm@v1.6.8
@@ -324,7 +324,7 @@ jobs:
         uses: actions/setup-node@v7.1.0
         with:
           # Need at least Node 24 for OIDC Trusted Publishing support
-          node-version: 24
+          node-version: 26
           cache: pnpm
           registry-url: https://registry.npmjs.org
 
