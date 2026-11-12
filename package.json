@@ -10,7 +10,7 @@
     "install:native:ci": "tsx scripts/install-ci-executables.zx.mts",
     "clean": "del-cli node_modules",
     "all:clean": "pnpm run -r clean && pnpm run clean",
-    "release": "npm version --force",
+    "release": "npm version --force --allow-same-version",
     "version": "tsx scripts/release.zx.mts"
   },
   "engines": {

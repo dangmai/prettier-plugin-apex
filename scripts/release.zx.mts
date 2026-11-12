@@ -17,20 +17,26 @@ const { version } = JSON.parse(
 );
 
 // Prereleases keep the `# Unreleased` heading, it only gets renamed once the
-// stable version ships.
+// stable version ships. If the top heading is already this version, we're
+// re-releasing it (e.g. after a failed publish), so there's nothing to rename.
 const changelogPath = path.join(rootDir, "CHANGELOG.md");
 const unreleasedHeading = "# Unreleased\n";
 if (!semver.prerelease(version)) {
   const changelog = fs.readFileSync(changelogPath, "utf8");
-  if (!changelog.startsWith(unreleasedHeading)) {
+  if (changelog.startsWith(`# ${version}\n`)) {
+    echo(
+      `::warning::CHANGELOG.md already starts with "# ${version}", leaving it as is`,
+    );
+  } else if (changelog.startsWith(unreleasedHeading)) {
+    fs.writeFileSync(
+      changelogPath,
+      `# ${version}\n${changelog.slice(unreleasedHeading.length)}`,
+    );
+  } else {
     throw new Error(
-      `CHANGELOG.md must start with "${unreleasedHeading.trim()}" to release ${version}`,
+      `CHANGELOG.md must start with "${unreleasedHeading.trim()}" or "# ${version}" to release ${version}`,
     );
   }
-  fs.writeFileSync(
-    changelogPath,
-    `# ${version}\n${changelog.slice(unreleasedHeading.length)}`,
-  );
 }
 
 const packages = await glob(
