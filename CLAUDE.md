@@ -20,7 +20,7 @@ packages/
 
 ## Universal workflow rules
 
-- **Before pushing**: run `pnpm nx run prettier-plugin-apex:lint` and the unit tests (`pnpm nx run prettier-plugin-apex:test:parser --configuration built-in`). Both must pass.
+- **Before pushing**: run `pnpm nx run prettier-plugin-apex:lint` and the unit tests (`pnpm nx run prettier-plugin-apex:test:parser --configuration built-in`). Both must pass. The tests need the parser server: `start-server` runs in the foreground and never exits, so start it in the background, run `pnpm --filter prettier-plugin-apex run wait-server`, then the tests, then `stop-server`.
 - **Before merging a non-trivial PR**: the integration suite runs only on manual dispatch (`gh workflow run tests-deployments.yml --ref <branch>`), not regular PR CI — dispatch it and confirm green first.
 - **Changelog entry required for any change that affects formatted output.** Add a bullet under `# Unreleased` in `CHANGELOG.md`. Bug fixes, layout changes, comment-handling changes, and new grammar support all qualify. Pure test additions, build/CI tweaks, internal refactors, and dependency bumps don't — though a notable internal-only improvement (e.g. a type-safety pass) still warrants a one-line `## Internal Changes` bullet.
 - **For changes that could affect performance** (printer, parser/prep walk, comment attachment, or the Java serializer), add the `benchmark` label to the PR and read the bot's comparison comment to confirm the real measured impact — don't reason about perf only in the abstract. See `performance-harness.md`.
