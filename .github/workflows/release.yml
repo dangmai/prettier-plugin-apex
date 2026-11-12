@@ -1,0 +1,64 @@
+name: Release
+
+# Cuts a release from `main`: runs `pnpm release <version>`, which bumps every
+# published package, finalizes CHANGELOG.md for stable versions, commits and
+# tags. Pushing that tag triggers tests-deployments.yml, which publishes to npm.
+#
+# The push uses PERSONAL_TOKEN instead of GITHUB_TOKEN for two reasons:
+#   - main requires status checks, and only an admin can push past them.
+#   - Tags pushed with GITHUB_TOKEN don't trigger other workflows, so the
+#     deployment would never start.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: >-
+          Version to release, e.g. 2.4.0 or 2.4.0-beta.1. Stable versions require
+          CHANGELOG.md to start with "# Unreleased".
+        required: true
+        type: string
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          token: ${{ secrets.PERSONAL_TOKEN }}
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6.1.1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Configure git identity
+        run: |
+          git config user.name "${GITHUB_ACTOR}"
+          git config user.email "${GITHUB_ACTOR_ID}+${GITHUB_ACTOR}@users.noreply.github.com"
+
+      - name: Bump version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: pnpm release "${VERSION}"
+
+      - name: Push commit and tag
+        run: |
+          tag="v$(node -p 'require("./package.json").version')"
+          git push --atomic origin HEAD:main "refs/tags/${tag}"
