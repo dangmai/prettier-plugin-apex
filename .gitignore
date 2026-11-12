@@ -20,4 +20,6 @@ packages/prettier-plugin-apex/tests_perf/results
 .nx
 .pnpm-store
 .DS_Store
+mise.local.toml
+mise.local.lock
 *.log

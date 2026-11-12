@@ -1,0 +1,8 @@
+[tools]
+node = "22.23.3"
+java = "oracle-graalvm-23.0.1"
+
+[settings]
+lockfile = true
+locked = true
+lockfile_platforms = ["linux-x64", "linux-arm64", "macos-x64", "macos-arm64", "windows-x64"]

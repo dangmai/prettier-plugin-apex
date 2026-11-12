@@ -82,6 +82,13 @@
       "enabled": false
     },
     {
+      // Keep local GraalVM on the same major as CI
+      "matchManagers": ["mise"],
+      "matchDepNames": ["java"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
       "groupName": "typescript-generator",
       "additionalBranchPrefix": "",
       "matchPackageNames": ["/typescript-generator/"]
