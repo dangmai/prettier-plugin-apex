@@ -33,7 +33,7 @@ jobs:
         run: ./packages/apex-ast-serializer/tools/create-jorje-jar.sh
       - name: Create Pull Request
         if: steps.pr_secret.outputs.available == 'true'
-        uses: peter-evans/create-pull-request@v8.1.1
+        uses: peter-evans/create-pull-request@v8.1.2
         with:
           commit-message: Updated jorje
           title: "Update jorje dependency"
