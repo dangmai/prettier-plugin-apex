@@ -55,10 +55,10 @@
   "devDependencies": {
     "@inquirer/prompts": "^8.5.2",
     "@types/wait-on": "5.3.4",
-    "@vitest/coverage-v8": "5.1.1",
+    "@vitest/coverage-v8": "5.1.2",
     "prettier": "catalog:",
     "vite": "8.3.8",
-    "vitest": "5.1.1"
+    "vitest": "5.1.2"
   },
   "peerDependencies": {
     "prettier": "^3.0.0"
